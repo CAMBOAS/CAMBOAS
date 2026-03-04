@@ -229,8 +229,8 @@ function buildReceiptHTML() {
     <tr>
       <td style="padding-right:6px;">${escapeHtml(it.product)}</td>
       <td class="t-center">${it.qty}</td>
-      <td class="t-right">${Number(it.price || 0).toFixed(0)}</td>
-      <td class="t-right">${Number(it.subtotal || 0).toFixed(0)}</td>
+      <td class="t-right">${Number(it.price || 0).toFixed(2)}</td>
+      <td class="t-right">${Number(it.subtotal || 0).toFixed(2)}</td>
     </tr>
   `).join("");
 
@@ -250,7 +250,7 @@ function buildReceiptHTML() {
       <div>📍 ទីតាំង: ${escapeHtml(province)} <strong>:</strong>  ​${escapeHtml(detailAddress)}</div>
       <div>📝 Note: ${escapeHtml(noteEl.value || "-")}</div>
       <div>📈 Page: <strong>${escapeHtml(pageEl.value || "-")}</strong> <strong>|</strong> CloseBy: ${escapeHtml(closeByEl.value || "-")}</div>
-      <div>🚚 Delivery: ${escapeHtml(deliveryNameEl.value || "-")} <strong>|</strong> Fee: $${deliveryFee.toFixed(0)}</div>
+      <div>🚚 Delivery: ${escapeHtml(deliveryNameEl.value || "-")} <strong>|</strong> Fee: $${deliveryFee.toFixed(2)}</div>
 
 
       <div class="print-hr"></div>
@@ -272,14 +272,14 @@ function buildReceiptHTML() {
 
       <div class="print-row">
         <div>Items Total</div>
-        <div>$${itemsTotal.toFixed(0)}</div>
+        <div>$${itemsTotal.toFixed(2)}</div>
       </div>
       <div class="print-row">
         <div>Delivery Fee</div>
-        <div>$${deliveryFee.toFixed(0)}</div>
+        <div>$${deliveryFee.toFixed(2)}</div>
       </div>
 
-      <div class="print-total">$${grand.toFixed(0)}</div>
+      <div class="print-total">$${grand.toFixed(2)}</div>
 
       <div class="print-hr"></div>
       <div class="print-muted">លេខបម្រើអតិថិជន 015 58 68 78 / 089 58 68 78</div>
