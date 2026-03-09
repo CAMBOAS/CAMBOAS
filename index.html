@@ -269,18 +269,17 @@
   </div>
 
   <div id="printArea" style="display:none;"></div>
-  <script src="app.js"></script>
-  <!-- Mac Style Alert -->
-<div id="macAlert" class="mac-alert">
 
-  /// You can use different icons and styles by changing the content and CSS of .mac-alert-icon and .mac-alert-text
-  <div class="mac-alert-box">
-    <div class="mac-alert-icon" id="macAlertIcon">✔</div>
-    <div class="mac-alert-text" id="macAlertText">Saved successfully</div>
+  <div id="macAlert" class="mac-alert hidden">
+    <div class="mac-alert-overlay" onclick="closeMacAlert()"></div>
+    <div class="mac-alert-card" role="dialog" aria-modal="true" aria-labelledby="macAlertTitle">
+      <div id="macAlertIcon" class="mac-alert-icon">✔</div>
+      <h3 id="macAlertTitle" class="mac-alert-title">ការជូនដំណឹង</h3>
+      <p id="macAlertText" class="mac-alert-text">Saved successfully</p>
+      <button class="mac-alert-btn" onclick="closeMacAlert()">យល់ព្រម</button>
+    </div>
   </div>
-</div>
 
-
-
+  <script src="app.js"></script>
 </body>
 </html>
