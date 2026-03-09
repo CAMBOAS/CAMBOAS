@@ -28,7 +28,20 @@ const paymentEl = el("payment");
 const btnAdd = el("btnAdd");
 const btnClearRow = el("btnClearRow");
 const btnPrint = el("btnPrint");
-const btnCopy = el("btnCopy");
+
+/* const btnCopy = el("btnCopy");
+ */
+btnCopy.addEventListener("click", async () => {
+  const summary = buildSummaryText();
+
+  try {
+    await navigator.clipboard.writeText(summary);
+    alert("Copied!");
+  } catch (err) {
+    console.error(err);
+    alert("Copy failed. Your browser blocked clipboard.");
+  }
+});
 const btnSave = el("btnSave");
 
 const WEB_APP_URL =
@@ -318,43 +331,40 @@ function buildReceiptHTML() {
 
       <div class="print-hr"></div>
 
-      <div>👤 ឈ្មោះ: <strong>${escapeHtml(customerEl.value || "-")}</strong></div>
-      <div>📞 លេខទូរសព្ទ: <strong>${escapeHtml(phoneEl.value || "-")}</strong></div>
-      <div>💳 ការទូទាត់: <strong>${escapeHtml(paymentEl.value || "-")}</strong></div>
-      <div>📍 ទីតាំង: ${escapeHtml(province)} <strong>:</strong> ${escapeHtml(detailAddress)}</div>
-      <div>📝 Note: ${escapeHtml(noteEl.value || "-")}</div>
-      <div>📈 Page: <strong>${escapeHtml(pageEl.value || "-")}</strong> <strong>|</strong> CloseBy: ${escapeHtml(closeByEl.value || "-")}</div>
-      <div>🚚 Delivery: ${escapeHtml(deliveryNameEl.value || "-")} <strong>|</strong> Fee: $${deliveryFee.toFixed(2)}</div>
+      <div>ឈ្មោះ: <strong>${escapeHtml(customerEl.value || "-")}</strong></div>
+      <div>លេខទូរសព្ទ: <strong>${escapeHtml(phoneEl.value || "-")}</strong></div>
+      <div>ទីតាំង: ${escapeHtml(province)} <strong>:</strong> ${escapeHtml(detailAddress)}</div>
+      <div>Note: ${escapeHtml(noteEl.value || "-")}</div>
+      <div>Page: <strong>${escapeHtml(pageEl.value || "-")}</strong> | CloseBy: ${escapeHtml(closeByEl.value || "-")}</div>
 
       <div class="print-hr"></div>
 
       <table class="print-table">
         <thead>
           <tr>
-            <th style="text-align:left;">Product</th>
-            <th class="t-center">Q</th>
-            <th class="t-right">Price</th>
-            <th class="t-right">Sub</th>
+            <th style="text-align:left;">ផលិតផល</th>
+            <th class="t-center">ចំនួន</th>
+           <th class="t-right">តម្លៃ</th>
+            <th class="t-right">សរុប</th>
           </tr>
         </thead>
         <tbody>
           ${rows || `<tr><td colspan="4">No items</td></tr>`}
         </tbody>
       </table>
-
       <div class="print-hr"></div>
-
       <div class="print-row">
-        <div>Items Total</div>
+        <div>តម្លៃសរុប</div>
         <div>$${itemsTotal.toFixed(2)}</div>
       </div>
       <div class="print-row">
-        <div>Delivery Fee</div>
+        <div>សេវាដឹក</div>
         <div>$${deliveryFee.toFixed(2)}</div>
       </div>
-
-      <div class="print-total">$${grand.toFixed(2)}</div>
-
+      <div class="print-row">
+         <div>ការទូទាត់: <strong>${escapeHtml(paymentEl.value || "-")}</strong></div>
+         <strong><div>$${grand.toFixed(2)}</div></strong>
+      </div>
       <div class="print-hr"></div>
       <div class="print-muted">លេខបម្រើអតិថិជន 015 58 68 78 / 089 58 68 78</div>
       <div class="print-hr"></div>
@@ -390,44 +400,55 @@ function buildSummaryText() {
   const detailAddress = el("addressDetail")?.value || "-";
   const dateText = dateEl.value ? formatDateKH(dateEl.value) : "-";
 
+  const customer = customerEl.value || "-";
+  const phone = phoneEl.value || "-";
+  const page = pageEl.value || "-";
+  const closeBy = closeByEl.value || "-";
+  const payment = paymentEl.value || "-";
+  const note = noteEl.value || "-";
+
   const header = [
-    `វិក័យប័ត្រ • ${dateText}`,
-    `👤 ឈ្មោះ: ${customerEl.value || "-"}`,
-    `📞 លេខទូរសព្ទ: ${phoneEl.value || "-"}`,
-    `💳 ការទូទាត់: ${paymentEl.value || "-"}`,
-    `📍 ទីតាំង: ${province} | ${detailAddress}`,
-    `📈 Page: ${pageEl.value || "-"} | CloseBy: ${closeByEl.value || "-"}`,
-    `🚚 Delivery: ${deliveryNameEl.value || "-"} | Fee: ${money(deliveryFee)}`,
-    noteEl.value ? `📝 Note: ${noteEl.value}` : `📝 Note: -`,
-    `--------------------------------`
+    `វិក័យប័ត្រ | ${dateText}`,
+    `ឈ្មោះ: ${customer}`,
+    `លេខទូរសព្ទ: ${phone}`,
+    `ទីតាំង: ${province} | ${detailAddress}`,
+    `Page: ${page} | CloseBy: ${closeBy}`,
+    `Note: ${note}`,
+    `-------------------------------------------`,
+    `បញ្ជីផលិតផល`,
+    `-------------------------------------------`
   ].join("\n");
-
-  const lines = items
-    .map((it, i) => `${i + 1}) ${it.product || "-"}\n   Q:${it.qty ?? 0}  Price:${money(it.price)}  Sub:${money(it.subtotal)}`)
-    .join("\n");
-
+  const lines = items.length
+    ? items.map((it, i) => {
+        const product = it.product || "-";
+        const qty = it.qty ?? 0;
+        const price = money(it.price);
+        const subtotal = money(it.subtotal);
+        return [
+          `${i + 1}. ${product}`,
+          `   ចំនួន   : ${qty}`,
+          `   តម្លៃ    : ${price}`,
+          `   សរុប    : ${subtotal}`
+        ].join("\n");
+      }).join("\n")
+    : `មិនទាន់មានផលិតផល`;
   const footer = [
-    `--------------------------------`,
-    `Items Total: ${money(itemsTotal)}`,
-    `Delivery Fee: ${money(deliveryFee)}`,
-    `GRAND TOTAL: ${money(grand)}`
+    `===========================================`,
+    `តម្លៃសរុប   : ${money(itemsTotal)}`,
+    `សេវាដឹក    : ${money(deliveryFee)}`,
+    `ការទូទាត់   : ${payment}`,
+    `សរុបត្រូវបង់ : ${money(grand)}`,
+    `-------------------------------------------`,
+    `លេខបម្រើអតិថិជន 015 58 68 78 / 089 58 68 78`,
+    `-------------------------------------------`
+
+    
+    
+    
   ].join("\n");
 
   return `${header}\n${lines}\n${footer}`;
 }
-
-btnCopy.addEventListener("click", async () => {
-  const summary = buildSummaryText();
-
-  try {
-    await navigator.clipboard.writeText(summary);
-    alert("Copied!");
-  } catch (err) {
-    console.error(err);
-    alert("Copy failed. Your browser blocked clipboard.");
-  }
-});
-
 // ===== Save to Google Sheet =====
 function collectPayloadForSheet() {
   const deliveryFee = Math.max(0, Number(deliveryFeeEl.value || 0));
