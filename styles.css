@@ -1,6 +1,5 @@
 /* ===================================================
-   ROOT VARIABLES (THEME COLORS)
-   👉 ប្ដូរពណ៌ UI ទាំងមូល កែតែផ្នែកនេះ
+   ROOT VARIABLES
 =================================================== */
 :root{
   --bg1:#070A12;
@@ -16,40 +15,68 @@
   --shadow: 0 16px 50px rgba(0,0,0,.55);
 }
 
+body.light-mode{
+  --bg1:#f6f8ff;
+  --bg2:#e9eefc;
+  --card: rgba(255,255,255,.78);
+  --stroke: rgba(15,23,42,.10);
+  --stroke2: rgba(15,23,42,.08);
+  --text:#111827;
+  --muted: rgba(17,24,39,.65);
+  --accent:#5b5ce6;
+  --good:#16a34a;
+  --danger:#ef4444;
+  --shadow: 0 16px 40px rgba(15,23,42,.10);
+}
+
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
 
-/* ===================================================
-   BODY BACKGROUND
-=================================================== */
 body{
   margin:0;
   font-family:"Kantumruy Pro", system-ui, Arial, sans-serif;
   color:var(--text);
-  background: radial-gradient(900px 700px at 15% 10%, #111c3a 0%, transparent 60%),
-              radial-gradient(900px 700px at 80% 60%, #2c1e4a 0%, transparent 55%),
-              linear-gradient(180deg,var(--bg1),var(--bg2));
+  background:
+    radial-gradient(900px 700px at 15% 10%, #111c3a 0%, transparent 60%),
+    radial-gradient(900px 700px at 80% 60%, #2c1e4a 0%, transparent 55%),
+    linear-gradient(180deg,var(--bg1),var(--bg2));
 }
 
-/* ===================================================
-   MAIN LAYOUT STRUCTURE
-=================================================== */
+body.light-mode{
+  background:
+    radial-gradient(900px 700px at 15% 10%, #dbe7ff 0%, transparent 60%),
+    radial-gradient(900px 700px at 80% 60%, #efe4ff 0%, transparent 55%),
+    linear-gradient(180deg,var(--bg1),var(--bg2));
+}
+
+.hidden{ display:none !important; }
+
+.theme-toggle{
+  min-width:52px;
+  padding:10px 14px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+}
 
 .app{
   display:flex;
   min-height:100vh;
-  justify-content: center;  /* ✅ center content horizontally */
+  justify-content:center;
 }
 
-/* ===================================================
-   SIDEBAR
-=================================================== */
 .sidebar{
   width:270px;
   padding:22px 18px;
   border-right:1px solid var(--stroke2);
   background: rgba(0,0,0,.25);
   backdrop-filter: blur(10px);
+}
+
+body.light-mode .sidebar{
+  background: rgba(255,255,255,.55);
+  backdrop-filter: blur(14px);
 }
 
 .brand{
@@ -61,7 +88,8 @@ body{
 }
 
 .logo{
-  width:44px; height:44px;
+  width:44px;
+  height:44px;
   border-radius:12px;
   background: linear-gradient(145deg, rgba(255,255,255,.20), rgba(255,255,255,.02));
   border:1px solid var(--stroke);
@@ -71,22 +99,39 @@ body{
 .brand-title{ font-weight:700; letter-spacing:.6px; }
 .brand-sub{ font-size:12px; color:var(--muted); margin-top:2px; }
 
-.nav{ margin-top:18px; display:flex; flex-direction:column; gap:10px; }
+.nav{
+  margin-top:18px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
 
 .nav-btn{
   text-align:left;
   padding:12px 14px;
   border-radius:14px;
   border:1px solid var(--stroke2);
-  background: transparent;
+  background:transparent;
   color:var(--text);
   cursor:pointer;
   transition:.25s;
+  text-decoration:none;
 }
-.nav-btn:hover{ border-color: var(--stroke); background: rgba(255,255,255,.03); }
+
+.nav-btn:hover{
+  border-color: var(--stroke);
+  background: rgba(255,255,255,.03);
+}
+
 .nav-btn.active{
   background: rgba(108,99,255,.18);
   border-color: rgba(108,99,255,.35);
+}
+
+body.light-mode .nav-btn.active,
+body.light-mode .seg-btn.active{
+  background: rgba(108,99,255,.12);
+  border-color: rgba(108,99,255,.28);
 }
 
 .sidebar-foot{
@@ -97,28 +142,32 @@ body{
   border-top:1px solid var(--stroke2);
 }
 
-/* Main */
-/* ===================================================
-   MAIN CONTENT AREA
-=================================================== */
 .main{
   flex:1;
-  padding:24px 24px 40px;
-  max-width: 1100px;
-  margin: 0 auto;          /* ✅ THIS makes it centered */
-}
-
-.main{
   width:100%;
+  max-width:1100px;
+  margin:0 auto;
+  padding:24px 24px 40px;
 }
 
 .topbar{
-  max-width: 1100px;
-  margin: 0 auto 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  max-width:1100px;
+  margin:0 auto 14px;
+}
+
+.topbar-right{
+  margin-left:auto;
+  display:flex;
+  gap:10px;
+  align-items:center;
 }
 
 .avatar-ring{
-  width:56px; height:56px;
+  width:56px;
+  height:56px;
   border-radius:50%;
   border:1px solid var(--stroke);
   background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.20), rgba(255,255,255,.02));
@@ -126,23 +175,23 @@ body{
 }
 
 .status-pill{
-  display:flex; align-items:center; gap:10px;
-  padding:10px 12px;
-  border-radius:14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:12px;
+  width:auto;
   background: var(--card);
   border:1px solid var(--stroke2);
 }
 
 .dot{
-  width:9px; height:9px; border-radius:50%;
+  width:9px;
+  height:9px;
+  border-radius:50%;
   background: var(--accent);
   box-shadow: 0 0 18px rgba(108,99,255,.8);
 }
-
-/* Card */
-/* ===================================================
-   CARD COMPONENT (Very Important)
-=================================================== */
 
 .card{
   background: var(--card);
@@ -166,11 +215,6 @@ body{
   margin:16px 0;
 }
 
-/* Grid */
-/* ===================================================
-   GRID SYSTEM
-=================================================== */
-
 .grid{
   display:grid;
   gap:14px;
@@ -183,10 +227,6 @@ body{
 .field-span-2{ grid-column: span 2; }
 .field-span-3{ grid-column: span 3; }
 
-/* ===================================================
-   FORM ELEMENTS
-=================================================== */
-
 .field label{
   display:block;
   font-size:12px;
@@ -194,7 +234,9 @@ body{
   margin-bottom:8px;
 }
 
-.input, .select, .textarea{
+.input,
+.select,
+.textarea{
   width:100%;
   border-radius:12px;
   border:1px solid var(--stroke2);
@@ -205,40 +247,28 @@ body{
   transition:.2s;
 }
 
+body.light-mode .input,
+body.light-mode .select,
+body.light-mode .textarea{
+  background: rgba(255,255,255,.82);
+}
+
 .select{ cursor:pointer; }
 .textarea{ min-height:120px; resize:vertical; }
 
-.input:focus, .select:focus, .textarea:focus{
+.input:focus,
+.select:focus,
+.textarea:focus{
   border-color: rgba(108,99,255,.5);
   box-shadow: 0 0 0 4px rgba(108,99,255,.12);
 }
 
-.small{ padding:10px 10px; border-radius:12px; font-size:13px; }
-
-/* Search */
-.search{
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-
-.icon-btn{
-  width:48px;
-  height:44px;
+.small{
+  padding:10px 10px;
   border-radius:12px;
-  border:1px solid var(--stroke2);
-  background: rgba(255,255,255,.04); /* ✅ FIX: removed red */
-  cursor:pointer;
-  color:var(--text);
-  transition:.2s;
+  font-size:13px;
 }
 
-.icon-btn:hover{
-  border-color: rgba(108,99,255,.4);
-  transform: translateY(-1px);
-}
-
-/* Payment segmented */
 .segmented{
   display:flex;
   gap:10px;
@@ -264,14 +294,12 @@ body{
   border-color: rgba(108,99,255,.45);
 }
 
-/* Product row */
 .product-row .actions .btn-row{
   display:flex;
   gap:10px;
   align-items:center;
 }
 
-/* Buttons */
 .btn{
   border:1px solid var(--stroke2);
   background: rgba(255,255,255,.04);
@@ -308,30 +336,42 @@ body{
   background: rgba(255,255,255,.05);
 }
 
-/* Table */
-.table-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  gap:14px;
+body.light-mode .icon-btn,
+body.light-mode .btn.soft{
+  background: rgba(255,255,255,.75);
 }
 
-.mini-field label{
-  display:block;
-  font-size:12px;
-  color:var(--muted);
-  margin-bottom:8px;
+.icon-btn{
+  width:48px;
+  height:44px;
+  border-radius:12px;
+  border:1px solid var(--stroke2);
+  background: rgba(255,255,255,.04);
+  cursor:pointer;
+  color:var(--text);
+  transition:.2s;
+}
+
+.icon-btn:hover{
+  border-color: rgba(108,99,255,.4);
+  transform: translateY(-1px);
 }
 
 .table-wrap{
   overflow:auto;
-  border-radius:16px;
-  border:1px solid var(--stroke2);
+  max-height:420px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.16);
+  -webkit-overflow-scrolling: touch;
 }
 
 .table{
   width:100%;
-  table-layout: fixed; /* IMPORTANT */
+  table-layout:fixed;
+  min-width:760px;
+  border-collapse:separate;
+  border-spacing:0;
 }
 
 .table th,
@@ -341,39 +381,51 @@ body{
   white-space:nowrap;
 }
 
-/* Column widths (stable layout) */
-.table th:nth-child(1),
-.table td:nth-child(1){
-  width:40%;   /* Product column */
+.table-orders thead th{
+  position:sticky;
+  top:0;
+  z-index:5;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
+  color: rgba(232,236,255,.85);
+  font-weight:800;
+  letter-spacing:.4px;
+  padding:16px 14px;
+  border-bottom:1px solid rgba(255,255,255,.10);
 }
 
-.table th:nth-child(2),
-.table td:nth-child(2){
-  width:10%;
+.table-orders thead th:first-child{ border-top-left-radius:18px; }
+.table-orders thead th:last-child{ border-top-right-radius:18px; }
+
+.table-orders tbody td{
+  padding:16px 14px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  color: rgba(232,236,255,.92);
+  vertical-align:middle;
 }
 
-.table th:nth-child(3),
-.table td:nth-child(3){
-  width:12%;
+.table-orders tbody tr:nth-child(odd){ background: rgba(255,255,255,.03); }
+.table-orders tbody tr:nth-child(even){ background: rgba(255,255,255,.06); }
+.table-orders tbody tr:hover{ background: rgba(108,99,255,.10); }
+
+.table-orders .num{
+  text-align:right;
+  font-variant-numeric: tabular-nums;
 }
 
-.table th:nth-child(4),
-.table td:nth-child(4){
-  width:12%;
-}
+.table-orders th:nth-child(1),
+.table-orders td:nth-child(1){ width:46%; text-align:left; padding-left:8px; }
+.table-orders th:nth-child(2),
+.table-orders td:nth-child(2){ width:8%; }
+.table-orders th:nth-child(3),
+.table-orders td:nth-child(3){ width:12%; }
+.table-orders th:nth-child(4),
+.table-orders td:nth-child(4){ width:12%; }
+.table-orders th:nth-child(5),
+.table-orders td:nth-child(5){ width:14%; }
+.table-orders th:nth-child(6),
+.table-orders td:nth-child(6){ width:8%; }
 
-.table th:nth-child(5),
-.table td:nth-child(5){
-  width:14%;
-}
-
-.table th:nth-child(6),
-.table td:nth-child(6){
-  width:12%;
-}
-.num{ text-align:right; }
-
-/* Summary */
 .summary{
   display:flex;
   justify-content:space-between;
@@ -403,7 +455,11 @@ body{
   text-shadow: 0 0 30px rgba(108,99,255,.45);
 }
 
-.actions-right{ display:flex; gap:10px; flex-wrap:wrap; }
+.actions-right{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
 
 .save-hint{
   margin-top:10px;
@@ -411,265 +467,61 @@ body{
   color:var(--muted);
 }
 
-/* ================================
-   ✅ FIX: Dropdown list background & text
-   - When dropdown opens: gray list + black text (visible)
-================================ */
-
-/* (closed) select */
-select.select, select{
+select.select,
+select{
   background: rgba(0,0,0,.15);
   color: var(--text);
   border: 1px solid var(--stroke2);
 }
 
-/* (opened) option list */
 select option{
-  background: #E5E7EB;  /* gray background */
-  color: #111827;       /* black text */
+  background: #E5E7EB;
+  color: #111827;
 }
 
-/* selected item inside list */
 select option:checked{
   background: #D1D5DB;
   color: #111827;
 }
 
-/* placeholder/disabled */
 select option:disabled{
   background: #E5E7EB;
   color: #6B7280;
 }
 
-/* focus style (soft gray) */
 select:focus{
   outline:none;
   border-color: rgba(148,163,184,.55);
   box-shadow: 0 0 0 3px rgba(148,163,184,.12);
 }
 
-/* Responsive */
-@media (max-width: 980px){
-  .sidebar{ display:none; }
-  .main{ max-width:none; }
-  .grid-4{ grid-template-columns: 1fr 1fr; }
-  .grid-3{ grid-template-columns: 1fr; }
-  .grid-6{ grid-template-columns: 1fr 1fr; }
-  .field-span-2, .field-span-3{ grid-column: auto; }
-  .total-value{ font-size:40px; }
-}
-
-/* Product text closer to left (like Delete is closer to right) */
-.table-orders td:first-child,
-.table-orders th:first-child{
-  text-align: left;
-  padding-left: 8px;   /* was 14px/16px -> reduce */
-}
-
-/* =========================
-   ORDER ITEMS TABLE (CLEAN)
-   Paste at END of styles.css
-========================= */
-
-.table-wrap{
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.16);
-  border-radius: 18px;
-  overflow: hidden;              /* make header/rows clip nicely */
-}
-
-/* Make columns stable */
-.table-orders{
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 0;             /* cleaner than spacing rows */
-}
-
-/* ===== TABLE HEADER (TABLE មេ) ===== */
-.table-orders thead th{
-  position: sticky;              /* header stays when scroll */
-  top: 0;
-  z-index: 5;
-
-  background: rgba(0,0,0,.35);   /* distinct header bg */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  color: rgba(232,236,255,.85);
-  font-weight: 800;
-  letter-spacing: .4px;
-  padding: 16px 14px;
-
-  border-bottom: 1px solid rgba(255,255,255,.10);
-}
-
-/* Round the header corners */
-.table-orders thead th:first-child{ border-top-left-radius: 18px; }
-.table-orders thead th:last-child{ border-top-right-radius: 18px; }
-
-/* ===== TABLE BODY ===== */
-.table-orders tbody td{
-  padding: 16px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.06);
-  color: rgba(232,236,255,.92);
-  vertical-align: middle;
-}
-
-/* Zebra rows: easier to read */
-.table-orders tbody tr:nth-child(odd){
-  background: rgba(255,255,255,.03);
-}
-.table-orders tbody tr:nth-child(even){
-  background: rgba(255,255,255,.06);
-}
-
-/* Hover focus row */
-.table-orders tbody tr:hover{
-  background: rgba(108,99,255,.10);
-}
-
-/* Align numbers nicely */
-.table-orders .num{
-  text-align: right;
-  font-variant-numeric: tabular-nums; /* numbers line up */
-}
-
-/* Product column: keep clean */
-.table-orders td:first-child{
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;           /* keep one line */
-}
-
-/* Column widths (stable layout) */
-.table-orders th:nth-child(1), .table-orders td:nth-child(1){ width: 46%; }
-.table-orders th:nth-child(2), .table-orders td:nth-child(2){ width: 8%;  }
-.table-orders th:nth-child(3), .table-orders td:nth-child(3){ width: 12%; }
-.table-orders th:nth-child(4), .table-orders td:nth-child(4){ width: 12%; }
-.table-orders th:nth-child(5), .table-orders td:nth-child(5){ width: 14%; }
-.table-orders th:nth-child(6), .table-orders td:nth-child(6){ width: 8%;  }
-
-/* Make delete button smaller and consistent in table */
-.table-orders .btn.danger{
-  padding: 8px 12px;
-  border-radius: 14px;
-}
-
-/* Optional: make the table area scroll inside card (so header sticky is useful) */
-.table-wrap{
-  max-height: 420px;
-  overflow: auto;
-}
-
-/* =========================
-   RESPONSIVE ORDER TABLE (MOBILE)
-========================= */
-.table-wrap{
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* keep table wide enough so columns don't crash */
-.table-orders{
-  min-width: 760px;              /* adjust if needed */
-}
-
-/* mobile: smaller spacing & text */
-@media (max-width: 640px){
-  .table-orders thead th,
-  .table-orders tbody td{
-    padding: 12px 10px;
-    font-size: 13px;
-  }
-
-  /* Make delete button smaller */
-  .table-orders .btn.danger{
-    padding: 7px 10px !important;
-    border-radius: 12px !important;
-  }
-
-  /* Don’t cut the last header like "Del..." */
-  .table-orders th:last-child,
-  .table-orders td:last-child{
-    white-space: nowrap;
-  }
-}
-
-@media (max-width: 640px){
-  .table-orders th:first-child,
-  .table-orders td:first-child{
-    position: sticky;
-    left: 0;
-    z-index: 6;
-    background: rgba(10,21,48,.95); /* match your theme */
-  }
-}
-
-/* =========================
-   FIX: Small Status Right Side
-========================= */
-
-/* Make topbar layout clean */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-/* Push status fully to right */
-.topbar-right{
-  margin-left:auto;
-}
-
-/* Make status pill small */
-.status-pill{
-  padding:6px 10px;
-  border-radius:12px;
-  width:auto;
-  gap:8px;
-}
-
-/* Make select smaller */
-.status-pill select{
-  width:auto;
-  min-width:130px;
-  padding:6px 10px;
-  font-size:13px;
-  background:transparent;
-  border:none;
-  color:var(--text);
-}
-
-/* ===== PRINT RECEIPT (Name Card Width) ===== */
-
 @media print {
-  /* លាក់ UI ទាំងអស់ */
   .app { display: none !important; }
-
-  /* បង្ហាញតែ printArea */
-  #printArea { 
+  #printArea {
     display: block !important;
     position: static !important;
   }
-
-  html, body { margin: 0 !important; padding: 0 !important; }
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background:#fff !important;
+    color:#000 !important;
+  }
 }
 
-/* optional: កុំឲ្យបែកទំព័រ */
-#printArea, .print-card { page-break-inside: avoid; break-inside: avoid; }
+#printArea,
+.print-card{
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
 
-
-/* Try set paper width like Name Card */
 @page{
   margin: 4mm;
-  /* Most printers accept custom size, some ignore */
   size: 86mm auto;
 }
 
-/* Receipt/Card layout */
-.print-card{ 
-  width: 50mm;           /* Name card width (close) */
+.print-card{
+  width: 50mm;
   background: #fff;
   color: #000;
   font-family: "Kantumruy Pro", Arial, sans-serif;
@@ -677,34 +529,157 @@ select:focus{
   line-height: 1.55;
 }
 
-.print-row{ display:flex; justify-content:space-between; gap:8px; }
-.print-title{ font-weight:800; font-size: 12px; }
-.print-muted{ opacity:.75; }
-
-
-
-.print-hr{
-  border: 0;
-  border-top: 1px dashed #000;   /* ឬ solid */
-  margin: 4px 0;                 /* កំណត់ចន្លោះ */
+.print-row{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
 }
 
+.print-title{
+  font-weight:800;
+  font-size: 12px;
+}
+
+.print-muted{ opacity:.75; }
+
+.print-hr{
+  border:0;
+  border-top:1px dashed #000;
+  margin:4px 0;
+}
 
 .print-table{
   width:100%;
   border-collapse: collapse;
 }
-.print-table th, .print-table td{
-  padding: 1px 0;
-  vertical-align: top;
+
+.print-table th,
+.print-table td{
+  padding:1px 0;
+  vertical-align:top;
 }
-.print-table th{ border-bottom: 1px solid #000; font-weight:800; }
+
+.print-table th{
+  border-bottom:1px solid #000;
+  font-weight:800;
+}
+
 .t-right{ text-align:right; }
 .t-center{ text-align:center; }
 
 .print-total{
-  font-size: 8px;
-  font-weight: 900;
-  text-align: right;
-  margin-top: 8px;
+  font-size:8px;
+  font-weight:900;
+  text-align:right;
+  margin-top:8px;
+}
+
+@media (max-width:980px){
+  .sidebar{ display:none; }
+  .main{ max-width:none; }
+  .grid-4{ grid-template-columns: 1fr 1fr; }
+  .grid-3{ grid-template-columns: 1fr; }
+  .grid-6{ grid-template-columns: 1fr 1fr; }
+  .field-span-2,
+  .field-span-3{ grid-column:auto; }
+  .total-value{ font-size:40px; }
+}
+
+@media (max-width:640px){
+  .table-orders thead th,
+  .table-orders tbody td{
+    padding:12px 10px;
+    font-size:13px;
+  }
+
+  .table-orders .btn.danger{
+    padding:7px 10px !important;
+    border-radius:12px !important;
+  }
+
+  .table-orders th:last-child,
+  .table-orders td:last-child{
+    white-space:nowrap;
+  }
+
+  .table-orders th:first-child,
+  .table-orders td:first-child{
+    position:sticky;
+    left:0;
+    z-index:6;
+    background: rgba(10,21,48,.95);
+  }
+}
+
+@media (max-width:768px){
+  .sidebar{ display:none; }
+  button{ width:100%; }
+}
+
+
+/* =========================
+   MAC STYLE ALERT
+========================= */
+
+.mac-alert{
+  position: fixed;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  transition: all .4s ease;
+}
+
+.mac-alert.show{
+  top: 30px;
+}
+
+.mac-alert-box{
+  display:flex;
+  align-items:center;
+  gap:14px;
+
+  padding:14px 22px;
+
+  border-radius:16px;
+
+  backdrop-filter: blur(20px);
+  background: rgba(30,30,40,.75);
+
+  border:1px solid rgba(255,255,255,.15);
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.5),
+    inset 0 0 10px rgba(255,255,255,.05);
+
+  font-weight:600;
+  letter-spacing:.3px;
+}
+
+.mac-alert-icon{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:14px;
+  font-weight:700;
+
+  background:#00C853;
+  color:#fff;
+}
+
+.mac-alert.error .mac-alert-icon{
+  background:#ff4d4d;
+}
+
+.mac-alert.warn .mac-alert-icon{
+  background:#ffb300;
+}
+
+.mac-alert-text{
+  font-size:14px;
 }
