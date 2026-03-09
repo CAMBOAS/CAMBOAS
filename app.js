@@ -414,9 +414,9 @@ function buildSummaryText() {
     `ទីតាំង: ${province} | ${detailAddress}`,
     `Page: ${page} | CloseBy: ${closeBy}`,
     `Note: ${note}`,
-    `===========================================`,
+    `======================================`,
     `បញ្ជីផលិតផល`,
-    `===========================================`
+    `======================================`
   ].join("\n");
   const lines = items.length
     ? items.map((it, i) => {
@@ -426,12 +426,12 @@ function buildSummaryText() {
         const subtotal = money(it.subtotal);
         return [
           `${i + 1}. ${product}`,
-          ` • ចំនួន: ${qty}   តម្លៃ: ${price}   សរុប: ${subtotal}`,
+          ` • ចំនួន: ${qty}   តម្លៃ: ${price}   សរុប: ${subtotal}\n`,
         ].join("\n");
       }).join("\n")
     : `មិនទាន់មានផលិតផល`;
   const footer = [
-    `===========================================`,
+    `======================================`,
     `តម្លៃសរុប    : ${money(itemsTotal)}`,
     `សេវាដឹក     : ${money(deliveryFee)}`,
     `ការទូទាត់    : ${payment}`,
@@ -524,4 +524,5 @@ function macAlert(message, type="success"){
   },3000)
 
 }
+
 
