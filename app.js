@@ -4,6 +4,9 @@ let items = []; // {id, product, qty, price, discount, subtotal}
 const el = (id) => document.getElementById(id);
 
 // ===== Elements =====
+const customProductWrapEl = el("customProductWrap");
+const customProductEl = el("customProduct");
+
 const productEl = el("product");
 const qtyEl = el("qty");
 const priceEl = el("price");
@@ -22,16 +25,41 @@ const statusEl = el("status");
 const deliveryNameEl = el("deliveryName");
 const paymentEl = el("payment");
 
-// Buttons
 const btnAdd = el("btnAdd");
 const btnClearRow = el("btnClearRow");
 const btnPrint = el("btnPrint");
 const btnCopy = el("btnCopy");
 const btnSave = el("btnSave");
 
-// ✅ Your Google Apps Script Web App URL
 const WEB_APP_URL =
   "https://script.google.com/macros/s/AKfycbxBklfyCd1rX9hSyoYf0RBAigRMhWvqgEgUCSyj6VXTo1Om4bZf-uSsO2-icI-zvmktPA/exec";
+
+// ===== Theme Toggle =====
+const themeToggleEl = el("themeToggle");
+
+function applyTheme(theme) {
+  const isLight = theme === "light";
+  document.body.classList.toggle("light-mode", isLight);
+
+  if (themeToggleEl) {
+    themeToggleEl.textContent = isLight ? "☀️" : "🌙";
+    themeToggleEl.title = isLight ? "Switch to dark mode" : "Switch to light mode";
+  }
+
+  localStorage.setItem("cambo-theme", theme);
+}
+
+(function initTheme() {
+  const savedTheme = localStorage.getItem("cambo-theme") || "dark";
+  applyTheme(savedTheme);
+})();
+
+if (themeToggleEl) {
+  themeToggleEl.addEventListener("click", () => {
+    const nextTheme = document.body.classList.contains("light-mode") ? "dark" : "light";
+    applyTheme(nextTheme);
+  });
+}
 
 // ===== Init default date =====
 (function initDate() {
@@ -42,8 +70,25 @@ const WEB_APP_URL =
   dateEl.value = `${yyyy}-${mm}-${dd}`;
 })();
 
+// ===== Load saved custom products =====
+(function loadSavedProducts() {
+  const savedProducts = JSON.parse(localStorage.getItem("products") || "[]");
+  const customOpt = [...productEl.options].find((o) => o.value === "__custom__");
+
+  savedProducts.forEach((p) => {
+    const exists = [...productEl.options].some((o) => o.value === p.name);
+    if (exists) return;
+
+    const opt = document.createElement("option");
+    opt.value = p.name;
+    opt.textContent = p.name;
+    opt.dataset.price = p.price;
+    productEl.insertBefore(opt, customOpt);
+  });
+})();
+
 // ===== Payment buttons =====
-document.getElementById("paymentGroup").addEventListener("click", (e) => {
+el("paymentGroup").addEventListener("click", (e) => {
   const btn = e.target.closest(".seg-btn");
   if (!btn) return;
 
@@ -54,6 +99,18 @@ document.getElementById("paymentGroup").addEventListener("click", (e) => {
 
 // ===== Product change => auto price =====
 productEl.addEventListener("change", () => {
+  const selected = productEl.value;
+
+  if (selected === "__custom__") {
+    customProductWrapEl.classList.remove("hidden");
+    customProductEl.focus();
+    priceEl.value = "0.00";
+    return;
+  }
+
+  customProductWrapEl.classList.add("hidden");
+  customProductEl.value = "";
+
   const opt = productEl.options[productEl.selectedIndex];
   const p = parseFloat(opt?.dataset?.price || "0");
   if (!Number.isNaN(p)) priceEl.value = p.toFixed(2);
@@ -64,6 +121,7 @@ function money(n) {
   const x = Number(n || 0);
   return `$${x.toFixed(2)}`;
 }
+
 function calcSubtotal(qty, price, discount) {
   const q = Math.max(1, Number(qty || 1));
   const p = Math.max(0, Number(price || 0));
@@ -71,10 +129,38 @@ function calcSubtotal(qty, price, discount) {
   return Math.max(0, q * p - d);
 }
 
+function saveProducts() {
+  const products = [...productEl.options]
+    .filter((o) => o.value && o.value !== "__custom__")
+    .map((o) => ({
+      name: o.value,
+      price: o.dataset.price || 0
+    }));
+
+  localStorage.setItem("products", JSON.stringify(products));
+}
+
+function escapeHtml(str) {
+  return String(str || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function clearRow() {
+  productEl.value = "";
+  customProductEl.value = "";
+  customProductWrapEl.classList.add("hidden");
+  qtyEl.value = 1;
+  priceEl.value = 0;
+  discountEl.value = 0;
+}
+
 function render() {
   tbody.innerHTML = "";
 
-  // items already newest-first because we use unshift()
   items.forEach((it) => {
     const tr = document.createElement("tr");
 
@@ -85,7 +171,7 @@ function render() {
       <td class="num">${money(it.discount)}</td>
       <td class="num"><b>${money(it.subtotal)}</b></td>
       <td class="num">
-        <button class="btn danger" style="padding:8px 12px; border-radius:12px;" data-del="${it.id}">Del</button>
+        <button class="btn danger" style="padding:8px 12px; border-radius:12px;" data-del="${it.id}" type="button">Del</button>
       </td>
     `;
 
@@ -100,42 +186,28 @@ function render() {
 }
 
 function resetAllForm() {
-  // 1) Clear items + table
   items = [];
   render();
-
-  // 2) Clear Product row inputs
   clearRow();
 
-  // 3) Clear Customer/Order fields
   pageEl.value = "";
   closeByEl.value = "";
-  statusEl.value = "Pending"; // default (change if you want)
+  statusEl.value = "Pending";
   customerEl.value = "";
   phoneEl.value = "";
 
-  // Province + Detail Address
-  const provinceEl = document.getElementById("province");
-  const addressDetailEl = document.getElementById("addressDetail");
+  const provinceEl = el("province");
+  const addressDetailEl = el("addressDetail");
   if (provinceEl) provinceEl.value = "";
   if (addressDetailEl) addressDetailEl.value = "";
 
-  // Delivery
   deliveryNameEl.value = "";
   deliveryFeeEl.value = 0;
-
-  // Note
   noteEl.value = "";
 
-  // Payment segmented: clear active + clear text
   paymentEl.value = "";
-  document.querySelectorAll("#paymentGroup .seg-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll("#paymentGroup .seg-btn").forEach((b) => b.classList.remove("active"));
 
-  // Search (if exists)
-  const searchEl = document.getElementById("search");
-  if (searchEl) searchEl.value = "";
-
-  // Date: reset to today (or you can keep current date if you want)
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -143,29 +215,37 @@ function resetAllForm() {
   dateEl.value = `${yyyy}-${mm}-${dd}`;
 }
 
-function clearRow() {
-  productEl.value = "";
-  qtyEl.value = 1;
-  priceEl.value = 0;
-  discountEl.value = 0;
-}
-
-function escapeHtml(str) {
-  return String(str || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
 // ===== Add item =====
 btnAdd.addEventListener("click", () => {
-  const product = productEl.value.trim();
+  let product = productEl.value.trim();
+
   if (!product) {
-    alert("Please select product!");
     productEl.focus();
     return;
+  }
+
+  if (product === "__custom__") {
+    product = customProductEl.value.trim();
+
+    if (!product) {
+      customProductEl.focus();
+      return;
+    }
+
+    const exists = [...productEl.options].some(
+      (opt) => opt.value.trim().toLowerCase() === product.toLowerCase()
+    );
+
+    if (!exists) {
+      const newOpt = document.createElement("option");
+      newOpt.value = product;
+      newOpt.textContent = product;
+      newOpt.dataset.price = Number(priceEl.value || 0).toFixed(2);
+
+      const customOpt = [...productEl.options].find((opt) => opt.value === "__custom__");
+      productEl.insertBefore(newOpt, customOpt);
+      saveProducts();
+    }
   }
 
   const qty = Math.max(1, parseInt(qtyEl.value || "1", 10));
@@ -174,19 +254,18 @@ btnAdd.addEventListener("click", () => {
   const subtotal = calcSubtotal(qty, price, discount);
 
   items.unshift({
-    id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
     product,
     qty,
     price,
     discount,
-    subtotal,
+    subtotal
   });
 
   render();
   clearRow();
 });
 
-// ===== Clear inputs =====
 btnClearRow.addEventListener("click", clearRow);
 
 // ===== Delete row =====
@@ -202,37 +281,33 @@ tbody.addEventListener("click", (e) => {
 // ===== Recalc total on delivery fee change =====
 deliveryFeeEl.addEventListener("input", render);
 
-// ===== Print =====
-
-
+// ===== Print helpers =====
 function formatDateKH(dateStr) {
-  // dateStr from input type="date" => YYYY-MM-DD
   if (!dateStr) return "-";
-  const [y,m,d] = String(dateStr).split("-");
+  const [y, m, d] = String(dateStr).split("-");
   return `${d}/${m}/${y}`;
 }
 
-//-------------------------|| Receipt HTML for Print ||-------------------------//
-//-- You can customize the receipt design here. It uses inline styles for simplicity, but you can also use CSS classes and define styles in a separate CSS file if you prefer. --//
-//-- The buildReceiptHTML function collects all the necessary data from the form and items, and constructs an HTML string that represents the receipt. --//
-//-- It includes order details, a table of items, totals, and any other relevant information you want to display on the printed receipt. --// 
-
 function buildReceiptHTML() {
-  const province = document.getElementById("province")?.value || "-";
-  const detailAddress = document.getElementById("addressDetail")?.value || "-";
+  const province = el("province")?.value || "-";
+  const detailAddress = el("addressDetail")?.value || "-";
 
   const deliveryFee = Math.max(0, Number(deliveryFeeEl.value || 0));
   const itemsTotal = items.reduce((s, it) => s + it.subtotal, 0);
   const grand = itemsTotal + deliveryFee;
 
-  const rows = items.map((it) => `
-    <tr>
-      <td style="padding-right:6px;">${escapeHtml(it.product)}</td>
-      <td class="t-center">${it.qty}</td>
-      <td class="t-right">${Number(it.price || 0).toFixed(2)}</td>
-      <td class="t-right">${Number(it.subtotal || 0).toFixed(2)}</td>
-    </tr>
-  `).join("");
+  const rows = items
+    .map(
+      (it) => `
+        <tr>
+          <td style="padding-right:6px;">${escapeHtml(it.product)}</td>
+          <td class="t-center">${it.qty}</td>
+          <td class="t-right">${Number(it.price || 0).toFixed(2)}</td>
+          <td class="t-right">${Number(it.subtotal || 0).toFixed(2)}</td>
+        </tr>
+      `
+    )
+    .join("");
 
   return `
     <div class="print-card">
@@ -243,17 +318,16 @@ function buildReceiptHTML() {
 
       <div class="print-hr"></div>
 
-      
       <div>👤 ឈ្មោះ: <strong>${escapeHtml(customerEl.value || "-")}</strong></div>
       <div>📞 លេខទូរសព្ទ: <strong>${escapeHtml(phoneEl.value || "-")}</strong></div>
       <div>💳 ការទូទាត់: <strong>${escapeHtml(paymentEl.value || "-")}</strong></div>
-      <div>📍 ទីតាំង: ${escapeHtml(province)} <strong>:</strong>  ​${escapeHtml(detailAddress)}</div>
+      <div>📍 ទីតាំង: ${escapeHtml(province)} <strong>:</strong> ${escapeHtml(detailAddress)}</div>
       <div>📝 Note: ${escapeHtml(noteEl.value || "-")}</div>
       <div>📈 Page: <strong>${escapeHtml(pageEl.value || "-")}</strong> <strong>|</strong> CloseBy: ${escapeHtml(closeByEl.value || "-")}</div>
       <div>🚚 Delivery: ${escapeHtml(deliveryNameEl.value || "-")} <strong>|</strong> Fee: $${deliveryFee.toFixed(2)}</div>
 
-
       <div class="print-hr"></div>
+
       <table class="print-table">
         <thead>
           <tr>
@@ -284,7 +358,6 @@ function buildReceiptHTML() {
       <div class="print-hr"></div>
       <div class="print-muted">លេខបម្រើអតិថិជន 015 58 68 78 / 089 58 68 78</div>
       <div class="print-hr"></div>
-
     </div>
   `;
 }
@@ -295,13 +368,12 @@ btnPrint.addEventListener("click", () => {
     return;
   }
 
-  const printArea = document.getElementById("printArea");
-  printArea.innerHTML = buildReceiptHTML();   // (ប្រើ function receipt របស់អ្នក)
+  const printArea = el("printArea");
+  printArea.innerHTML = buildReceiptHTML();
   printArea.style.display = "block";
 
   window.print();
 
-  // បិទក្រោយ print
   setTimeout(() => {
     printArea.style.display = "none";
     printArea.innerHTML = "";
@@ -309,27 +381,13 @@ btnPrint.addEventListener("click", () => {
 });
 
 // ===== Copy summary =====
-
-
-btnCopy.addEventListener("click", async () => {
-  const summary = buildSummaryText();
-  try {
-    await navigator.clipboard.writeText(summary);
-    alert("Copied!");
-  } catch (err) {
-    console.error(err);
-    alert("Copy failed. Your browser blocked clipboard.");
-  }
-});
-
 function buildSummaryText() {
   const deliveryFee = Math.max(0, Number(deliveryFeeEl.value || 0));
   const itemsTotal = items.reduce((s, it) => s + it.subtotal, 0);
   const grand = itemsTotal + deliveryFee;
 
-  const province = document.getElementById("province")?.value || "-";
-  const detailAddress = document.getElementById("addressDetail")?.value || "-";
-
+  const province = el("province")?.value || "-";
+  const detailAddress = el("addressDetail")?.value || "-";
   const dateText = dateEl.value ? formatDateKH(dateEl.value) : "-";
 
   const header = [
@@ -338,22 +396,15 @@ function buildSummaryText() {
     `📞 លេខទូរសព្ទ: ${phoneEl.value || "-"}`,
     `💳 ការទូទាត់: ${paymentEl.value || "-"}`,
     `📍 ទីតាំង: ${province} | ${detailAddress}`,
-    
-/*     `📝 Note: ${noteEl.value || "-"}`,
- */    
     `📈 Page: ${pageEl.value || "-"} | CloseBy: ${closeByEl.value || "-"}`,
-    `🚚 Delivery: ${deliveryNameEl.value || "-"} | Fee: ${money(deliveryFee)}`,noteEl.value ? 
-    `📝 Note: ${noteEl.value}` : `📝 Note: -`,
+    `🚚 Delivery: ${deliveryNameEl.value || "-"} | Fee: ${money(deliveryFee)}`,
+    noteEl.value ? `📝 Note: ${noteEl.value}` : `📝 Note: -`,
     `--------------------------------`
   ].join("\n");
 
-  const lines = items.map((it, i) => {
-    const p = it.product || "-";
-    const q = it.qty ?? 0;
-    const pr = money(it.price);
-    const sub = money(it.subtotal);
-    return `${i + 1}) ${p}\n   Q:${q}  Price:${pr}  Sub:${sub}`;
-  }).join("\n");
+  const lines = items
+    .map((it, i) => `${i + 1}) ${it.product || "-"}\n   Q:${it.qty ?? 0}  Price:${money(it.price)}  Sub:${money(it.subtotal)}`)
+    .join("\n");
 
   const footer = [
     `--------------------------------`,
@@ -365,7 +416,43 @@ function buildSummaryText() {
   return `${header}\n${lines}\n${footer}`;
 }
 
-// ✅ ===== Save to Google Sheet (CAMBO_ORDERS) =====
+btnCopy.addEventListener("click", async () => {
+  const summary = buildSummaryText();
+
+  try {
+    await navigator.clipboard.writeText(summary);
+    alert("Copied!");
+  } catch (err) {
+    console.error(err);
+    alert("Copy failed. Your browser blocked clipboard.");
+  }
+});
+
+// ===== Save to Google Sheet =====
+function collectPayloadForSheet() {
+  const deliveryFee = Math.max(0, Number(deliveryFeeEl.value || 0));
+  const itemsTotal = items.reduce((s, it) => s + it.subtotal, 0);
+  const grand = itemsTotal + deliveryFee;
+
+  return {
+    dateTime: new Date().toISOString(),
+    orderId: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    page: pageEl.value || "",
+    closeBy: closeByEl.value || "",
+    status: statusEl.value || "",
+    customer: customerEl.value || "",
+    phone: phoneEl.value || "",
+    province: el("province")?.value || "",
+    detailAddress: el("addressDetail")?.value || "",
+    deliveryName: deliveryNameEl.value || "",
+    deliveryFee,
+    payment: paymentEl.value || "",
+    note: noteEl.value || "",
+    items,
+    total: grand
+  };
+}
+
 btnSave.addEventListener("click", async () => {
   if (items.length === 0) {
     alert("No items to save!");
@@ -378,102 +465,43 @@ btnSave.addEventListener("click", async () => {
     const res = await fetch(WEB_APP_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(payload)
     });
 
     const data = await res.json();
 
     if (data.ok) {
-      alert(`Saved ✅\nOrderID: ${data.orderId || "-"}\nItems: ${data.rowsAdded || items.length}`);
-
-      // ✅ Clear ALL form after successful save
+      macAlert(`Saved successfully\nOrderID: ${data.orderId || "-"}\nItems: ${data.rowsAdded || items.length}`);
       resetAllForm();
     } else {
-      alert(`Save failed ❌\n${data.error || "Unknown error"}`);
+      macAlert(`Save failed ❌\n${data.error || "Unknown error"}`, "error");
     }
   } catch (err) {
     console.error(err);
-    alert("Save error ❌\nIf CORS: redeploy Web App as Anyone.");
+    macAlert("Save error ❌\nIf CORS: redeploy Web App as Anyone.", "error");
   }
 });
 
-// ✅ Clear ALL fields in the form
-function resetAllForm() {
-  // 1) Clear items + table
-  items = [];
-  render();
-
-  // 2) Clear product row inputs
-  clearRow();
-
-  // 3) Clear main form fields
-  pageEl.value = "";
-  closeByEl.value = "";
-  statusEl.value = "Pending"; // default
-  customerEl.value = "";
-  phoneEl.value = "";
-
-  // Province + Detail Address
-  const provinceEl = document.getElementById("province");
-  const addressDetailEl = document.getElementById("addressDetail");
-  if (provinceEl) provinceEl.value = "";
-  if (addressDetailEl) addressDetailEl.value = "";
-
-  // Delivery
-  deliveryNameEl.value = "";
-  deliveryFeeEl.value = 0;
-
-  // Payment (segmented)
-  paymentEl.value = "";
-  document.querySelectorAll("#paymentGroup .seg-btn").forEach((b) => b.classList.remove("active"));
-
-  // Note
-  noteEl.value = "";
-
-  // Search (if exists)
-  const searchEl = document.getElementById("search");
-  if (searchEl) searchEl.value = "";
-
-  // Date reset to today
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0");
-  const dd = String(today.getDate()).padStart(2, "0");
-  dateEl.value = `${yyyy}-${mm}-${dd}`;
-}
-
-// Payload for 1-sheet readable columns (no JSON columns)
-function collectPayloadForSheet() {
-  const deliveryFee = Math.max(0, Number(deliveryFeeEl.value || 0));
-  const itemsTotal = items.reduce((s, it) => s + it.subtotal, 0);
-  const grand = itemsTotal + deliveryFee;
-
-  return {
-    dateTime: new Date().toISOString(),
-    orderId: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
-
-    page: pageEl.value || "",
-    closeBy: closeByEl.value || "",
-    status: statusEl.value || "",
-
-    customer: customerEl.value || "",
-    phone: phoneEl.value || "",
-
-    province: document.getElementById("province")?.value || "",
-    detailAddress: document.getElementById("addressDetail")?.value || "",
-
-    deliveryName: deliveryNameEl.value || "",
-    deliveryFee,
-
-    payment: paymentEl.value || "",
-
-  
-    note: noteEl.value || "",
-
-    items,
-    total: grand,
-  };
-}
-
-// initial render
+// ===== Initial render =====
 render();
+
+
+function macAlert(message, type="success"){
+
+  const alert = document.getElementById("macAlert")
+  const text = document.getElementById("macAlertText")
+
+  alert.classList.remove("error","warn")
+
+  if(type==="error") alert.classList.add("error")
+  if(type==="warn") alert.classList.add("warn")
+
+  text.textContent = message
+
+  alert.classList.add("show")
+
+  setTimeout(()=>{
+    alert.classList.remove("show")
+  },3000)
+
+}
