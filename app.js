@@ -433,10 +433,9 @@ function buildSummaryText() {
     : `មិនទាន់មានផលិតផល`;
   const footer = [
     `===========================================`,
-    `តម្លៃសរុប    : ${money(itemsTotal)}`,
-    `សេវាដឹក     : ${money(deliveryFee)}`,
-    `ការទូទាត់    : ${payment}`,
-    `សរុបត្រូវបង់  : ${money(grand)}`,
+    `តម្លៃសរុប៖\t\t\t: ${money(itemsTotal)}`,
+    `សេវាដឹក៖\t\t\t\t: ${money(deliveryFee)}`,
+    `ការទូទាត់៖\t ${payment}\t: ${money(grand)}`,
     `-------------------------------------------`,
     `លេខបម្រើអតិថិជន៖`,
     `• 015 58 68 78`,
@@ -527,4 +526,3 @@ function macAlert(message, type="success"){
   },3000)
 
 }
-
