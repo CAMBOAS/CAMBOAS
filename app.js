@@ -427,7 +427,7 @@ function buildSummaryText() {
         const subtotal = money(it.subtotal);
         return [
           `${i + 1}. ${product}`,
-          ` • ចំនួន: ${qty}   តម្លៃ: ${price}   សរុប: ${subtotal}`,
+          ` • ចំនួន: ${qty}   តម្លៃ: ${price}   សរុប: ${subtotal}\n`,
         ].join("\n");
       }).join("\n")
     : `មិនទាន់មានផលិតផល`;
@@ -527,3 +527,4 @@ function macAlert(message, type="success"){
   },3000)
 
 }
+
