@@ -29,17 +29,20 @@ const btnAdd = el("btnAdd");
 const btnClearRow = el("btnClearRow");
 const btnPrint = el("btnPrint");
 
-/* const btnCopy = el("btnCopy");
- */
+const btnCopy = el("btnCopy");
+
 btnCopy.addEventListener("click", async () => {
   const summary = buildSummaryText();
 
   try {
     await navigator.clipboard.writeText(summary);
-    alert("Copied!");
+
+    macAlert("Copied receipt ✔\nReady to paste anywhere");
+
   } catch (err) {
     console.error(err);
-    alert("Copy failed. Your browser blocked clipboard.");
+
+    macAlert("Copy failed ❌", "error");
   }
 });
 const btnSave = el("btnSave");
@@ -373,10 +376,10 @@ function buildReceiptHTML() {
 }
 
 btnPrint.addEventListener("click", () => {
-  if (items.length === 0) {
-    alert("No items to print!");
-    return;
-  }
+if (items.length === 0) {
+  macAlert("No items to print!", "warn");
+  return;
+}
 
   const printArea = el("printArea");
   printArea.innerHTML = buildReceiptHTML();
@@ -475,10 +478,10 @@ function collectPayloadForSheet() {
 }
 
 btnSave.addEventListener("click", async () => {
-  if (items.length === 0) {
-    alert("No items to save!");
-    return;
-  }
+if (items.length === 0) {
+  macAlert("សូមបន្ថែមផលិតផលជាមុនសិន មុនពេល Save", "warn");
+  return;
+}
 
   const payload = collectPayloadForSheet();
 
@@ -506,28 +509,7 @@ btnSave.addEventListener("click", async () => {
 // ===== Initial render =====
 render();
 
-
-function macAlert(message, type="success"){
-
-  const alert = document.getElementById("macAlert")
-  const text = document.getElementById("macAlertText")
-
-  alert.classList.remove("error","warn")
-
-  if(type==="error") alert.classList.add("error")
-  if(type==="warn") alert.classList.add("warn")
-
-  text.textContent = message
-
-  alert.classList.add("show")
-
-  setTimeout(()=>{
-    alert.classList.remove("show")
-  },3000)
-
-}
-//
-function macAlert(message, type = "success") {
+function macAlert(message, type = "success", autoClose = true) {
   const alertBox = document.getElementById("macAlert");
   const text = document.getElementById("macAlertText");
   const icon = document.getElementById("macAlertIcon");
@@ -547,6 +529,13 @@ function macAlert(message, type = "success") {
   }
 
   text.textContent = message;
+
+  if (autoClose) {
+    clearTimeout(window.__macAlertTimer);
+    window.__macAlertTimer = setTimeout(() => {
+      closeMacAlert();
+    }, 2200);
+  }
 }
 
 function closeMacAlert() {
