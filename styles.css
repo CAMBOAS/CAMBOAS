@@ -497,15 +497,25 @@ select:focus{
 
 @media print {
   .app { display: none !important; }
+
   #printArea {
     display: block !important;
     position: static !important;
+    width: 100% !important;
+    text-align: center !important;
   }
+
   html, body {
     margin: 0 !important;
     padding: 0 !important;
     background:#fff !important;
     color:#000 !important;
+    width: 100% !important;
+  }
+
+  .print-card {
+    margin: 0 auto !important;
+    text-align: left !important;
   }
 }
 
@@ -516,16 +526,17 @@ select:focus{
 }
 
 @page{
-  margin: 4mm;
+  margin: 8mm;
   size: 86mm auto;
 }
 
 .print-card{
-  width: 50mm;
+  width: 60mm;
+  margin: 0 auto;   /* អោយ receipt នៅកណ្ដាល */
   background: #fff;
   color: #000;
   font-family: "Kantumruy Pro", Arial, sans-serif;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.55;
 }
 
@@ -623,15 +634,18 @@ select:focus{
 
 .mac-alert{
   position: fixed;
-  top: -120px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  transition: all .4s ease;
+  bottom:-120px;
+  left:50%;
+  transform:translateX(-50%);
 }
 
 .mac-alert.show{
-  top: 30px;
+  bottom:25px;
+}
+
+.mac-alert.show{
+  top:auto;
+  bottom:20px;
 }
 
 .mac-alert-box{
@@ -683,3 +697,4 @@ select:focus{
 .mac-alert-text{
   font-size:14px;
 }
+
