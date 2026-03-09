@@ -408,7 +408,7 @@ function buildSummaryText() {
   const note = noteEl.value || "-";
 
   const header = [
-    `វិក័យប័ត្រ | ${dateText}`,
+    `វិក័យប័ត្រ \t\t| ${dateText}`,
     `ឈ្មោះ: ${customer}`,
     `លេខទូរសព្ទ: ${phone}`,
     `ទីតាំង: ${province} | ${detailAddress}`,
@@ -434,10 +434,10 @@ function buildSummaryText() {
     : `មិនទាន់មានផលិតផល`;
   const footer = [
     `===========================================`,
-    `តម្លៃសរុប   : ${money(itemsTotal)}`,
-    `សេវាដឹក    : ${money(deliveryFee)}`,
-    `ការទូទាត់   : ${payment}`,
-    `សរុបត្រូវបង់ : ${money(grand)}`,
+    `តម្លៃសរុប    : ${money(itemsTotal)}`,
+    `សេវាដឹក     : ${money(deliveryFee)}`,
+    `ការទូទាត់    : ${payment}`,
+    `សរុបត្រូវបង់  : ${money(grand)}`,
     `-------------------------------------------`,
     `លេខបម្រើអតិថិជន 015 58 68 78 / 089 58 68 78`,
     `-------------------------------------------`
