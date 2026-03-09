@@ -3,33 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CAMBO DASHBOARD</title>
-
+  <title>CAMBO</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&display=swap" rel="stylesheet" />
 
 </head>
-
 <body>
   <div class="app">
-
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="brand">
         <div class="logo"></div>
         <div class="brand-text">
-          <div class="brand-title">CAMBO DASHBOARD</div>
+          <div class="brand-title">CAMBO SOLO</div>
           <div class="brand-sub">Customer / Orders</div>
         </div>
       </div>
 
       <nav class="nav">
-        <button class="nav-btn">Dashboard</button>
-        <button class="nav-btn active">Customer</button>
-        <button class="nav-btn">Stoke</button>
+        <a href="index-fixed.html" class="nav-btn">Dashboard</a>
+        <a href="index-fixed.html" class="nav-btn active">Customer Orders</a>
+        <a href="pages/search-edit-data.html" class="nav-btn">Search & Edit Data</a>
+        <a href="pages/orders.html" class="nav-btn">Stock</a>
       </nav>
 
       <div class="sidebar-foot">
@@ -37,11 +33,11 @@
       </div>
     </aside>
 
-    <!-- Main -->
     <main class="main">
       <header class="topbar">
         <div class="avatar-ring"></div>
         <div class="topbar-right">
+          <button id="themeToggle" class="btn soft theme-toggle" type="button" title="Toggle theme">🌙</button>
           <div class="status-pill">
             <span class="dot"></span>
             <select id="status" class="select small">
@@ -54,101 +50,88 @@
         </div>
       </header>
 
-      <!-- Filters -->
       <section class="card">
         <div class="grid grid-4">
           <div class="field">
             <label>Pages</label>
             <select id="page" class="select">
               <option value="">Select...</option>
+              <option>Helen CCR</option>
               <option>Brand1 CCR</option>
               <option>JELY BRAND BY HELEN</option>
               <option>JELY CCR BRAND</option>
               <option>ចែម៉ៅ CCR BRAND</option>
               <option>ហេឡេន CCR</option>
-              <option>Helen CCR</option>
+              <option>ស្រីម៉ៅ JELY</option>
+              <option>ស្រីម៉ៅ JELY BRAND</option>
             </select>
           </div>
-
           <div class="field">
             <label>CloseBy</label>
             <select id="closeBy" class="select">
               <option value="">Select...</option>
-              <option>Jonh Helen</option>
+              <option>John Helen</option>
+              <option>John Wick</option>
               <option>Srey Phear</option>
               <option>Srey Pichh</option>
               <option>Bong Phear</option>
               <option>Admin</option>
+
             </select>
           </div>
-
-          
-
-    
-
         </div>
       </section>
 
-      <!-- Customer Info -->
       <section class="card">
         <h3 class="card-title">Customer Info</h3>
-
         <div class="grid grid-3">
           <div class="field">
             <label>Customer</label>
             <input id="customer" class="input" placeholder="Customer name..." />
           </div>
-
           <div class="field">
             <label>Phone</label>
             <input id="phone" class="input" placeholder="Phone..." />
           </div>
-
           <div class="field">
             <label>Date</label>
             <input id="date" type="date" class="input" />
           </div>
-
-
           <div class="field field-span-2">
-          <label>Province</label>
-          <select id="province" class="select">
-            <option value="">Select Province...</option>
-            <option>រាជធានីភ្នំពេញ</option>
-            <option>ខេត្តបន្ទាយមានជ័យ</option>
-            <option>ខេត្តបាត់ដំបង</option>
-            <option>ខេត្តកំពង់ចាម</option>
-            <option>ខេត្តកំពង់ឆ្នាំង</option>
-            <option>ខេត្តកំពង់ស្ពឺ</option>
-            <option>ខេត្តកំពង់ធំ</option>
-            <option>ខេត្តកំពត</option>
-            <option>ខេត្តកណ្តាល</option>
-            <option>ខេត្តកែប</option>
-            <option>ខេត្តកោះកុង</option>
-            <option>ខេត្តក្រចេះ</option>
-            <option>ខេត្តមណ្ឌលគិរី</option>
-            <option>ខេត្តឧត្ដរមានជ័យ</option>
-            <option>ខេត្តប៉ៃលិន</option>
-            <option>ខេត្តព្រះវិហារ</option>
-            <option>ខេត្តព្រៃវែង</option>
-            <option>ខេត្តពោធិ៍សាត់</option>
-            <option>ខេត្តព្រះសីហនុ</option>
-            <option>ខេត្តរតនគិរី</option>
-            <option>ខេត្តសៀមរាប</option>
-            <option>ខេត្តស្ទឹងត្រែង</option>
-            <option>ខេត្តស្វាយរៀង</option>
-            <option>ខេត្តតាកែវ</option>
-            <option>ខេត្តត្បូងឃ្មុំ</option>
-          </select>
-        </div>
-
-      <div class="field field-span-1">
-        <label>Detail Address</label>
-        <input id="addressDetail" class="input" placeholder="Village / Commune / Street..." />
-      </div>
-
-
-
+            <label>Province</label>
+            <select id="province" class="select">
+              <option value="">Select Province...</option>
+              <option>រាជធានីភ្នំពេញ</option>
+              <option>ខេត្តបន្ទាយមានជ័យ</option>
+              <option>ខេត្តបាត់ដំបង</option>
+              <option>ខេត្តកំពង់ចាម</option>
+              <option>ខេត្តកំពង់ឆ្នាំង</option>
+              <option>ខេត្តកំពង់ស្ពឺ</option>
+              <option>ខេត្តកំពង់ធំ</option>
+              <option>ខេត្តកំពត</option>
+              <option>ខេត្តកណ្តាល</option>
+              <option>ខេត្តកែប</option>
+              <option>ខេត្តកោះកុង</option>
+              <option>ខេត្តក្រចេះ</option>
+              <option>ខេត្តមណ្ឌលគិរី</option>
+              <option>ខេត្តឧត្ដរមានជ័យ</option>
+              <option>ខេត្តប៉ៃលិន</option>
+              <option>ខេត្តព្រះវិហារ</option>
+              <option>ខេត្តព្រៃវែង</option>
+              <option>ខេត្តពោធិ៍សាត់</option>
+              <option>ខេត្តព្រះសីហនុ</option>
+              <option>ខេត្តរតនគិរី</option>
+              <option>ខេត្តសៀមរាប</option>
+              <option>ខេត្តស្ទឹងត្រែង</option>
+              <option>ខេត្តស្វាយរៀង</option>
+              <option>ខេត្តតាកែវ</option>
+              <option>ខេត្តត្បូងឃ្មុំ</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Detail Address</label>
+            <input id="addressDetail" class="input" placeholder="Village / Commune / Street..." />
+          </div>
           <div class="field field-span-2">
             <label>Delivery</label>
             <select id="deliveryName" class="select">
@@ -156,13 +139,12 @@
               <option>ភ្នំពេញ តាធំ</option>
               <option>ភ្នំពេញ តាតូច</option>
               <option>Vireak Buntham</option>
-              <option>J&T</option>
-              <option>DRSB </option>
+              <option>J&amp;T</option>
+              <option>DRSB</option>
               <option>ដឹកខ្លួនឯង</option>
               <option>Other</option>
             </select>
           </div>
-
           <div class="field">
             <label>Delivery Fee</label>
             <input id="deliveryFee" class="input" type="number" min="0" step="0.01" value="0" />
@@ -174,20 +156,18 @@
         <div class="field">
           <label>Payment</label>
           <div class="segmented" id="paymentGroup">
-            <button class="seg-btn" data-pay="AC">AC</button>
-            <button class="seg-btn" data-pay="ABA">ABA</button>
-            <button class="seg-btn" data-pay="Wing">Wing</button>
-            <button class="seg-btn" data-pay="Delivery">Delivery</button>
-            <button class="seg-btn" data-pay="Other">Other</button>
+            <button class="seg-btn" type="button" data-pay="AC">AC</button>
+            <button class="seg-btn" type="button" data-pay="ABA">ABA</button>
+            <button class="seg-btn" type="button" data-pay="Wing">Wing</button>
+            <button class="seg-btn" type="button" data-pay="Delivery">Delivery</button>
+            <button class="seg-btn" type="button" data-pay="Other">Other</button>
           </div>
           <input id="payment" class="input small" placeholder="Selected payment..." readonly />
         </div>
       </section>
 
-      <!-- Add Product -->
       <section class="card">
         <h3 class="card-title">Add Product</h3>
-
         <div class="grid grid-6 product-row">
           <div class="field field-span-2">
             <label>Product</label>
@@ -197,49 +177,53 @@
               <option value="សាប៊ូកក់សក់ និងម៉ាសសក់ CCR" data-price="16">សាប៊ូកក់សក់ និងម៉ាសសក់ CCR</option>
               <option value="សាប៊ូកក់សក់ និងម៉ាសសក់ VIP 5in1 CCR" data-price="16">សាប៊ូកក់សក់ និងម៉ាសសក់ VIP 5in1 CCR</option>
               <option value="សាប៊ូកក់សក់ និងម៉ាសសក់ Premium CCR" data-price="16">សាប៊ូកក់សក់ និងម៉ាសសក់ Premium CCR</option>
-              <option value="សាប៊ូកក់និងដុសខ្លួនក្មេង CCR" data-price="12">សាប៊ូកក់និងដុសខ្លួនក្មេង CCR</option>
+              <option value="សាប៊ូកក់ និងដុសខ្លួនក្មេង CCR" data-price="12">សាប៊ូកក់ និងដុសខ្លួនក្មេង CCR</option>
               <option value="ស្ព្រាយបាញ់សក់ CCR (Hair Spray)" data-price="10">ស្ព្រាយបាញ់សក់ CCR (Hair Spray)</option>
               <option value="ប្រេងលាបសក់ CCR ឬសេរ៉ូមសក់ VIP" data-price="12">ប្រេងលាបសក់ CCR ឬសេរ៉ូមសក់ VIP</option>
               <option value="សាប៊ូដុសខ្លួន មាសក្លិនទឹកអប់អូតែលផ្កាយ 5" data-price="12">សាប៊ូដុសខ្លួន មាសក្លិនទឹកអប់អូតែលផ្កាយ 5</option>
-              <option value="សាប៊ូដុសមុខ JELY Gluta" data-price="8.5">សាប៊ូដុសមុខ JELY Gluta</option>         
+              <option value="សាប៊ូដុសខ្លួន ផ្កាកូលាប" data-price="15">សាប៊ូដុសខ្លួន ផ្កាកូលាប</option>
+              <option value="សាប៊ូដុសមុខ JELY Gluta" data-price="8.5">សាប៊ូដុសមុខ JELY Gluta</option>
               <option value="សាប៊ូដុសមុខ យិនសិន CCR" data-price="8.50">សាប៊ូដុសមុខ យិនសិន CCR</option>
               <option value="ហ្វូមលាងមុខ (Facial Foam)" data-price="8.50">ហ្វូមលាងមុខ (Facial Foam)</option>
               <option value="ទឹកអនាម័យ JELY" data-price="8.50">ទឹកអនាម័យ JELY</option>
               <option value="ថ្នាំដុសធ្មេញ CCR" data-price="12">ថ្នាំដុសធ្មេញ CCR</option>
               <option value="ឡេខ្លួន JELY (Body Lotion)" data-price="15">ឡេខ្លួន JELY (Body Lotion)</option>
               <option value="ឡេខ្លួន Gluta SUDO" data-price="16">ឡេខ្លួន Gluta SUDO</option>
-              <option value="ឡេក្លៀក ស្ព្រៃក្លៀក SUDO" data-price="10">ឡេក្លៀក ស្ព្រៃក្លៀក SUDO</option>សាប៊ូដុសខ្លួន ផ្កាកុលាប</option>
+              <option value="ឡេក្លៀក ស្ព្រៃក្លៀក SUDO" data-price="10">ឡេក្លៀក ស្ព្រៃក្លៀក SUDO</option>
               <option value="ម៉ាស់បិទមុខ 6D CCR" data-price="15">ម៉ាស់បិទមុខ 6D CCR</option>
               <option value="ម៉ាស់អប់មុខ 24k" data-price="6">ម៉ាស់អប់មុខ 24k</option>
               <option value="BB Cream CCR" data-price="9.5">BB Cream CCR</option>
               <option value="SUNSCREEN CCR" data-price="9.5">SUNSCREEN CCR</option>
               <option value="ហ្វៃប័រផាសិន CCR" data-price="18">ហ្វៃប័រផាសិន CCR</option>
               <option value="កាហ្វេសម្រក CCR" data-price="18">កាហ្វេសម្រក CCR</option>
-
-
+              <option value="សេរ៉ូមលាបខ្លួន JELY" data-price="15">សេរ៉ូមលាបខ្លួន JELY</option>
+              <option value="សំឡីវីតាមីន JELY" data-price="15">សំឡីវីតាមីន JELY</option>
+              <option value="__custom__">+ Add New Product</option>
             </select>
+          </div>
+
+          <div class="field field-span-2 hidden" id="customProductWrap">
+            <label>New Product Name</label>
+            <input id="customProduct" class="input" placeholder="Type new product name..." />
           </div>
 
           <div class="field">
             <label>QTY</label>
             <input id="qty" class="input" type="number" min="1" step="1" value="1" />
           </div>
-
           <div class="field">
             <label>Price</label>
             <input id="price" class="input" type="number" min="0" step="0.01" value="0" />
           </div>
-
           <div class="field">
             <label>Discount</label>
             <input id="discount" class="input" type="number" min="0" step="0.01" value="0" />
           </div>
-
           <div class="field actions">
             <label>Action</label>
             <div class="btn-row">
-              <button id="btnClearRow" class="btn danger" title="Clear inputs">🗑</button>
-              <button id="btnAdd" class="btn primary" title="Add item">＋</button>
+              <button id="btnClearRow" class="btn danger" type="button" title="Clear inputs">🗑</button>
+              <button id="btnAdd" class="btn primary" type="button" title="Add item">＋</button>
             </div>
           </div>
         </div>
@@ -250,7 +234,6 @@
         </div>
       </section>
 
-      <!-- Table -->
       <section class="card">
         <div class="table-wrap">
           <table class="table table-orders">
@@ -264,9 +247,7 @@
                 <th class="num">Delete</th>
               </tr>
             </thead>
-            <tbody id="tbody">
-              <!-- rows -->
-            </tbody>
+            <tbody id="tbody"></tbody>
           </table>
         </div>
 
@@ -275,22 +256,31 @@
             <div class="total-label">TOTAL</div>
             <div class="total-value" id="total">$0.00</div>
           </div>
-
           <div class="actions-right">
-            <button class="btn soft" id="btnPrint">Print</button>
-            <button class="btn soft" id="btnCopy">Copy</button>
-            <button class="btn success" id="btnSave">Save</button>
+            <button class="btn soft" id="btnPrint" type="button">Print</button>
+            <button class="btn soft" id="btnCopy" type="button">Copy</button>
+            <button class="btn success" id="btnSave" type="button">Save</button>
           </div>
         </div>
 
-        <div class="save-hint">✅ Save (demo) to LocalStorage — later we connect to Google Sheet</div>
+        <div class="save-hint">✅ Save to LocalStorage — later we connect to Google Sheet</div>
       </section>
     </main>
   </div>
 
-  <script src="app.js"></script>
-<!--   <div id="printArea" style="display:none"></div>
- -->  
   <div id="printArea" style="display:none;"></div>
+  <script src="app.js"></script>
+  <!-- Mac Style Alert -->
+<div id="macAlert" class="mac-alert">
+
+  /// You can use different icons and styles by changing the content and CSS of .mac-alert-icon and .mac-alert-text
+  <div class="mac-alert-box">
+    <div class="mac-alert-icon" id="macAlertIcon">✔</div>
+    <div class="mac-alert-text" id="macAlertText">Saved successfully</div>
+  </div>
+</div>
+
+
+
 </body>
 </html>
