@@ -408,7 +408,7 @@ function buildSummaryText() {
   const note = noteEl.value || "-";
 
   const header = [
-    `វិក័យប័ត្រ \t\t| ${dateText}`,
+    `វិក័យប័ត្រ                    | ${dateText}`,
     `ឈ្មោះ: ${customer}`,
     `លេខទូរសព្ទ: ${phone}`,
     `ទីតាំង: ${province} | ${detailAddress}`,
@@ -426,9 +426,7 @@ function buildSummaryText() {
         const subtotal = money(it.subtotal);
         return [
           `${i + 1}. ${product}`,
-          `   ចំនួន   : ${qty}`,
-          `   តម្លៃ    : ${price}`,
-          `   សរុប    : ${subtotal}`
+          ` • ចំនួន: ${qty}   តម្លៃ: ${price}   សរុប: ${subtotal}`,
         ].join("\n");
       }).join("\n")
     : `មិនទាន់មានផលិតផល`;
