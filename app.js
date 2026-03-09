@@ -526,3 +526,31 @@ function macAlert(message, type="success"){
   },3000)
 
 }
+//
+function macAlert(message, type = "success") {
+  const alertBox = document.getElementById("macAlert");
+  const text = document.getElementById("macAlertText");
+  const icon = document.getElementById("macAlertIcon");
+
+  if (!alertBox || !text || !icon) return;
+
+  alertBox.classList.remove("hidden", "error", "warn");
+
+  if (type === "error") {
+    alertBox.classList.add("error");
+    icon.textContent = "✕";
+  } else if (type === "warn") {
+    alertBox.classList.add("warn");
+    icon.textContent = "!";
+  } else {
+    icon.textContent = "✔";
+  }
+
+  text.textContent = message;
+}
+
+function closeMacAlert() {
+  const alertBox = document.getElementById("macAlert");
+  if (!alertBox) return;
+  alertBox.classList.add("hidden");
+}
