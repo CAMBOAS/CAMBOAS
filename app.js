@@ -410,47 +410,54 @@ function buildSummaryText() {
   const payment = paymentEl.value || "-";
   const note = noteEl.value || "-";
 
-  const header = [
-    `វិក័យប័ត្រ                    | ${dateText}`,
-    `-------------------------------------------`,
-    `ឈ្មោះ: ${customer}`,
-    `លេខទូរសព្ទ: ${phone}`,
-    `ទីតាំង: ${province} | ${detailAddress}`,
-    `Page: ${page} | CloseBy: ${closeBy}`,
-    `Note: ${note}`,
-    `===========================================`,
-    `បញ្ជីផលិតផល`,
-    `-------------------------------------------`
-  ].join("\n");
-  const lines = items.length
-    ? items.map((it, i) => {
-        const product = it.product || "-";
-        const qty = it.qty ?? 0;
-        const price = money(it.price);
-        const subtotal = money(it.subtotal);
-        return [
-          `${i + 1}. ${product}`,
-          ` • ចំនួន: ${qty}   តម្លៃ: ${price}   សរុប: ${subtotal}\n`,
-        ].join("\n");
-      }).join("\n")
-    : `មិនទាន់មានផលិតផល`;
-  const footer = [
-    `===========================================`,
-    `តម្លៃសរុប៖\t\t\t: ${money(itemsTotal)}`,
-    `សេវាដឹក៖\t\t\t\t: ${money(deliveryFee)}`,
-    `ការទូទាត់៖\t ${payment}\t: ${money(grand)}`,
-    `-------------------------------------------`,
-    `លេខបម្រើអតិថិជន៖`,
-    `• 015 58 68 78`,
-    `• 089 58 68 78`,
-    `-------------------------------------------`
+  const exchangeRate = 4100;  // For exchange rate, you can replace it with a dynamic value if needed
 
-    
-    
-    
-  ].join("\n");
+function moneyRiel(value) {
+  return `${Number(value || 0).toLocaleString()}៛`;
+}
 
-  return `${header}\n${lines}\n${footer}`;
+const header = [
+  `វិក័យប័ត្រ                    | ${dateText}`,
+  `..................................................`,
+  `ឈ្មោះ:  ${customer}`,
+  `លេខទូរសព្ទ: ${phone}`,
+  `ទីតាំង: ${province} | ${detailAddress}`,
+  `ដឹកជញ្ជូន:    ${deliveryNameEl.value || "-"}`,
+  `Note:   ${note}`,
+  `..................................................`,
+  `បញ្ជីផលិតផល`,
+  `..................................................`,
+].join("\n");
+
+const lines = items.length
+  ? items.map((it, i) => {
+      const product = it.product || "-";
+      const qty = it.qty ?? 0;
+      const price = money(it.price);
+      const subtotal = money(it.subtotal);
+      return [
+        `${i + 1}. ${product}`,
+        ` • ចំនួន: ${qty}   តម្លៃ: ${price}   សរុប: ${subtotal}\n`,
+      ].join("\n");
+    }).join("\n")
+  : `មិនទាន់មានផលិតផល`;
+
+const grandRiel = grand * exchangeRate;
+
+const footer = [
+  `..................................................`,
+  `តម្លៃសរុប៖\t\t\t: ${money(itemsTotal)}`,
+  `សេវាដឹក៖\t\t\t\t: ${money(deliveryFee)}`,
+  `ការទូទាត់៖ ${payment}\t\t : ${money(grand)}`,
+  `ប្រាក់រៀល\t\t\t\t: ${moneyRiel(grandRiel)}`,
+  `..................................................`,
+  `Page: ${page} | ${closeBy}`, // You can adjust this line as needed
+  `លេខបម្រើអតិថិជន៖`,
+  `• 015 58 68 78 • 089 58 68 78`,
+  `..................................................`,
+].join("\n");
+
+return `${header}\n${lines}\n${footer}`;
 }
 // ===== Save to Google Sheet =====
 function collectPayloadForSheet() {
@@ -508,6 +515,9 @@ if (items.length === 0) {
 
 // ===== Initial render =====
 render();
+
+
+
 
 function macAlert(message, type = "success", autoClose = true) {
   const alertBox = document.getElementById("macAlert");
