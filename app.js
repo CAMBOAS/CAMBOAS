@@ -305,6 +305,7 @@ function formatDateKH(dateStr) {
 }
 
 function buildReceiptHTML() {
+
   const province = el("province")?.value || "-";
   const detailAddress = el("addressDetail")?.value || "-";
 
@@ -312,14 +313,18 @@ function buildReceiptHTML() {
   const itemsTotal = items.reduce((s, it) => s + it.subtotal, 0);
   const grand = itemsTotal + deliveryFee;
 
+  // Exchange rate USD → RIEL
+  const exchangeRate = 4100;
+  const grandRiel = grand * exchangeRate;
+
   const rows = items
     .map(
-      (it) => `
+      (it, i) => `
         <tr>
-          <td style="padding-right:6px;">${escapeHtml(it.product)}</td>
+          <td style="padding-right:6px;">${i + 1}. ${escapeHtml(it.product)}</td>
           <td class="t-center">${it.qty}</td>
-          <td class="t-right">${Number(it.price || 0).toFixed(2)}</td>
-          <td class="t-right">${Number(it.subtotal || 0).toFixed(2)}</td>
+          <td class="t-right">$${Number(it.price || 0).toFixed(2)}</td>
+          <td class="t-right">$${Number(it.subtotal || 0).toFixed(2)}</td>
         </tr>
       `
     )
@@ -327,18 +332,18 @@ function buildReceiptHTML() {
 
   return `
     <div class="print-card">
+
       <div class="print-row">
         <div class="print-title">វិក័យប័ត្រ</div>
         <div class="print-muted">កាលបរិច្ឆេទ ${escapeHtml(formatDateKH(dateEl.value))}</div>
       </div>
 
       <div class="print-hr"></div>
-
       <div>ឈ្មោះ: <strong>${escapeHtml(customerEl.value || "-")}</strong></div>
       <div>លេខទូរសព្ទ: <strong>${escapeHtml(phoneEl.value || "-")}</strong></div>
       <div>ទីតាំង: ${escapeHtml(province)} <strong>:</strong> ${escapeHtml(detailAddress)}</div>
+      <div>ដឹកជញ្ជូន: ${escapeHtml(deliveryNameEl.value || "-")}</div>
       <div>Note: ${escapeHtml(noteEl.value || "-")}</div>
-      <div>Page: <strong>${escapeHtml(pageEl.value || "-")}</strong> | CloseBy: ${escapeHtml(closeByEl.value || "-")}</div>
 
       <div class="print-hr"></div>
 
@@ -347,7 +352,7 @@ function buildReceiptHTML() {
           <tr>
             <th style="text-align:left;">ផលិតផល</th>
             <th class="t-center">ចំនួន</th>
-           <th class="t-right">តម្លៃ</th>
+            <th class="t-right">តម្លៃ</th>
             <th class="t-right">សរុប</th>
           </tr>
         </thead>
@@ -355,7 +360,9 @@ function buildReceiptHTML() {
           ${rows || `<tr><td colspan="4">No items</td></tr>`}
         </tbody>
       </table>
+
       <div class="print-hr"></div>
+
       <div class="print-row">
         <div>តម្លៃសរុប</div>
         <div>$${itemsTotal.toFixed(2)}</div>
@@ -365,15 +372,29 @@ function buildReceiptHTML() {
         <div>$${deliveryFee.toFixed(2)}</div>
       </div>
       <div class="print-row">
-         <div>ការទូទាត់: <strong>${escapeHtml(paymentEl.value || "-")}</strong></div>
-         <strong><div>$${grand.toFixed(2)}</div></strong>
+        <div>ការទូទាត់: <strong>${escapeHtml(paymentEl.value || "-")}</strong></div>
+        <div style="text-align:right;">
+          <div style="font-weight:700; font-size:12px;">
+            $${grand.toFixed(2)}
+          </div>
+          <div style="font-size:13px; color:#666;">
+            ${Math.round(grandRiel).toLocaleString()}៛
+          </div>
+        </div>
       </div>
       <div class="print-hr"></div>
-      <div class="print-muted">លេខបម្រើអតិថិជន 015 58 68 78 / 089 58 68 78</div>
+      <div>
+        Page: <strong>${escapeHtml(pageEl.value || "-")}</strong> |
+        CloseBy: ${escapeHtml(closeByEl.value || "-")}
+      </div>
+      <div class="print-muted">
+        លេខបម្រើអតិថិជន 015 58 68 78 / 089 58 68 78
+      </div>
       <div class="print-hr"></div>
     </div>
   `;
 }
+
 
 btnPrint.addEventListener("click", () => {
 if (items.length === 0) {
