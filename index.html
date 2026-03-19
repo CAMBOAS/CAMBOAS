@@ -3,104 +3,101 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CAMBO</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <title>CAMBO DASHBOARD</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ 
+ <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;600;700&display=swap" rel="stylesheet" />
+ 
+
+ 
+
+
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="logo"></div>
-        <div class="brand-text">
-          <div class="brand-title">CAMBO SOLO</div>
-          <div class="brand-sub">Customer / Orders</div>
-        </div>
-      </div>
+  <div class="app-shell">
+    <div class="page-wrap">
 
-      <nav class="nav">
-        <a href="index-fixed.html" class="nav-btn">Dashboard</a>
-        <a href="index-fixed.html" class="nav-btn active">Customer Orders</a>
-        <a href="pages/search-edit-data.html" class="nav-btn">Search & Edit Data</a>
-        <a href="pages/orders.html" class="nav-btn">Stock</a>
-      </nav>
+      <!-- Top Bar -->
+      <section class="top-header glass-card">
+        <div class="title-box">Home Page</div>
 
-      <div class="sidebar-foot">
-        <div class="hint">UI v1 (Fast to use)</div>
-      </div>
-    </aside>
+        <div class="top-actions">
+          <button id="themeToggle" class="theme-btn" type="button" title="Toggle Theme">
+            ☀️
+          </button>
 
-    <main class="main">
-      <header class="topbar">
-        <div class="avatar-ring"></div>
-        <div class="topbar-right">
-          <button id="themeToggle" class="btn soft theme-toggle" type="button" title="Toggle theme">🌙</button>
-          <div class="status-pill">
-            <span class="dot"></span>
-            <select id="status" class="select small">
+          <div class="status-select-wrap">
+            <span class="status-dot"></span>
+            <select id="status">
               <option value="Pending">Status: Pending</option>
               <option value="Confirmed">Status: Confirmed</option>
-              <option value="Delivered">Status: Delivered</option>
+              <option value="Done">Status: Done</option>
               <option value="Cancel">Status: Cancel</option>
-            </select>
-          </div>
-        </div>
-      </header>
-
-      <section class="card">
-        <div class="grid grid-4">
-          <div class="field">
-            <label>Pages</label>
-            <select id="page" class="select">
-              <option value="">Select...</option>
-              <option>Helen CCR</option>
-              <option>Brand1 CCR</option>
-              <option>JELY BRAND BY HELEN</option>
-              <option>JELY CCR BRAND</option>
-              <option>ចែម៉ៅ CCR BRAND</option>
-              <option>ហេឡេន CCR</option>
-              <option>ស្រីម៉ៅ JELY</option>
-              <option>ស្រីម៉ៅ JELY BRAND</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>CloseBy</label>
-            <select id="closeBy" class="select">
-              <option value="">Select...</option>
-              <option>John Helen</option>
-              <option>John Wick</option>
-              <option>Srey Phear</option>
-              <option>Srey Pichh</option>
-              <option>Bong Phear</option>
-              <option>Admin</option>
-
             </select>
           </div>
         </div>
       </section>
 
-      <section class="card">
-        <h3 class="card-title">Customer Info</h3>
-        <div class="grid grid-3">
-          <div class="field">
-            <label>Customer</label>
-            <input id="customer" class="input" placeholder="Customer name..." />
+      <!-- Filter -->
+      <section class="glass-card filter-card">
+        <div class="field-group">
+          <label>Pages</label>
+          <select id="page">
+            <option value="">Select...</option>
+           <option>Helen CCR</option>
+
+            <option>Brand1 CCR</option>
+            <option>JELY BRAND BY HELEN</option>
+            <option>JELY CCR BRAND</option>
+            <option>ចែម៉ៅ CCR BRAND</option>
+            <option>ហេឡេន CCR</option>
+            <option>ស្រីម៉ៅ JELY</option>
+            <option>ស្រីម៉ៅ JELY BRAND </option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label>CloseBy</label>
+          <select id="closeBy">
+            <option value="">Select...</option>
+            <option>Jonh Helen</option>
+            <option>Jonh Wick</option>
+            <option>Srey Pichh</option>
+            <option>Srey Phear</option>
+            <option>Bong Phear</option>
+            <option>Admin</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Customer Info -->
+      <section class="glass-card section-card">
+        <h2 class="section-title">ព័ត៌មានអតិថិជន</h2>
+
+        <div class="form-grid">
+          <div class="field-group">
+            <label>ឈ្មោះអតិថិជន</label>
+            <input type="text" id="customer" placeholder="customer..." />
           </div>
-          <div class="field">
-            <label>Phone</label>
-            <input id="phone" class="input" placeholder="Phone..." />
+
+          <div class="field-group">
+            <label>លេខទូរសព្ទ</label>
+            <input type="text" id="phone" placeholder="phone..." />
           </div>
-          <div class="field">
-            <label>Date</label>
-            <input id="date" type="date" class="input" />
+
+          <div class="field-group">
+            <label>ថ្ងៃខែឆ្នាំ</label>
+            <input type="date" id="date" />
           </div>
-          <div class="field field-span-2">
-            <label>Province</label>
-            <select id="province" class="select">
-              <option value="">Select Province...</option>
+
+          <div class="field-group span-2">
+            <label>ទីតាំង</label>
+            <select id="province">
+              <option value="">ជ្រើសរើសទីតាំង...</option>
               <option>រាជធានីភ្នំពេញ</option>
               <option>ខេត្តបន្ទាយមានជ័យ</option>
               <option>ខេត្តបាត់ដំបង</option>
@@ -128,158 +125,159 @@
               <option>ខេត្តត្បូងឃ្មុំ</option>
             </select>
           </div>
-          <div class="field">
-            <label>Detail Address</label>
-            <input id="addressDetail" class="input" placeholder="Village / Commune / Street..." />
+
+          <div class="field-group">
+            <label>ទីតាំងតំបន</label>
+            <input type="text" id="addressDetail" placeholder="ភូមិឃុំ / ផ្លូវ / ផ្ទះលេខ..." />
           </div>
-          <div class="field field-span-2">
-            <label>Delivery</label>
+
+          <div class="field-group span-2">
+            <label>ដឹកជញ្ជូន</label>
             <select id="deliveryName" class="select">
               <option value="">Delivery Name...</option>
               <option>ភ្នំពេញ តាធំ</option>
               <option>ភ្នំពេញ តាតូច</option>
-              <option>វិរៈ ប៊ុនថាំ</option>
+              <option>វីរៈ ប៊ុនថាំ</option>
               <option>J&amp;T</option>
               <option>DRSB</option>
               <option>ដឹកខ្លួនឯង</option>
               <option>Other</option>
             </select>
           </div>
-          <div class="field">
-            <label>Delivery Fee</label>
-            <input id="deliveryFee" class="input" type="number" min="0" step="0.01" value="0" />
+
+          <div class="field-group">
+            <label>ថ្លៃដឹកជញ្ជូន</label>
+            <input type="number" id="deliveryFee" placeholder="0" value="0" min="0" step="0.01" />
           </div>
         </div>
 
-        <div class="divider"></div>
-
-        <div class="field">
-          <label>Payment</label>
-          <div class="segmented" id="paymentGroup">
-            <button class="seg-btn" type="button" data-pay="AC">AC</button>
-            <button class="seg-btn" type="button" data-pay="ABA">ABA</button>
-            <button class="seg-btn" type="button" data-pay="Wing">Wing</button>
-            <button class="seg-btn" type="button" data-pay="Delivery">Delivery</button>
-            <button class="seg-btn" type="button" data-pay="Other">Other</button>
+        <div class="payment-block">
+          <label class="payment-label">បង់ប្រាក់</label>
+          <div class="payment-options" id="paymentOptions">
+            <button type="button" class="payment-btn" data-value="AC">AC</button>
+            <button type="button" class="payment-btn" data-value="ABA">ABA</button>
+            <button type="button" class="payment-btn" data-value="Wing">Wing</button>
+            <button type="button" class="payment-btn" data-value="Delivery">Delivery</button>
+            <button type="button" class="payment-btn" data-value="Other">Other</button>
           </div>
-          <input id="payment" class="input small" placeholder="Selected payment..." readonly />
+          <input type="text" id="payment" readonly placeholder="Selected payment..." />
         </div>
       </section>
 
-      <section class="card">
-        <h3 class="card-title">Add Product</h3>
-        <div class="grid grid-6 product-row">
-          <div class="field field-span-2">
-            <label>Product</label>
-            <select id="product" class="select">
-              <option value="">Select product...</option>
-              <option value="__custom__">+ Add New Product</option>
-              <option value="សាប៊ូកក់ និងស្បា JELY" data-price="15">សាប៊ូកក់ និងស្បា JELY</option>
-              <option value="សាប៊ូកក់ និងម៉ាស CCR" data-price="16">សាប៊ូកក់ និងម៉ាស CCR</option>
-              <option value="សាប៊ូកក់ និងម៉ាសសក់ VIP 5in1 CCR" data-price="16">សាប៊ូកក់ និងម៉ាសសក់ VIP 5in1 CCR</option>
-              <option value="សាប៊ូកក់ និងម៉ាស Premium CCR" data-price="16">សាប៊ូកក់ និងម៉ាស Premium CCR</option>
-              <option value="សាប៊ូកក់ និងដុសខ្លួនក្មេង CCR" data-price="12">សាប៊ូកក់ និងដុសខ្លួនក្មេង CCR</option>
-              <option value="ស្ព្រាយបាញ់សក់ CCR Hair Spray" data-price="10">ស្ព្រាយបាញ់សក់ CCR Hair Spray</option>
-              <option value="ប្រេងលាបសក់ CCR ឬសេរ៉ូមសក់ VIP" data-price="12">ប្រេងលាបសក់ CCR ឬសេរ៉ូមសក់ VIP</option>
-              <option value="សាប៊ូដុសខ្លួន មាសក្លិនទឹកអប់អូតែលផ្កាយ 5" data-price="12">សាប៊ូដុសខ្លួន មាសក្លិនទឹកអប់អូតែលផ្កាយ 5</option>
-              <option value="សាប៊ូដុសខ្លួន ផ្កាកូលាប" data-price="15">សាប៊ូដុសខ្លួន ផ្កាកូលាប</option>
-              <option value="សាប៊ូដុសមុខ JELY Gluta" data-price="8.5">សាប៊ូដុសមុខ JELY Gluta</option>
-              <option value="សាប៊ូដុសមុខ យិនសិន CCR" data-price="8.50">សាប៊ូដុសមុខ យិនសិន CCR</option>
-              <option value="ហ្វូមលាងមុខ Facial Foam" data-price="8.50">ហ្វូមលាងមុខ Facial Foam</option>
-              <option value="ទឹកអនាម័យ JELY" data-price="8.50">ទឹកអនាម័យ JELY</option>
-              <option value="ថ្នាំដុសធ្មេញ CCR" data-price="12">ថ្នាំដុសធ្មេញ CCR</option>
-              <option value="ឡេខ្លួន JELY Body Lotion" data-price="15">ឡេខ្លួន JELY Body Lotion</option>
-              <option value="ឡេខ្លួន Gluta SUDO" data-price="16">ឡេខ្លួន Gluta SUDO</option>
-              <option value="ឡេក្លៀក ស្ព្រៃក្លៀក SUDO" data-price="10">ឡេក្លៀក ស្ព្រៃក្លៀក SUDO</option>
-              <option value="ម៉ាស់បិទមុខ 6D CCR" data-price="15">ម៉ាស់បិទមុខ 6D CCR</option>
-              <option value="ម៉ាស់អប់មុខ 24k" data-price="6">ម៉ាស់អប់មុខ 24k</option>
-              <option value="BB Cream CCR" data-price="9.5">BB Cream CCR</option>
-              <option value="SUNSCREEN CCR" data-price="9.5">SUNSCREEN CCR</option>
-              <option value="ហ្វៃប័រផាសិន CCR" data-price="18">ហ្វៃប័រផាសិន CCR</option>
-              <option value="កាហ្វេសម្រក CCR" data-price="18">កាហ្វេសម្រក CCR</option>
-              <option value="សេរ៉ូមលាបខ្លួន JELY" data-price="15">សេរ៉ូមលាបខ្លួន JELY</option>
-              <option value="សំឡីវីតាមីន JELY" data-price="15">សំឡីវីតាមីន JELY</option>
-            </select>
+      <!-- Product Section -->
+      <section class="glass-card section-card">
+        <div class="section-head">
+        <h2 class="section-title">ផលិតផល</h2>
+
+        <div class="product-tabs">
+        <button class="tab-btn active" data-category="All">All</button>
+        <button class="tab-btn" data-category="Hair">Hair</button>
+        <button class="tab-btn" data-category="Body">Body</button>
+        <button class="tab-btn" data-category="Face">Face</button>
+        <button class="tab-btn" data-category="Drink">Drink</button>
+        </div>
+
+        </div>
+
+        <div id="productGrid" class="product-grid"></div>
+
+        <div class="quick-add-bar">
+          <div class="quick-left">
+            <input
+              type="text"
+              id="manualProductInput"
+              class="manual-product-input"
+              placeholder="Product name..."
+            />
           </div>
 
-          <div class="field field-span-2 hidden" id="customProductWrap">
-            <label>New Product Name</label>
-            <input id="customProduct" class="input" placeholder="Type new product name..." />
-          </div>
-
-          <div class="field">
-            <label>QTY</label>
-            <input id="qty" class="input" type="number" min="1" step="1" value="1" />
-          </div>
-          <div class="field">
-            <label>Price</label>
-            <input id="price" class="input" type="number" min="0" step="0.01" value="0" />
-          </div>
-          <div class="field">
-            <label>Discount</label>
-            <input id="discount" class="input" type="number" min="0" step="0.01" value="0" />
-          </div>
-          <div class="field actions">
-            <label>Action</label>
-            <div class="btn-row">
-              <button id="btnClearRow" class="btn danger" type="button" title="Clear inputs">🗑</button>
-              <button id="btnAdd" class="btn primary" type="button" title="Add item">＋</button>
+          <div class="quick-right">
+            <div class="mini-field">
+              <label>QTY</label>
+              <input type="number" id="manualQty" value="1" min="1" step="1" />
             </div>
+            <div class="mini-field">
+              <label>Price</label>
+              <input type="number" id="manualPrice" value="0" min="0" step="0.01" />
+            </div>
+            <div class="mini-field">
+              <label>Discount</label>
+              <input type="number" id="manualDiscount" value="0" min="0" step="0.01" />
+            </div>
+            <button id="manualAddBtn" class="mini-add-btn" type="button">+</button>
           </div>
-        </div>
-
-        <div class="field" style="margin-top:14px;">
-          <label>Note</label>
-          <textarea id="note" class="textarea" placeholder="Write note..."></textarea>
         </div>
       </section>
 
-      <section class="card">
+      <!-- Note -->
+      <section class="glass-card note-card">
+        <h2 class="section-title">Note</h2>
+        <textarea id="note" placeholder="Write note here..."></textarea>
+      </section>
+
+      <!-- Table -->
+      <section class="glass-card table-card">
         <div class="table-wrap">
-          <table class="table table-orders">
+          <table>
             <thead>
               <tr>
-                <th>Product</th>
-                <th class="num">QTY</th>
-                <th class="num">Price</th>
-                <th class="num">Discount</th>
-                <th class="num">Subtotal</th>
-                <th class="num">Delete</th>
+                <th>ផលិតផល</th>
+                <th>ចំនួន</th>
+                <th>តម្លៃ</th>
+                <th>បញ្ចុះតម្លៃ</th>
+                <th>សរុប</th>
+                <th>លុប</th>
               </tr>
             </thead>
-            <tbody id="tbody"></tbody>
+            <tbody id="itemsTableBody">
+              <tr class="empty-row">
+                <td colspan="6">No products added yet.</td>
+              </tr>
+            </tbody>
           </table>
         </div>
 
-        <div class="summary">
+        <div class="bottom-bar">
           <div class="total-box">
-            <div class="total-label">TOTAL</div>
-            <div class="total-value" id="total">$0.00</div>
+            <span>Total</span>
+            <strong id="grandTotal">0.00</strong>
           </div>
-          <div class="actions-right">
-            <button class="btn soft" id="btnPrint" type="button">Print</button>
-            <button class="btn soft" id="btnCopy" type="button">Copy</button>
-            <button class="btn success" id="btnSave" type="button">Save</button>
+
+          <div class="bottom-actions-wrap">
+            <div class="action-buttons">
+              <div class="receipt-no-inline">
+                <label for="receiptNo">លេខប៉ុង</label>
+                <input type="number" id="receiptNo" placeholder="បញ្ចូលលេខ..." min="0" step="1" />
+              </div>
+
+              <button id="printBtn" class="btn btn-print" type="button">Print</button>
+              <button id="copyBtn" class="btn btn-copy" type="button">Copy</button>
+              <button id="saveBtn" class="btn btn-save" type="button">Save</button>
+              <button id="shareBtn" class="btn btn-share" type="button" aria-label="Share receipt">📤 Share</button>
+            </div>
+
+            <div class="bottom-toggle-row">
+              <div class="bottom-toggle-actions">
+                <button id="toggleQrBtn" class="toggle-qr-btn is-on" type="button" aria-pressed="true">QR Code: ON</button>
+              </div>
+            </div>
           </div>
         </div>
-
-        <div class="save-hint">✅ Save to LocalStorage — later we connect to Google Sheet</div>
       </section>
-    </main>
-  </div>
 
-  <div id="printArea" style="display:none;"></div>
-
-  <div id="macAlert" class="mac-alert hidden">
-    <div class="mac-alert-overlay" onclick="closeMacAlert()"></div>
-    <div class="mac-alert-card" role="dialog" aria-modal="true" aria-labelledby="macAlertTitle">
-      <div id="macAlertIcon" class="mac-alert-icon">✔</div>
-      <h3 id="macAlertTitle" class="mac-alert-title">ការជូនដំណឹង</h3>
-      <p id="macAlertText" class="mac-alert-text">Saved successfully</p>
-      <button class="mac-alert-btn" onclick="closeMacAlert()">យល់ព្រម</button>
     </div>
   </div>
 
-  <script src="app.js"></script>
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- Print Area -->
+<div id="printArea" style="display:none;"></div>
+
+<script>
+    window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUBnWArrEqqMR7AeUeTe_7gptv0dYfo9PR3oDL5ZzfPknHXj4_qC8rmYfFbRrIHAgC-A/exec";
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
