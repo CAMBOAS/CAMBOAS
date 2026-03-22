@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAMBO V2 - Search & Edit Orders</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="standalone-page">
+    <header class="topbar">
+      <div>
+        <h1>Search & Edit Orders</h1>
+        <p>
+          ស្វែងរកតាមឈ្មោះ ឬ លេខទូរសព្ទ ហើយចុចមើលព័ត៌មានលម្អិត ឬកែប្រែបានភ្លាមៗ។
+        </p>
+      </div>
+
+      <div class="top-actions">
+        <button class="ghost-btn" id="printTableBtn">Print Table</button>
+        <button class="primary-btn" id="newRecordBtn">+ Add Record</button>
+      </div>
+    </header>
+
+    <section class="stats-grid">
+      <article class="stat-card">
+        <div class="stat-label">Total Records</div>
+        <div class="stat-value" id="totalRecords">0</div>
+        <div class="stat-note">Total order records</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value" id="pendingCount">0</div>
+        <div class="stat-note">Orders waiting</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">Delivered</div>
+        <div class="stat-value" id="deliveredCount">0</div>
+        <div class="stat-note">Completed orders</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">Revenue</div>
+        <div class="stat-value" id="revenueCount">$0.00</div>
+        <div class="stat-note">Filtered total</div>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <div class="smart-search-wrap">
+          <span class="search-icon">🔎</span>
+          <input
+            id="searchInput"
+            class="smart-search"
+            placeholder="Search by customer name or phone number..."
+          />
+        </div>
+
+        <div class="toolbar-filters">
+          <select id="statusFilter" class="select">
+            <option value="">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancel">Cancel</option>
+          </select>
+
+          <select id="pageFilter" class="select">
+            <option value="">All Pages</option>
+          </select>
+
+          <select id="closeByFilter" class="select">
+            <option value="">All CloseBy</option>
+          </select>
+
+          <input id="dateFilter" type="date" class="select" />
+
+          <button class="ghost-btn" id="clearFiltersBtn">Reset</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Page</th>
+              <th>CloseBy</th>
+              <th>Province</th>
+              <th>Products</th>
+              <th>Total</th>
+              <th>Payment</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="table-foot">
+        <div id="resultText">Showing 0 records</div>
+        <div class="foot-actions">
+          <span class="soft-pill" id="activeFiltersText">No filters</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="drawer" id="detailDrawer">
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <div>
+          <h2>Order Detail</h2>
+          <p>
+            នៅទីនេះអ្នកអាចមើលលម្អិត កែប្រែ គណនាតម្លៃឡើងវិញ និង Print បាន។
+          </p>
+        </div>
+        <button class="ghost-btn" id="closeDrawerBtn">Close</button>
+      </div>
+
+      <div class="detail-summary">
+        <div class="detail-chip">
+          <span>Order ID</span>
+          <strong id="detailOrderIdText">-</strong>
+        </div>
+
+        <div class="detail-chip">
+          <span>Status</span>
+          <strong id="detailStatusText">-</strong>
+        </div>
+
+        <div class="detail-chip">
+          <span>Grand Total</span>
+          <strong id="detailGrandTotalText">$0.00</strong>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Order ID</label>
+          <input id="editOrderId" class="input" readonly />
+        </div>
+
+        <div class="field">
+          <label>Date</label>
+          <input id="editDate" type="date" class="input" />
+        </div>
+
+        <div class="field">
+          <label>Customer</label>
+          <input id="editCustomer" class="input" />
+        </div>
+
+        <div class="field">
+          <label>Phone</label>
+          <input id="editPhone" class="input" />
+        </div>
+
+        <div class="field">
+          <label>Page</label>
+          <input id="editPage" class="input" />
+        </div>
+
+        <div class="field">
+          <label>CloseBy</label>
+          <input id="editCloseBy" class="input" />
+        </div>
+
+        <div class="field">
+          <label>Province</label>
+          <input id="editProvince" class="input" />
+        </div>
+
+        <div class="field">
+          <label>Delivery Name</label>
+          <input id="editDeliveryName" class="input" />
+        </div>
+
+        <div class="field full">
+          <label>Detail Address</label>
+          <input id="editAddress" class="input" />
+        </div>
+
+        <div class="field">
+          <label>Payment</label>
+          <input id="editPayment" class="input" />
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <select id="editStatus" class="input">
+            <option>Pending</option>
+            <option>Confirmed</option>
+            <option>Delivered</option>
+            <option>Cancel</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Delivery Fee</label>
+          <input id="editDeliveryFee" class="input" type="number" step="0.01" />
+        </div>
+
+        <div class="field">
+          <label>Grand Total</label>
+          <input id="editGrandTotal" class="input" readonly />
+        </div>
+
+        <div class="field full">
+          <label>Note</label>
+          <textarea id="editNote" class="input textarea"></textarea>
+        </div>
+      </div>
+
+      <section class="product-editor">
+        <div class="panel-head">
+          <h3>Products</h3>
+          <button class="ghost-btn small-btn" id="addLineBtn">+ Add Line</button>
+        </div>
+
+        <div class="table-wrap inner-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Discount</th>
+                <th>Subtotal</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="productLines"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="drawer-foot">
+        <button class="ghost-btn" id="printDetailBtn">Print Invoice</button>
+        <button class="ghost-btn" id="deleteBtn">Delete</button>
+        <button class="ghost-btn" id="cancelEditBtn">Cancel</button>
+        <button class="primary-btn" id="saveEditBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
