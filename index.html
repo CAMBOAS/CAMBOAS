@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAMBO MINI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body data-page="dashboard">
+  <div class="app-shell">
+    
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="brand brand-desktop">
+          <div class="brand-logo">CM</div>
+        </div>
+        <div class="brand brand-mobile">
+          <div class="brand-logo">CM</div>
+          <div class="brand-text">
+            <h2>CAMBO MINI</h2>
+            <p>POS Dashboard</p>
+          </div>
+        </div>
+        <nav class="menu" aria-label="Main navigation">
+          <a class="menu-item" data-page="dashboard" data-label="Dashboard" href="index.html"><span class="menu-icon">🏠</span><span class="menu-label">Dashboard</span></a>
+          <a class="menu-item" data-page="orders" data-label="Orders" href="pages/orders.html"><span class="menu-icon">🧾</span><span class="menu-label">Orders</span></a>
+          <a class="menu-item" data-page="products" data-label="Products" href="pages/products.html"><span class="menu-icon">🛍️</span><span class="menu-label">Products</span></a>
+          <a class="menu-item" data-page="search-edit" data-label="Search & Edit" href="pages/search-edit.html"><span class="menu-icon">🔍</span><span class="menu-label">Search & Edit</span></a>
+          <a class="menu-item" data-page="customers" data-label="Customers" href="pages/customers.html"><span class="menu-icon">👥</span><span class="menu-label">Customers</span></a>
+          <a class="menu-item" data-page="reports" data-label="Reports" href="pages/reports.html"><span class="menu-icon">📊</span><span class="menu-label">Reports</span></a>
+          <a class="menu-item" data-page="settings" data-label="Settings" href="pages/settings.html"><span class="menu-icon">⚙️</span><span class="menu-label">Settings</span></a>
+        </nav>
+      </div>
+      <div class="sidebar-footer">
+        <button id="themeToggle" class="theme-btn">🌙 Dark Mode</button>
+        <div class="profile profile-sidebar">
+          <div class="avatar">C</div>
+          <div class="profile-text">
+            <strong>CAMBO MINI</strong>
+            <span>Admin</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <main class="main">
+      
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-btn mobile-menu" id="menuToggle" aria-label="Open menu">☰</button>
+          <div>
+            <h1>ប្រព័ន្ធគ្រប់គ្រងការលក់</h1>
+            <p>Dashboard main page</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Search product, order, customer..." />
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-btn" aria-label="Notifications">🔔</button>
+            <button class="icon-btn" aria-label="Messages">💬</button>
+          </div>
+        </div>
+      </header>
+    
+      
+      <section class="hero-card">
+        <div class="hero-content">
+          <h2>ផ្ទាំងគ្រប់គ្រង POS សម្រាប់ការលក់</h2>
+          <p>ខ្ញុំបានរៀបចំ structure ថ្មីឲ្យបែប multi-page ដើម្បីងាយបន្ថែម page ថ្មីៗនៅពេលក្រោយ ហើយ Dashboard នៅជា <strong>index.html</strong> ដដែល ដើម្បីឲ្យចូល project បានស្រួលជាងមុន។</p>
+          <div class="hero-actions">
+            <a class="primary-btn" href="pages/orders.html">Open Orders</a>
+            <a class="secondary-btn" href="pages/search-edit.html">Search & Edit</a>
+          </div>
+        </div>
+        <div class="hero-preview">
+          <div class="preview-card preview-card-main">
+            <div class="preview-header"></div>
+            <div class="preview-media"></div>
+            <div class="preview-lines"><span></span><span></span><span></span></div>
+          </div>
+          <div class="preview-card preview-card-float"></div>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">💰</div><div><p class="stat-label">Total Sales</p><h3>$2,480</h3><span class="stat-growth up">+12.4%</span></div></div>
+        <div class="stat-card"><div class="stat-icon">🧾</div><div><p class="stat-label">Orders Today</p><h3>128</h3><span class="stat-growth up">+8.2%</span></div></div>
+        <div class="stat-card"><div class="stat-icon">👥</div><div><p class="stat-label">Customers</p><h3>764</h3><span class="stat-growth up">+4.1%</span></div></div>
+        <div class="stat-card"><div class="stat-icon">📦</div><div><p class="stat-label">Stock Items</p><h3>53</h3><span class="stat-growth down">-2.7%</span></div></div>
+      </section>
+
+      <section class="content-grid">
+        <div class="panel">
+          <div class="panel-header"><h3>Popular Products</h3><a class="text-btn" href="pages/products.html">See All</a></div>
+          <div class="product-grid">
+            <div class="product-card"><div class="product-thumb gradient-1"></div><h4>VIP Hair Shampoo</h4><p>Healthy hair care product</p><div class="product-meta"><strong>$16</strong><span>In Stock</span></div></div>
+            <div class="product-card"><div class="product-thumb gradient-2"></div><h4>Premium Hair Mask</h4><p>Smooth and shiny effect</p><div class="product-meta"><strong>$16</strong><span>Hot</span></div></div>
+            <div class="product-card"><div class="product-thumb gradient-3"></div><h4>Fiber Passion</h4><p>Drink category product</p><div class="product-meta"><strong>$18</strong><span>Low Stock</span></div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h3>Quick Actions</h3></div>
+          <div class="action-list">
+            <a class="action-card" href="pages/products.html">➕ Add Product</a>
+            <a class="action-card" href="pages/orders.html">🧾 Create Receipt</a>
+            <a class="action-card" href="pages/search-edit.html">🔍 Search & Edit</a>
+            <a class="action-card" href="pages/reports.html">📊 View Reports</a>
+            <a class="action-card" href="pages/customers.html">👥 Customers</a>
+            <a class="action-card" href="pages/settings.html">⚙️ Settings</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel table-panel">
+        <div class="panel-header"><h3>Recent Orders</h3><button class="text-btn">Export</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Invoice</th><th>Customer</th><th>Product</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody id="orderTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+    
+    <nav class="mobile-bottom-nav" aria-label="Mobile navigation">
+      <a class="bottom-nav-item" data-page="dashboard" href="index.html"><span>🏠</span><small>Home</small></a>
+      <a class="bottom-nav-item" data-page="products" href="pages/products.html"><span>🛍️</span><small>Products</small></a>
+      <a class="bottom-nav-item create" data-page="orders" href="pages/orders.html"><span>➕</span><small>Orders</small></a>
+      <a class="bottom-nav-item" data-page="reports" href="pages/reports.html"><span>📊</span><small>Reports</small></a>
+      <a class="bottom-nav-item" data-page="settings" href="pages/settings.html"><span>👤</span><small>Profile</small></a>
+    </nav>
+    
+  </div>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
