@@ -4,7 +4,7 @@ const products = [
     name: "សាប៊ូកក់&ស្បាសក់ JELY",
     price: 15,
     category: "Hair",
-    image: "../images/products/hair/សាប៊ូកក់សក់ និងស្បាសក់ JELY.png",
+    image: "images/products/hair/សាប៊ូកក់សក់ និងស្បាសក់ JELY.png",
     detail: "សាប៊ូកក់សក់ និងស្បាសក់ JELY"
   },
   {
@@ -12,7 +12,7 @@ const products = [
     name: "សាប៊ូកក់&ម៉ាសសក់ CCR",
     price: 16,
     category: "Hair",
-    image: "../images/products/hair/សាប៊ូកក់សក់ និងម៉ាសសក់ CCR.png",
+    image: "images/products/hair/សាប៊ូកក់សក់ និងម៉ាសសក់ CCR.png",
     detail: "សាប៊ូកក់ និងម៉ាសសក់ CCR"
   },
   {
@@ -20,7 +20,7 @@ const products = [
     name: "ស្ព្រាយបាញ់សក់ CCR",
     price: 10,
     category: "Hair",
-    image: "../images/products/hair/ស្រ្ពៃបាញ់សក់.png",
+    image: "images/products/hair/ស្រ្ពៃបាញ់សក់.png",
     detail: "ស្ព្រាយបាញ់សក់ CCR Hair Spray"
   },
   {
@@ -28,7 +28,7 @@ const products = [
     name: "សាប៊ូកក់&ម៉ាសសក់ VIP 5in1 CCR",
     price: 16,
     category: "Hair",
-    image: "../images/products/hair/សក់និងម៉ាស 5in1.png",
+    image: "images/products/hair/សក់និងម៉ាស 5in1.png",
     detail: "សាប៊ូកក់ និងម៉ាសសក់ VIP 5in1 CCR"
   },
   {
@@ -36,7 +36,7 @@ const products = [
     name: "សាប៊ូកក់&ម៉ាសសក់ Premium CCR",
     price: 16,
     category: "Hair",
-    image: "../images/products/hair/សក់និងម៉ាស Premium CCR.png",
+    image: "images/products/hair/សក់និងម៉ាស Premium CCR.png",
     detail: "សាប៊ូកក់ និងម៉ាសសក់ Premium CCR"
   },
   {
@@ -44,7 +44,7 @@ const products = [
     name: "ប្រេងលាបសក់/សេរ៉ូមសក់ VIP CCR",
     price: 12,
     category: "Hair",
-    image: "../images/products/hair/ប្រេងលាបសក់ CCR.png",
+    image: "images/products/hair/ប្រេងលាបសក់ CCR.png",
     detail: "ប្រេងលាបសក់ CCR VIP"
   },
   {
@@ -52,7 +52,7 @@ const products = [
     name: "ឡេលាបខ្លួន Gluta SUDO",
     price: 16,
     category: "Body",
-    image: "../images/products/body/ឡេលាបខ្លួន Gluta SUDO.png",
+    image: "images/products/body/ឡេលាបខ្លួន Gluta SUDO.png",
     detail: "ឡេលាបខ្លួន Gluta SUDO"
   },
   {
@@ -60,7 +60,7 @@ const products = [
     name: "សេរ៉ូមលាបខ្លួន JELY",
     price: 15,
     category: "Body",
-    image: "../images/products/body/សេរ៉ូមលាបខ្លួន JELY BODY ESSENCE VC WHITENGING.png",
+    image: "images/products/body/សេរ៉ូមលាបខ្លួន JELY BODY ESSENCE VC WHITENGING.png",
     detail: "សេរ៉ូមលាបខ្លួន Body Serum JELY"
   },
   {
@@ -68,7 +68,7 @@ const products = [
     name: "ស្រ្ពៃក្លៀក/ឡេក្លៀក SUDO",
     price: 10,
     category: "Body",
-    image: "../images/products/body/ស្រ្ពៃក្លៀក និងឡេកលៀត.png",
+    image: "images/products/body/ស្រ្ពៃក្លៀក និងឡេកលៀត.png",
     detail: "ស្រ្ពៃក្លៀក/ឡេក្លៀក SUDO"
   },
   {
@@ -76,7 +76,7 @@ const products = [
     name: "សាប៊ូដុសខ្លួន CCR (ក្លិនទឹកអប់)",
     price: 12,
     category: "Body",
-    image: "../images/products/body/សាប៊ូដុសខ្លួនមាសក្លិនទឹកអប់អូតែលផ្កាយ 5.png",
+    image: "images/products/body/សាប៊ូដុសខ្លួនមាសក្លិនទឹកអប់អូតែលផ្កាយ 5.png",
     detail: "សាប៊ូដុសខ្លួន CCR (ក្លិនទឹកអប់)"
   },
   {
@@ -84,7 +84,7 @@ const products = [
     name: "សាប៊ូដុសខ្លួនកុលាប CCR",
     price: 12,
     category: "Body",
-    image: "../images/products/body/សាប៊ូដុសខ្លួនកុលាប.png",
+    image: "images/products/body/សាប៊ូដុសខ្លួនកុលាប.png",
     detail: "សាប៊ូដុសខ្លួនកុលាប BodyWash Rose CCR"
   },
   {
@@ -92,7 +92,7 @@ const products = [
     name: "ឡេលាបខ្លួន JELY",
     price: 15,
     category: "Body",
-    image: "../images/products/body/ឡេលាបខ្លួន JELY BODY LOTION.png",
+    image: "images/products/body/ឡេលាបខ្លួន JELY BODY LOTION.png",
     detail: "ឡេលាបខ្លួន BODY LOTION JELY"
   },
   {
@@ -100,7 +100,7 @@ const products = [
     name: "សាប៊ូកក់&ដុសខ្លួនក្មេង CCR",
     price: 12,
     category: "Body",
-    image: "../images/products/body/សាប៊ូកក់សក់និងដុសខ្លួនក្មេង CCR.png",
+    image: "images/products/body/សាប៊ូកក់សក់និងដុសខ្លួនក្មេង CCR.png",
     detail: "សាប៊ូកក់ និងដុសខ្លួនក្មេង CCR"
   },
   {
@@ -108,7 +108,7 @@ const products = [
     name: "ទឹកអនាម័យស្រ្ដី JELY",
     price: 12,
     category: "Body",
-    image: "../images/products/body/ទឹកអនាម័យស្រ្ដី JELY.png",
+    image: "images/products/body/ទឹកអនាម័យស្រ្ដី JELY.png",
     detail: "ទឹកអនាម័យស្រ្ដី Feminine Wash​ JELY"
   },
   {
@@ -116,7 +116,7 @@ const products = [
     name: "ក្រដាស់សើម CCR",
     price: 10,
     category: "Face",
-    image: "../images/products/face/ក្រដាស់សើម Remove MakeUp CCR.png",
+    image: "images/products/face/ក្រដាស់សើម Remove MakeUp CCR.png",
     detail: "ក្រដាស់សើម Remove MakeUp CCR"
   },
   {
@@ -124,7 +124,7 @@ const products = [
     name: "សំឡីវីតាមីន JELY Mask Pad",
     price: 15,
     category: "Face",
-    image: "../images/products/face/សំឡីវីតាមីន​ JELY.png",
+    image: "images/products/face/សំឡីវីតាមីន​ JELY.png",
     detail: "សំឡីវីតាមីន JELY Mask Pad"
   },
   {
@@ -132,7 +132,7 @@ const products = [
     name: "BB Cream CCR",
     price: 9.5,
     category: "Face",
-    image: "../images/products/face/BB Cream.png",
+    image: "images/products/face/BB Cream.png",
     detail: "BB Cream CCR"
   },
   {
@@ -140,7 +140,7 @@ const products = [
     name: "SUNSCREEN Cream CCR",
     price: 9.5,
     category: "Face",
-    image: "../images/products/face/SUNSCREEN CCR.png",
+    image: "images/products/face/SUNSCREEN CCR.png",
     detail: "SUNSCREEN Cream CCR"
   },
   {
@@ -148,7 +148,7 @@ const products = [
     name: "សាប៊ូមុខ JELY Gluta",
     price: 8.5,
     category: "Face",
-    image: "../images/products/face/សាប៊ូដុសមុខ JELY Gluta.png",
+    image: "images/products/face/សាប៊ូដុសមុខ JELY Gluta.png",
     detail: "សាប៊ូមុខ​​​ ​JELY Gluta"
   },
   {
@@ -156,7 +156,7 @@ const products = [
     name: "សាប៊ូមុខយិនសិន CCR",
     price: 8.5,
     category: "Face",
-    image: "../images/products/face/សាប៊ូដុសមុខ យិនសិន CCR.png",
+    image: "images/products/face/សាប៊ូដុសមុខ យិនសិន CCR.png",
     detail: "សាប៊ូមុខយិនសិន Ginseng CCR"
   },
   {
@@ -164,7 +164,7 @@ const products = [
     name: "CC SERUM JELY",
     price: 15,
     category: "Face",
-    image: "../images/products/face/CC SERUM JELY.png",
+    image: "images/products/face/CC SERUM JELY.png",
     detail: "CC Serum Pink Tone JELY"
   },
   {
@@ -172,7 +172,7 @@ const products = [
     name: "ឈុតមុខស្អាត JELY",
     price: 25,
     category: "Face",
-    image: "../images/products/face/ឈុតមុខស្អាត JELY.png",
+    image: "images/products/face/ឈុតមុខស្អាត JELY.png",
     detail: "ឈុតមុខស្អាត JELY Essence + Milk + Night Cream"
   },
   {
@@ -180,7 +180,7 @@ const products = [
     name: "ថ្នាំដុសធ្មេញ CCR",
     price: 10,
     category: "Face",
-    image: "../images/products/face/ថ្នាំដុសធ្មេញ CCR.png",
+    image: "images/products/face/ថ្នាំដុសធ្មេញ CCR.png",
     detail: "ថ្នាំដុសធ្មេញ CCR"
   },
   {
@@ -188,7 +188,7 @@ const products = [
     name: "ម៉ាស់បិទមុខ 6D CCR",
     price: 15,
     category: "Face",
-    image: "../images/products/face/ម៉ាស់បិទមុខ 6D CCR.png",
+    image: "images/products/face/ម៉ាស់បិទមុខ 6D CCR.png",
     detail: "ម៉ាស់បិទមុខ 6D CCR"
   },
   {
@@ -196,7 +196,7 @@ const products = [
     name: "ហ្វៃប័រផាសសិន CCR",
     price: 18,
     category: "Drink",
-    image: "../images/products/drink/Fibery Passion Fruit.png",
+    image: "images/products/drink/Fibery Passion Fruit.png",
     detail: "ហ្វៃប័រផាសសិន Fiber CCR"
   },
   {
@@ -204,7 +204,7 @@ const products = [
     name: "កាហ្វេសម្រក CCR",
     price: 18,
     category: "Drink",
-    image: "../images/products/drink/CoffeeCCR.png",
+    image: "images/products/drink/CoffeeCCR.png",
     detail: "កាហ្វេសម្រក Coffee CCR"
   }
 ];
@@ -625,8 +625,8 @@ function getSelectedQrMeta() {
 
   const method = (els.payment.value || "").trim().toUpperCase();
   const fileMap = {
-    ABA: { src: "../images/qr/ABA.png", name: "CHEA CHANROTHA" },
-    AC: { src: "../images/qr/AC.png", name: "CHEA CHANROTHA" }
+    ABA: { src: "images/qr/ABA.png", name: "CHEA CHANROTHA" },
+    AC: { src: "images/qr/AC.png", name: "CHEA CHANROTHA" }
   };
 
   if (!fileMap[method]) return null;
@@ -791,10 +791,10 @@ async function handleSave() {
 function renderInvoiceAreaForCapture() {
   if (!els.printArea) throw new Error("Print area not found.");
 
-  const receiptHTML = buildReceiptHTML();
+  const receiptHTML = buildShareReceiptHTML();
   els.printArea.style.display = "block";
   els.printArea.innerHTML = `
-    <style id="captureReceiptStyles">${getReceiptPrintStyles()}</style>
+    <style id="captureReceiptStyles">${getShareReceiptStyles()}</style>
     <div class="share-capture-stage">
       <div id="invoiceArea" class="share-capture-shell">
         ${receiptHTML}
@@ -885,32 +885,33 @@ async function captureInvoiceBlob() {
     throw new Error("html2canvas library is missing.");
   }
 
-  const invoiceArea = renderShareAreaForCapture();
+  const invoiceArea = renderInvoiceAreaForCapture();
   if (!invoiceArea) throw new Error("Invoice area not found.");
 
-  await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 260)));
+  await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 220)));
   if (document.fonts && document.fonts.ready) {
     try { await document.fonts.ready; } catch {}
   }
 
   await inlineInvoiceImages(invoiceArea);
 
-  const captureWidth = Math.ceil(invoiceArea.scrollWidth || invoiceArea.offsetWidth || 1080);
-  const captureHeight = Math.ceil(Math.max(1920, invoiceArea.scrollHeight || invoiceArea.offsetHeight || 1920));
+  const captureHeight = Math.max(200, Math.ceil(invoiceArea.scrollHeight || invoiceArea.offsetHeight || 0));
+
+  let lastError = null;
 
   try {
     const canvas = await html2canvas(invoiceArea, {
-      scale: 1,
-      width: captureWidth,
+      width: 1080,
       height: captureHeight,
-      windowWidth: captureWidth,
-      windowHeight: captureHeight,
+      scale: Math.max(2, Math.min(window.devicePixelRatio || 1, 3)),
       useCORS: true,
       allowTaint: false,
-      backgroundColor: "#f8fbfd",
+      backgroundColor: "#ffffff",
       logging: false,
       imageTimeout: 0,
       foreignObjectRendering: false,
+      windowWidth: 1080,
+      windowHeight: captureHeight,
       scrollX: 0,
       scrollY: 0
     });
@@ -924,10 +925,11 @@ async function captureInvoiceBlob() {
 
     return blob;
   } catch (error) {
+    lastError = error;
     if (error && /tainted canvases/i.test(String(error.message || error))) {
       throw new Error("Share មិនដំណើរការ ព្រោះមានរូបភាព ឬ QR code មួយចំនួនមិនអនុញ្ញាតឱ្យ browser បម្លែងជា image។ សូមពិនិត្យរូបភាព/QR source ឬសាកបើកតាម localhost/http server។");
     }
-    throw error;
+    throw lastError || error;
   } finally {
     cleanupInvoiceCaptureArea();
   }
@@ -941,7 +943,7 @@ async function handleShareInvoice() {
   try {
     if (els.shareBtn) {
       els.shareBtn.disabled = true;
-      els.shareBtn.textContent = "📤 Rendering...";
+      els.shareBtn.textContent = "📤 Preparing...";
     }
 
     const blob = await captureInvoiceBlob();
@@ -951,7 +953,7 @@ async function handleShareInvoice() {
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({
         title: "Invoice",
-        text: "Receipt image",
+        text: "Invoice image",
         files: [file]
       });
       toast("Invoice shared successfully.", "success");
@@ -1011,6 +1013,368 @@ function clearOrderForm() {
   syncQrToggleButton();
   setToday();
   cleanupInvoiceCaptureArea();
+}
+
+function buildShareReceiptHTML() {
+  const province = (els.province?.value || "").trim();
+  const detailAddress = (els.addressDetail?.value || "").trim();
+  const fullAddress = [detailAddress, province].filter(Boolean).join(" : ") || "-";
+  const deliveryFee = Math.max(0, Number(els.deliveryFee?.value || 0));
+  const itemsTotal = getItemsTotal();
+  const grand = itemsTotal + deliveryFee;
+  const grandRiel = Math.round(grand * 4100);
+  const paymentText = (els.payment?.value || "-").trim() || "-";
+  const pageText = (els.page?.value || "-").trim() || "-";
+  const closeByText = (els.closeBy?.value || "-").trim() || "-";
+  const noteText = (els.note?.value || "-").trim() || "-";
+  const customerText = (els.customer?.value || "-").trim() || "-";
+  const phoneText = (els.phone?.value || "-").trim() || "-";
+  const deliveryNameText = (els.deliveryName?.value || "-").trim() || "-";
+  const dateText = formatDateKH(els.date?.value);
+  const receiptNo = getReceiptNoValue();
+  const qrMeta = getSelectedQrMeta();
+  const hasBottomBlock = !!(qrMeta || receiptNo);
+
+  const rows = items.map((it, i) => `
+    <div class="share-item-row">
+      <div class="share-col-product">${i + 1}. ${escapeHtml(it.name)}</div>
+      <div class="share-col-qty">${escapeHtml(String(it.qty))} ឈុត</div>
+      <div class="share-col-price">${escapeHtml(formatDisplayMoney(it.price))}</div>
+      <div class="share-col-subtotal">${escapeHtml(formatDisplayMoney(it.subtotal))}</div>
+    </div>
+  `).join("");
+
+  const bottomBlock = hasBottomBlock ? `
+    <div class="share-dash share-bottom-separator"></div>
+    <div class="share-bottom-grid ${!qrMeta ? 'no-qr' : ''} ${!receiptNo ? 'no-number' : ''}">
+      ${qrMeta ? `
+        <div class="share-qr-side">
+          <div class="share-qr-box">
+            <img class="share-qr-image" src="${escapeHtml(getAssetUrl(qrMeta.src))}" alt="${escapeHtml(qrMeta.label)} QR Code" />
+          </div>
+          <div class="share-qr-label">${escapeHtml(qrMeta.label)}</div>
+          ${qrMeta.name ? `<div class="share-qr-name">${escapeHtml(qrMeta.name)}</div>` : ""}
+        </div>
+      ` : ""}
+      ${receiptNo ? `
+        <div class="share-receipt-side">
+          <div class="share-receipt-number">${escapeHtml(receiptNo)}</div>
+        </div>
+      ` : ""}
+    </div>
+  ` : `<div class="share-tail-space"></div>`;
+
+  return `
+    <div class="share-poster ${hasBottomBlock ? 'has-bottom-block' : 'trim-bottom'}">
+      <div class="share-content">
+        <div class="share-head">
+          <div class="share-title">វិក័យប័ត្រ</div>
+          <div class="share-date">កាលបរិច្ឆេទ: ${escapeHtml(dateText)}</div>
+        </div>
+
+        <div class="share-dash"></div>
+
+        <div class="share-info-grid">
+          <div class="share-info-labels">
+            <div>ឈ្មោះ:</div>
+            <div>លេខទូរសព្ទ:</div>
+            <div>ទីតាំង</div>
+            <div>អ្នកដឹកជញ្ជូន</div>
+            <div>Note:</div>
+          </div>
+          <div class="share-info-values">
+            <div>${escapeHtml(customerText)}</div>
+            <div>${escapeHtml(phoneText)}</div>
+            <div>${escapeHtml(fullAddress)}</div>
+            <div>${escapeHtml(deliveryNameText)}</div>
+            <div>${escapeHtml(noteText)}</div>
+          </div>
+        </div>
+
+        <div class="share-dash"></div>
+
+        <div class="share-table-head">
+          <div class="share-col-product">ផលិតផល</div>
+          <div class="share-col-qty">ចំនួន</div>
+          <div class="share-col-price">តម្លៃ</div>
+          <div class="share-col-subtotal">សរុប</div>
+        </div>
+        <div class="share-table-line"></div>
+        <div class="share-items-wrap">${rows}</div>
+
+        <div class="share-dash"></div>
+
+        <div class="share-total-row"><span>ការទូទាត់</span><span>${escapeHtml(formatDisplayMoney(itemsTotal))}</span></div>
+        <div class="share-total-row"><span>សេវាដឹក</span><span>${deliveryFee === 0 ? 'ហ្វ្រីដឹក' : escapeHtml(formatDisplayMoney(deliveryFee))}</span></div>
+        <div class="share-pay-row">
+          <div class="share-pay-left">ការទូទាត់ <strong>${escapeHtml(paymentText)}</strong></div>
+          <div class="share-grand-wrap">
+            <div class="share-grand-total">${escapeHtml(formatDisplayMoney(grand))}</div>
+          </div>
+        </div>
+        <div class="share-riel-row"><span>ប្រាក់រៀល</span><span>${escapeHtml(grandRiel.toLocaleString())}៛</span></div>
+
+        <div class="share-dash"></div>
+
+        <div class="share-mini-meta">Page: ${escapeHtml(pageText)} | CloseBy: ${escapeHtml(closeByText)}</div>
+        <div class="share-service-row">
+          <span>លេខបម្រើអតិថិជន:</span>
+          <span>015 58 68 78 / 089 58 68 78</span>
+        </div>
+
+        ${bottomBlock}
+      </div>
+    </div>
+  `;
+}
+
+function getShareReceiptStyles() {
+  return `
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #ffffff; }
+    body {
+      font-family: "Kantumruy Pro", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      color: #045f80;
+    }
+    .share-capture-stage {
+      width: fit-content;
+      margin: 0 auto;
+      background: #ffffff;
+    }
+    .share-capture-shell,
+    .share-poster {
+      width: 1080px;
+      background: #f3f7f9;
+      position: relative;
+      overflow: hidden;
+    }
+    .share-content {
+      width: 1080px;
+      position: relative;
+      z-index: 2;
+      padding: 54px 50px 50px;
+      display: flex;
+      flex-direction: column;
+    }
+    .trim-bottom .share-content {
+      padding-bottom: 50px;
+    }
+    .share-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .share-title {
+      font-size: 100px;
+      font-weight: 800;
+      line-height: 0.88;
+      color: #045f80;
+      letter-spacing: 0;
+    }
+    .share-date {
+      padding-top: 18px;
+      font-size: 27px;
+      font-weight: 500;
+      color: #9ab6c4;
+      white-space: nowrap;
+    }
+    .share-dash {
+      margin: 26px 0 18px;
+      border-top: 2px dashed #5f99ae;
+    }
+    .share-info-grid {
+      display: grid;
+      grid-template-columns: 245px minmax(0, 1fr);
+      gap: 8px 36px;
+      font-size: 34px;
+      line-height: 1.26;
+      color: #045f80;
+    }
+    .share-info-labels,
+    .share-info-values {
+      display: grid;
+      gap: 5px;
+    }
+    .share-info-labels,
+    .share-info-values { font-weight: 500; }
+    .share-table-head,
+    .share-item-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 130px 130px 130px;
+      column-gap: 16px;
+      align-items: start;
+    }
+    .share-table-head {
+      color: #045f80;
+      font-size: 31px;
+      font-weight: 800;
+      padding: 0 0 6px;
+    }
+    .share-table-line {
+      border-top: 4px solid #045f80;
+      margin-bottom: 10px;
+    }
+    .share-item-row {
+      padding: 8px 0;
+      color: #045f80;
+      font-size: 28px;
+      line-height: 1.28;
+    }
+    .share-col-product {
+      text-align: left;
+      padding-right: 8px;
+      word-break: break-word;
+    }
+    .share-col-qty,
+    .share-col-price,
+    .share-col-subtotal {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .share-total-row,
+    .share-pay-row,
+    .share-riel-row,
+    .share-service-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      color: #045f80;
+      font-size: 28px;
+      line-height: 1.25;
+    }
+    .share-total-row { margin: 4px 0; }
+    .share-pay-row { margin-top: 10px; }
+    .share-pay-left {
+      font-size: 28px;
+      line-height: 1.2;
+    }
+    .share-pay-left strong {
+      display: inline-block;
+      margin-left: 16px;
+      font-size: ៥០px;
+      line-height: 0.95;
+      font-weight: 800;
+    }
+    .share-grand-wrap {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .share-grand-label {
+      font-size: 28px;
+      line-height: 1;
+    }
+    .share-grand-total {
+      font-size: 45px;
+      line-height: 0.95;
+      font-weight: 800;
+    }
+    .share-riel-row {
+      margin-top: 10px;
+      font-size: 25px;
+      color: #2c7f9c;
+    }
+    .share-mini-meta {
+      color: #2c7f9c;
+      font-size: 24px;
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+    .share-service-row {
+      font-size: 24px;
+      color: #2c7f9c;
+      align-items: center;
+    }
+    .share-bottom-separator {
+      margin-top: 18px;
+      margin-bottom: 20px;
+    }
+    .share-bottom-grid {
+      display: grid;
+      grid-template-columns: 430px minmax(0, 1fr);
+      column-gap: 36px;
+      align-items: end;
+      min-height: 500px;
+    }
+    .share-bottom-grid.no-qr {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .share-bottom-grid.no-number {
+      grid-template-columns: 430px;
+      justify-content: start;
+    }
+    .share-qr-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .share-qr-box {
+      width: 470px;
+      max-width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: transparent;
+    }
+    .share-qr-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .share-qr-label {
+      margin-top: 16px;
+      font-size: 76px;
+      line-height: 0.96;
+      font-weight: 800;
+      color: #045f80;
+      text-align: center;
+    }
+    .share-qr-name {
+      margin-top: 6px;
+      font-size: 44px;
+      line-height: 1.08;
+      font-weight: 800;
+      color: #045f80;
+      text-align: center;
+      text-transform: uppercase;
+      word-break: break-word;
+    }
+    .share-receipt-side {
+      min-height: 470px;
+      border-left: 2px dashed #5f99ae;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 26px;
+      padding-bottom: 20px;
+    }
+    .share-bottom-grid.no-qr .share-receipt-side {
+      border-left: none;
+      padding-left: 0;
+      justify-content: flex-start;
+    }
+    .share-receipt-number {
+      font-size: 190px;
+      line-height: 0.88;
+      font-weight: 800;
+      color: #045f80;
+      font-variant-numeric: tabular-nums;
+    }
+    .share-tail-space {
+      height: 50px;
+    }
+  `;
 }
 
 function buildReceiptHTML() {
@@ -1303,7 +1667,7 @@ function getReceiptPrintStyles() {
       margin-top: 2px;
     }
     .receipt-footer {
-      font-size: 12px;
+      font-size: 14px;
       line-height: 1.35;
     }
     .receipt-phone {
