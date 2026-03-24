@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAMBO MINI - Customers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body data-page="customers" class="light">
+  <div id="layout-root"></div>
+  <div id="page-content" hidden>
+    <section class="page-panel">
+      <div class="section-head">
+        <h2>ទិន្នន័យអតិថិជន</h2>
+        <span class="page-path">Customer profiles / history / quick actions</span>
+      </div>
+      <p class="page-desc">រៀបចំទំព័រអតិថិជនថ្មីឲ្យងាយមើលជាងមុន ដោយបង្ហាញស្ថិតិសង្ខេប អតិថិជនថ្មី អតិថិជនទិញញឹកញាប់ និង quick action សម្រាប់តាមដានការលក់។</p>
+
+      <section class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">👥</div><div><p class="stat-label">Total Customers</p><h3>764</h3><span class="stat-growth up">+24 this month</span></div></div>
+        <div class="stat-card"><div class="stat-icon">⭐</div><div><p class="stat-label">VIP Customers</p><h3>58</h3><span class="stat-growth up">High repeat rate</span></div></div>
+        <div class="stat-card"><div class="stat-icon">📍</div><div><p class="stat-label">Top Province</p><h3>ភ្នំពេញ</h3><span class="stat-growth up">42% of orders</span></div></div>
+        <div class="stat-card"><div class="stat-icon">📦</div><div><p class="stat-label">Avg. Order</p><h3>$18.90</h3><span class="stat-growth up">+6.2%</span></div></div>
+      </section>
+    </section>
+
+    <section class="content-grid">
+      <div class="panel">
+        <div class="panel-header"><h3>Customer Highlights</h3><a class="text-btn" href="search-edit.html">Open Search &amp; Edit</a></div>
+        <div class="check-list">
+          <div class="check-item"><strong>YAYA</strong>VIP customer • ទិញញឹកញាប់ • ABA Payment</div>
+          <div class="check-item"><strong>Helen</strong>ទិញច្រើនប្រភេទ • Hair + Face • Delivered លឿន</div>
+          <div class="check-item"><strong>Sokha</strong>ត្រូវតាមដាន address update មុន confirm</div>
+          <div class="check-item"><strong>Dalin</strong>Repeat order សម្រាប់ Drink category</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h3>Quick Actions</h3></div>
+        <div class="action-list">
+          <a class="action-card" href="orders.html">➕ បង្កើត Order ថ្មី</a>
+          <a class="action-card" href="search-edit.html">🔎 ស្វែងរកអតិថិជន</a>
+          <a class="action-card" href="reports.html">📊 មើលរបាយការណ៍</a>
+          <a class="action-card" href="settings.html">⚙️ កំណត់ប្រព័ន្ធ</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel table-panel">
+      <div class="panel-header"><h3>Recent Customer List</h3><button class="text-btn">Export</button></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Province</th>
+              <th>Last Order</th>
+              <th>Favorite</th>
+              <th>Total Orders</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>YAYA</td><td>098765412</td><td>រាជធានីភ្នំពេញ</td><td>16/03/2026</td><td>VIP 5in1 CCR</td><td>12</td><td><span class="status paid">VIP</span></td></tr>
+            <tr><td>Helen</td><td>015586878</td><td>រាជធានីភ្នំពេញ</td><td>15/03/2026</td><td>Premium CCR</td><td>9</td><td><span class="status paid">Active</span></td></tr>
+            <tr><td>Sokha</td><td>012345678</td><td>ខេត្តកំពង់ចាម</td><td>14/03/2026</td><td>Hair Set CCR</td><td>4</td><td><span class="status pending">Follow up</span></td></tr>
+            <tr><td>Dalin</td><td>0978882233</td><td>ខេត្តបាត់ដំបង</td><td>13/03/2026</td><td>Fiber Passion</td><td>6</td><td><span class="status paid">Repeat</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+  <script src="../assets/js/layout.js"></script>
+  <script>
+    injectLayout({ basePath: '../', active: 'customers', title: 'Customers', subtitle: 'Customer list, favorite products, and follow-up view' });
+  </script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>
