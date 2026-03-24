@@ -668,6 +668,478 @@ async function shareCurrentOrder() {
 }
 
 
+
+function buildPrintInvoiceHTML(order, index = 0, total = 1) {
+  const province = (order.province || '').trim();
+  const detailAddress = (order.address || '').trim();
+  const fullAddress = [detailAddress, province].filter(Boolean).join(' : ') || '-';
+
+  const deliveryFee = Math.max(0, Number(order.deliveryFee || 0));
+  const itemsTotal = (order.products || []).reduce((sum, item) => sum + calcSubtotal(item), 0);
+  const grand = itemsTotal + deliveryFee;
+  const grandRiel = Math.round(grand * 4100);
+
+  const paymentText = (order.payment || '-').trim() || '-';
+  const pageText = (order.page || '-').trim() || '-';
+  const closeByText = (order.closeBy || '-').trim() || '-';
+  const noteText = (order.note || '-').trim() || '-';
+  const customerText = (order.customer || '-').trim() || '-';
+  const phoneText = (order.phone || '-').trim() || '-';
+  const deliveryNameText = (order.deliveryName || '-').trim() || '-';
+  const dateText = formatDateForShare(order.date);
+  const receiptNo = (order.receiptNo || '').trim();
+  const qrMeta = getSelectedQrMeta(order);
+
+  const rows = (order.products || []).map((it, i) => `
+    <div class="receipt-item-row">
+      <div class="receipt-col-product">${i + 1}. ${escapeHtml(it.name || '-')}</div>
+      <div class="receipt-col-qty">${escapeHtml(String(it.qty || 0))} ឈុត</div>
+      <div class="receipt-col-price">${escapeHtml(formatDisplayMoney(it.price || 0))}</div>
+      <div class="receipt-col-subtotal">${escapeHtml(formatDisplayMoney(calcSubtotal(it)))}</div>
+    </div>
+  `).join('');
+
+  return `
+    <section class="receipt-print ${index < total - 1 ? 'page-break' : ''}">
+      <div class="receipt-head">
+        <div class="receipt-title">វិក័យប័ត្រ</div>
+        <div class="receipt-date">កាលបរិច្ឆេទ: ${escapeHtml(dateText)}</div>
+      </div>
+
+      <div class="receipt-dash"></div>
+
+      <div class="receipt-info-grid">
+        <div class="receipt-info-labels">
+          <div>ឈ្មោះ:</div>
+          <div>លេខទូរសព្ទ:</div>
+          <div>ទីតាំង:</div>
+          <div>អ្នកដឹកជញ្ជូន:</div>
+          <div>Note:</div>
+        </div>
+        <div class="receipt-info-values">
+          <div><strong>${escapeHtml(customerText)}</strong></div>
+          <div><strong>${escapeHtml(phoneText)}</strong></div>
+          <div>${escapeHtml(fullAddress)}</div>
+          <div>${escapeHtml(deliveryNameText)}</div>
+          <div>${escapeHtml(noteText)}</div>
+        </div>
+      </div>
+
+      <div class="receipt-dash"></div>
+
+      <div class="receipt-table-head">
+        <div class="receipt-col-product">ផលិតផល</div>
+        <div class="receipt-col-qty">ចំនួន</div>
+        <div class="receipt-col-price">តម្លៃ</div>
+        <div class="receipt-col-subtotal">សរុប</div>
+      </div>
+      <div class="receipt-table-line"></div>
+
+      <div class="receipt-items-wrap">
+        ${rows || `
+          <div class="receipt-item-row">
+            <div class="receipt-col-product">-</div>
+            <div class="receipt-col-qty">0 ឈុត</div>
+            <div class="receipt-col-price">$0</div>
+            <div class="receipt-col-subtotal">$0</div>
+          </div>
+        `}
+      </div>
+
+      <div class="receipt-dash"></div>
+
+      <div class="receipt-total-row">
+        <span>តម្លៃទំនិញ</span>
+        <span>${escapeHtml(formatDisplayMoney(itemsTotal))}</span>
+      </div>
+
+      <div class="receipt-total-row">
+        <span>សេវាដឹក</span>
+        <span>${deliveryFee === 0 ? 'ហ្វ្រីដឹក' : escapeHtml(formatDisplayMoney(deliveryFee))}</span>
+      </div>
+
+      <div class="receipt-pay-row">
+        <div class="receipt-pay-left">ការទូទាត់: <strong>${escapeHtml(paymentText)}</strong></div>
+        <div class="receipt-grand-total">${escapeHtml(formatDisplayMoney(grand))}</div>
+      </div>
+
+      <div class="receipt-riel-row">
+        <span>ប្រាក់រៀល:</span>
+        <span><strong>${escapeHtml(grandRiel.toLocaleString())}៛</strong></span>
+      </div>
+
+      <div class="receipt-dash"></div>
+
+      <div class="receipt-meta">Page: <strong>${escapeHtml(pageText)}</strong> | CloseBy: <strong>${escapeHtml(closeByText)}</strong></div>
+      <div class="receipt-service">លេខបម្រើអតិថិជន 015 58 68 78 / 089 58 68 78</div>
+
+      ${(qrMeta || receiptNo) ? `
+        <div class="receipt-dash"></div>
+        <div class="receipt-bottom ${!qrMeta ? 'no-qr' : ''} ${!receiptNo ? 'no-number' : ''}">
+          ${qrMeta ? `
+            <div class="receipt-qr-side">
+              <div class="receipt-qr-box">
+                <img class="receipt-qr-image" src="${escapeHtml(qrMeta.src)}" alt="${escapeHtml(qrMeta.label)} QR Code" />
+              </div>
+              <div class="receipt-qr-label">${escapeHtml(qrMeta.label)}</div>
+              ${qrMeta.name ? `<div class="receipt-qr-name">${escapeHtml(qrMeta.name)}</div>` : ''}
+            </div>
+          ` : ''}
+
+          ${receiptNo ? `
+            <div class="receipt-number-side">
+              <div class="receipt-number">${escapeHtml(receiptNo)}</div>
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+    </section>
+  `;
+}
+
+function getPrintDocumentStyles() {
+  return `
+    @page {
+      size: 80mm auto;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+    }
+
+    body {
+      width: 80mm;
+      font-family: "Kantumruy Pro", sans-serif;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color: #111827;
+      font-size: 11px;
+    }
+
+    .print-root {
+      width: 80mm;
+      margin: 0 auto;
+      padding: 0;
+    }
+
+    .receipt-print {
+      width: 80mm;
+      margin: 0 auto;
+      padding: 4mm 3.2mm 4mm;
+      background: #fff;
+      page-break-inside: avoid;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+
+    .receipt-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .receipt-title {
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 0.95;
+      color: #000;
+    }
+
+    .receipt-date {
+      font-size: 10.5px;
+      line-height: 1.3;
+      color: #6b7280;
+      text-align: right;
+      white-space: nowrap;
+      padding-top: 1.2mm;
+    }
+
+    .receipt-dash {
+      border-top: 1px dashed #6b7280;
+      margin: 2.6mm 0;
+    }
+
+    .receipt-info-grid {
+      display: grid;
+      grid-template-columns: 24mm minmax(0, 1fr);
+      gap: 1.2mm 2.2mm;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .receipt-info-labels,
+    .receipt-info-values {
+      display: grid;
+      gap: 1mm;
+    }
+
+    .receipt-info-labels {
+      font-weight: 700;
+      color: #111;
+    }
+
+    .receipt-info-values {
+      color: #111;
+      word-break: break-word;
+    }
+
+    .receipt-table-head,
+    .receipt-item-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 13mm 13mm 13mm;
+      column-gap: 1.6mm;
+      align-items: start;
+    }
+
+    .receipt-table-head {
+      font-size: 10.8px;
+      font-weight: 800;
+      color: #000;
+    }
+
+    .receipt-table-line {
+      border-top: 1px solid #111;
+      margin: 1.4mm 0 1.7mm;
+    }
+
+    .receipt-item-row {
+      font-size: 10.8px;
+      line-height: 1.45;
+      padding: 1mm 0;
+      color: #111;
+    }
+
+    .receipt-col-product {
+      text-align: left;
+      word-break: break-word;
+      padding-right: 1mm;
+    }
+
+    .receipt-col-qty,
+    .receipt-col-price,
+    .receipt-col-subtotal {
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .receipt-total-row,
+    .receipt-pay-row,
+    .receipt-riel-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #111;
+      margin: 0.8mm 0;
+    }
+
+    .receipt-pay-row {
+      align-items: flex-end;
+      margin-top: 1.5mm;
+    }
+
+    .receipt-pay-left {
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .receipt-pay-left strong {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .receipt-grand-total {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .receipt-riel-row {
+      color: #000000;
+      font-size: 10.5px;
+    }
+
+    .receipt-meta {
+      font-size: 10.8px;
+      color: #111;
+      line-height: 1.45;
+      margin-bottom: 1.2mm;
+      word-break: break-word;
+    }
+
+    .receipt-service {
+      font-size: 10px;
+      color: #6b7280;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .receipt-bottom {
+      display: grid;
+      grid-template-columns: 1fr 20mm;
+      gap: 2.2mm;
+      align-items: stretch;
+      margin-top: 1.5mm;
+    }
+
+    .receipt-bottom.no-number {
+      grid-template-columns: 1fr;
+    }
+
+    .receipt-bottom.no-qr {
+      grid-template-columns: 1fr;
+    }
+
+    .receipt-qr-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .receipt-qr-box {
+      width: 100%;
+      max-width: 35mm;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .receipt-qr-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .receipt-qr-label {
+      margin-top: 1.2mm;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1;
+      text-align: center;
+      color: #000;
+    }
+
+    .receipt-qr-name {
+      margin-top: 1mm;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.2;
+      text-align: center;
+      color: #000;
+      text-transform: uppercase;
+      word-break: break-word;
+    }
+
+    .receipt-number-side {
+      border-left: 1px solid #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 35mm;
+      padding-left: 2.2mm;
+    }
+
+    .receipt-bottom.no-qr .receipt-number-side {
+      border-left: none;
+      padding-left: 0;
+      min-height: auto;
+      justify-content: flex-start;
+    }
+
+    .receipt-number {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 0.95;
+      color: #000;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+    }
+
+    img {
+      image-rendering: crisp-edges;
+    }
+  `;
+}
+
+
+function openPrintWindow(title, contentHtml) {
+  const printWindow = window.open('', '_blank', 'width=1100,height=900');
+  if (!printWindow) {
+    showNotice('Browser blocked the print window. Please allow popups and try again.', 'error');
+    return;
+  }
+  printWindow.document.open();
+  printWindow.document.write(`<!DOCTYPE html>
+    <html lang="km">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>${escapeHtml(title)}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <style>${getPrintDocumentStyles()}</style>
+      </head>
+      <body>
+        <div class="print-root">${contentHtml}</div>
+        <script>
+          window.addEventListener('load', function () {
+            setTimeout(function () {
+              window.focus();
+              window.print();
+            }, 250);
+          });
+        <\/script>
+      </body>
+    </html>`);
+  printWindow.document.close();
+}
+
+function printOrdersCollection(orders, title = 'Print Orders') {
+  if (!Array.isArray(orders) || !orders.length) {
+    showNotice('មិនមានទិន្នន័យសម្រាប់ព្រីនទេ។', 'error');
+    return;
+  }
+  const html = orders.map((order, index) => buildPrintInvoiceHTML(order, index, orders.length)).join('');
+  openPrintWindow(title, html);
+}
+
+function printFilteredOrders() {
+  const rows = filterOrders();
+  if (!rows.length) {
+    showNotice('មិនមានទិន្នន័យក្រោយ filter សម្រាប់ព្រីនទេ។', 'error');
+    return;
+  }
+  printOrdersCollection(rows, `Print ${rows.length} Orders`);
+}
+
+function printCurrentOrderDetail() {
+  const order = readOrderFromForm();
+  if (!order.products.some(line => line.name)) {
+    showNotice('សូមបញ្ចូលផលិតផលជាមុនសិន។', 'error');
+    return;
+  }
+  printOrdersCollection([order], `Print ${order.customer || order.id || 'Order'}`);
+}
+
+
 async function apiGet(params) {
   if (!WEB_APP_URL || WEB_APP_URL.includes('PASTE_YOUR')) throw new Error('សូមដាក់ Web App URL ជាមុនសិន នៅក្នុង assets/js/search-edit.js');
   const url = new URL(WEB_APP_URL);
@@ -841,8 +1313,8 @@ function bindEvents() {
   });
 
   qs('newRecordBtn')?.addEventListener('click', () => openDrawer('', true));
-  qs('printTableBtn')?.addEventListener('click', () => window.print());
-  qs('printDetailBtn')?.addEventListener('click', () => window.print());
+  qs('printTableBtn')?.addEventListener('click', printFilteredOrders);
+  qs('printDetailBtn')?.addEventListener('click', printCurrentOrderDetail);
 }
 
 async function bootSearchEditPage() {
