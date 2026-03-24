@@ -441,3 +441,7 @@ body:not(.light) .drawer-foot .qr-toggle-btn.off:hover{
     width:auto !important;
   }
 }
+
+
+/* Multi-print button polish */
+#printTableBtn{min-width:140px}
