@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+  <title>Analytics - CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="apple-touch-icon" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .analytics-wrap{display:grid;gap:20px;padding:4px 0 8px}.analytics-hero{padding:22px 24px;border-radius:24px}.hero-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.hero-top h2{margin:0 0 6px;color:var(--text)}.hero-top p{margin:0;color:var(--muted)}.analytics-filters{display:flex;gap:10px;flex-wrap:wrap}.analytics-filters input,.analytics-filters select{min-height:42px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);padding:0 14px}.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}.kpi-card{padding:18px 18px 16px;border-radius:22px}.kpi-label{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#8fb6d9}.kpi-value{display:block;margin-top:12px;font-size:28px;font-weight:800;color:var(--text)}.kpi-note{margin-top:8px;color:var(--muted);font-size:13px}.analytics-grid{display:grid;grid-template-columns:1.35fr .95fr;gap:18px}.chart-card,.list-card{padding:20px;border-radius:24px}.card-title{margin:0 0 4px;color:var(--text);font-size:20px}.card-sub{margin:0 0 18px;color:var(--muted)}.chart-box{height:320px;position:relative}.mini-list{display:grid;gap:12px}.mini-item{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.14)}.mini-item strong{color:var(--text)}.mini-item span{color:var(--muted);font-size:13px}.priority-breakdown,.status-breakdown{display:grid;gap:10px}.progress-row{display:grid;gap:8px}.progress-head{display:flex;justify-content:space-between;color:var(--text);font-weight:700}.progress-track{height:10px;border-radius:999px;background:rgba(148,163,184,.16);overflow:hidden}.progress-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,#8b5cf6,#06b6d4)}@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.analytics-grid{grid-template-columns:1fr}}@media(max-width:680px){.kpi-grid{grid-template-columns:1fr}.analytics-hero,.chart-card,.list-card{padding:16px}.chart-box{height:260px}}
+  </style>
+</head>
+<body>
+<div class="background"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+<div class="dashboard"><div class="sidebar-overlay"></div><aside class="sidebar" id="sharedSidebar"></aside><main class="main-content"><div class="shared-topbar" id="sharedHeader"></div>
+<div class="analytics-wrap">
+  <section class="glass-card analytics-hero">
+    <div class="hero-top">
+      <div><h2>Report & Analytics</h2><p>Revenue, orders, products, pages និង priority សម្រាប់ CAMBO MINI</p></div>
+      <div class="analytics-filters">
+        <input id="analyticsStart" type="date">
+        <input id="analyticsEnd" type="date">
+        <select id="analyticsPage"><option value="">All Pages</option></select>
+        <button class="btn btn-primary" id="analyticsRefresh" type="button">Refresh</button>
+      </div>
+    </div>
+  </section>
+  <section class="kpi-grid">
+    <article class="glass-card kpi-card"><span class="kpi-label">Total Revenue</span><strong class="kpi-value" id="kpiRevenue">$0</strong><div class="kpi-note" id="kpiRevenueNote">Filtered revenue</div></article>
+    <article class="glass-card kpi-card"><span class="kpi-label">Total Orders</span><strong class="kpi-value" id="kpiOrders">0</strong><div class="kpi-note" id="kpiOrdersNote">All filtered records</div></article>
+    <article class="glass-card kpi-card"><span class="kpi-label">Customers</span><strong class="kpi-value" id="kpiCustomers">0</strong><div class="kpi-note">Unique customers</div></article>
+    <article class="glass-card kpi-card"><span class="kpi-label">Average Order</span><strong class="kpi-value" id="kpiAverage">$0</strong><div class="kpi-note">Average value per order</div></article>
+  </section>
+  <section class="analytics-grid">
+    <article class="glass-card chart-card"><h3 class="card-title">Revenue by Day</h3><p class="card-sub">មើលចំណូលតាមថ្ងៃក្នុង date range</p><div class="chart-box"><canvas id="revenueAnalyticsChart"></canvas></div></article>
+    <article class="glass-card list-card"><h3 class="card-title">Top Products</h3><p class="card-sub">លក់ច្រើនជាងគេ</p><div class="mini-list" id="topProductsList"></div></article>
+  </section>
+  <section class="analytics-grid">
+    <article class="glass-card list-card"><h3 class="card-title">Top Pages</h3><p class="card-sub">Page ដែលបិទការលក់បានច្រើន</p><div class="mini-list" id="topPagesList"></div></article>
+    <article class="glass-card list-card"><h3 class="card-title">Status & Priority</h3><p class="card-sub">ស្ថានភាព និងអាទិភាព</p><div class="status-breakdown" id="statusBreakdown"></div><div style="height:18px"></div><div class="priority-breakdown" id="priorityBreakdown"></div></article>
+  </section>
+</div></main></div>
+<script src="../assets/js/layout.js"></script>
+<script src="../assets/js/dashboard-layout.js"></script>
+<script src="../assets/js/vendor/chart-lite.js"></script>
+<script src="../assets/js/orders-data.js"></script>
+<script src="../assets/js/analytics-live.js"></script>
+</body></html>

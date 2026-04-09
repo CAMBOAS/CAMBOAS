@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+    <title>Search & Edit Orders - CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="apple-touch-icon" href="../images/logo/LOGO%20CAMBOMINI.png">
+    <meta name="description" content="Search & Edit Orders mixed UI for CAMBO MINI POS">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/search-edit-pos.css">
+</head>
+<body>
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="dashboard">
+        <div class="sidebar-overlay"></div>
+        <aside class="sidebar" id="sharedSidebar"></aside>
+        <main class="main-content pos-content">
+            <div class="shared-topbar" id="sharedHeader"></div>
+
+            <div class="page-wrap pos-page-wrap">
+                <section class="hero-card card glass-card">
+                    <div class="hero-content">
+                        <h2>ស្វែងរក កែប្រែ និងគ្រប់គ្រងទិន្នន័យការកម្មង់</h2>
+                        <p>Mix UI រវាង layout dashboard និង table style ដើម្បីឲ្យ Search &amp; Edit Orders មើលស្អាត ស្រួលប្រើ និងនៅតែស្ថិតក្នុង project ដើម។</p>
+                        <div class="hero-badge">SEARCH &amp; EDIT ORDERS</div>
+                    </div>
+                </section>
+
+                <section class="stats-grid pos-stats-grid">
+                    <article class="stat-card card glass-card">
+                        <span class="stat-label">Total Records</span>
+                        <strong id="totalRecords">0</strong>
+                        <p>Total order records</p>
+                    </article>
+                    <article class="stat-card card glass-card">
+                        <span class="stat-label">Pending</span>
+                        <strong id="pendingCount">0</strong>
+                        <p>Orders waiting</p>
+                    </article>
+                    <article class="stat-card card glass-card">
+                        <span class="stat-label">Delivered</span>
+                        <strong id="deliveredCount">0</strong>
+                        <p>Completed orders</p>
+                    </article>
+                    <article class="stat-card card glass-card">
+                        <span class="stat-label">Revenue</span>
+                        <strong id="revenueCount">$0.00</strong>
+                        <p>Filtered total</p>
+                    </article>
+                </section>
+
+                <section class="table-card card glass-card">
+                    <div class="table-tools-row">
+                        <div class="table-tools-left">
+                            <span id="showingTextTop">Showing 0 records in selected date range</span>
+                            <span class="selected-pill">Selected: <b id="selectedCountTop">0</b></span>
+                            <div class="footer-right top-range-chip" id="footerRangeTextTop">2026-03-01 → 2026-03-31 · John Wick</div>
+                        </div>
+                        <div class="table-tools-actions">
+                            <input id="listReceiptStart" class="small-input print-input" type="number" min="1" step="1" placeholder="Start">
+                            <input id="listReceiptEnd" class="small-input print-input" type="number" min="1" step="1" placeholder="End">
+                            <button id="qrToggle" class="btn btn-green" type="button">QR: ON</button>
+                            <button id="shareImageBtn" class="btn" type="button">Share IMG</button>
+                            <button id="printSelectedBtn" class="btn" type="button">Print Selected</button>
+                            <button id="printTableBtn" class="btn" type="button">Print Table</button>
+                            <button id="exportTablePdfBtn" class="btn" type="button">Export PDF</button>
+                            <button id="addRecordBtn" class="btn btn-primary add-record-btn" type="button">+ Add Record</button>
+                        </div>
+                    </div>
+
+                    <div class="filter-row">
+                        <label class="table-search">
+                            <span>🔎</span>
+                            <input id="tableSearch" type="text" placeholder="Search...">
+                        </label>
+
+                        <select id="deliveryFilter">
+                            <option value="">Delivery</option>
+                            <option>J&amp;T</option>
+                            <option>DRSB</option>
+                            <option>វិរៈ ប៊ុនថាំ</option>
+                            <option>ភ្នំពេញ តាធំ</option>
+                            <option>ភ្នំពេញ តាតូច</option>
+                            <option>ដឹកខ្លួនឯង</option>
+                        </select>
+
+                        <select id="provinceFilter">
+                            <option value="">Province</option>
+                            <option value="ភ្នំពេញ">រាជធានីភ្នំពេញ</option>
+                            <option value="ខេត្ត">ខេត្ត</option>
+                        </select>
+
+                        <select id="statusFilter">
+                            <option value="">Status</option>
+                            <option>Pending</option>
+                            <option>Delivered</option>
+                            <option>Cancelled</option>
+                        </select>
+
+                        <select id="pageFilter">
+                            <option value="">Pages</option>
+                            <option>Brand1 CCR</option>
+                            <option>JELY CCR BRAND</option>
+                            <option>ហេឡេន CCR</option>
+                            <option>JELY BRAND BY HELEN</option>
+                            <option>ចែម៉ៅ CCR BRAND</option>
+                            <option>ស្រីម៉ៅ JELY</option>
+                            <option>HELEN CCR</option>
+                            <option>ស្រីម៉ៅ JELY BRAND</option>
+                        </select>
+
+                        <select id="priorityFilter">
+                            <option value="">Priority</option>
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select>
+
+                        <select id="closeByFilter">
+                            <option value="">CloseBy</option>
+                            <option>Jonh Helen</option>
+                            <option>Srey Phear</option>
+                            <option>Srey Pichh</option>
+                            <option>Bong Phear</option>
+                            <option>Admin</option>
+                        </select>
+
+                        <div class="date-filter-wrap" id="dateFilterWrap">
+                            <button class="btn btn-range" id="dateRangeTrigger" type="button" aria-expanded="false">This Month</button>
+                            <div class="range-chip" id="rangeChip">01/03/2026 → 31/03/2026</div>
+                            <div class="date-range-popover" id="dateRangePopover" hidden>
+                                <div class="date-range-quick-grid">
+                                    <button type="button" class="quick-range-btn" data-range="today">Today</button>
+                                    <button type="button" class="quick-range-btn" data-range="yesterday">Yesterday</button>
+                                    <button type="button" class="quick-range-btn" data-range="last7">Last 7 days</button>
+                                    <button type="button" class="quick-range-btn" data-range="last30">Last 30 days</button>
+                                    <button type="button" class="quick-range-btn" data-range="thisMonth">This month</button>
+                                    <button type="button" class="quick-range-btn" data-range="lastMonth">Last month</button>
+                                    <button type="button" class="quick-range-btn quick-range-clear" data-range="all">Clear</button>
+                                </div>
+                                <div class="date-range-inputs">
+                                    <label class="date-range-field">
+                                        <span>Start Date</span>
+                                        <input id="dateStartInput" type="date">
+                                    </label>
+                                    <label class="date-range-field">
+                                        <span>End Date</span>
+                                        <input id="dateEndInput" type="date">
+                                    </label>
+                                </div>
+                                <div class="date-range-actions">
+                                    <button id="dateRangeCancel" type="button" class="btn btn-reset">Cancel</button>
+                                    <button id="dateRangeApply" type="button" class="btn btn-primary">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="resetBtn" class="btn btn-reset" type="button">Reset</button>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table class="orders-table">
+                            <colgroup>
+                                <col class="col-check">
+                                <col class="col-date">
+                                <col class="col-customer">
+                                <col class="col-phone">
+                                <col class="col-province">
+                                <col class="col-products">
+                                <col class="col-page">
+                                <col class="col-closeby">
+                                <col class="col-priority">
+                                <col class="col-total">
+                                <col class="col-status">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-col"><input id="selectAll" type="checkbox"></th>
+                                    <th class="th-date">Date</th>
+                                    <th class="th-customer">Customer</th>
+                                    <th class="th-phone">Phone</th>
+                                    <th class="th-province">Province</th>
+                                    <th class="th-products">Products</th>
+                                    <th class="th-page">Page</th>
+                                    <th class="th-closeby">CloseBy</th>
+                                    <th class="th-priority">Priority</th>
+                                    <th class="th-total">Total</th>
+                                    <th class="th-status">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTbody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-footer">
+                        <div class="footer-left">
+                            <span id="showingText">Showing 0 records in selected date range</span>
+                            <span class="selected-pill">Selected: <b id="selectedCount">0</b></span>
+                        </div>
+                        <div class="footer-right" id="footerRangeText">2026-03-01 → 2026-03-31 · John Wick</div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+
+    <div class="drawer" id="detailDrawer" aria-hidden="true">
+      <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+      <div class="drawer-panel">
+        <div class="drawer-head">
+          <div class="drawer-head-copy">
+            <h2>Order Detail</h2>
+            <p>កែប្រែទិន្នន័យ គណនាតម្លៃឡើងវិញ Share និង Print បានភ្លាមៗ។</p>
+          </div>
+          <div class="drawer-head-actions">
+            <button class="ghost-btn drawer-close-icon danger-close-btn" id="closeDrawerBtn" type="button" aria-label="Close">✕</button>
+            <button class="ghost-btn drawer-copy-btn" id="copyDetailBtn" type="button" title="Copy Text">📋 Copy Text</button>
+          </div>
+        </div>
+
+        <div class="detail-summary">
+          <div class="detail-chip"><span>Order ID</span><strong id="detailOrderIdText">AUTO</strong></div>
+          <div class="detail-chip"><span>Status</span><strong id="detailStatusText">Pending</strong></div>
+          <div class="detail-chip"><span>Grand Total</span><strong id="detailGrandTotalText">$0.00</strong></div>
+          <div class="detail-chip"><span>Priority</span><strong id="detailPriorityText">Medium</strong></div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field"><label>Order ID</label><input id="editOrderId" class="input" readonly /></div>
+          <div class="field"><label>Date</label><input id="editDate" type="date" class="input" /></div>
+          <div class="field"><label>Customer</label><input id="editCustomer" class="input" /></div>
+          <div class="field"><label>Phone</label><input id="editPhone" class="input" /></div>
+          <div class="field"><label>Page</label><input id="editPage" class="input" /></div>
+          <div class="field"><label>CloseBy</label><input id="editCloseBy" class="input" /></div>
+          <div class="field"><label>Province</label><input id="editProvince" class="input" /></div>
+          <div class="field"><label>Delivery Name</label><input id="editDeliveryName" class="input" /></div>
+          <div class="field full"><label>Detail Address</label><input id="editAddress" class="input" /></div>
+          <div class="field"><label>Payment</label><input id="editPayment" class="input" /></div>
+          <div class="field">
+            <label>Status</label>
+            <select id="editStatus" class="input">
+              <option>Pending</option>
+              <option>Confirmed</option>
+              <option>Delivered</option>
+              <option>Cancel</option>
+            </select>
+          </div>
+          <div class="field"><label>Delivery Fee</label><input id="editDeliveryFee" class="input" type="number" step="0.01" /></div>
+          <div class="field"><label>Priority</label><select id="editPriority" class="input"><option>High</option><option selected>Medium</option><option>Low</option></select></div>
+          <div class="field"><label>Grand Total</label><input id="editGrandTotal" class="input" readonly /></div>
+          <div class="field full"><label>Note</label><textarea id="editNote" class="input textarea"></textarea></div>
+        </div>
+
+        <section class="product-editor">
+          <div class="panel-head">
+            <h3>Products</h3>
+            <button class="ghost-btn small-btn" id="addLineBtn" type="button">+ Add Line</button>
+          </div>
+          <div class="table-wrap inner-wrap">
+            <table class="products-lines-table">
+              <colgroup>
+                <col class="col-product" />
+                <col class="col-qty" />
+                <col class="col-price" />
+                <col class="col-discount" />
+                <col class="col-subtotal" />
+                <col class="col-action" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th>Discount</th>
+                  <th>Subtotal</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="productLines"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="drawer-foot">
+          <div class="drawer-foot-row">
+            <button class="ghost-btn danger-btn footer-btn" id="deleteOrderBtn" type="button">Delete</button>
+            <button class="qr-toggle-btn footer-btn" id="qrToggleBtn" type="button" aria-pressed="true">QR Code</button>
+            <input id="receiptNoInput" class="receipt-input footer-input" type="text" placeholder="លេខប៉ុង" />
+            <button class="ghost-btn footer-btn" id="shareDetailBtn" type="button">Share IMG</button>
+            <button class="ghost-btn footer-btn" id="printDetailBtn" type="button">Print</button>
+            <button class="primary-btn footer-btn" id="saveEditBtn" type="button">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+        </main>
+    </div>
+    <script src="../assets/js/vendor/html2canvas-lite.js"></script>
+
+
+
+
+    <div id="printArea" style="display:none;"></div>
+    <script src="../assets/js/layout.js"></script>
+    <script src="../assets/js/dashboard-layout.js"></script>
+    <script src="../assets/js/pdf-export.js"></script>
+
+
+<!--     <script src="../assets/js/vendor/chart-lite.js"></script>
+ -->
+
+    <script src="../assets/js/printer-receipt.js"></script>
+    <script src="../assets/js/copy-receipt.js"></script>
+    <script src="../assets/js/share-receipt.js"></script>
+    <script src="../assets/js/orders-data.js"></script>
+    <script src="../assets/js/search-edit-pos.js"></script>
+
+
+</body>
+</html>
