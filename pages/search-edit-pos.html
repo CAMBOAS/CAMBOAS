@@ -17,7 +17,6 @@
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
-
     <div class="dashboard">
         <div class="sidebar-overlay"></div>
         <aside class="sidebar" id="sharedSidebar"></aside>
@@ -32,7 +31,6 @@
                         <div class="hero-badge">SEARCH &amp; EDIT ORDERS</div>
                     </div>
                 </section>
-
                 <section class="stats-grid pos-stats-grid">
                     <article class="stat-card card glass-card">
                         <span class="stat-label">Total Records</span>
@@ -55,13 +53,12 @@
                         <p>Filtered total</p>
                     </article>
                 </section>
-
                 <section class="table-card card glass-card">
                     <div class="table-tools-row">
                         <div class="table-tools-left">
-                            <span id="showingTextTop">Showing 0 records in selected date range</span>
+                            <span id="showingTextTop" style="display:none !important;"></span>
                             <span class="selected-pill">Selected: <b id="selectedCountTop">0</b></span>
-                            <div class="footer-right top-range-chip" id="footerRangeTextTop">2026-03-01 → 2026-03-31 · John Wick</div>
+                            <div class="footer-right top-range-chip" id="footerRangeTextTop" style="display:none !important;"></div>
                         </div>
                         <div class="table-tools-actions">
                             <div class="export-tools-wrap" id="exportToolsWrap">
@@ -217,7 +214,6 @@
         </main>
     </div>
 
-
     <div class="drawer" id="detailDrawer" aria-hidden="true">
       <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
@@ -311,9 +307,6 @@
         </main>
     </div>
     <script src="../assets/js/vendor/html2canvas-lite.js"></script>
-
-
-
 
     <div id="printArea" style="display:none;"></div>
     <script src="../assets/js/layout.js"></script>
