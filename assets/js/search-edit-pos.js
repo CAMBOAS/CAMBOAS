@@ -1,5 +1,5 @@
 const ASSET_ROOT = '../assets';
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzd1g4M2oIFIl5MYkUnVd-WtxTzaEgXXepuIXYJ-KZboRNJGIOXfPOd8ANWX-dzay-ynQ/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbYu6Szxqz_GAPVdHfFLSzogBGqLB9j72IvJHKw5YTtiL1pmx8d0s_84Db8_b3lJpX5w/exec';
 const STORAGE_KEY = 'cambo_search_edit_orders_v3';
 const EXCHANGE_RATE = 4100;
 
