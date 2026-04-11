@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
     <title>Search & Edit Orders - CAMBO MINI</title>
-  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
-  <link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
-  <link rel="apple-touch-icon" href="../images/logo/LOGO%20CAMBOMINI.png">
     <meta name="description" content="Search & Edit Orders mixed UI for CAMBO MINI POS">
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
@@ -66,13 +63,20 @@
                             <div class="footer-right top-range-chip" id="footerRangeTextTop">2026-03-01 → 2026-03-31 · John Wick</div>
                         </div>
                         <div class="table-tools-actions">
-                            <input id="listReceiptStart" class="small-input print-input" type="number" min="1" step="1" placeholder="Start">
-                            <input id="listReceiptEnd" class="small-input print-input" type="number" min="1" step="1" placeholder="End">
-                            <button id="qrToggle" class="btn btn-green" type="button">QR: ON</button>
-                            <button id="shareImageBtn" class="btn" type="button">Share IMG</button>
-                            <button id="printSelectedBtn" class="btn" type="button">Print Selected</button>
-                            <button id="printTableBtn" class="btn" type="button">Print Table</button>
-                            <button id="exportTablePdfBtn" class="btn" type="button">Export PDF</button>
+                            <div class="export-tools-wrap" id="exportToolsWrap">
+                                <button id="exportDataToggle" class="btn export-data-toggle" type="button" aria-expanded="false">Export Data</button>
+                                <div class="export-tools-popover" id="exportToolsPopover" hidden>
+                                    <div class="export-tools-grid">
+                                        <input id="listReceiptStart" class="small-input print-input" type="number" min="1" step="1" placeholder="Start">
+                                        <input id="listReceiptEnd" class="small-input print-input" type="number" min="1" step="1" placeholder="End">
+                                        <button id="qrToggle" class="btn btn-green export-btn-wide" type="button">QR: ON</button>
+                                        <button id="shareImageBtn" class="btn" type="button">Share IMG</button>
+                                        <button id="printSelectedBtn" class="btn" type="button">Print Selected</button>
+                                        <button id="printTableBtn" class="btn export-btn-wide" type="button">Print Table</button>
+                                        <button id="exportTablePdfBtn" class="btn export-btn-wide" type="button">Export A4</button>
+                                    </div>
+                                </div>
+                            </div>
                             <button id="addRecordBtn" class="btn btn-primary add-record-btn" type="button">+ Add Record</button>
                         </div>
                     </div>
@@ -315,14 +319,11 @@
     <script src="../assets/js/dashboard-layout.js"></script>
     <script src="../assets/js/pdf-export.js"></script>
 
-
-<!--     <script src="../assets/js/vendor/chart-lite.js"></script>
- -->
-
     <script src="../assets/js/printer-receipt.js"></script>
     <script src="../assets/js/copy-receipt.js"></script>
     <script src="../assets/js/share-receipt.js"></script>
     <script src="../assets/js/orders-data.js"></script>
+    <script src="../assets/js/export-daily-clearance-template.js"></script>
     <script src="../assets/js/search-edit-pos.js"></script>
 
 
