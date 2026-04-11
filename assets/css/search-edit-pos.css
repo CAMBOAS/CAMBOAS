@@ -1191,3 +1191,18 @@ html[data-theme="light"] #receiptNoInput::placeholder{
 html[data-theme="light"] .priority-high{color:#b91c1c;background:rgba(254,226,226,.88)}
 html[data-theme="light"] .priority-medium{color:#6d28d9;background:rgba(237,233,254,.92)}
 html[data-theme="light"] .priority-low{color:#166534;background:rgba(220,252,231,.92)}
+
+
+/* ===== export tools dropdown like date range ===== */
+.export-tools-wrap{position:relative;display:inline-flex;align-items:center;flex:0 0 auto;}
+.export-data-toggle{min-width:118px;justify-content:center;}
+.export-tools-popover{position:absolute;top:calc(100% + 10px);right:0;left:auto;width:320px;min-width:320px;max-width:min(320px,calc(100vw - 24px));padding:12px;border-radius:18px;background:#fff;border:1px solid var(--pos-line-strong);box-shadow:0 24px 60px rgba(15,23,42,.16);z-index:10000;}
+.export-tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.export-tools-grid .btn,.export-tools-grid .small-input{width:100%;min-width:0;}
+.export-btn-wide{grid-column:1 / -1;}
+.export-tools-wrap.open .export-data-toggle{background:#f5f3ff;border-color:rgba(124,58,237,.22);color:var(--pos-purple-2);}
+[data-theme="dark"] .export-tools-popover{background:rgba(15,23,42,.98);border-color:rgba(148,163,184,.22);box-shadow:0 24px 60px rgba(2,6,23,.5);}
+@media (max-width: 760px){
+  .export-tools-popover{position:fixed;left:10px;right:10px;top:auto;bottom:10px;width:auto;max-width:none;min-width:0;border-radius:18px;}
+  .export-tools-grid{grid-template-columns:1fr 1fr;}
+}
