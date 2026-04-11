@@ -138,6 +138,7 @@ qs('shareDetailBtn')?.addEventListener('click', shareCurrentOrderAsImage);
 qs('printDetailBtn')?.addEventListener('click', printCurrentOrderDetail);
 qs('pdfDetailBtn')?.addEventListener('click', exportCurrentOrderPdf);
 qs('dateRangeTrigger')?.addEventListener('click', toggleDatePopover);
+qs('exportDataToggle')?.addEventListener('click', toggleExportToolsPopover);
 qs('dateRangeCancel')?.addEventListener('click', closeDatePopover);
 qs('dateRangeApply')?.addEventListener('click', applyDateRangeFromPopover);
 qs('dateStartInput')?.addEventListener('input', handleCustomDateInput);
@@ -155,12 +156,15 @@ qs('listReceiptEnd')?.addEventListener('input', render);
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && qs('detailDrawer')?.classList.contains('open')) closeDrawer();
   if (e.key === 'Escape' && qs('dateFilterWrap')?.classList.contains('open')) closeDatePopover();
+  if (e.key === 'Escape' && qs('exportToolsWrap')?.classList.contains('open')) closeExportToolsPopover();
 });
 
 document.addEventListener('click', (e) => {
-  const wrap = qs('dateFilterWrap');
-  if (!wrap || !wrap.classList.contains('open')) return;
-  if (!wrap.contains(e.target)) closeDatePopover();
+  const dateWrap = qs('dateFilterWrap');
+  if (dateWrap && dateWrap.classList.contains('open') && !dateWrap.contains(e.target)) closeDatePopover();
+
+  const exportWrap = qs('exportToolsWrap');
+  if (exportWrap && exportWrap.classList.contains('open') && !exportWrap.contains(e.target)) closeExportToolsPopover();
 });
 
 
@@ -372,6 +376,38 @@ function initDateFilter() {
   setAppliedDateRange('today');
   updateDateTriggerText();
   syncDatePopoverUi();
+}
+
+function openExportToolsPopover() {
+  const wrap = qs('exportToolsWrap');
+  const popover = qs('exportToolsPopover');
+  const trigger = qs('exportDataToggle');
+  if (!wrap || !popover) return;
+  closeDatePopover();
+  wrap.classList.add('open');
+  popover.hidden = false;
+  if (trigger) trigger.setAttribute('aria-expanded', 'true');
+}
+
+function closeExportToolsPopover() {
+  const wrap = qs('exportToolsWrap');
+  const popover = qs('exportToolsPopover');
+  const trigger = qs('exportDataToggle');
+  if (!wrap || !popover) return;
+  wrap.classList.remove('open');
+  popover.hidden = true;
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
+}
+
+function toggleExportToolsPopover(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  const wrap = qs('exportToolsWrap');
+  if (!wrap) return;
+  if (wrap.classList.contains('open')) closeExportToolsPopover();
+  else openExportToolsPopover();
 }
 
 function provinceGroup(text) {
@@ -1068,16 +1104,24 @@ async function exportReceiptHtmlToPdf(title, contentHtml) {
 }
 
 async function exportFilteredOrdersPdf() {
-  const rows = applyListPrintSettings(getFilteredOrders());
-  if (!rows.length) return toast('មិនមានទិន្នន័យសម្រាប់ PDF ទេ។', 'error');
-  const html = rows.map((order, index) => buildPrintInvoiceHTML(order, index, rows.length)).join('');
-  await exportReceiptHtmlToPdf(`orders-${rows.length}`, html);
+  const rows = getFilteredOrders().filter((order) => selectedIds.has(order.id));
+  const preparedRows = rows.length ? applyListPrintSettings(rows) : applyListPrintSettings(getTopActionRows());
+  if (!preparedRows.length) return toast('មិនមានទិន្នន័យសម្រាប់ Export ទេ។', 'error');
+  if (window.CamboDailyClearanceTemplate && typeof window.CamboDailyClearanceTemplate.exportRows === 'function') {
+    window.CamboDailyClearanceTemplate.exportRows(preparedRows, { exchangeRate: EXCHANGE_RATE });
+    return;
+  }
+  toast('រកមិនឃើញ export template file ទេ។', 'error');
 }
 
 async function exportCurrentOrderPdf() {
   const order = readOrderFromForm();
-  if (!(order.products || []).some(line => line.name)) return toast('សូមបញ្ចូលផលិតផលជាមុនសិន។', 'error');
-  await exportReceiptHtmlToPdf(order.customer || order.id || 'order', buildPrintInvoiceHTML(order, 0, 1));
+  if (!(order.products || []).some((line) => line.name)) return toast('សូមបញ្ចូលផលិតផលជាមុនសិន។', 'error');
+  if (window.CamboDailyClearanceTemplate && typeof window.CamboDailyClearanceTemplate.exportRows === 'function') {
+    window.CamboDailyClearanceTemplate.exportRows([{ ...order, receiptNo: order.receiptNo || '' }], { exchangeRate: EXCHANGE_RATE });
+    return;
+  }
+  toast('រកមិនឃើញ export template file ទេ។', 'error');
 }
 
 async function startRealtimeSync() {
