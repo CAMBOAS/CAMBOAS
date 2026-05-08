@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="km">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,14 +15,14 @@
     .kpi{padding:16px 18px;border-radius:20px}
     .kpi span{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
     .kpi strong{display:block;margin-top:8px;font-size:22px;color:var(--text)}
-    .clayout{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start}
+    .clayout{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start}
     .cp{padding:20px 22px;border-radius:22px}
     .cp-title{margin:0 0 14px;font-size:16px;font-weight:700;color:var(--text)}
-    .tools{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .tools{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
     .tools input,.tools select{min-height:38px;padding:0 12px;border-radius:10px;font-size:13px}
     table{width:100%;border-collapse:collapse}
     thead th{text-align:left;padding:9px 12px;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--line)}
-    tbody td{padding:10px 12px;border-bottom:1px solid rgba(148,163,200,.06);font-size:13px;color:var(--text)}
+    tbody td{padding:10px 12px;border-bottom:1px solid rgba(148,163,200,.06);font-size:13px;color:var(--text);vertical-align:middle}
     tbody tr:last-child td{border-bottom:none}
     tbody tr:hover td{background:rgba(255,255,255,.02)}
     .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,rgba(139,92,246,.4),rgba(6,182,212,.3));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
@@ -33,10 +33,22 @@
     .p-paid{background:rgba(34,197,94,.12);color:#86efac;border-color:rgba(34,197,94,.2)}
     .p-pending{background:rgba(251,191,36,.1);color:#fde68a;border-color:rgba(251,191,36,.18)}
     .p-processing{background:rgba(6,182,212,.1);color:#7dd3fc;border-color:rgba(6,182,212,.2)}
-    .p-rate{background:rgba(139,92,246,.12);color:#c4b5fd;border-color:rgba(139,92,246,.2)}
-    .comm-val{color:#7dd3fc;font-weight:800}
+    .comm-val{color:#fde68a;font-weight:800}
     .sales-val{color:var(--text);font-weight:700}
-    .stchange{background:rgba(255,255,255,.06)!important;border:1px solid var(--line)!important;border-radius:8px!important;color:var(--text)!important;padding:4px 8px!important;font-size:11px!important;cursor:pointer;min-height:auto!important}
+    .stchange{background:rgba(255,255,255,.06)!important;border:1px solid var(--line)!important;border-radius:8px!important;color:var(--text)!important;padding:4px 8px!important;font-size:11px!important;cursor:pointer;min-height:auto!important;font-family:inherit}
+    .rate-inp{width:90px;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:12px;text-align:center;font-family:inherit}
+    .rate-inp:focus{outline:none;border-color:rgba(139,92,246,.5)}
+    .exp-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:2px 6px;line-height:1;border-radius:6px}
+    .exp-btn:hover{background:rgba(255,255,255,.06);color:var(--text)}
+    .detail-row td{padding:0!important;border-bottom:none!important}
+    .detail-wrap{padding:8px 12px 14px 56px;border-bottom:1px solid rgba(148,163,200,.06)}
+    .detail-title{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+    .order-list{display:grid;gap:5px}
+    .order-item{display:grid;grid-template-columns:90px 1fr 130px 100px;gap:8px;align-items:center;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.06);font-size:12px}
+    .order-date{color:var(--muted);font-size:11px}
+    .order-cust{font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .order-items-count{color:#c4b5fd;font-size:11px}
+    .order-total{color:#7dd3fc;font-weight:700;text-align:right}
     .lb{display:grid;gap:8px}
     .lbi{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1)}
     .rk{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
@@ -47,13 +59,24 @@
     .lbi-info{flex:1;min-width:0}
     .lbi-info b{display:block;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .lbi-info small{font-size:11px;color:var(--muted)}
-    .lbi-amt{font-size:13px;font-weight:800;color:#7dd3fc;white-space:nowrap}
+    .lbi-amt{font-size:13px;font-weight:800;color:#fde68a;white-space:nowrap}
     .cbars{display:grid;gap:8px;margin-top:4px}
     .brow{display:grid;gap:3px}
     .blbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
     .btrack{height:7px;border-radius:999px;background:rgba(148,163,200,.12);overflow:hidden}
     .bfill{height:100%;border-radius:999px;background:linear-gradient(90deg,#8b5cf6,#06b6d4)}
+    .sett-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(148,163,200,.08)}
+    .sett-row:last-child{border-bottom:none;padding-bottom:0}
+    .sett-label{font-size:13px;color:var(--text);font-weight:600}
+    .sett-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .big-inp{width:100px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:14px;text-align:center;font-family:inherit;font-weight:700}
+    .big-inp:focus{outline:none;border-color:rgba(139,92,246,.5)}
+    .save-btn{padding:7px 16px;border-radius:10px;background:linear-gradient(135deg,rgba(139,92,246,.3),rgba(6,182,212,.2));border:1px solid rgba(139,92,246,.3);color:#c4b5fd;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:12px}
+    .save-btn:hover{background:linear-gradient(135deg,rgba(139,92,246,.4),rgba(6,182,212,.3))}
+    .no-data{text-align:center;padding:36px 20px;color:var(--muted);font-size:13px}
+    .badge-orders{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:22px;padding:0 7px;border-radius:999px;background:rgba(139,92,246,.15);color:#c4b5fd;font-size:12px;font-weight:800;border:1px solid rgba(139,92,246,.2)}
     @media(max-width:1080px){.clayout{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:640px){.order-item{grid-template-columns:80px 1fr auto}}
   </style>
 </head>
 <body>
@@ -64,29 +87,34 @@
   <main class="main-content">
     <div class="shared-topbar" id="sharedHeader"></div>
     <div class="cw">
+
+      <!-- Header -->
       <section class="glass-card" style="padding:20px 24px;border-radius:22px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
-          <div><h2 style="margin:0 0 4px;color:var(--text)">Commission</h2><p style="margin:0;color:var(--muted);font-size:14px">គ្រប់គ្រង commission Agent និង payout report</p></div>
-          <select id="mFilter" onchange="ra()" style="min-height:36px;padding:0 12px;border-radius:10px;font-size:13px">
-            <option value="4">April 2025</option>
-            <option value="3">March 2025</option>
-            <option value="2">February 2025</option>
-          </select>
+          <div>
+            <h2 style="margin:0 0 4px;color:var(--text)">Commission</h2>
+            <p style="margin:0;color:var(--muted);font-size:14px">គ្រប់គ្រង commission CloseBy និង payout report</p>
+          </div>
+          <select id="mFilter" onchange="ra()" style="min-height:36px;padding:0 14px;border-radius:10px;font-size:13px"></select>
         </div>
       </section>
 
+      <!-- KPI Stats -->
       <div class="stats-row">
-        <article class="glass-card kpi"><span>Total Commission</span><strong id="sTot">$0</strong></article>
-        <article class="glass-card kpi"><span>Paid Out</span><strong id="sPaid" style="color:#86efac">$0</strong></article>
-        <article class="glass-card kpi"><span>Pending</span><strong id="sPend" style="color:#fde68a">$0</strong></article>
-        <article class="glass-card kpi"><span>Active Agents</span><strong id="sAg">0</strong></article>
+        <article class="glass-card kpi"><span>Total Commission</span><strong id="sTot">0 ៛</strong></article>
+        <article class="glass-card kpi"><span>Paid Out</span><strong id="sPaid" style="color:#86efac">0 ៛</strong></article>
+        <article class="glass-card kpi"><span>Pending</span><strong id="sPend" style="color:#fde68a">0 ៛</strong></article>
+        <article class="glass-card kpi"><span>Active CloseBy</span><strong id="sAg">0</strong></article>
       </div>
 
+      <!-- Main layout -->
       <div class="clayout">
+
+        <!-- Left: Commission Table -->
         <article class="glass-card cp">
           <h3 class="cp-title">Commission Records</h3>
           <div class="tools">
-            <input type="text" id="srch" placeholder="ស្វែងរក Agent..." oninput="rt()">
+            <input type="text" id="srch" placeholder="ស្វែងរក CloseBy..." oninput="rt()" style="flex:1;min-width:140px">
             <select id="fst" onchange="rt()">
               <option value="">All Status</option>
               <option value="Paid">Paid</option>
@@ -94,20 +122,62 @@
               <option value="Processing">Processing</option>
             </select>
           </div>
-          <table>
-            <thead><tr><th>Agent</th><th>Orders</th><th>Sales</th><th>Rate</th><th>Commission</th><th>Status</th></tr></thead>
-            <tbody id="tbody"></tbody>
-          </table>
+          <div style="overflow-x:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>CloseBy</th>
+                  <th>Orders</th>
+                  <th>Items</th>
+                  <th>Sales ($)</th>
+                  <th>Rate (៛/order)</th>
+                  <th>Commission</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
         </article>
+
+        <!-- Right side -->
         <div style="display:grid;gap:18px;align-content:start">
+
+          <!-- Commission Setup -->
           <article class="glass-card cp">
-            <h3 class="cp-title">🏆 Top Agents</h3>
+            <h3 class="cp-title">⚙️ Commission Setup</h3>
+            <div class="sett-row">
+              <div>
+                <div class="sett-label">Default Rate ក្នុងមួយ Order</div>
+                <div class="sett-sub">ចំនួន Order × Rate = Commission</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <input type="number" id="defRate" class="big-inp" value="200" min="0" step="50">
+                <span style="color:var(--muted);font-size:13px;font-weight:700">៛</span>
+              </div>
+            </div>
+            <div class="sett-row">
+              <div>
+                <div class="sett-label">ឧទាហរណ៍</div>
+                <div class="sett-sub" id="exampleCalc">10 orders × 200៛ = 2,000៛</div>
+              </div>
+            </div>
+            <button class="save-btn" onclick="saveDefRate()">💾 Apply to All</button>
+          </article>
+
+          <!-- Top CloseBy -->
+          <article class="glass-card cp">
+            <h3 class="cp-title">🏆 Top CloseBy</h3>
             <div class="lb" id="lb"></div>
           </article>
+
+          <!-- Orders by CloseBy chart -->
           <article class="glass-card cp">
-            <h3 class="cp-title">Sales by Page</h3>
+            <h3 class="cp-title">Orders by CloseBy</h3>
             <div class="cbars" id="cbars"></div>
           </article>
+
         </div>
       </div>
     </div>
@@ -116,67 +186,272 @@
 <script src="../assets/js/layout.js"></script>
 <script src="../assets/js/dashboard-layout.js"></script>
 <script>
-const AG=[
-  {id:1,name:'ហេឡែន CCR',page:'Helen CCR',orders:42,sales:1260,rate:8,st:'Paid'},
-  {id:2,name:'ស្រីម៉ៅ JELY',page:'ស្រីម៉ៅ JELY BRAND',orders:35,sales:980,rate:8,st:'Paid'},
-  {id:3,name:'ចែម៉ៅ Brand',page:'ចែម៉ៅ CCR BRAND',orders:28,sales:720,rate:10,st:'Processing'},
-  {id:4,name:'JELY CCR',page:'JELY CCR BRAND',orders:51,sales:1530,rate:8,st:'Paid'},
-  {id:5,name:'Brand1 Team',page:'Brand1 CCR',orders:19,sales:490,rate:10,st:'Pending'},
-  {id:6,name:'JELY Helen',page:'JELY BRAND BY HELEN',orders:33,sales:870,rate:8,st:'Pending'},
-  {id:7,name:'ហេឡេន Team',page:'ហេឡេន CCR',orders:22,sales:610,rate:10,st:'Processing'},
-  {id:8,name:'ស្រីម៉ៅ Plus',page:'ស្រីម៉ៅ JELY',orders:15,sales:380,rate:8,st:'Pending'},
-];
-function gc(a){return a.sales*a.rate/100;}
-function upSt(id,st){const a=AG.find(x=>x.id===id);if(a){a.st=st;ra();}}
-function rt(){
-  const q=(document.getElementById('srch').value||'').toLowerCase();
-  const f=document.getElementById('fst').value;
-  const list=AG.filter(a=>(!q||a.name.toLowerCase().includes(q)||a.page.toLowerCase().includes(q))&&(!f||a.st===f));
-  document.getElementById('tbody').innerHTML=list.map(a=>{
-    const comm=gc(a),init=a.name.substring(0,2);
-    return `<tr>
-      <td><div class="ai"><div class="av">${init}</div><div><b>${a.name}</b><small>${a.page.length>20?a.page.slice(0,20)+'…':a.page}</small></div></div></td>
-      <td>${a.orders}</td>
-      <td><span class="sales-val">$${a.sales.toLocaleString()}</span></td>
-      <td><span class="pill p-rate">${a.rate}%</span></td>
-      <td><span class="comm-val">$${comm.toFixed(2)}</span></td>
-      <td><select class="stchange" onchange="upSt(${a.id},this.value)">
-        ${['Paid','Pending','Processing'].map(s=>`<option${s===a.st?' selected':''}>${s}</option>`).join('')}
-      </select></td>
-    </tr>`;}).join('');
-  us();
-}
-function us(){
-  const tot=AG.reduce((s,a)=>s+gc(a),0);
-  const paid=AG.filter(a=>a.st==='Paid').reduce((s,a)=>s+gc(a),0);
-  const pend=AG.filter(a=>a.st==='Pending').reduce((s,a)=>s+gc(a),0);
-  document.getElementById('sTot').textContent='$'+tot.toFixed(2);
-  document.getElementById('sPaid').textContent='$'+paid.toFixed(2);
-  document.getElementById('sPend').textContent='$'+pend.toFixed(2);
-  document.getElementById('sAg').textContent=AG.length;
-}
-function rlb(){
-  const top=[...AG].sort((a,b)=>gc(b)-gc(a)).slice(0,5);
-  const rc=i=>i===0?'r1':i===1?'r2':i===2?'r3':'rn';
-  const em=['🥇','🥈','🥉'];
-  document.getElementById('lb').innerHTML=top.map((a,i)=>`
-    <div class="lbi">
-      <div class="rk ${rc(i)}">${i<3?em[i]:i+1}</div>
-      <div class="lbi-info"><b>${a.name}</b><small>${a.orders} orders · ${a.rate}% rate</small></div>
-      <span class="lbi-amt">$${gc(a).toFixed(2)}</span>
-    </div>`).join('');
-}
-function rchart(){
-  const s=[...AG].sort((a,b)=>b.sales-a.sales);
-  const mx=s[0]?.sales||1;
-  document.getElementById('cbars').innerHTML=s.map(a=>`
-    <div class="brow">
-      <div class="blbl"><span>${a.page.length>24?a.page.slice(0,24)+'…':a.page}</span><span style="color:#7dd3fc">$${gc(a).toFixed(0)}</span></div>
-      <div class="btrack"><div class="bfill" style="width:${Math.round(a.sales/mx*100)}%"></div></div>
-    </div>`).join('');
-}
-function ra(){rt();rlb();rchart();}
-document.addEventListener('DOMContentLoaded',ra);
+(function(){
+  const ORDERS_KEY = 'cambo_search_edit_orders_v3';
+  const COMM_KEY   = 'commission_settings_v2';
+
+  /* ── settings ── */
+  function loadSett(){ try{return JSON.parse(localStorage.getItem(COMM_KEY)||'{}')}catch{return{}} }
+  function saveSett(s){ localStorage.setItem(COMM_KEY,JSON.stringify(s)) }
+
+  /* ── helpers ── */
+  function getItems(o){
+    return (Array.isArray(o.items)&&o.items.length ? o.items
+          : Array.isArray(o.products)&&o.products.length ? o.products : []);
+  }
+
+  function parseDate(o){
+    const raw = String(o.createdAt||o.date||'');
+    if(!raw) return null;
+    let m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m) return {y:+m[1],mo:+m[2]};
+    m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if(m) return {y:+m[3],mo:+m[2]};
+    return null;
+  }
+
+  function fmtDate(o){
+    const raw = String(o.createdAt||o.date||'');
+    const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m) return m[3]+'/'+m[2]+'/'+m[1];
+    const m2 = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if(m2) return raw.slice(0,10);
+    return '-';
+  }
+
+  function moneyFmt(n){
+    return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2});
+  }
+
+  /* ── month filter ── */
+  var MONTHS_KM=['','មករា','កុម្ភៈ','មីនា','មេសា','ឧសភា','មិថុនា','កក្កដា','សីហា','កញ្ញា','តុលា','វិច្ឆិកា','ធ្នូ'];
+
+  function buildMonthFilter(){
+    var orders = JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');
+    var seen={};
+    orders.forEach(function(o){
+      var d=parseDate(o); if(!d) return;
+      var k=d.y+'-'+String(d.mo).padStart(2,'0');
+      seen[k]={y:d.y,mo:d.mo};
+    });
+    var keys=Object.keys(seen).sort().reverse();
+    var sel=document.getElementById('mFilter');
+    if(!keys.length){
+      var now=new Date();
+      var k=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+      sel.innerHTML='<option value="'+k+'">'+MONTHS_KM[now.getMonth()+1]+' '+now.getFullYear()+'</option>';
+    } else {
+      sel.innerHTML=keys.map(function(k){
+        var v=seen[k];
+        return '<option value="'+k+'">'+MONTHS_KM[v.mo]+' '+v.y+'</option>';
+      }).join('');
+    }
+  }
+
+  function getFilteredOrders(){
+    var orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');
+    var val=document.getElementById('mFilter').value;
+    if(!val) return orders;
+    var parts=val.split('-'); var fy=+parts[0],fm=+parts[1];
+    return orders.filter(function(o){var d=parseDate(o);return d&&d.y===fy&&d.mo===fm;});
+  }
+
+  /* ── group by closeBy ── */
+  function groupByCloseBy(orders){
+    var sett=loadSett();
+    var defRate=Number(document.getElementById('defRate').value)||0;
+    var groups={};
+    orders.forEach(function(o){
+      var cb=(o.closeBy||o.CloseBy||'').trim()||'Unknown';
+      if(!groups[cb]){
+        groups[cb]={
+          name:cb,
+          totalOrders:0,
+          totalItems:0,
+          totalSales:0,
+          rate: sett[cb]!==undefined ? sett[cb].rate : defRate,
+          status: sett[cb]!==undefined ? sett[cb].status : 'Pending',
+          orders:[]
+        };
+      }
+      var items=getItems(o);
+      var itemQty=items.reduce(function(s,it){return s+(+it.qty||1);},0);
+      var sale=+(o.grandTotal||o.subtotal||0);
+      groups[cb].totalOrders++;
+      groups[cb].totalItems+=itemQty;
+      groups[cb].totalSales+=sale;
+      groups[cb].orders.push({
+        date:fmtDate(o),
+        customer:o.customer||'-',
+        itemsCount:items.length,
+        itemQty:itemQty,
+        total:sale,
+        receiptNo:o.receiptNo||o.id||''
+      });
+    });
+    return Object.values(groups).sort(function(a,b){return b.totalOrders-a.totalOrders;});
+  }
+
+  /* ── state ── */
+  var _agents=[];
+  var _expanded={};
+
+  /* ── render table ── */
+  function rt(){
+    var q=(document.getElementById('srch').value||'').toLowerCase();
+    var f=document.getElementById('fst').value;
+    var list=_agents.filter(function(a){
+      return (!q||a.name.toLowerCase().includes(q))&&(!f||a.status===f);
+    });
+
+    if(!list.length){
+      document.getElementById('tbody').innerHTML='<tr><td colspan="8"><div class="no-data">គ្មានទិន្នន័យ commission សម្រាប់ខែនេះ<br><small>Orders ត្រូវមាន CloseBy field</small></div></td></tr>';
+      us([]);return;
+    }
+
+    document.getElementById('tbody').innerHTML=list.map(function(a){
+      var comm=a.totalOrders*a.rate;
+      var init=a.name.replace(/\s/g,'').substring(0,2).toUpperCase()||'??';
+      var stCls=a.status==='Paid'?'p-paid':a.status==='Processing'?'p-processing':'p-pending';
+      var enc=encodeURIComponent(a.name);
+      var isExp=!!_expanded[a.name];
+
+      var main='<tr>'
+        +'<td><div class="ai"><div class="av">'+init+'</div><div><b>'+a.name+'</b></div></div></td>'
+        +'<td><span class="badge-orders">'+a.totalOrders+'</span></td>'
+        +'<td style="color:var(--muted)">'+a.totalItems+'</td>'
+        +'<td><span class="sales-val">$'+moneyFmt(a.totalSales)+'</span></td>'
+        +'<td><input type="number" class="rate-inp" value="'+a.rate+'" min="0" step="50"'
+        +' onchange="window._commUpRate(\''+enc+'\',this.value)" onclick="event.stopPropagation()"> <span style="font-size:11px;color:var(--muted)">៛</span></td>'
+        +'<td><span class="comm-val">'+comm.toLocaleString()+'៛</span></td>'
+        +'<td><select class="stchange" onclick="event.stopPropagation()" onchange="window._commUpSt(\''+enc+'\',this.value)">'
+        +['Paid','Pending','Processing'].map(function(s){return '<option'+(s===a.status?' selected':'')+'>'+s+'</option>';}).join('')
+        +'</select></td>'
+        +'<td><button class="exp-btn" onclick="window._commToggle(\''+enc+'\')">'+(isExp?'▲':'▼')+'</button></td>'
+        +'</tr>';
+
+      var detail='';
+      if(isExp){
+        detail='<tr class="detail-row"><td colspan="8"><div class="detail-wrap">'
+          +'<div class="detail-title">Orders ទាំងអស់ ('+a.totalOrders+')</div>'
+          +'<div class="order-list">'
+          +a.orders.map(function(od){
+            return '<div class="order-item">'
+              +'<span class="order-date">'+od.date+'</span>'
+              +'<span class="order-cust">'+od.customer+'</span>'
+              +'<span class="order-items-count">'+od.itemsCount+' ផលិតផល · '+od.itemQty+' ឈុត</span>'
+              +'<span class="order-total">$'+moneyFmt(od.total)+'</span>'
+              +'</div>';
+          }).join('')
+          +'</div></div></td></tr>';
+      }
+      return main+detail;
+    }).join('');
+
+    us(list);
+  }
+
+  /* ── global callbacks (called from inline HTML) ── */
+  window._commToggle=function(enc){
+    var n=decodeURIComponent(enc);
+    _expanded[n]=!_expanded[n];
+    rt();
+  };
+  window._commUpRate=function(enc,val){
+    var n=decodeURIComponent(enc);
+    var s=loadSett(); if(!s[n])s[n]={};
+    s[n].rate=+val||0; saveSett(s);
+    var ag=_agents.find(function(a){return a.name===n;});
+    if(ag) ag.rate=s[n].rate;
+    us(_agents); rlb(); rchart();
+  };
+  window._commUpSt=function(enc,st){
+    var n=decodeURIComponent(enc);
+    var s=loadSett(); if(!s[n])s[n]={};
+    s[n].status=st; saveSett(s);
+    var ag=_agents.find(function(a){return a.name===n;});
+    if(ag) ag.status=st;
+    us(_agents);
+  };
+
+  /* ── stats ── */
+  function us(list){
+    var tot =list.reduce(function(s,a){return s+a.totalOrders*a.rate;},0);
+    var paid=list.filter(function(a){return a.status==='Paid';}).reduce(function(s,a){return s+a.totalOrders*a.rate;},0);
+    var pend=list.filter(function(a){return a.status==='Pending';}).reduce(function(s,a){return s+a.totalOrders*a.rate;},0);
+    document.getElementById('sTot').textContent =tot.toLocaleString()+'៛';
+    document.getElementById('sPaid').textContent=paid.toLocaleString()+'៛';
+    document.getElementById('sPend').textContent=pend.toLocaleString()+'៛';
+    document.getElementById('sAg').textContent  =_agents.length;
+  }
+
+  /* ── leaderboard ── */
+  function rlb(){
+    var top=[..._agents].sort(function(a,b){return(b.totalOrders*b.rate)-(a.totalOrders*a.rate);}).slice(0,5);
+    var rc=function(i){return i===0?'r1':i===1?'r2':i===2?'r3':'rn';};
+    var em=['🥇','🥈','🥉'];
+    document.getElementById('lb').innerHTML=top.length
+      ?top.map(function(a,i){
+        return '<div class="lbi">'
+          +'<div class="rk '+rc(i)+'">'+(i<3?em[i]:i+1)+'</div>'
+          +'<div class="lbi-info"><b>'+a.name+'</b>'
+          +'<small>'+a.totalOrders+' orders · '+a.totalItems+' items</small></div>'
+          +'<span class="lbi-amt">'+(a.totalOrders*a.rate).toLocaleString()+'៛</span>'
+          +'</div>';
+      }).join('')
+      :'<div class="no-data">គ្មានទិន្នន័យ</div>';
+  }
+
+  /* ── bar chart ── */
+  function rchart(){
+    var s=[..._agents].sort(function(a,b){return b.totalOrders-a.totalOrders;});
+    var mx=s[0]?s[0].totalOrders:1;
+    document.getElementById('cbars').innerHTML=s.length
+      ?s.map(function(a){
+        var nm=a.name.length>22?a.name.slice(0,22)+'…':a.name;
+        return '<div class="brow">'
+          +'<div class="blbl"><span>'+nm+'</span>'
+          +'<span style="color:#c4b5fd">'+a.totalOrders+' orders</span></div>'
+          +'<div class="btrack"><div class="bfill" style="width:'+Math.round(a.totalOrders/mx*100)+'%"></div></div>'
+          +'</div>';
+      }).join('')
+      :'<div class="no-data">គ្មានទិន្នន័យ</div>';
+  }
+
+  /* ── save default rate ── */
+  window.saveDefRate=function(){
+    var r=Number(document.getElementById('defRate').value)||0;
+    var s=loadSett(); s._default=r; saveSett(s);
+    // apply to agents that have no individual rate set
+    _agents.forEach(function(a){
+      if(!(s[a.name]&&s[a.name].rate!==undefined)) a.rate=r;
+    });
+    updateExample();
+    rt(); rlb(); rchart();
+  };
+
+  function updateExample(){
+    var r=Number(document.getElementById('defRate').value)||0;
+    document.getElementById('exampleCalc').textContent='10 orders × '+r.toLocaleString()+'៛ = '+(10*r).toLocaleString()+'៛';
+  }
+
+  /* ── main render ── */
+  function ra(){
+    var orders=getFilteredOrders();
+    _agents=groupByCloseBy(orders);
+    rt(); rlb(); rchart();
+  }
+
+  /* ── init ── */
+  document.addEventListener('DOMContentLoaded',function(){
+    var s=loadSett();
+    if(s._default!==undefined) document.getElementById('defRate').value=s._default;
+    document.getElementById('defRate').addEventListener('input',updateExample);
+    updateExample();
+    buildMonthFilter();
+    ra();
+  });
+})();
 </script>
 <script src="../assets/js/sw-register.js"></script>
 </body>
