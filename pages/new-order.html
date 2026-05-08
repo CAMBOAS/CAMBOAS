@@ -1,0 +1,645 @@
+﻿<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+  <title>New Order - CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .no-wrap{display:grid;gap:20px;padding:4px 0}
+    .no-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start}
+    .no-card{padding:22px;border-radius:22px}
+    .no-title{margin:0 0 16px;font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+    .no-title svg{width:17px;height:17px;opacity:.7;flex-shrink:0}
+    .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    .frow.cols3{grid-template-columns:1fr 1fr 1fr}
+    .frow.full{grid-template-columns:1fr}
+    .fg{display:flex;flex-direction:column;gap:5px}
+    .fg label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+    .fg input,.fg select,.fg textarea{min-height:40px;border-radius:10px;padding:0 12px;font-size:13px}
+    .fg textarea{min-height:72px;padding:10px 12px;resize:vertical}
+    /* Payment buttons */
+    .payment-opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+    .pay-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
+    .pay-btn.active{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.5);color:var(--text)}
+    /* Product picker */
+    .ptabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+    .ptab{padding:5px 14px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+    .ptab.active{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.4);color:var(--text)}
+    .psearch{display:flex;gap:8px;margin-bottom:10px}
+    .psearch input{flex:1;min-height:40px;border-radius:10px;padding:0 12px;font-size:13px}
+    .plist{display:grid;gap:6px;max-height:320px;overflow-y:auto}
+    .prow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);cursor:pointer;transition:.15s}
+    .prow:hover{border-color:rgba(6,182,212,.35);background:rgba(6,182,212,.07)}
+    .pthumb{width:36px;height:36px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(139,92,246,.12);overflow:hidden}
+    .pthumb img{width:36px;height:36px;object-fit:cover;border-radius:8px}
+    .pinfo{flex:1;min-width:0}
+    .pinfo b{display:block;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .pinfo span{font-size:11px;color:var(--muted)}
+    .pprice{font-size:13px;font-weight:800;color:#7dd3fc;white-space:nowrap}
+    /* Cart */
+    .cart-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
+    .citem{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);margin-bottom:6px}
+    .citem-name{flex:1;font-size:13px;color:var(--text);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .qty-ctrl{display:flex;align-items:center;gap:5px;flex-shrink:0}
+    .qbtn{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--text);cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .qval{min-width:24px;text-align:center;font-size:13px;font-weight:700;color:var(--text)}
+    .citem-price{font-size:13px;font-weight:800;color:#7dd3fc;min-width:52px;text-align:right;flex-shrink:0}
+    .rmvbtn{width:24px;height:24px;border-radius:7px;border:none;background:rgba(239,68,68,.14);color:#fca5a5;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    /* Summary */
+    .sum-box{padding:14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);margin:12px 0}
+    .srow{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;color:var(--muted)}
+    .srow.total{border-top:1px solid var(--line);margin-top:8px;padding-top:10px;font-size:15px;font-weight:700;color:var(--text)}
+    .srow.total span:last-child{color:#7dd3fc}
+    .srow.riel{font-size:12px}
+    /* Submit */
+    .submit-btn{width:100%;padding:13px;border-radius:13px;border:none;background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.02em;margin-top:4px;transition:.15s}
+    .submit-btn:hover{opacity:.88}
+    .submit-btn:disabled{opacity:.5;cursor:not-allowed}
+    /* Toast */
+    .toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+    .toast{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;color:#fff;max-width:300px;opacity:1;transition:opacity .4s,transform .4s}
+    .toast.success{background:rgba(22,163,74,.92)}
+    .toast.error{background:rgba(220,38,38,.92)}
+    .toast.info{background:rgba(59,130,246,.92)}
+    @media(max-width:980px){.no-grid{grid-template-columns:1fr}}
+    @media(max-width:600px){.frow,.frow.cols3{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="background"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+<div class="dashboard">
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar" id="sharedSidebar"></aside>
+  <main class="main-content">
+    <div class="shared-topbar" id="sharedHeader"></div>
+    <div class="no-wrap">
+
+      <!-- Hero -->
+      <section class="glass-card" style="padding:20px 24px;border-radius:22px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <div>
+            <h2 style="margin:0 0 4px;color:var(--text)">New Order</h2>
+            <p style="margin:0;color:var(--muted);font-size:14px">បង្កើតការបញ្ជាទិញថ្មីសម្រាប់អតិថិជន</p>
+          </div>
+          <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
+        </div>
+      </section>
+
+      <div class="no-grid">
+        <!-- ═══ LEFT COLUMN ═══ -->
+        <div style="display:grid;gap:18px">
+
+          <!-- Customer Info -->
+          <article class="glass-card no-card">
+            <h3 class="no-title">
+              <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              ព័ត៌មានអតិថិជន
+            </h3>
+
+            <!-- Pages / CloseBy / Status -->
+            <div class="frow cols3">
+              <div class="fg">
+                <label>Pages</label>
+                <select id="page">
+                  <option value="">ជ្រើស...</option>
+                  <option>Helen CCR</option>
+                  <option>Brand1 CCR</option>
+                  <option>JELY BRAND BY HELEN</option>
+                  <option>JELY CCR BRAND</option>
+                  <option>ចែម៉ៅ CCR BRAND</option>
+                  <option>ហេឡេន CCR</option>
+                  <option>ស្រីម៉ៅ JELY</option>
+                  <option>ស្រីម៉ៅ JELY BRAND</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>CloseBy</label>
+                <input id="closeBy" type="text" placeholder="...">
+              </div>
+              <div class="fg">
+                <label>Status</label>
+                <select id="status">
+                  <option value="Pending">Pending</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Done">Done</option>
+                  <option value="Cancel">Cancel</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Customer / Phone -->
+            <div class="frow">
+              <div class="fg"><label>ឈ្មោះអតិថិជន</label><input id="customer" type="text" placeholder="customer..."></div>
+              <div class="fg"><label>លេខទូរស័ព្ទ</label><input id="phone" type="text" placeholder="0xx xxx xxx"></div>
+            </div>
+
+            <!-- Date -->
+            <div class="frow full">
+              <div class="fg"><label>ថ្ងៃខែឆ្នាំ</label><input id="date" type="date"></div>
+            </div>
+
+            <!-- Address detail -->
+            <div class="frow full">
+              <div class="fg"><label>ទីតាំងតំបន</label><input id="addressDetail" type="text" placeholder="ភូមិ / ផ្លូវ / ផ្ទះលេខ..."></div>
+            </div>
+
+            <!-- Province -->
+            <div class="frow full">
+              <div class="fg">
+                <label>ខេត្ត / ក្រុង</label>
+                <select id="province">
+                  <option value="">ជ្រើស...</option>
+                  <option>រាជធានីភ្នំពេញ</option>
+                  <option>ខេត្តបន្ទាយមានជ័យ</option>
+                  <option>ខេត្តបាត់ដំបង</option>
+                  <option>ខេត្តកំពង់ចាម</option>
+                  <option>ខេត្តកំពង់ឆ្នាំង</option>
+                  <option>ខេត្តកំពង់ស្ពឺ</option>
+                  <option>ខេត្តកំពង់ធំ</option>
+                  <option>ខេត្តកំពត</option>
+                  <option>ខេត្តកណ្ដាល</option>
+                  <option>ខេត្តកោះកុង</option>
+                  <option>ខេត្តក្រចេះ</option>
+                  <option>ខេត្តមណ្ឌលគីរី</option>
+                  <option>ខេត្តពោធិ៍សាត់</option>
+                  <option>ខេត្តព្រះវិហារ</option>
+                  <option>ខេត្តព្រៃវែង</option>
+                  <option>ខេត្តរតនគីរី</option>
+                  <option>ខេត្តសៀមរាប</option>
+                  <option>ខេត្តស្ទឹងត្រែង</option>
+                  <option>ខេត្តស្វាយរៀង</option>
+                  <option>ខេត្តតាកែវ</option>
+                  <option>ខេត្តឧត្ដរមានជ័យ</option>
+                  <option>ខេត្តកែប</option>
+                  <option>ខេត្តប៉ៃលិន</option>
+                  <option>ខេត្តព្រះសីហនុ</option>
+                  <option>ខេត្តត្បូងឃ្មុំ</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Delivery Name / Fee -->
+            <div class="frow">
+              <div class="fg">
+                <label>ដឹកជញ្ជូន</label>
+                <select id="deliveryName">
+                  <option value="">ជ្រើស...</option>
+                  <option>វីរៈ ប៊ុនថាំ</option>
+                  <option>J&amp;T</option>
+                  <option>DRSB</option>
+                  <option>ភ្នំពេញ តាធំ</option>
+                  <option>ភ្នំពេញ តាតូច</option>
+                  <option>ដឹកខ្លួនឯង</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>ថ្លៃដឹក ($)</label>
+                <input id="deliveryFee" type="number" value="2" min="0" step="0.5" placeholder="2">
+              </div>
+            </div>
+
+            <!-- Payment -->
+            <div class="frow full">
+              <div class="fg">
+                <label>បង់ប្រាក់</label>
+                <div class="payment-opts" id="paymentOptions">
+                  <button type="button" class="pay-btn" data-value="AC">AC</button>
+                  <button type="button" class="pay-btn" data-value="ABA">ABA</button>
+                  <button type="button" class="pay-btn" data-value="Wing">Wing</button>
+                  <button type="button" class="pay-btn active" data-value="Delivery">Delivery</button>
+                  <button type="button" class="pay-btn" data-value="Other">Other</button>
+                </div>
+                <input type="hidden" id="payment" value="Delivery">
+              </div>
+            </div>
+          </article>
+
+          <!-- Note  (class "note-card" required by order-plust.js) -->
+          <article class="glass-card no-card note-card">
+            <h3 class="no-title">
+              <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Note
+            </h3>
+            <div class="fg"><textarea id="note" placeholder="..."></textarea></div>
+          </article>
+
+          <!-- Product Picker -->
+          <article class="glass-card no-card">
+            <h3 class="no-title">
+              <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              ជ្រើសរើសផលិតផល
+            </h3>
+            <div class="ptabs" id="categoryTabs">
+              <button class="ptab active" data-cat="All">All</button>
+              <button class="ptab" data-cat="Hair">Hair</button>
+              <button class="ptab" data-cat="Body">Body</button>
+              <button class="ptab" data-cat="Face">Face</button>
+              <button class="ptab" data-cat="Drink">Drink</button>
+            </div>
+            <div class="psearch">
+              <input id="pSearch" type="text" placeholder="ស្វែងរក..." oninput="filterProds()">
+            </div>
+            <div class="plist" id="pList"></div>
+          </article>
+        </div>
+
+        <!-- ═══ RIGHT COLUMN: Cart ═══ -->
+        <article class="glass-card no-card" style="position:sticky;top:20px">
+          <h3 class="no-title">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Cart Summary
+          </h3>
+          <div id="cartItems">
+            <div class="cart-empty">🛒 មិនទាន់មានផលិតផល<br><small>ចុចលើ product ខាងឆ្វេង</small></div>
+          </div>
+          <div class="sum-box">
+            <div class="srow"><span>Subtotal</span><span id="subTotal">$0</span></div>
+            <div class="srow"><span>Delivery</span><span id="deliveryDisplay">$2</span></div>
+            <div class="srow total"><span>Total</span><span id="grandTotal">$0</span></div>
+            <div class="srow riel"><span>ប្រាក់រៀល</span><span id="rielTotal">0៛</span></div>
+          </div>
+          <button class="submit-btn" id="submitBtn" onclick="submitOrder()">✓ Save Order</button>
+        </article>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script>
+// ── Apps Script URL (same as Smart Orderer) ──────────────────────────────────
+window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQxWk5L-hnefMrSbkrRnS-SFD-2PzAQ3RvPRUPacSYJCBZoeDZuG8xVo-fmDTdpn52uw/exec";
+
+// ── KHR exchange rate ────────────────────────────────────────────────────────
+var KHR_RATE = (function(){
+  try { var r = Number(localStorage.getItem('cambo_khr_rate')); return r > 0 ? r : 4100; } catch { return 4100; }
+})();
+
+// ── Full product catalog (27 products) ───────────────────────────────────────
+var products = [
+  {id:1, name:"សាប៊ូកក់&ស្បាសក់ JELY",              price:15,   category:"Hair",  detail:"សាប៊ូកក់សក់ និងស្បាសក់ JELY",                         image:"../images/products/hair/សាប៊ូកក់សក់ និងស្បាសក់ JELY.png"},
+  {id:2, name:"សាប៊ូកក់&ម៉ាសសក់ CCR",               price:16,   category:"Hair",  detail:"សាប៊ូកក់ និងម៉ាសសក់ CCR",                            image:"../images/products/hair/សាប៊ូកក់សក់ និងម៉ាសសក់ CCR.png"},
+  {id:3, name:"ស្ព្រាយបាញ់សក់ CCR",                 price:10,   category:"Hair",  detail:"ស្ព្រាយបាញ់សក់ CCR Hair Spray",                      image:"../images/products/hair/ស្រ្ពៃបាញ់សក់.png"},
+  {id:4, name:"សាប៊ូកក់&ម៉ាសសក់ VIP 5in1 CCR",      price:16,   category:"Hair",  detail:"សាប៊ូកក់ និងម៉ាសសក់ VIP 5in1 CCR",                   image:"../images/products/hair/សក់និងម៉ាស 5in1.png"},
+  {id:5, name:"សាប៊ូកក់&ម៉ាសសក់ Premium CCR",       price:16,   category:"Hair",  detail:"សាប៊ូកក់ និងម៉ាសសក់ Premium CCR",                    image:"../images/products/hair/សក់និងម៉ាស Premium CCR.png"},
+  {id:6, name:"ប្រេងលាបសក់/សេរ៉ូមសក់ VIP CCR",     price:12,   category:"Hair",  detail:"ប្រេងលាបសក់ CCR VIP",                                image:"../images/products/hair/ប្រេងលាបសក់ CCR.png"},
+  {id:7, name:"ឡេលាបខ្លួន Gluta SUDO",              price:16,   category:"Body",  detail:"ឡេលាបខ្លួន Gluta SUDO",                              image:"../images/products/body/ឡេលាបខ្លួន Gluta SUDO.png"},
+  {id:8, name:"សេរ៉ូមលាបខ្លួន JELY",                price:15,   category:"Body",  detail:"សេរ៉ូមលាបខ្លួន Body Serum JELY",                      image:"../images/products/body/សេរ៉ូមលាបខ្លួន JELY BODY ESSENCE VC WHITENGING.png"},
+  {id:9, name:"ស្រ្ពៃក្លៀក/ឡេក្លៀក SUDO",          price:10,   category:"Body",  detail:"ស្រ្ពៃក្លៀក/ឡេក្លៀក SUDO",                           image:"../images/products/body/ស្រ្ពៃក្លៀក និងឡេកលៀត.png"},
+  {id:10,name:"សាប៊ូដុសខ្លួន CCR (ក្លិនទឹកអប់)",   price:12,   category:"Body",  detail:"សាប៊ូដុសខ្លួន CCR (ក្លិនទឹកអប់)",                    image:"../images/products/body/សាប៊ូដុសខ្លួនមាសក្លិនទឹកអប់អូតែលផ្កាយ 5.png"},
+  {id:11,name:"សាប៊ូដុសខ្លួនកុលាប CCR",             price:12,   category:"Body",  detail:"សាប៊ូដុសខ្លួនកុលាប BodyWash Rose CCR",                image:"../images/products/body/សាប៊ូដុសខ្លួនកុលាប.png"},
+  {id:12,name:"ឡេលាបខ្លួន JELY",                    price:15,   category:"Body",  detail:"ឡេលាបខ្លួន BODY LOTION JELY",                        image:"../images/products/body/ឡេលាបខ្លួន JELY BODY LOTION.png"},
+  {id:13,name:"សាប៊ូកក់&ដុសខ្លួនក្មេង CCR",         price:12,   category:"Body",  detail:"សាប៊ូកក់ និងដុសខ្លួនក្មេង CCR",                      image:"../images/products/body/សាប៊ូកក់សក់និងដុសខ្លួនក្មេង CCR.png"},
+  {id:14,name:"ទឹកអនាម័យស្រ្ដី JELY",               price:12,   category:"Body",  detail:"ទឹកអនាម័យស្រ្ដី Feminine Wash JELY",                  image:"../images/products/body/ទឹកអនាម័យស្រ្ដី JELY.png"},
+  {id:15,name:"ក្រដាស់សើម CCR",                     price:10,   category:"Face",  detail:"ក្រដាស់សើម Remove MakeUp CCR",                        image:"../images/products/face/ក្រដាស់សើម Remove MakeUp CCR.png"},
+  {id:16,name:"សំឡីវីតាមីន JELY Mask Pad",           price:15,   category:"Face",  detail:"សំឡីវីតាមីន JELY Mask Pad",                           image:"../images/products/face/សំឡីវីតាមីន​ JELY.png"},
+  {id:17,name:"BB Cream CCR",                        price:9.5,  category:"Face",  detail:"BB Cream CCR",                                        image:"../images/products/face/BB Cream.png"},
+  {id:18,name:"SUNSCREEN Cream CCR",                 price:9.5,  category:"Face",  detail:"SUNSCREEN Cream CCR",                                 image:"../images/products/face/SUNSCREEN CCR.png"},
+  {id:19,name:"សាប៊ូមុខ JELY Gluta",                price:8.5,  category:"Face",  detail:"សាប៊ូមុខ JELY Gluta",                                image:"../images/products/face/សាប៊ូដុសមុខ JELY Gluta.png"},
+  {id:20,name:"សាប៊ូមុខយិនសិន CCR",                 price:8.5,  category:"Face",  detail:"សាប៊ូមុខយិនសិន Ginseng CCR",                         image:"../images/products/face/សាប៊ូដុសមុខ យិនសិន CCR.png"},
+  {id:21,name:"CC SERUM JELY",                       price:15,   category:"Face",  detail:"CC Serum Pink Tone JELY",                             image:"../images/products/face/CC SERUM JELY.png"},
+  {id:22,name:"ឈុតមុខស្អាត JELY",                   price:25,   category:"Face",  detail:"ឈុតមុខស្អាត JELY Essence + Milk + Night Cream",       image:"../images/products/face/ឈុតមុខស្អាត JELY.png"},
+  {id:23,name:"ថ្នាំដុសធ្មេញ CCR",                  price:10,   category:"Face",  detail:"ថ្នាំដុសធ្មេញ CCR",                                  image:"../images/products/face/ថ្នាំដុសធ្មេញ CCR.png"},
+  {id:24,name:"ម៉ាស់បិទមុខ 6D CCR",                 price:15,   category:"Face",  detail:"ម៉ាស់បិទមុខ 6D CCR",                                 image:"../images/products/face/ម៉ាស់បិទមុខ 6D CCR.png"},
+  {id:25,name:"ហ្វៃប័រផាសសិន CCR",                 price:18,   category:"Drink", detail:"ហ្វៃប័រផាសសិន Fiber CCR",                             image:"../images/products/drink/Fibery Passion Fruit.png"},
+  {id:26,name:"កាហ្វេសម្រក CCR",                    price:18,   category:"Drink", detail:"កាហ្វេសម្រក Coffee CCR",                              image:"../images/products/drink/CoffeeCCR.png"},
+  {id:27,name:"ឈុតសម្រកទ្វេដង CCR",                price:42,   category:"Drink", detail:"ឈុតសម្រកទ្វេដង CCR",                                 image:"../images/products/drink/SlimSetX2_CCR.png"}
+];
+
+// ── State ────────────────────────────────────────────────────────────────────
+var items = [];              // global — order-plust.js reads/writes this
+var activeCategory = 'All';
+
+// ── els (global — order-plust.js uses this) ───────────────────────────────────
+// Set after DOMContentLoaded; declared var so order-plust.js can see it.
+var els = null;
+
+function _el(id){ return document.getElementById(id); }
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function fmt(n){
+  n = Number(n || 0);
+  return '$' + (Number.isInteger(n) ? n : n.toFixed(2));
+}
+
+function escHtml(s){
+  return String(s || '').replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c];
+  });
+}
+
+function toast(msg, type){
+  var el = document.createElement('div');
+  el.className = 'toast ' + (type || 'info');
+  el.textContent = msg;
+  _el('toastContainer').appendChild(el);
+  setTimeout(function(){ el.style.opacity = '0'; el.style.transform = 'translateY(-8px)'; }, 2200);
+  setTimeout(function(){ el.remove(); }, 2600);
+}
+
+// ── Totals ───────────────────────────────────────────────────────────────────
+function getItemsTotal(){
+  return items.reduce(function(s, it){ return s + Number(it.subtotal || 0); }, 0);
+}
+
+function getDeliveryFeeValue(){
+  return Math.max(0, Number((_el('deliveryFee') && _el('deliveryFee').value) || 0));
+}
+
+function getGrandTotal(){ return getItemsTotal() + getDeliveryFeeValue(); }
+
+function calcTotal(){
+  var sub   = getItemsTotal();
+  var grand = getGrandTotal();
+  _el('subTotal').textContent       = fmt(sub);
+  _el('deliveryDisplay').textContent = fmt(getDeliveryFeeValue());
+  _el('grandTotal').textContent     = fmt(grand);
+  _el('rielTotal').textContent      = Math.round(grand * KHR_RATE).toLocaleString() + '៛';
+}
+
+// ── Cart rendering ────────────────────────────────────────────────────────────
+// renderTable() is the name order-plust.js expects — alias to renderCart()
+function renderTable(){ renderCart(); }
+
+function renderCart(){
+  var el = _el('cartItems');
+  if(!items.length){
+    el.innerHTML = '<div class="cart-empty">🛒 មិនទាន់មានផលិតផល<br><small>ចុចលើ product ខាងឆ្វេង</small></div>';
+    calcTotal();
+    return;
+  }
+
+  el.innerHTML = items.map(function(c, idx){
+    return '<div class="citem">'
+      + '<span class="citem-name">' + escHtml(c.name) + '</span>'
+      + '<div class="qty-ctrl">'
+      + '<button class="qbtn" data-action="dec" data-idx="' + idx + '">−</button>'
+      + '<span class="qval">' + c.qty + '</span>'
+      + '<button class="qbtn" data-action="inc" data-idx="' + idx + '">+</button>'
+      + '</div>'
+      + '<span class="citem-price">' + fmt(c.subtotal) + '</span>'
+      + '<button class="rmvbtn" data-action="rmv" data-idx="' + idx + '">×</button>'
+      + '</div>';
+  }).join('');
+
+  // Event delegation — avoids float-ID issues in onclick strings
+  el.querySelectorAll('[data-action]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var idx    = Number(btn.dataset.idx);
+      var action = btn.dataset.action;
+      if(action === 'dec') _chQty(idx, -1);
+      else if(action === 'inc') _chQty(idx,  1);
+      else if(action === 'rmv') _rmvItem(idx);
+    });
+  });
+
+  calcTotal();
+}
+
+function _chQty(idx, dir){
+  if(!items[idx]) return;
+  items[idx].qty = Math.max(1, items[idx].qty + dir);
+  items[idx].subtotal = Math.max(0, items[idx].qty * items[idx].price - items[idx].discount);
+  renderCart();
+}
+
+function _rmvItem(idx){
+  items.splice(idx, 1);
+  renderCart();
+}
+
+// ── Add product to cart ───────────────────────────────────────────────────────
+function addToCart(id){
+  var p = products.find(function(x){ return String(x.id) === String(id); });
+  if(!p) return;
+
+  // Increment if already in cart
+  var ex = items.find(function(x){ return String(x.productId) === String(id); });
+  if(ex){
+    ex.qty++;
+    ex.subtotal = Math.max(0, ex.qty * ex.price - ex.discount);
+  } else {
+    items.push({
+      rowId:     Date.now() + Math.random(),
+      productId: String(p.id),
+      name:      p.name,
+      qty:       1,
+      price:     p.price,
+      discount:  0,
+      subtotal:  p.price
+    });
+  }
+  renderCart();
+}
+
+// ── Product list rendering ────────────────────────────────────────────────────
+function getFiltered(){
+  var q = ((_el('pSearch') && _el('pSearch').value) || '').toLowerCase();
+  return products.filter(function(p){
+    var catOk = activeCategory === 'All' || p.category === activeCategory;
+    var qOk   = !q || p.name.toLowerCase().indexOf(q) >= 0
+                    || p.detail.toLowerCase().indexOf(q) >= 0;
+    return catOk && qOk;
+  });
+}
+
+function filterProds(){ renderPList(getFiltered()); }
+
+function renderPList(list){
+  _el('pList').innerHTML = list.map(function(p){
+    return '<div class="prow" onclick="addToCart(' + p.id + ')">'
+      + '<div class="pthumb"><img src="' + escHtml(p.image) + '" alt="" onerror="this.style.display=\'none\'"></div>'
+      + '<div class="pinfo">'
+      + '<b>' + escHtml(p.name) + '</b>'
+      + '<span>' + escHtml(p.category) + '</span>'
+      + '</div>'
+      + '<span class="pprice">' + fmt(p.price) + '</span>'
+      + '</div>';
+  }).join('');
+}
+
+// ── Clear all ─────────────────────────────────────────────────────────────────
+// clearOrderForm() is the name order-plust.js expects
+function clearOrderForm(){ clearAll(); }
+
+function clearAll(){
+  items = [];
+  renderCart();
+
+  ['customer','phone','addressDetail','note','closeBy'].forEach(function(id){
+    if(_el(id)) _el(id).value = '';
+  });
+
+  if(_el('page'))         _el('page').value         = '';
+  if(_el('province'))     _el('province').value     = '';
+  if(_el('deliveryName')) _el('deliveryName').value = '';
+  if(_el('deliveryFee'))  _el('deliveryFee').value  = '2';
+  if(_el('status'))       _el('status').value       = 'Pending';
+  if(_el('payment'))      _el('payment').value      = 'Delivery';
+
+  _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.value === 'Delivery');
+  });
+
+  var today = new Date();
+  if(_el('date')) _el('date').value = today.toISOString().split('T')[0];
+
+  calcTotal();
+}
+
+// ── Build order payload ───────────────────────────────────────────────────────
+function buildPayload(){
+  var now     = new Date();
+  var dateVal = _el('date').value || now.toISOString().split('T')[0];
+  var timeStr = String(now.getHours()).padStart(2,'0')
+              + ':' + String(now.getMinutes()).padStart(2,'0')
+              + ':' + String(now.getSeconds()).padStart(2,'0');
+  var dateTime = /^\d{4}-\d{2}-\d{2}$/.test(dateVal)
+    ? dateVal + 'T' + timeStr
+    : dateVal;
+  var createdAt = /^\d{4}-\d{2}-\d{2}$/.test(dateVal)
+    ? new Date(dateVal + 'T' + timeStr).toISOString()
+    : now.toISOString();
+
+  return {
+    id:           Date.now(),
+    createdAt:    createdAt,
+    status:       (_el('status')       && _el('status').value)       || 'Pending',
+    page:         (_el('page')         && _el('page').value)         || '',
+    closeBy:      (_el('closeBy')      && _el('closeBy').value)      || '',
+    customer:     (_el('customer')     && _el('customer').value)     || '',
+    phone:        (_el('phone')        && _el('phone').value)        || '',
+    date:         dateTime,
+    province:     (_el('province')     && _el('province').value)     || '',
+    addressDetail:(_el('addressDetail')&& _el('addressDetail').value)|| '',
+    delivery:     (_el('deliveryName') && _el('deliveryName').value) || '',
+    deliveryFee:  getDeliveryFeeValue(),
+    payment:      (_el('payment')      && _el('payment').value)      || '',
+    note:         (_el('note')         && _el('note').value)         || '',
+    showQrEnabled: true,
+    receiptNo:    '',
+    items:        items.map(function(it){ return Object.assign({}, it); }),
+    itemsTotal:   getItemsTotal(),
+    total:        getGrandTotal(),
+    totalRiel:    getGrandTotal() * KHR_RATE
+  };
+}
+
+// ── POST to Google Apps Script ────────────────────────────────────────────────
+async function _postToAppsScript(order){
+  var url = window.APPS_SCRIPT_URL;
+  if(!url) throw new Error('Apps Script URL is missing.');
+
+  var res  = await fetch(url, {
+    method:  'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body:    JSON.stringify(order)
+  });
+  var text = await res.text();
+  var data;
+  try { data = JSON.parse(text); } catch { throw new Error('Invalid server response: ' + text); }
+  if(!res.ok || !data.ok) throw new Error(data.message || 'Save failed.');
+  return data;
+}
+
+// ── Submit order ──────────────────────────────────────────────────────────────
+async function submitOrder(){
+  if(!items.length){ toast('សូមជ្រើសរើសផលិតផលជាមុន!', 'error'); return; }
+
+  var btn = _el('submitBtn');
+  var originalText = btn.textContent;
+  btn.disabled    = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    var order  = buildPayload();
+    var result = await _postToAppsScript(order);
+
+    // Mirror to localStorage (same key as Smart Orderer)
+    try {
+      var saved = JSON.parse(localStorage.getItem('camboOrders') || '[]');
+      saved.push(order);
+      localStorage.setItem('camboOrders', JSON.stringify(saved));
+    } catch {}
+
+    toast(
+      result.telegram && result.telegram.ok === false
+        ? 'Saved to Google Sheet. Telegram failed.'
+        : 'Order saved successfully!',
+      'success'
+    );
+    clearAll();
+  } catch(err){
+    console.error('Save failed:', err);
+    toast(err.message || 'Save failed.', 'error');
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = originalText;
+  }
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  // Build els object — global so order-plust.js can access it
+  els = {
+    customer:     _el('customer'),
+    phone:        _el('phone'),
+    date:         _el('date'),
+    province:     _el('province'),
+    addressDetail:_el('addressDetail'),
+    deliveryName: _el('deliveryName'),
+    deliveryFee:  _el('deliveryFee'),
+    payment:      _el('payment'),
+    paymentOptions:_el('paymentOptions'),
+    note:         _el('note'),
+    page:         _el('page'),
+    closeBy:      _el('closeBy'),
+    status:       _el('status')
+  };
+
+  // Set today's date
+  _el('date').value = new Date().toISOString().split('T')[0];
+
+  // Payment buttons
+  _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      _el('payment').value = btn.dataset.value || '';
+    });
+  });
+
+  // Category tabs
+  _el('categoryTabs').querySelectorAll('.ptab').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      _el('categoryTabs').querySelectorAll('.ptab').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      activeCategory = btn.dataset.cat || 'All';
+      renderPList(getFiltered());
+    });
+  });
+
+  // Delivery fee change → update totals
+  _el('deliveryFee').addEventListener('input', calcTotal);
+
+  // Initial render
+  renderPList(products);
+  calcTotal();
+});
+</script>
+
+<!-- order-plust.js: Receipt Paste feature — requires els, items, products, renderTable, clearOrderForm -->
+<script src="../assets/js/order-plust.js"></script>
+<script src="../assets/js/layout.js"></script>
+<script src="../assets/js/dashboard-layout.js"></script>
+<script src="../assets/js/sw-register.js"></script>
+</body>
+</html>

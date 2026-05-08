@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+  <title>Commission - CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .cw{display:grid;gap:18px}
+    .stats-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .kpi{padding:16px 18px;border-radius:20px}
+    .kpi span{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .kpi strong{display:block;margin-top:8px;font-size:22px;color:var(--text)}
+    .clayout{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start}
+    .cp{padding:20px 22px;border-radius:22px}
+    .cp-title{margin:0 0 14px;font-size:16px;font-weight:700;color:var(--text)}
+    .tools{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .tools input,.tools select{min-height:38px;padding:0 12px;border-radius:10px;font-size:13px}
+    table{width:100%;border-collapse:collapse}
+    thead th{text-align:left;padding:9px 12px;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--line)}
+    tbody td{padding:10px 12px;border-bottom:1px solid rgba(148,163,200,.06);font-size:13px;color:var(--text)}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:hover td{background:rgba(255,255,255,.02)}
+    .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,rgba(139,92,246,.4),rgba(6,182,212,.3));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}
+    .ai{display:flex;align-items:center;gap:10px}
+    .ai b{display:block;color:var(--text)}
+    .ai small{color:var(--muted);font-size:11px}
+    .pill{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid}
+    .p-paid{background:rgba(34,197,94,.12);color:#86efac;border-color:rgba(34,197,94,.2)}
+    .p-pending{background:rgba(251,191,36,.1);color:#fde68a;border-color:rgba(251,191,36,.18)}
+    .p-processing{background:rgba(6,182,212,.1);color:#7dd3fc;border-color:rgba(6,182,212,.2)}
+    .p-rate{background:rgba(139,92,246,.12);color:#c4b5fd;border-color:rgba(139,92,246,.2)}
+    .comm-val{color:#7dd3fc;font-weight:800}
+    .sales-val{color:var(--text);font-weight:700}
+    .stchange{background:rgba(255,255,255,.06)!important;border:1px solid var(--line)!important;border-radius:8px!important;color:var(--text)!important;padding:4px 8px!important;font-size:11px!important;cursor:pointer;min-height:auto!important}
+    .lb{display:grid;gap:8px}
+    .lbi{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1)}
+    .rk{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+    .r1{background:linear-gradient(135deg,#f59e0b,#fde68a);color:#78350f}
+    .r2{background:linear-gradient(135deg,#94a3b8,#e2e8f0);color:#1e293b}
+    .r3{background:linear-gradient(135deg,#b45309,#fbbf24);color:#fff}
+    .rn{background:rgba(255,255,255,.08);color:var(--muted)}
+    .lbi-info{flex:1;min-width:0}
+    .lbi-info b{display:block;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .lbi-info small{font-size:11px;color:var(--muted)}
+    .lbi-amt{font-size:13px;font-weight:800;color:#7dd3fc;white-space:nowrap}
+    .cbars{display:grid;gap:8px;margin-top:4px}
+    .brow{display:grid;gap:3px}
+    .blbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+    .btrack{height:7px;border-radius:999px;background:rgba(148,163,200,.12);overflow:hidden}
+    .bfill{height:100%;border-radius:999px;background:linear-gradient(90deg,#8b5cf6,#06b6d4)}
+    @media(max-width:1080px){.clayout{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+<div class="background"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+<div class="dashboard">
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar" id="sharedSidebar"></aside>
+  <main class="main-content">
+    <div class="shared-topbar" id="sharedHeader"></div>
+    <div class="cw">
+      <section class="glass-card" style="padding:20px 24px;border-radius:22px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+          <div><h2 style="margin:0 0 4px;color:var(--text)">Commission</h2><p style="margin:0;color:var(--muted);font-size:14px">គ្រប់គ្រង commission Agent និង payout report</p></div>
+          <select id="mFilter" onchange="ra()" style="min-height:36px;padding:0 12px;border-radius:10px;font-size:13px">
+            <option value="4">April 2025</option>
+            <option value="3">March 2025</option>
+            <option value="2">February 2025</option>
+          </select>
+        </div>
+      </section>
+
+      <div class="stats-row">
+        <article class="glass-card kpi"><span>Total Commission</span><strong id="sTot">$0</strong></article>
+        <article class="glass-card kpi"><span>Paid Out</span><strong id="sPaid" style="color:#86efac">$0</strong></article>
+        <article class="glass-card kpi"><span>Pending</span><strong id="sPend" style="color:#fde68a">$0</strong></article>
+        <article class="glass-card kpi"><span>Active Agents</span><strong id="sAg">0</strong></article>
+      </div>
+
+      <div class="clayout">
+        <article class="glass-card cp">
+          <h3 class="cp-title">Commission Records</h3>
+          <div class="tools">
+            <input type="text" id="srch" placeholder="ស្វែងរក Agent..." oninput="rt()">
+            <select id="fst" onchange="rt()">
+              <option value="">All Status</option>
+              <option value="Paid">Paid</option>
+              <option value="Pending">Pending</option>
+              <option value="Processing">Processing</option>
+            </select>
+          </div>
+          <table>
+            <thead><tr><th>Agent</th><th>Orders</th><th>Sales</th><th>Rate</th><th>Commission</th><th>Status</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </article>
+        <div style="display:grid;gap:18px;align-content:start">
+          <article class="glass-card cp">
+            <h3 class="cp-title">🏆 Top Agents</h3>
+            <div class="lb" id="lb"></div>
+          </article>
+          <article class="glass-card cp">
+            <h3 class="cp-title">Sales by Page</h3>
+            <div class="cbars" id="cbars"></div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../assets/js/layout.js"></script>
+<script src="../assets/js/dashboard-layout.js"></script>
+<script>
+const AG=[
+  {id:1,name:'ហេឡែន CCR',page:'Helen CCR',orders:42,sales:1260,rate:8,st:'Paid'},
+  {id:2,name:'ស្រីម៉ៅ JELY',page:'ស្រីម៉ៅ JELY BRAND',orders:35,sales:980,rate:8,st:'Paid'},
+  {id:3,name:'ចែម៉ៅ Brand',page:'ចែម៉ៅ CCR BRAND',orders:28,sales:720,rate:10,st:'Processing'},
+  {id:4,name:'JELY CCR',page:'JELY CCR BRAND',orders:51,sales:1530,rate:8,st:'Paid'},
+  {id:5,name:'Brand1 Team',page:'Brand1 CCR',orders:19,sales:490,rate:10,st:'Pending'},
+  {id:6,name:'JELY Helen',page:'JELY BRAND BY HELEN',orders:33,sales:870,rate:8,st:'Pending'},
+  {id:7,name:'ហេឡេន Team',page:'ហេឡេន CCR',orders:22,sales:610,rate:10,st:'Processing'},
+  {id:8,name:'ស្រីម៉ៅ Plus',page:'ស្រីម៉ៅ JELY',orders:15,sales:380,rate:8,st:'Pending'},
+];
+function gc(a){return a.sales*a.rate/100;}
+function upSt(id,st){const a=AG.find(x=>x.id===id);if(a){a.st=st;ra();}}
+function rt(){
+  const q=(document.getElementById('srch').value||'').toLowerCase();
+  const f=document.getElementById('fst').value;
+  const list=AG.filter(a=>(!q||a.name.toLowerCase().includes(q)||a.page.toLowerCase().includes(q))&&(!f||a.st===f));
+  document.getElementById('tbody').innerHTML=list.map(a=>{
+    const comm=gc(a),init=a.name.substring(0,2);
+    return `<tr>
+      <td><div class="ai"><div class="av">${init}</div><div><b>${a.name}</b><small>${a.page.length>20?a.page.slice(0,20)+'…':a.page}</small></div></div></td>
+      <td>${a.orders}</td>
+      <td><span class="sales-val">$${a.sales.toLocaleString()}</span></td>
+      <td><span class="pill p-rate">${a.rate}%</span></td>
+      <td><span class="comm-val">$${comm.toFixed(2)}</span></td>
+      <td><select class="stchange" onchange="upSt(${a.id},this.value)">
+        ${['Paid','Pending','Processing'].map(s=>`<option${s===a.st?' selected':''}>${s}</option>`).join('')}
+      </select></td>
+    </tr>`;}).join('');
+  us();
+}
+function us(){
+  const tot=AG.reduce((s,a)=>s+gc(a),0);
+  const paid=AG.filter(a=>a.st==='Paid').reduce((s,a)=>s+gc(a),0);
+  const pend=AG.filter(a=>a.st==='Pending').reduce((s,a)=>s+gc(a),0);
+  document.getElementById('sTot').textContent='$'+tot.toFixed(2);
+  document.getElementById('sPaid').textContent='$'+paid.toFixed(2);
+  document.getElementById('sPend').textContent='$'+pend.toFixed(2);
+  document.getElementById('sAg').textContent=AG.length;
+}
+function rlb(){
+  const top=[...AG].sort((a,b)=>gc(b)-gc(a)).slice(0,5);
+  const rc=i=>i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+  const em=['🥇','🥈','🥉'];
+  document.getElementById('lb').innerHTML=top.map((a,i)=>`
+    <div class="lbi">
+      <div class="rk ${rc(i)}">${i<3?em[i]:i+1}</div>
+      <div class="lbi-info"><b>${a.name}</b><small>${a.orders} orders · ${a.rate}% rate</small></div>
+      <span class="lbi-amt">$${gc(a).toFixed(2)}</span>
+    </div>`).join('');
+}
+function rchart(){
+  const s=[...AG].sort((a,b)=>b.sales-a.sales);
+  const mx=s[0]?.sales||1;
+  document.getElementById('cbars').innerHTML=s.map(a=>`
+    <div class="brow">
+      <div class="blbl"><span>${a.page.length>24?a.page.slice(0,24)+'…':a.page}</span><span style="color:#7dd3fc">$${gc(a).toFixed(0)}</span></div>
+      <div class="btrack"><div class="bfill" style="width:${Math.round(a.sales/mx*100)}%"></div></div>
+    </div>`).join('');
+}
+function ra(){rt();rlb();rchart();}
+document.addEventListener('DOMContentLoaded',ra);
+</script>
+<script src="../assets/js/sw-register.js"></script>
+</body>
+</html>

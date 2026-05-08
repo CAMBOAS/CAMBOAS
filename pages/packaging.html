@@ -1,0 +1,410 @@
+﻿<!DOCTYPE html>
+<html lang="km" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Packaging — CAMBO MINI</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/packaging.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* PK3 Compact Cards */
+/* Toolbar as header row */
+.pkg-toolbar{
+  display:flex!important;align-items:center!important;
+  justify-content:space-between!important;
+  padding:8px 14px!important;
+  margin-bottom:6px!important;
+  min-height:44px!important;
+}
+.pkg-tl{display:flex!important;align-items:center!important;gap:8px!important}
+.pkg-tr{display:flex!important;align-items:center!important;gap:6px!important}
+/* Pills */
+.pkg-pill{
+  padding:5px 14px!important;border-radius:20px!important;
+  border:1px solid rgba(148,163,184,.2)!important;
+  background:transparent!important;
+  color:var(--muted,#94a3b8)!important;
+  font-size:12px!important;font-weight:600!important;
+  cursor:pointer!important;font-family:inherit!important;
+  transition:all .13s!important;white-space:nowrap!important;
+}
+.pkg-pill:hover{color:var(--text,#f1f5f9)!important;border-color:rgba(148,163,184,.4)!important}
+.pkg-pill.active{
+  background:rgba(139,92,246,.15)!important;
+  border-color:rgba(139,92,246,.4)!important;
+  color:#c4b5fd!important;
+}
+[data-theme="light"] .pkg-pill.active{background:rgba(99,102,241,.1)!important;color:#4f46e5!important;border-color:rgba(99,102,241,.3)!important}
+/* ol-btn style for Today button */
+.ol-btn{
+  min-height:34px!important;padding:0 14px!important;
+  border-radius:8px!important;border:1px solid rgba(148,163,184,.2)!important;
+  background:transparent!important;color:var(--text,#f1f5f9)!important;
+  font-size:13px!important;font-weight:600!important;cursor:pointer!important;
+  font-family:inherit!important;transition:all .13s!important;
+}
+.ol-btn:hover{background:rgba(148,163,184,.08)!important;border-color:rgba(148,163,184,.35)!important}
+[data-theme="light"] .ol-btn{color:#0f172a!important}
+/* Actions button */
+.pkg-export-toggle{
+  min-height:34px!important;padding:0 14px!important;
+  border-radius:8px!important;
+  background:linear-gradient(135deg,#8b5cf6,#6d28d9)!important;
+  color:#fff!important;border:none!important;
+  font-size:13px!important;font-weight:700!important;
+  cursor:pointer!important;font-family:inherit!important;
+  display:flex!important;align-items:center!important;gap:5px!important;
+}
+.pkg-export-toggle:hover{opacity:.9!important}
+/* Date popover */
+[hidden]{display:none!important}
+.ol-date-pop{
+  background:var(--card-bg,#1e1e2e)!important;
+  border:1px solid rgba(139,92,246,.25)!important;
+  border-radius:12px!important;padding:12px!important;
+  box-shadow:0 16px 48px rgba(0,0,0,.4)!important;
+}
+[data-theme="light"] .ol-date-pop{
+  background:#fff!important;
+  border-color:rgba(99,102,241,.2)!important;
+  box-shadow:0 8px 32px rgba(0,0,0,.12)!important;
+}
+.ol-date-grid{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:6px!important;margin-bottom:10px!important;
+}
+.ol-date-preset{
+  padding:7px 10px!important;border-radius:8px!important;
+  border:1px solid rgba(148,163,184,.18)!important;
+  background:rgba(255,255,255,.04)!important;
+  color:var(--muted,#94a3b8)!important;
+  font-size:12px!important;font-weight:600!important;
+  cursor:pointer!important;font-family:inherit!important;
+  transition:all .13s!important;text-align:center!important;
+}
+.ol-date-preset:hover{
+  background:rgba(139,92,246,.1)!important;
+  color:#c4b5fd!important;
+  border-color:rgba(139,92,246,.3)!important;
+}
+.ol-date-preset.active{
+  background:rgba(139,92,246,.2)!important;
+  color:#c4b5fd!important;
+  border-color:rgba(139,92,246,.5)!important;
+}
+[data-theme="light"] .ol-date-preset{
+  background:#f8fafc!important;color:#475569!important;
+  border-color:rgba(148,163,184,.2)!important;
+}
+[data-theme="light"] .ol-date-preset:hover{
+  background:rgba(99,102,241,.08)!important;color:#4f46e5!important;
+}
+[data-theme="light"] .ol-date-preset.active{
+  background:rgba(99,102,241,.12)!important;color:#4f46e5!important;
+  border-color:rgba(99,102,241,.35)!important;
+}
+/* Date inputs in light mode */
+[data-theme="light"] #pkgCustomStart,
+[data-theme="light"] #pkgCustomEnd,
+[data-theme="light"] #pkgCustS,
+[data-theme="light"] #pkgCustE{
+  background:#f8fafc!important;color:#0f172a!important;
+  border-color:rgba(148,163,184,.25)!important;
+}
+#pkgList{display:flex!important;flex-direction:column!important;gap:4px!important;padding:0 0 60px!important}
+.pkg-card,.pkg-card.pkg-packed,.pkg-card:hover,.pkg-card-header,.pkg-card-body,.pkg-card-footer{all:unset!important;box-sizing:border-box!important;display:block!important}
+.pk3{display:flex!important;align-items:center!important;gap:0!important;background:var(--glass-bg,rgba(255,255,255,.04))!important;border:1px solid rgba(148,163,184,.12)!important;border-radius:10px!important;overflow:hidden!important;min-height:64px!important;transition:border-color .15s,background .12s!important;cursor:pointer!important}
+.pk3:hover{border-color:rgba(148,163,184,.3)!important;background:rgba(148,163,184,.04)!important}
+.pk3.pk3-packed{background:rgba(16,185,129,.05)!important;border-color:rgba(16,185,129,.2)!important}
+[data-theme="light"] .pk3{background:#fff!important;border-color:rgba(0,0,0,.08)!important}
+[data-theme="light"] .pk3.pk3-packed{background:#f0fdf4!important}
+.pk3-bar{width:3px!important;align-self:stretch!important;flex-shrink:0!important}
+.pk3-cb{width:15px!important;height:15px!important;margin:0 10px!important;flex-shrink:0!important;cursor:pointer!important;accent-color:#8b5cf6!important}
+.pk3-img{width:54px!important;height:54px!important;border-radius:8px!important;overflow:hidden!important;flex-shrink:0!important;margin-right:10px!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(148,163,184,.06)!important}
+.pk3-img .pkg-prod-img{width:54px!important;height:54px!important;object-fit:cover!important;border-radius:8px!important}
+.pk3-img .pkg-prod-img-ph{width:54px!important;height:54px!important;font-size:20px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.pk3-body{flex:1!important;min-width:0!important;padding:8px 0!important}
+.pk3-name{font-size:13px!important;font-weight:700!important;color:var(--text,#f1f5f9)!important;display:block!important;margin-bottom:3px!important}
+[data-theme="light"] .pk3-name{color:#0f172a!important}
+.pk3-sub{font-size:11px!important;color:var(--muted,#94a3b8)!important;display:flex!important;align-items:center!important;gap:6px!important;margin-bottom:3px!important}
+.pk3-ph{font-size:11px!important;color:#60a5fa!important;font-weight:500!important;text-decoration:none!important}
+.pk3-dt{font-size:11px!important;color:rgba(148,163,184,.5)!important}
+.pk3-chips{display:flex!important;flex-wrap:wrap!important;gap:3px!important}
+.pk3-chip{font-size:11px!important;color:var(--muted,#94a3b8)!important;background:rgba(148,163,184,.07)!important;border:1px solid rgba(148,163,184,.1)!important;border-radius:5px!important;padding:1px 6px!important;display:inline-flex!important;align-items:center!important;gap:3px!important;white-space:nowrap!important}
+[data-theme="light"] .pk3-chip{background:#f1f5f9!important}
+.pk3-chip-qty{color:#a78bfa!important;font-weight:700!important}
+.pk3-note{font-size:10px!important;color:#fbbf24!important;margin-top:2px!important;display:block!important}
+.pk3-side{display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:5px!important;padding:8px 12px!important;flex-shrink:0!important}
+.pk3-amt{font-size:13px!important;font-weight:700!important;color:var(--text,#f1f5f9)!important}
+[data-theme="light"] .pk3-amt{color:#0f172a!important}
+.pk3-tog{font-size:11px!important;font-weight:700!important;font-family:inherit!important;padding:5px 10px!important;border-radius:7px!important;cursor:pointer!important;white-space:nowrap!important;transition:filter .15s,transform .15s!important;display:inline-flex!important;align-items:center!important;gap:4px!important}
+.pk3-tog:hover{filter:brightness(1.15)!important;transform:scale(1.04)!important}
+.pk3-tog:active{transform:scale(.97)!important}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 768px) {
+
+  /* Stats: 2x2 compact grid */
+  .pkg-stats {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    margin-bottom: 10px !important;
+  }
+  .pkg-stat {
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+  }
+  .pkg-stat-n { font-size: 20px !important; }
+  .pkg-stat-l { font-size: 11px !important; }
+
+  /* Toolbar: stack pills on top, date+actions on bottom */
+  .pkg-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+  .pkg-tl {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+  .pkg-tr {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    justify-content: flex-end !important;
+  }
+  .pkg-pill {
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+  }
+  .ol-btn {
+    min-height: 36px !important;
+    padding: 0 14px !important;
+    font-size: 13px !important;
+  }
+  .pkg-export-toggle {
+    min-height: 36px !important;
+    padding: 0 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* Card: bigger image, better spacing */
+  .pk3 {
+    border-radius: 12px !important;
+    min-height: 80px !important;
+  }
+  .pk3-bar { width: 4px !important; }
+  .pk3-cb  { margin: 0 8px !important; }
+  .pk3-img {
+    width: 64px !important; height: 64px !important;
+    border-radius: 10px !important;
+    margin: 0 10px 0 0 !important;
+  }
+  .pk3-img .pkg-prod-img {
+    width: 64px !important; height: 64px !important;
+  }
+  .pk3-img .pkg-prod-img-ph {
+    width: 64px !important; height: 64px !important;
+    font-size: 24px !important;
+  }
+  .pk3-body { padding: 10px 0 !important; }
+  .pk3-name {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    margin-bottom: 3px !important;
+  }
+  .pk3-sub {
+    font-size: 12px !important;
+    gap: 8px !important;
+    margin-bottom: 4px !important;
+  }
+  .pk3-ph { font-size: 12px !important; }
+  .pk3-dt { font-size: 11px !important; }
+  .pk3-chips { gap: 4px !important; }
+  .pk3-chip {
+    font-size: 11px !important;
+    padding: 2px 8px !important;
+    border-radius: 6px !important;
+  }
+  .pk3-note { font-size: 11px !important; }
+  .pk3-side {
+    padding: 10px 12px !important;
+    min-width: 90px !important;
+    gap: 6px !important;
+  }
+  .pk3-amt { font-size: 14px !important; }
+  .pk3-tog {
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    min-width: 80px !important;
+    justify-content: center !important;
+  }
+
+  /* Detail panel full screen on mobile */
+  .pkg-detail-panel {
+    width: 100vw !important;
+    border-left: none !important;
+  }
+}
+
+/* ── Mobile Popover Fix ── */
+@media (max-width: 768px) {
+  /* Date popover: full width, centered */
+  #pkgDatePop {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    top: auto !important;
+    width: auto !important;
+    min-width: unset !important;
+  }
+  /* Toolbar right side: wrap nicely */
+  .pkg-tr {
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+  /* Export popover: full width too */
+  .pkg-export-popover {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+  }
+}
+</style>
+</head>
+<body>
+  <aside class="sidebar" id="sharedSidebar"></aside>
+  <div class="sidebar-overlay"></div>
+  <div class="main-content">
+    <header class="shared-topbar" id="sharedHeader"></header>
+
+    <!-- ── Stats ── -->
+    <div class="pkg-stats">
+      <div class="pkg-stat">
+        <span class="pkg-stat-ico">📦</span>
+        <div><div class="pkg-stat-n" id="stTotal">0</div><div class="pkg-stat-l">សរុប</div></div>
+      </div>
+      <div class="pkg-stat pkg-s-red">
+        <span class="pkg-stat-ico">🔴</span>
+        <div><div class="pkg-stat-n" id="stPending">0</div><div class="pkg-stat-l">មិនទាន់វិច</div></div>
+      </div>
+      <div class="pkg-stat pkg-s-green">
+        <span class="pkg-stat-ico">🟢</span>
+        <div><div class="pkg-stat-n" id="stPacked">0</div><div class="pkg-stat-l">វិចរួច</div></div>
+      </div>
+      <div class="pkg-stat pkg-s-blue">
+        <span class="pkg-stat-ico">💰</span>
+        <div><div class="pkg-stat-n" id="stRevenue">$0</div><div class="pkg-stat-l">តម្លៃរួម</div></div>
+      </div>
+    </div>
+
+    <!-- ── Toolbar ── -->
+    <div class="pkg-toolbar glass-card" style="border-radius:10px;border:1px solid rgba(148,163,184,.15);background:var(--glass-bg,rgba(255,255,255,.05));margin-bottom:8px">
+      <div class="pkg-tl">
+        <label class="pkg-select-all-wrap">
+          <input type="checkbox" id="pkgSelectAll"> <span>Selected: <b id="pkgSelCount">0</b></span>
+        </label>
+        <!-- Filter pills -->
+        <div class="pkg-filter-pills">
+          <button class="pkg-pill active" data-f="all">ទាំងអស់</button>
+          <button class="pkg-pill" data-f="pending">🔴 មិនទាន់</button>
+          <button class="pkg-pill" data-f="packed">🟢 វិចរួច</button>
+        </div>
+      </div>
+      <div class="pkg-tr">
+        <button class="pkg-save-btn" id="pkgSaveBtn" style="display:none">💾 រក្សាទុក</button>
+        <!-- Date Filter Popover -->
+        <div class="pkg-date-wrap" id="pkgDateWrap" style="position:relative;display:inline-block">
+          <button class="ol-btn" id="pkgDateBtn"><span id="pkgDateLabel">Today</span></button>
+
+          <div id="pkgDatePop" hidden class="ol-date-pop" style="position:absolute;right:0;top:calc(100% + 6px);z-index:999;min-width:280px">
+            <div class="ol-date-grid">
+              <button class="ol-date-preset active" data-p="today">Today</button>
+              <button class="ol-date-preset" data-p="yesterday">Yesterday</button>
+              <button class="ol-date-preset" data-p="last7">Last 7 Days</button>
+              <button class="ol-date-preset" data-p="thisMonth">This Month</button>
+              <button class="ol-date-preset" data-p="lastMonth">Last Month</button>
+              <button class="ol-date-preset" data-p="all">All Time</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <input type="date" id="pkgCustomStart" style="
+                flex:1;min-height:32px;padding:0 8px;border-radius:8px;
+                border:1px solid rgba(148,163,200,.2);
+                background:#0f0f1a;color:#f1f5f9;font-size:12px;font-family:inherit
+              ">
+              <span style="color:#94a3b8;font-size:12px">→</span>
+              <input type="date" id="pkgCustomEnd" style="
+                flex:1;min-height:32px;padding:0 8px;border-radius:8px;
+                border:1px solid rgba(148,163,200,.2);
+                background:#0f0f1a;color:#f1f5f9;font-size:12px;font-family:inherit
+              ">
+              <button id="pkgCustomOK" style="
+                min-height:32px;padding:0 12px;border-radius:8px;border:none;
+                background:linear-gradient(135deg,#8b5cf6,#06b6d4);
+                color:#fff;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit
+              ">OK</button>
+            </div>
+          </div>
+        </div>
+        <div class="pkg-export-wrap" id="pkgExportWrap">
+          <button class="pkg-export-toggle" id="pkgExportToggle">
+            Actions <span class="pkg-caret">▾</span>
+          </button>
+          <div class="pkg-export-popover" id="pkgExportPopover" hidden>
+            <!-- Row 1: Start/End receipt number -->
+            <div class="pkg-exp-row">
+              <input type="text" id="pkgReceiptStart" class="pkg-exp-input" placeholder="លេខវិក្កយបត្រ">
+              <input type="number" id="pkgReceiptEnd" class="pkg-exp-input" min="1" placeholder="End #">
+            </div>
+            <!-- Row 2: QR toggle -->
+            <button class="pkg-exp-btn pkg-exp-btn-green pkg-exp-wide" id="pkgQrToggle">QR: ON</button>
+            <!-- Row 3: Share + Print Selected -->
+            <div class="pkg-exp-row">
+              <button class="pkg-exp-btn" data-act="share">🖼 Share IMG</button>
+              <button class="pkg-exp-btn" data-act="printsel">🖨 Print Selected</button>
+            </div>
+            <!-- Row 4: Print Table -->
+            <button class="pkg-exp-btn pkg-exp-wide" data-act="printtable">📋 Print Table</button>
+            <!-- Row 5: Export Data -->
+            <button class="pkg-exp-btn pkg-exp-wide" data-act="export">📤 Export Data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── List ── -->
+    <div id="pkgList" class="pkg-list"></div>
+
+  </div>
+
+  <!-- ── Detail Panel (right side) ── -->
+  <div class="pkg-detail-overlay" id="pkgDetailOverlay" hidden></div>
+  <div class="pkg-detail-panel" id="pkgDetailPanel" hidden>
+    <div class="pkg-detail-head">
+      <button class="pkg-back-btn" id="pkgBackBtn">← ត្រឡប់</button>
+      <h3 id="pkgDetailTitle">Product Detail</h3>
+      <button class="pkg-close-btn" id="pkgDetailClose">✕</button>
+    </div>
+    <div class="pkg-detail-body" id="pkgDetailBody"></div>
+    <div class="pkg-detail-foot">
+      <span class="pkg-detail-total-label">សរុបទឹកប្រាក់</span>
+      <span class="pkg-detail-total-val" id="pkgDetailTotal">$0</span>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="../assets/js/printer-receipt.js"></script>
+  <script src="../assets/js/share-receipt.js"></script>
+  <div id="printArea" style="display:none;position:fixed;left:-9999px;top:0;z-index:-1"></div>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/packaging.js"></script>
+<script src="../assets/js/sw-register.js"></script>
+</body>
+</html>

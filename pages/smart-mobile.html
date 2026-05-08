@@ -1,0 +1,1462 @@
+﻿<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+  <title>Smart Orders Mobile - CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="apple-touch-icon" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/orders-details.css" />
+
+  <style>
+    /* ══════════════════════════════════════════════
+       SMART MOBILE — Mobile-first override styles
+       Targets: 320px–768px (smartphones)
+    ══════════════════════════════════════════════ */
+
+    /* ── Reset / base ── */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    /* ── Base: full-width, no overflow ── */
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Topbar sits directly in body — full viewport width */
+    #sharedHeader.shared-topbar {
+      width: 100%;
+      max-width: 100vw;
+      margin-bottom: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --mob-accent: #7c5cff;
+      --mob-accent2: #5c7cfa;
+      --mob-bottom-h: 68px;
+      --mob-header-h: 54px;
+      --mob-radius: 14px;
+      --mob-card-bg: var(--card, rgba(255,255,255,0.88));
+      --mob-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    /* ── Main body — push main content below sidebar/topbar ── */
+    body { overflow-x: hidden; }
+
+    /* Hide desktop sidebar toggle on mobile via existing layout rules;
+       the shared sidebar collapses on small screens already. */
+
+    /* ── Full-width page wrapper — no side padding, edge-to-edge ── */
+    .mob-page {
+      width: 100%;
+      max-width: 100vw;
+      box-sizing: border-box;
+      padding: 6px 0 calc(var(--mob-bottom-h) + 16px + env(safe-area-inset-bottom));
+      overflow-x: hidden;
+    }
+
+    /* ══ Section cards — full screen width, no side radius ══ */
+    .mob-card {
+      background: var(--mob-card-bg);
+      border-radius: 0;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.07), 0 -1px 0 rgba(0,0,0,0.04);
+      margin-bottom: 8px;
+      overflow: hidden;
+      border: none;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      width: 100%;
+    }
+
+    .mob-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px 10px;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid var(--line, rgba(0,0,0,0.07));
+      gap: 8px;
+    }
+
+    .mob-card-head h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text, #18213a);
+      margin: 0;
+      letter-spacing: .01em;
+    }
+
+    .mob-card-head .mob-toggle-icon {
+      font-size: 16px;
+      color: var(--muted, #6b7898);
+      transition: transform .25s;
+      flex-shrink: 0;
+    }
+
+    .mob-card-head.is-open .mob-toggle-icon { transform: rotate(180deg); }
+
+    .mob-card-body {
+      padding: 12px 14px 14px;
+    }
+
+    .mob-card-body.is-hidden { display: none; }
+
+    /* ══ Customer Form Grid (2-col) ══ */
+    .mob-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 10px;
+    }
+
+    .mob-form-grid .span-2 { grid-column: 1 / -1; }
+
+    .mob-field {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .mob-field label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--muted, #6b7898);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .mob-field input,
+    .mob-field select,
+    .mob-field .searchable-select input.combo-input {
+      height: 38px;
+      border: 1.5px solid var(--line, rgba(0,0,0,0.12));
+      border-radius: 9px;
+      padding: 0 10px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--input, rgba(255,255,255,0.9));
+      color: var(--text, #18213a);
+      width: 100%;
+      transition: border-color .2s;
+    }
+
+    .mob-field input:focus,
+    .mob-field select:focus,
+    .mob-field .searchable-select input.combo-input:focus {
+      border-color: var(--mob-accent);
+      outline: none;
+    }
+
+    /* Date field full-width */
+    input[type="date"] { width: 100%; }
+
+    /* Carrier badge inside phone */
+    #carrierBadgeMobile {
+      right: 8px;
+      font-size: 10px;
+    }
+
+    /* ── Payment buttons ── */
+    .mob-payment-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mob-payment-row .payment-btn {
+      flex: 1;
+      min-width: 52px;
+      height: 36px;
+      border: 1.5px solid var(--line, rgba(0,0,0,0.12));
+      border-radius: 9px;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--text, #18213a);
+      cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+
+    .mob-payment-row .payment-btn.active {
+      background: var(--mob-accent);
+      border-color: var(--mob-accent);
+      color: #fff;
+    }
+
+    /* ══ Product section ══ */
+    .mob-prod-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 10px 14px 0;
+      scrollbar-width: none;
+    }
+
+    .mob-prod-tabs::-webkit-scrollbar { display: none; }
+
+    .mob-prod-tabs .tab-btn {
+      flex-shrink: 0;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--line, rgba(0,0,0,0.12));
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--muted, #6b7898);
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+
+    .mob-prod-tabs .tab-btn.active {
+      background: var(--mob-accent);
+      border-color: var(--mob-accent);
+      color: #fff;
+    }
+
+    /* Product grid override → horizontal cards */
+    #productGrid.product-grid {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0 !important;
+      padding: 8px 0 0 !important;
+      background: transparent !important;
+    }
+
+    /* Override desktop grid-4 / grid-2 / grid-1 classes on mobile */
+    #productGrid.grid-4,
+    #productGrid.grid-2,
+    #productGrid.grid-1 {
+      display: flex !important;
+      flex-direction: column !important;
+    }
+
+    /* ── Horizontal product card ── */
+    #productGrid .product-card {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-start !important;
+      gap: 0 !important;
+      padding: 10px 14px !important;
+      border-radius: 0 !important;
+      border: none !important;
+      border-bottom: 1px solid var(--line, rgba(0,0,0,0.07)) !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      min-height: unset !important;
+    }
+
+    #productGrid .product-card:last-child {
+      border-bottom: none !important;
+    }
+
+    /* Product image — left thumbnail */
+    #productGrid .product-image {
+      width: 62px !important;
+      height: 62px !important;
+      flex-shrink: 0 !important;
+      border-radius: 10px !important;
+      overflow: hidden !important;
+      background: var(--product-bg, #f3f0ff) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-right: 10px !important;
+      margin-top: 2px !important;
+    }
+
+    #productGrid .product-image img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      border-radius: 10px !important;
+    }
+
+    /* Product info — right side */
+    #productGrid .product-info {
+      flex: 1 !important;
+      min-width: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 4px !important;
+    }
+
+    #productGrid .product-info h4 {
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      color: var(--text, #18213a) !important;
+      margin: 0 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      line-height: 1.3 !important;
+    }
+
+    #productGrid .product-info p {
+      font-size: 11px !important;
+      color: var(--muted, #6b7898) !important;
+      margin: 0 0 3px !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    /* Controls row */
+    #productGrid .product-controls {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-end !important;
+      gap: 5px !important;
+      flex-wrap: nowrap !important;
+    }
+
+    #productGrid .pc-field {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 2px !important;
+      flex: 1 !important;
+      min-width: 0 !important;
+    }
+
+    #productGrid .pc-field label {
+      font-size: 9.5px !important;
+      font-weight: 700 !important;
+      color: var(--muted, #6b7898) !important;
+      text-transform: uppercase !important;
+      letter-spacing: .04em !important;
+    }
+
+    #productGrid .pc-field input {
+      width: 100% !important;
+      height: 32px !important;
+      border: 1.5px solid var(--line, rgba(0,0,0,0.12)) !important;
+      border-radius: 7px !important;
+      padding: 0 5px !important;
+      font-size: 12px !important;
+      font-family: inherit !important;
+      background: var(--input, rgba(255,255,255,0.9)) !important;
+      color: var(--text, #18213a) !important;
+      text-align: center !important;
+    }
+
+    #productGrid .add-btn {
+      width: 32px !important;
+      height: 32px !important;
+      flex-shrink: 0 !important;
+      border-radius: 8px !important;
+      border: none !important;
+      background: var(--mob-accent) !important;
+      color: #fff !important;
+      font-size: 20px !important;
+      font-weight: 300 !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      align-self: flex-end !important;
+      line-height: 1 !important;
+      transition: opacity .15s !important;
+    }
+
+    #productGrid .add-btn:active { opacity: .7 !important; }
+
+    /* ── Quick-add bar (manual product) ── */
+    .mob-quick-add {
+      padding: 10px 14px 14px;
+      border-top: 1px solid var(--line, rgba(0,0,0,0.07));
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .mob-quick-add input[type="text"] {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid var(--line, rgba(0,0,0,0.12));
+      border-radius: 9px;
+      padding: 0 12px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--input, rgba(255,255,255,0.9));
+      color: var(--text, #18213a);
+    }
+
+    .mob-quick-row {
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+    }
+
+    .mob-quick-row .mini-field {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .mob-quick-row .mini-field label {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--muted, #6b7898);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .mob-quick-row .mini-field input {
+      height: 34px;
+      border: 1.5px solid var(--line, rgba(0,0,0,0.12));
+      border-radius: 8px;
+      padding: 0 7px;
+      font-size: 12px;
+      font-family: inherit;
+      background: var(--input, rgba(255,255,255,0.9));
+      color: var(--text, #18213a);
+      width: 100%;
+      text-align: center;
+    }
+
+    .mob-quick-row .mini-add-btn {
+      width: 40px;
+      height: 34px;
+      border-radius: 9px;
+      border: none;
+      background: var(--mob-accent);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 300;
+      cursor: pointer;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    /* ══ Note textarea ══ */
+    .mob-note textarea {
+      width: 100%;
+      min-height: 80px;
+      border: 1.5px solid var(--line, rgba(0,0,0,0.12));
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--input, rgba(255,255,255,0.9));
+      color: var(--text, #18213a);
+      resize: vertical;
+    }
+
+    /* ══ Total panel ══ */
+    .mob-total-panel {
+      padding: 12px 14px;
+    }
+
+    .mob-total-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .mob-total-row .mob-total-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted, #6b7898);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .mob-total-row #grandTotal {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--mob-accent);
+      letter-spacing: .01em;
+    }
+
+    /* KHR rate box */
+    .mob-khr {
+      background: rgba(124,92,255,0.06);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .mob-khr .khr-label {
+      font-size: 12px;
+      color: var(--muted, #6b7898);
+      font-weight: 600;
+    }
+
+    .mob-khr .khr-total {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--mob-accent);
+    }
+
+    .mob-khr-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .khr-edit-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 8px;
+      border: 1px solid rgba(124,92,255,0.25);
+      background: transparent;
+      font-size: 11px;
+      color: var(--mob-accent);
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    #khrInputRow {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    #khrInputRow .khr-input {
+      flex: 1;
+      height: 32px;
+      border: 1.5px solid var(--mob-accent);
+      border-radius: 8px;
+      padding: 0 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--input, white);
+      color: var(--text, #18213a);
+    }
+
+    #khrInputRow .khr-apply-btn,
+    #khrInputRow .khr-cancel-btn {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    #khrInputRow .khr-apply-btn {
+      background: var(--mob-accent);
+      color: #fff;
+    }
+
+    #khrInputRow .khr-cancel-btn {
+      background: rgba(0,0,0,0.07);
+      color: var(--text, #18213a);
+    }
+
+    /* ══ Items table (scrollable) ══ */
+    .mob-table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 0 -14px;
+      padding: 0 14px;
+    }
+
+    .mob-table-wrap table {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .mob-table-wrap table thead tr {
+      background: rgba(124,92,255,0.06);
+    }
+
+    .mob-table-wrap table th {
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted, #6b7898);
+      border-bottom: 1px solid var(--line, rgba(0,0,0,0.08));
+    }
+
+    .mob-table-wrap table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line, rgba(0,0,0,0.06));
+      color: var(--text, #18213a);
+      vertical-align: middle;
+    }
+
+    .mob-table-wrap table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .mob-table-wrap .empty-row td {
+      text-align: center;
+      color: var(--muted, #6b7898);
+      font-size: 12px;
+      padding: 20px;
+    }
+
+    /* Inline qty +/- buttons in table */
+    .mob-table-wrap .qty-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      min-width: 80px;
+    }
+
+    .mob-table-wrap .qty-ctrl button {
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      border: 1px solid var(--line, rgba(0,0,0,0.12));
+      background: transparent;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--mob-accent);
+      font-weight: 700;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .mob-table-wrap .qty-ctrl span {
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    /* Delete btn in table */
+    .mob-table-wrap .del-btn {
+      width: 26px; height: 26px;
+      border-radius: 7px;
+      border: none;
+      background: rgba(239,68,68,0.1);
+      color: #ef4444;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ══ Fixed bottom action bar ══ */
+    .mob-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--mob-bottom-h);
+      padding-bottom: env(safe-area-inset-bottom);
+      background: var(--mob-card-bg);
+      border-top: 1px solid var(--line, rgba(0,0,0,0.1));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-left: 10px;
+      padding-right: 10px;
+      z-index: 300;
+      box-shadow: 0 -2px 16px rgba(0,0,0,0.07);
+      /* Auto-hide transition */
+      transform: translateY(0);
+      opacity: 1;
+      transition: transform 0.35s cubic-bezier(.4,0,.2,1), opacity 0.35s ease;
+    }
+
+    .mob-bottom-bar.bar-hidden {
+      transform: translateY(110%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Desktop: offset bottom bar so it doesn't overlap the sidebar */
+    @media (min-width: 981px) {
+      .mob-bottom-bar {
+        left: var(--sb-w, 272px);
+      }
+    }
+
+    /* QR toggle */
+    #toggleQrBtn.toggle-qr-btn {
+      flex-shrink: 0;
+      padding: 0 10px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1.5px solid var(--line, rgba(0,0,0,0.12));
+      background: transparent;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--muted, #6b7898);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    #toggleQrBtn.is-on {
+      background: rgba(124,92,255,0.1);
+      border-color: var(--mob-accent);
+      color: var(--mob-accent);
+    }
+
+    /* Receipt no input */
+    .mob-receipt-field {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mob-receipt-field label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted, #6b7898);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    #receiptNo {
+      height: 32px;
+      border: 1.5px solid var(--line, rgba(0,0,0,0.12));
+      border-radius: 8px;
+      padding: 0 8px;
+      font-size: 12px;
+      font-family: inherit;
+      background: var(--input, rgba(255,255,255,0.9));
+      color: var(--text, #18213a);
+      width: 100%;
+    }
+
+    /* Action buttons */
+    .mob-action-btns {
+      display: flex;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .mob-action-btns .btn {
+      height: 38px;
+      padding: 0 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity .15s;
+    }
+
+    .mob-action-btns .btn:active { opacity: .75; }
+
+    .mob-action-btns .btn-print  { background: rgba(92,124,250,0.12); color: var(--mob-accent2); }
+    .mob-action-btns .btn-copy   { background: rgba(16,185,129,0.12); color: #059669; }
+    .mob-action-btns .btn-share  { background: rgba(251,146,60,0.12); color: #ea7a0e; }
+    .mob-action-btns .btn-save   { background: var(--mob-accent); color: #fff; }
+
+    /* ══ Section head with product manager button ══ */
+    .mob-prod-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px 0;
+    }
+
+    .mob-prod-head h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text, #18213a);
+      margin: 0;
+    }
+
+    .pm-open-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--line, rgba(0,0,0,0.12));
+      background: transparent;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--muted, #6b7898);
+      cursor: pointer;
+    }
+
+    /* ══ Toast ══ */
+    .toast-container {
+      position: fixed;
+      top: calc(var(--mob-header-h) + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+      width: 90vw;
+      max-width: 340px;
+    }
+
+    /* ══ Dark theme adjustments ══ */
+    [data-theme="dark"] .mob-card {
+      background: rgba(30,24,55,0.88);
+      border-color: rgba(255,255,255,0.07);
+    }
+
+    [data-theme="dark"] .mob-bottom-bar {
+      background: rgba(20,16,40,0.92);
+      border-top-color: rgba(255,255,255,0.08);
+    }
+
+    [data-theme="dark"] .mob-field input,
+    [data-theme="dark"] .mob-field select,
+    [data-theme="dark"] .mob-field .searchable-select input.combo-input,
+    [data-theme="dark"] .mob-quick-add input[type="text"],
+    [data-theme="dark"] .mob-quick-row .mini-field input,
+    [data-theme="dark"] #receiptNo,
+    [data-theme="dark"] .mob-note textarea,
+    [data-theme="dark"] #khrInputRow .khr-input {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.12);
+      color: #e8e0ff;
+    }
+
+    [data-theme="dark"] #productGrid .product-image {
+      background: rgba(255,255,255,0.07) !important;
+    }
+
+    [data-theme="dark"] #productGrid .pc-field input {
+      background: rgba(255,255,255,0.07) !important;
+      border-color: rgba(255,255,255,0.12) !important;
+      color: #e8e0ff !important;
+    }
+
+    /* ══ Searchable combo dropdown fix for mobile ══ */
+    .searchable-select .combo-dropdown {
+      z-index: 400;
+      max-height: 160px;
+    }
+
+    /* ══ Product Drawer (right panel, same as desktop) ══ */
+    .product-drawer {
+      z-index: 600;
+    }
+
+    .drawer-overlay {
+      z-index: 599;
+    }
+
+    /* ══ PM Modal ══ */
+    #pmModal {
+      z-index: 700;
+    }
+
+    /* ══ Scrollbar hide ══ */
+    .mob-page::-webkit-scrollbar { display: none; }
+
+    /* ══ Scroll top / bottom buttons ══ */
+    #scrollBtns {
+      position: fixed;
+      right: 12px;
+      bottom: calc(var(--mob-bottom-h) + env(safe-area-inset-bottom) + 10px);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 400;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .35s;
+    }
+
+    #scrollBtns.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #scrollTopBtn,
+    #scrollBotBtn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(124,92,255,0.72);
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      transition: background .15s, transform .1s;
+      line-height: 1;
+    }
+
+    #scrollTopBtn:active,
+    #scrollBotBtn:active {
+      background: rgba(124,92,255,1);
+      transform: scale(.92);
+    }
+
+    /* ══ On desktop (>600px) — show a note about using full version ══ */
+    @media (min-width: 601px) {
+      .mob-desktop-notice {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 16px;
+        background: rgba(124,92,255,0.08);
+        border-radius: 10px;
+        font-size: 13px;
+        color: var(--mob-accent);
+        font-weight: 600;
+        margin-bottom: 12px;
+        border: 1px dashed rgba(124,92,255,0.3);
+      }
+
+      .mob-desktop-notice a {
+        color: var(--mob-accent);
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .mob-desktop-notice a:hover { text-decoration: underline; }
+    }
+
+    @media (max-width: 600px) {
+      .mob-desktop-notice { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Sidebar overlay + sidebar: position:fixed — no flex wrapper needed -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar" id="sharedSidebar"></aside>
+
+  <!-- Topbar: directly in body — full 100vw, no main-content margin -->
+  <div id="sharedHeader" class="shared-topbar"></div>
+
+  <!-- Mobile page content — directly in body, never inside main-content -->
+  <div class="mob-page">
+
+        <!-- Desktop notice -->
+        <div class="mob-desktop-notice">
+          📱 ទំព័រនេះបានរចនាសម្រាប់ Smartphone — <a href="orders-details.html">ប្ដូរទៅ Desktop version →</a>
+        </div>
+
+        <!-- ══ Section 1: Customer Info ══ -->
+        <div class="mob-card">
+          <div class="mob-card-head is-open" id="custHead" onclick="mobToggle(this,'custBody')">
+            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+              <h3 style="margin:0;white-space:nowrap;">👤 ព័ត៌មានអតិថិជន</h3>
+              <!-- Mobile carrier badge in header (phone-carrier.js shows this on mobile) -->
+              <span id="carrierBadgeMobile" style="display:none;align-items:center;gap:5px;padding:3px 10px 3px 6px;border-radius:20px;font-size:11px;font-weight:800;border:1.5px solid;flex-shrink:0;pointer-events:none;">
+                <img id="carrierLogoMobile" src="" alt="" style="height:15px;width:auto;border-radius:2px;">
+                <span id="carrierNameMobile"></span>
+              </span>
+            </div>
+            <span class="mob-toggle-icon">▾</span>
+          </div>
+          <div class="mob-card-body" id="custBody">
+            <div class="mob-form-grid">
+
+              <!-- Pages -->
+              <div class="mob-field">
+                <label>Pages</label>
+                <div class="searchable-select" id="pagesCombo">
+                  <input type="text" class="combo-input" id="pagesInput" placeholder="Pages..." autocomplete="off" />
+                  <input type="hidden" id="page" />
+                </div>
+              </div>
+
+              <!-- CloseBy -->
+              <div class="mob-field">
+                <label>CloseBy</label>
+                <div class="searchable-select" id="closeByCombo">
+                  <input type="text" class="combo-input" id="closeByInput" placeholder="CloseBy..." autocomplete="off" />
+                  <input type="hidden" id="closeBy" />
+                </div>
+              </div>
+
+              <!-- Status -->
+              <div class="mob-field">
+                <label>Status</label>
+                <select id="status">
+                  <option value="Pending">Pending</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Done">Done</option>
+                  <option value="Cancel">Cancel</option>
+                </select>
+              </div>
+
+              <!-- Date -->
+              <div class="mob-field">
+                <label>ថ្ងៃខែឆ្នាំ</label>
+                <input type="date" id="date" />
+              </div>
+
+              <!-- Customer -->
+              <div class="mob-field span-2">
+                <label>ឈ្មោះអតិថិជន</label>
+                <input type="text" id="customer" placeholder="Customer..." />
+              </div>
+
+              <!-- Phone -->
+              <div class="mob-field span-2">
+                <label>លេខទូរសព្ទ</label>
+                <input type="text" id="phone" placeholder="Phone..." />
+                <!-- Hidden desktop placeholder — phone-carrier.js needs these IDs -->
+                <span id="carrierBadgeDesktop" style="display:none!important;position:absolute;pointer-events:none;">
+                  <img id="carrierLogoDesktop" src="" alt="">
+                  <span id="carrierNameDesktop"></span>
+                </span>
+              </div>
+
+              <!-- Address -->
+              <div class="mob-field span-2">
+                <label>ទីតាំងតំបន</label>
+                <input type="text" id="addressDetail" placeholder="ភូមិ / ផ្លូវ / ផ្ទះ..." />
+              </div>
+
+              <!-- Province -->
+              <div class="mob-field span-2">
+                <label>ខេត្ត / ក្រុង</label>
+                <div class="searchable-select" id="provinceCombo">
+                  <input type="text" class="combo-input" id="provinceInput" placeholder="ខេត្ត..." autocomplete="off" />
+                  <input type="hidden" id="province" />
+                </div>
+              </div>
+
+              <!-- Delivery -->
+              <div class="mob-field">
+                <label>ដឹកជញ្ជូន</label>
+                <div class="searchable-select" id="deliveryCombo">
+                  <input type="text" class="combo-input" id="deliveryInput" placeholder="ដឹកជញ្ជូន..." autocomplete="off" />
+                  <input type="hidden" id="deliveryName" />
+                </div>
+              </div>
+
+              <!-- Delivery Fee -->
+              <div class="mob-field">
+                <label>ថ្លៃដឹក</label>
+                <input type="number" id="deliveryFee" placeholder="0" value="0" min="0" step="0.01" />
+              </div>
+
+              <!-- Payment -->
+              <div class="mob-field span-2">
+                <label>បង់ប្រាក់</label>
+                <div class="mob-payment-row" id="paymentOptions">
+                  <button type="button" class="payment-btn" data-value="AC">AC</button>
+                  <button type="button" class="payment-btn" data-value="ABA">ABA</button>
+                  <button type="button" class="payment-btn" data-value="Wing">Wing</button>
+                  <button type="button" class="payment-btn" data-value="Delivery">Delivery</button>
+                  <button type="button" class="payment-btn" data-value="Other">Other</button>
+                </div>
+                <input type="hidden" id="payment" value="" />
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Section 2: Products ══ -->
+        <div class="mob-card">
+          <div class="mob-prod-head">
+            <h3>📦 ផលិតផល</h3>
+            <button class="pm-open-btn" id="pmOpenBtn" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              គ្រប់គ្រង
+            </button>
+          </div>
+
+          <!-- Category tabs -->
+          <div class="mob-prod-tabs">
+            <button class="tab-btn active" data-category="All">All</button>
+            <button class="tab-btn" data-category="Hair">Hair</button>
+            <button class="tab-btn" data-category="Body">Body</button>
+            <button class="tab-btn" data-category="Face">Face</button>
+            <button class="tab-btn" data-category="Drink">Drink</button>
+          </div>
+
+          <!-- Product grid (JS renders horizontal cards via CSS overrides above) -->
+          <div id="productGrid" class="product-grid"></div>
+
+          <!-- Manual / quick-add -->
+          <div class="mob-quick-add">
+            <input type="text" id="manualProductInput" placeholder="Product name (manual)..." />
+            <div class="mob-quick-row">
+              <div class="mini-field">
+                <label>QTY</label>
+                <input type="number" id="manualQty" value="1" min="1" step="1" />
+              </div>
+              <div class="mini-field">
+                <label>Price</label>
+                <input type="number" id="manualPrice" value="0" min="0" step="0.01" />
+              </div>
+              <div class="mini-field">
+                <label>Discount</label>
+                <input type="number" id="manualDiscount" value="0" min="0" step="0.01" />
+              </div>
+              <button id="manualAddBtn" class="mini-add-btn" type="button">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Section 3: Note ══ -->
+        <div class="mob-card note-card">
+          <div class="mob-card-head is-open" id="noteHead" onclick="mobToggle(this,'noteBody')">
+            <h3>📝 Note</h3>
+            <span class="mob-toggle-icon">▾</span>
+          </div>
+          <div class="mob-card-body mob-note" id="noteBody">
+            <textarea id="note" placeholder="Write note here..."></textarea>
+          </div>
+        </div>
+
+        <!-- ══ Section 4: Total ══ -->
+        <div class="mob-card">
+          <div class="mob-total-panel">
+            <div class="mob-total-row">
+              <span class="mob-total-label">TOTAL</span>
+              <strong id="grandTotal">$0.00</strong>
+            </div>
+
+            <div class="mob-khr" id="khrRateBox">
+              <div>
+                <div class="khr-label">ប្រាក់រៀល</div>
+                <strong class="khr-total" id="rielTotalDisplay">0៛</strong>
+              </div>
+              <div class="mob-khr-controls">
+                <button type="button" class="khr-edit-btn" id="khrEditBtn" title="Set exchange rate">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  <span id="khrRateLabel">4,100</span>
+                </button>
+              </div>
+            </div>
+            <div id="khrInputRow" hidden>
+              <input type="number" id="khrRateInput" class="khr-input" placeholder="Rate..." min="1" step="1" value="4100" />
+              <button type="button" class="khr-apply-btn" id="khrApplyBtn">✓</button>
+              <button type="button" class="khr-cancel-btn" id="khrCancelBtn">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Section 5: Items Table ══ -->
+        <div class="mob-card">
+          <div class="mob-card-body" style="padding-left:0;padding-right:0;padding-top:0">
+            <div class="mob-table-wrap" style="padding:0 14px">
+              <table id="itemsTable">
+                <thead>
+                  <tr>
+                    <th>ផលិតផល</th>
+                    <th>ចំនួន</th>
+                    <th>តម្លៃ</th>
+                    <th>បញ្ចុះ</th>
+                    <th>សរុប</th>
+                    <th>លុប</th>
+                  </tr>
+                </thead>
+                <tbody id="itemsTableBody">
+                  <tr class="empty-row">
+                    <td colspan="6">No products added yet.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+  </div><!-- /mob-page -->
+
+  <!-- ══ Scroll Top / Bottom Buttons ══ -->
+  <div id="scrollBtns">
+    <button id="scrollTopBtn" title="ឡើងលើ">▲</button>
+    <button id="scrollBotBtn" title="ចុះក្រោម">▼</button>
+  </div>
+
+  <!-- ══ Fixed Bottom Action Bar ══ -->
+  <div class="mob-bottom-bar">
+    <button id="toggleQrBtn" class="toggle-qr-btn is-on" type="button" aria-pressed="true">QR</button>
+    <div class="mob-receipt-field">
+      <label for="receiptNo">លេខប៉ុង</label>
+      <input type="number" id="receiptNo" placeholder="លេខ..." min="0" step="1" />
+    </div>
+    <div class="mob-action-btns">
+      <button id="printBtn"  class="btn btn-print"  type="button">Print</button>
+      <button id="copyBtn"   class="btn btn-copy"   type="button">Copy</button>
+      <button id="shareBtn"  class="btn btn-share"  type="button">Share</button>
+      <button id="saveBtn"   class="btn btn-save"   type="button">Save</button>
+    </div>
+  </div>
+
+  <!-- ══ Product Edit Drawer (same as desktop) ══ -->
+  <div id="drawerOverlay" class="drawer-overlay" hidden></div>
+  <aside id="productDrawer" class="product-drawer" aria-hidden="true">
+    <div class="product-drawer-head">
+      <div>
+        <h3>កែផលិតផល</h3>
+        <p>ចុចឈ្មោះក្នុងតារាង ដើម្បីកែ QTY / Price / Discount</p>
+      </div>
+      <button id="closeProductDrawerBtn" class="product-drawer-close" type="button" aria-label="Close drawer">✕</button>
+    </div>
+    <div class="product-drawer-body">
+      <div class="drawer-summary-card">
+        <span>កែទិន្នន័យផលិតផល</span>
+        <strong id="drawerPreviewSubtotal">0.00</strong>
+      </div>
+      <div class="drawer-form-grid">
+        <div class="field-group drawer-span-2">
+          <label>ឈ្មោះផលិតផល</label>
+          <input type="text" id="drawerEditName" placeholder="Product name..." />
+        </div>
+        <div class="field-group">
+          <label>ចំនួន</label>
+          <input type="number" id="drawerEditQty" min="1" step="1" value="1" />
+        </div>
+        <div class="field-group">
+          <label>តម្លៃ</label>
+          <input type="number" id="drawerEditPrice" min="0" step="0.01" value="0" />
+        </div>
+        <div class="field-group drawer-span-2">
+          <label>បញ្ចុះតម្លៃ</label>
+          <input type="number" id="drawerEditDiscount" min="0" step="0.01" value="0" />
+        </div>
+      </div>
+      <div class="drawer-inline-total">
+        <div class="drawer-total-box">
+          <span>Subtotal</span>
+          <strong id="drawerLineSubtotal">0.00</strong>
+        </div>
+      </div>
+      <div class="drawer-actions-row">
+        <button id="drawerDeleteBtn" class="btn drawer-delete-btn" type="button">Delete</button>
+        <div class="drawer-right-actions">
+          <button id="drawerCancelBtn" class="btn drawer-cancel-btn" type="button">Cancel</button>
+          <button id="drawerSaveBtn" class="btn btn-save" type="button">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ Toast ══ -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- ══ Print area (hidden) ══ -->
+  <div id="printArea" style="display:none;"></div>
+
+  <!-- ══ Apps Script URL ══ -->
+  <script>
+    window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQxWk5L-hnefMrSbkrRnS-SFD-2PzAQ3RvPRUPacSYJCBZoeDZuG8xVo-fmDTdpn52uw/exec";
+  </script>
+
+  <!-- ══ Same script loading order as orders-details.html ══ -->
+  <script src="../assets/js/printer-receipt.js"></script>
+  <script src="../assets/js/share-receipt.js"></script>
+  <script src="../assets/js/copy-receipt.js"></script>
+  <script src="../assets/js/phone-carrier.js"></script>
+  <script src="../assets/js/product-manager.js"></script>
+  <script src="../assets/js/orders-details.js"></script>
+  <script src="../assets/js/order-plust.js"></script>
+  <script src="../assets/js/dashboard-layout.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="../assets/js/share-receipt.js"></script>
+  <script src="../assets/js/searchable-combo.js"></script>
+  <script src="../assets/js/sw-register.js"></script>
+
+  <!-- ══ KHR rate controller ══ -->
+  <script>
+  (function(){
+    function getRate(){ return window.KHR_RATE || 4100; }
+    function saveRate(r){ window.KHR_RATE = r; try{ localStorage.setItem('cambo_khr_rate', String(r)); }catch{} }
+    function updateLabel(){
+      const lbl = document.getElementById('khrRateLabel');
+      if(lbl) lbl.textContent = getRate().toLocaleString();
+    }
+    function triggerRielUpdate(){
+      if(typeof updateRielDisplay === 'function') updateRielDisplay();
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      const inp = document.getElementById('khrRateInput');
+      if(inp) inp.value = getRate();
+      updateLabel();
+      triggerRielUpdate();
+      const editBtn   = document.getElementById('khrEditBtn');
+      const applyBtn  = document.getElementById('khrApplyBtn');
+      const cancelBtn = document.getElementById('khrCancelBtn');
+      const inputRow  = document.getElementById('khrInputRow');
+      if(editBtn) editBtn.addEventListener('click', function(){
+        if(inp) inp.value = getRate();
+        if(inputRow) inputRow.hidden = false;
+        if(inp) setTimeout(()=>{ inp.focus(); inp.select(); }, 50);
+      });
+      function applyRate(){
+        const v = Number(inp?.value);
+        if(v > 0){ saveRate(v); updateLabel(); triggerRielUpdate(); }
+        if(inputRow) inputRow.hidden = true;
+      }
+      if(applyBtn)  applyBtn.addEventListener('click', applyRate);
+      if(cancelBtn) cancelBtn.addEventListener('click', function(){ if(inputRow) inputRow.hidden = true; });
+      if(inp)       inp.addEventListener('keydown', function(e){ if(e.key==='Enter') applyRate(); if(e.key==='Escape' && inputRow) inputRow.hidden=true; });
+    });
+  })();
+  </script>
+
+  <!-- ══ Section collapse toggle ══ -->
+  <script>
+  function mobToggle(headEl, bodyId) {
+    const body = document.getElementById(bodyId);
+    if(!body) return;
+    const isOpen = headEl.classList.contains('is-open');
+    if(isOpen){
+      headEl.classList.remove('is-open');
+      body.classList.add('is-hidden');
+    } else {
+      headEl.classList.add('is-open');
+      body.classList.remove('is-hidden');
+    }
+  }
+  </script>
+
+  <!-- ══ Bottom bar auto-hide logic ══ -->
+  <script>
+  (function(){
+    var bar   = document.querySelector('.mob-bottom-bar');
+    var timer = null;
+
+    function showBar(){
+      if(!bar) return;
+      bar.classList.remove('bar-hidden');
+      clearTimeout(timer);
+      timer = setTimeout(function(){
+        bar.classList.add('bar-hidden');
+      }, 3000);
+    }
+
+    // Show on page load, hide after 3s
+    showBar();
+
+    // Show again on scroll
+    window.addEventListener('scroll', showBar, { passive: true });
+
+    // Show again when user touches any input/button inside the bar
+    if(bar){
+      bar.addEventListener('pointerdown', function(){
+        bar.classList.remove('bar-hidden');
+        clearTimeout(timer);
+      });
+      bar.addEventListener('pointerup', function(){
+        clearTimeout(timer);
+        timer = setTimeout(function(){
+          bar.classList.add('bar-hidden');
+        }, 3000);
+      });
+    }
+  })();
+  </script>
+
+  <!-- ══ Scroll buttons logic ══ -->
+  <script>
+  (function(){
+    var wrap = document.getElementById('scrollBtns');
+    var timer;
+    function show(){
+      wrap.classList.add('visible');
+      clearTimeout(timer);
+      timer = setTimeout(function(){ wrap.classList.remove('visible'); }, 2200);
+    }
+    window.addEventListener('scroll', show, { passive: true });
+    document.getElementById('scrollTopBtn').onclick = function(){
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    document.getElementById('scrollBotBtn').onclick = function(){
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    };
+  })();
+  </script>
+
+  <!-- ══ Product Manager Modal (same as desktop) ══ -->
+  <div id="pmModal" hidden>
+    <div class="pm5-panel">
+      <div class="pm5-head">
+        <h2>⚙️ គ្រប់គ្រងផលិតផល</h2>
+        <button id="pmCloseBtn" class="pm5-close" type="button">✕</button>
+      </div>
+      <div class="pm5-tabs">
+        <button class="pmT pmT-on" data-tab="list">📋 បញ្ជីផលិតផល</button>
+        <button class="pmT" data-tab="form">➕ បន្ថែម / កែ</button>
+      </div>
+      <div id="pmTabList" class="pm5-body">
+        <div class="pm5-toolbar">
+          <input type="text" id="pmSearch" placeholder="🔍 ស្វែងរកផលិតផល...">
+          <button id="pmAddBtn" class="pm5-add-btn" type="button">➕ ផលិតផលថ្មី</button>
+        </div>
+        <div id="pmItems" class="pm5-list"></div>
+      </div>
+      <div id="pmTabForm" class="pm5-body" hidden>
+        <div class="pm5-form">
+          <h3 id="pmFormTitle" class="pm5-form-title">➕ បន្ថែមផលិតផលថ្មី</h3>
+          <div id="pmImgZone" class="pm5-img-zone">
+            <input type="file" id="pmImgFile" accept="image/*" hidden>
+            <div id="pmImgPrev" class="pm5-img-prev">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>ចុច ឬ Drag រូបភាព</span>
+            </div>
+          </div>
+          <div class="pm5-fields">
+            <div class="pm5-fg pm5-span2">
+              <label>ឈ្មោះផលិតផល *</label>
+              <input type="text" id="pmFName" placeholder="ឈ្មោះ...">
+            </div>
+            <div class="pm5-fg pm5-span2">
+              <label>ឈ្មោះ Sub</label>
+              <input type="text" id="pmFSub" placeholder="Sub name / description...">
+            </div>
+            <div class="pm5-fg">
+              <label>Category</label>
+              <select id="pmFCat">
+                <option value="Hair">Hair</option>
+                <option value="Body">Body</option>
+                <option value="Face">Face</option>
+                <option value="Drink">Drink</option>
+              </select>
+            </div>
+            <div class="pm5-fg">
+              <label>តម្លៃ ($)</label>
+              <input type="number" id="pmFPrice" placeholder="0.00" min="0" step="0.5">
+            </div>
+          </div>
+          <div class="pm5-form-actions">
+            <button type="button" class="pm5-cancel-btn pmT" data-tab="list">← ត្រឡប់</button>
+            <button type="button" id="pmSaveBtn" class="pm5-save-btn">✓ រក្សាទុក</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

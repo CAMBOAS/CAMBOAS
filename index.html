@@ -1,0 +1,446 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+    <title>CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="shortcut icon" type="image/png" href="images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="apple-touch-icon" href="images/logo/LOGO%20CAMBOMINI.png">
+    <meta name="description" content="3D Glassmorphism Dashboard Template by CAMBO MINI">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/templatemo-glass-admin-style.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+<style>
+.tx-stroke-item:active{transform:scale(.99)}
+.tx-s-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;color:#fff}
+.tx-s-info{flex:1;min-width:0}
+.tx-s-name{font-size:13px;font-weight:600;color:var(--text-primary,#f1f5f9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-s-product{font-size:11px;color:var(--text-muted,#94a3b8);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-s-date{font-size:11px;color:var(--text-muted,#94a3b8);min-width:70px;text-align:center}
+.tx-s-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.tx-s-amt{font-size:14px;font-weight:600;color:#f1f5f9}
+.tx-s-status{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
+.tx-s-status.pending{background:rgba(234,179,8,.15);color:#fbbf24}
+.tx-s-status.delivered{background:rgba(34,197,94,.15);color:#4ade80}
+.tx-s-status.cancelled{background:rgba(239,68,68,.15);color:#f87171}
+.tx-s-status.processing{background:rgba(59,130,246,.15);color:#60a5fa}
+.tx-s-status.default{background:rgba(148,163,184,.15);color:#94a3b8}
+.tx-s-arrow{font-size:16px;color:rgba(148,163,184,.5);flex-shrink:0}
+.tx-stroke-empty{text-align:center;padding:24px;color:#94a3b8;font-size:13px}
+.tx-stroke-footer{margin-top:8px}
+.tx-stroke-footer a{display:block;text-align:center;padding:8px;border-radius:8px;border:1px solid rgba(148,163,184,.2);font-size:12px;color:#94a3b8;text-decoration:none;transition:background .15s}
+.tx-stroke-footer a:hover{background:rgba(148,163,184,.08)}
+</style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="dashboard">
+        <div class="sidebar-overlay"></div>
+        <aside class="sidebar" id="sharedSidebar"></aside>
+        <main class="main-content">
+            <div class="shared-topbar" id="sharedHeader"></div>
+            <div class="live-pill" style="margin-bottom:18px;"><span class="live-dot"></span>Realtime Data Sync</div>
+            <!-- Top Navbar -->
+
+            <!-- Stats Cards -->
+            <section class="stats-grid">
+                <div class="glass-card glass-card-3d stat-card">
+                    <div class="stat-card-inner">
+                        <div class="stat-info">
+                            <h3>Total Revenue</h3>
+                            <div class="stat-value">$84,254</div>
+                            <span class="stat-change positive">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                                +12.5%
+                            </span>
+                        </div>
+                        <div class="stat-icon cyan">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--emerald-light)" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card glass-card-3d stat-card">
+                    <div class="stat-card-inner">
+                        <div class="stat-info">
+                            <h3>Active Users</h3>
+                            <div class="stat-value">24,521</div>
+                            <span class="stat-change positive">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                                +8.2%
+                            </span>
+                        </div>
+                        <div class="stat-icon magenta">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card glass-card-3d stat-card">
+                    <div class="stat-card-inner">
+                        <div class="stat-info">
+                            <h3>Total Orders</h3>
+                            <div class="stat-value">8,461</div>
+                            <span class="stat-change negative">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
+                                -3.1%
+                            </span>
+                        </div>
+                        <div class="stat-icon purple">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="2">
+                                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card glass-card-3d stat-card">
+                    <div class="stat-card-inner">
+                        <div class="stat-info">
+                            <h3>Conversion Rate</h3>
+                            <div class="stat-value">3.24%</div>
+                            <span class="stat-change positive">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                                +2.4%
+                            </span>
+                        </div>
+                        <div class="stat-icon success">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Content Grid -->
+            <!-- Row 1: Chart + Top Customers -->
+            <section class="content-grid">
+                <!-- Chart Card -->
+                <div class="glass-card chart-card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Revenue Analytics</h2>
+                            <p class="card-subtitle">Monthly revenue overview</p>
+                        </div>
+                        <div class="card-actions">
+                            <button class="card-btn active">Monthly</button>
+                            <button class="card-btn">Weekly</button>
+                            <button class="card-btn">Daily</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <div class="chart-container">
+                            <div class="chart-y-axis">
+                                <span class="y-value">$100K</span>
+                                <span class="y-value">$80K</span>
+                                <span class="y-value">$60K</span>
+                                <span class="y-value">$40K</span>
+                                <span class="y-value">$20K</span>
+                                <span class="y-value">$0</span>
+                            </div>
+                            <div class="chart-placeholder">
+                                <div class="chart-bar-group"><div class="chart-bar bar-emerald" style="height: 120px;"></div><span class="chart-label">Jan</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-gold" style="height: 160px;"></div><span class="chart-label">Feb</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-coral" style="height: 90px;"></div><span class="chart-label">Mar</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-teal" style="height: 140px;"></div><span class="chart-label">Apr</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-amber" style="height: 180px;"></div><span class="chart-label">May</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-emerald" style="height: 130px;"></div><span class="chart-label">Jun</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-gold" style="height: 170px;"></div><span class="chart-label">Jul</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-coral" style="height: 150px;"></div><span class="chart-label">Aug</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-teal" style="height: 190px;"></div><span class="chart-label">Sep</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-amber" style="height: 140px;"></div><span class="chart-label">Oct</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-emerald" style="height: 175px;"></div><span class="chart-label">Nov</span></div>
+                                <div class="chart-bar-group"><div class="chart-bar bar-gold" style="height: 200px;"></div><span class="chart-label">Dec</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Feed -->
+                <div class="glass-card activity-card" id="topCustomersCard">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Top Customers</h2>
+                            <p class="card-subtitle">អតិថិជនទិញច្រើនជាងគេ</p>
+                        </div>
+                        <div class="tc-period-tabs">
+                            <button class="tc-tab active" data-period="monthly">Monthly</button>
+                            <button class="tc-tab" data-period="weekly">Weekly</button>
+                            <button class="tc-tab" data-period="daily">Daily</button>
+                        </div>
+                    </div>
+                    <div class="tc-list" id="tcList">
+                        <div class="tc-loading">Loading...</div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Row 2: Stock Overview -->
+            <section class="tx-full-section">
+                <div class="glass-card table-card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Stock Overview</h2>
+                            <p class="card-subtitle">ស្ថានភាពស្តុកផលិតផល</p>
+                        </div>
+                        <div class="card-actions" style="display:flex;align-items:center;gap:8px">
+                            <div id="stockSummaryBadges" style="display:flex;gap:6px"></div>
+                            <a href="pages/stock.html" class="card-btn">View Stock</a>
+                        </div>
+                    </div>
+                    <div id="stockOverviewList" class="tx-stroke-list" style="max-height:320px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,.2) transparent"></div>
+                </div>
+            </section>
+
+            <!-- Bottom Grid -->
+            <section class="bottom-grid">
+                <!-- Calendar Widget -->
+                <div class="glass-card">
+                    <div class="calendar-header">
+                        <h2 class="card-title">January 2025</h2>
+                        <div class="calendar-nav">
+                            <button class="calendar-nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+                            <button class="calendar-nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+                        </div>
+                    </div>
+                    <div class="calendar-grid">
+                        <span class="calendar-day-name">Sun</span><span class="calendar-day-name">Mon</span><span class="calendar-day-name">Tue</span><span class="calendar-day-name">Wed</span><span class="calendar-day-name">Thu</span><span class="calendar-day-name">Fri</span><span class="calendar-day-name">Sat</span>
+                        <span class="calendar-day other-month">29</span><span class="calendar-day other-month">30</span><span class="calendar-day other-month">31</span><span class="calendar-day today">1</span><span class="calendar-day">2</span><span class="calendar-day">3</span><span class="calendar-day">4</span>
+                        <span class="calendar-day">5</span><span class="calendar-day">6</span><span class="calendar-day">7</span><span class="calendar-day">8</span><span class="calendar-day">9</span><span class="calendar-day">10</span><span class="calendar-day">11</span>
+                        <span class="calendar-day">12</span><span class="calendar-day">13</span><span class="calendar-day">14</span><span class="calendar-day">15</span><span class="calendar-day">16</span><span class="calendar-day">17</span><span class="calendar-day">18</span>
+                        <span class="calendar-day">19</span><span class="calendar-day">20</span><span class="calendar-day">21</span><span class="calendar-day">22</span><span class="calendar-day">23</span><span class="calendar-day">24</span><span class="calendar-day">25</span>
+                        <span class="calendar-day">26</span><span class="calendar-day">27</span><span class="calendar-day">28</span><span class="calendar-day">29</span><span class="calendar-day">30</span><span class="calendar-day">31</span><span class="calendar-day other-month">1</span>
+                    </div>
+                </div>
+
+                <!-- Donut Chart -->
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">Traffic Sources</h2>
+                            <p class="card-subtitle">User acquisition breakdown</p>
+                        </div>
+                    </div>
+                    <div class="donut-container">
+                        <div class="donut-chart">
+                            <svg width="140" height="140" viewBox="0 0 140 140">
+                                <circle class="donut-bg" cx="70" cy="70" r="54"/>
+                                <circle class="donut-segment" cx="70" cy="70" r="54" stroke="var(--emerald-light)" stroke-dasharray="169.6 339.3" stroke-dashoffset="0"/>
+                                <circle class="donut-segment" cx="70" cy="70" r="54" stroke="var(--gold)" stroke-dasharray="101.8 339.3" stroke-dashoffset="-169.6"/>
+                                <circle class="donut-segment" cx="70" cy="70" r="54" stroke="var(--coral)" stroke-dasharray="67.9 339.3" stroke-dashoffset="-271.4"/>
+                            </svg>
+                            <div class="donut-center">
+                                <div class="donut-value">24.5K</div>
+                                <div class="donut-label">Visitors</div>
+                            </div>
+                        </div>
+                        <div class="donut-legend">
+                            <div class="legend-item"><span class="legend-color cyan"></span><span>Organic Search (50%)</span></div>
+                            <div class="legend-item"><span class="legend-color magenta"></span><span>Social Media (30%)</span></div>
+                            <div class="legend-item"><span class="legend-color purple"></span><span>Direct Traffic (20%)</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cambodia Province Sales Card -->
+                <div class="glass-card province-sales-card" id="provinceSalesCard">
+                    <div style="flex-shrink:0;margin-bottom:8px">
+                        <!-- Title row -->
+                        <div class="card-header" style="margin-bottom:8px">
+                            <div>
+                                <h2 class="card-title" style="font-size:15px">ការលក់តាមខេត្ត/ក្រុង</h2>
+                                <p class="card-subtitle" style="font-size:11px">ទាំង 25 ខេត្តក្រុងនៃកម្ពុជា</p>
+                            </div>
+                            <select id="provSortSel" style="font-size:11px;padding:4px 8px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-family:inherit;cursor:pointer;height:28px">
+                                <option value="desc">High → Low</option>
+                                <option value="asc">Low → High</option>
+                                <option value="name">A → Z</option>
+                            </select>
+                        </div>
+                        <!-- Period filter row -->
+                        <div class="prov-period-tabs" id="provPeriodTabs">
+                            <button class="prov-period-btn active" data-period="monthly">Monthly</button>
+                            <button class="prov-period-btn" data-period="weekly">Weekly</button>
+                            <button class="prov-period-btn" data-period="daily">Daily</button>
+                        </div>
+                    </div>
+                    <div class="prov-list" id="provList" style="max-height:320px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,.2) transparent"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>Copyright © 2026 Your Company. Designed by <a href="https://www.facebook.com/SEREYROB22" target="_blank" rel="nofollow">CAMBO MINI</a></p>
+    </footer>
+
+    <script src="assets/js/vendor/chart-lite.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script src="assets/js/top-customers.js"></script>
+    <script src="assets/js/dashboard-live.js"></script>
+    <script src="assets/js/dashboard-layout.js"></script>
+    <script src="assets/js/province-sales.js"></script>
+    <!-- CAMBO MINI 607 Glass Admin -->
+
+<script>
+(function(){
+
+  /* ── Default stock data (fallback if localStorage empty) ── */
+  var DEFAULT_STOCK = [
+    {id:1, name:'ហ្វៃប័រផាសិន CCR',      cat:'Drinks',    box:1,pack:28,bottles:84,qty:3,stock:84,max:84},
+    {id:2, name:'កាហ្វេសម្រក CCR',         cat:'Drinks',    box:1,pack:28,bottles:84,qty:3,stock:84,max:84},
+    {id:3, name:'សាប៊ូដុសមុខ JELY Gluta', cat:'Face Care', box:1,pack:50,bottles:100,qty:5,stock:100,max:100},
+    {id:4, name:'សាប៊ូដុសមុខ យ៉ែងស៊ីន CCR',cat:'Face Care',box:1,pack:0,bottles:0,qty:6,stock:50,max:100},
+    {id:5, name:'ហ្យូមណ្ដាមមុខ (Facial Foam)',cat:'Face Care',box:1,pack:0,bottles:0,qty:2,stock:40,max:80},
+    {id:6, name:'ម៉ាស់បិទមុខ 6D CCR',      cat:'Face Care', box:1,pack:0,bottles:0,qty:3,stock:30,max:60},
+    {id:7, name:'ម៉ាស់ហ្មមុខ 24k',          cat:'Face Care', box:1,pack:0,bottles:0,qty:0,stock:0,max:50},
+    {id:8, name:'ស័ម្ភីតាម៉ីស JELY Mask Pad',cat:'Face Care',box:1,pack:0,bottles:0,qty:2,stock:20,max:60},
+    {id:9, name:'BB Cream CCR',             cat:'Face Care', box:1,pack:0,bottles:0,qty:2,stock:28,max:80},
+    {id:10,name:'SUNSCREEN CCR',            cat:'Face Care', box:1,pack:0,bottles:0,qty:2,stock:34,max:80},
+    {id:11,name:'ថ្នាំុសផ្ញើ CCR',          cat:'Face Care', box:1,pack:14,bottles:72,qty:5,stock:72,max:100},
+    {id:12,name:'លលុតមុខស្អាត JELY',        cat:'Face Care', box:1,pack:0,bottles:0,qty:3,stock:25,max:60},
+    {id:13,name:'CC SERUM PINK TONE JELY',  cat:'Face Care', box:1,pack:0,bottles:0,qty:2,stock:15,max:60},
+    {id:14,name:'សេរ៉ូមបណ្ដូ Body Serum JELY',cat:'Face Care',box:1,pack:0,bottles:0,qty:2,stock:18,max:60},
+    {id:15,name:'សាប៊ូដុសសខ្លួ មាស',       cat:'Body Care', box:1,pack:0,bottles:0,qty:4,stock:40,max:100},
+    {id:16,name:'សាប៊ូដុសសខ្លួ គ្នាកុលាប', cat:'Body Care', box:1,pack:0,bottles:0,qty:4,stock:50,max:100},
+    {id:17,name:'សាប៊ូកក់ ទឹងដុសសខ្លួ CCR',cat:'Body Care', box:1,pack:0,bottles:0,qty:3,stock:30,max:80},
+    {id:18,name:'ឡេដួ JELY (Body Lotion)',  cat:'Body Care', box:1,pack:0,bottles:0,qty:2,stock:32,max:80},
+    {id:19,name:'ឡេដួ Gluta SUDO',          cat:'Body Care', box:1,pack:0,bottles:0,qty:2,stock:5,max:60},
+    {id:20,name:'ទឹកអគ្រាម៉ាយ JELY',        cat:'Body Care', box:1,pack:20,bottles:60,qty:3,stock:60,max:100},
+    {id:21,name:'ឡេក្រ្លែក SUDO',           cat:'Body Care', box:1,pack:0,bottles:0,qty:2,stock:20,max:60},
+    {id:22,name:'ស្ក្រ្លែក SUDO',            cat:'Body Care', box:0,pack:0,bottles:0,qty:2,stock:0,max:50},
+    {id:23,name:'សាប៊ូកក់សក់ JELY កក់',     cat:'Hair Care', box:1,pack:0,bottles:0,qty:2,stock:22,max:60},
+    {id:24,name:'សាប៊ូកក់សក់ JELY អប់',     cat:'Hair Care', box:0,pack:0,bottles:0,qty:2,stock:0,max:50},
+    {id:25,name:'សាប៊ូកក់សក់ CCR កក់',      cat:'Hair Care', box:1,pack:0,bottles:0,qty:2,stock:20,max:60},
+    {id:26,name:'សាប៊ូកក់សក់ CCR អប់',      cat:'Hair Care', box:0,pack:0,bottles:0,qty:2,stock:0,max:50},
+    {id:27,name:'VIP 5in1 CCR កក់',         cat:'Hair Care', box:1,pack:0,bottles:0,qty:2,stock:15,max:50},
+    {id:28,name:'VIP 5in1 CCR អប់',         cat:'Hair Care', box:0,pack:0,bottles:0,qty:2,stock:0,max:50},
+    {id:29,name:'Premium CCR កក់',          cat:'Hair Care', box:1,pack:0,bottles:0,qty:2,stock:12,max:50},
+    {id:30,name:'Premium CCR អប់',          cat:'Hair Care', box:0,pack:0,bottles:0,qty:2,stock:0,max:50},
+    {id:31,name:'Hair Spray CCR',           cat:'Hair Care', box:1,pack:0,bottles:0,qty:2,stock:10,max:50},
+    {id:32,name:'ប្រេងណ្ដាសក់ CCR VIP',    cat:'Hair Care', box:1,pack:0,bottles:0,qty:2,stock:8,max:50}
+  ];
+
+  function getStock(){
+    try{
+      var s = JSON.parse(localStorage.getItem('cambo_stock_v2')||'null');
+      if(s && Array.isArray(s) && s.length) return s;
+    }catch(e){}
+    return DEFAULT_STOCK;
+  }
+
+  function getStatus(p){
+    var s = p.stock !== undefined ? p.stock : (p.qty||0);
+    if(s===0) return 'out';
+    if(s/p.max < 0.15) return 'low';
+    return 'ok';
+  }
+
+  /* Cat color */
+  var CAT_COLORS = {
+    'Face':  {bg:'rgba(139,92,246,.15)', color:'#8b5cf6'},
+    'Body':  {bg:'rgba(6,182,212,.15)',  color:'#06b6d4'},
+    'Hair':  {bg:'rgba(16,185,129,.15)', color:'#10b981'},
+    'Drink': {bg:'rgba(245,158,11,.15)', color:'#f59e0b'}
+  };
+
+  function catStyle(cat){
+    var c = CAT_COLORS[cat] || {bg:'rgba(148,163,184,.15)',color:'#94a3b8'};
+    return 'background:'+c.bg+';color:'+c.color;
+  }
+  function catInitial(cat){ return (cat||'?')[0]; }
+
+  function renderStockOverview(){
+    var el  = document.getElementById('stockOverviewList');
+    var sum = document.getElementById('stockSummaryBadges');
+    if(!el) return;
+
+    var items = getStock();
+
+    /* Summary badges */
+    var nOk  = items.filter(function(p){return getStatus(p)==='ok';}).length;
+    var nLow = items.filter(function(p){return getStatus(p)==='low';}).length;
+    var nOut = items.filter(function(p){return getStatus(p)==='out';}).length;
+
+    if(sum){
+      sum.innerHTML =
+        '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(16,185,129,.15);color:#10b981;font-weight:600">✓ '+nOk+' In Stock</span>' +
+        (nLow?'<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(245,158,11,.15);color:#f59e0b;font-weight:600">⚠ '+nLow+' Low</span>':'') +
+        (nOut?'<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(239,68,68,.15);color:#ef4444;font-weight:600">✕ '+nOut+' Out</span>':'');
+    }
+
+    /* Sort: out → low → ok */
+    var sorted = items.slice().sort(function(a,b){
+      var order = {out:0, low:1, ok:2};
+      return order[getStatus(a)] - order[getStatus(b)];
+    });
+
+    var html = sorted.map(function(p){
+      var st  = getStatus(p);
+      var stockVal = p.stock !== undefined ? p.stock : (p.qty||0);
+    var pct = p.max > 0 ? Math.round(stockVal/p.max*100) : 0;
+
+      /* Status colors */
+      var stBg    = st==='ok'?'rgba(16,185,129,.15)':st==='low'?'rgba(245,158,11,.15)':'rgba(239,68,68,.15)';
+      var stColor = st==='ok'?'#10b981':st==='low'?'#f59e0b':'#ef4444';
+      var stLabel = st==='ok'?'In Stock':st==='low'?'Low Stock':'Out of Stock';
+      var barColor= st==='ok'?'#10b981':st==='low'?'#f59e0b':'#ef4444';
+
+      /* Left border accent */
+      var borderLeft = st==='ok'?'3px solid #10b981':st==='low'?'3px solid #f59e0b':'3px solid #ef4444';
+
+      var stockQty = p.stock !== undefined ? p.stock : (p.qty||0);
+      return '<a class="tx-stroke-item" href="pages/stock.html" style="border-left:'+borderLeft+';border-radius:0 10px 10px 0;">'
+        +'<div class="tx-s-avatar" style="'+catStyle(p.cat)+';border-radius:8px;width:34px;height:34px">'+catInitial(p.cat)+'</div>'
+        +'<div class="tx-s-info" style="flex:1;min-width:0">'
+        +  '<div class="tx-s-name">'+p.name+'</div>'
+        +  '<div style="display:flex;align-items:center;gap:6px;margin-top:4px">'
+        +    '<div style="flex:1;height:4px;background:rgba(148,163,184,.2);border-radius:2px">'
+        +      '<div style="height:100%;width:'+pct+'%;background:'+barColor+';border-radius:2px"></div>'
+        +    '</div>'
+        +    '<span style="font-size:10px;color:#94a3b8;min-width:30px">'+pct+'%</span>'
+        +  '</div>'
+        +'</div>'
+        +'<span style="font-size:10px;padding:2px 8px;border-radius:20px;'+catStyle(p.cat)+';font-weight:600;flex-shrink:0">'+p.cat+'</span>'
+        +'<div class="tx-s-right" style="min-width:70px;align-items:flex-end">'
+        +  '<div style="display:flex;align-items:baseline;gap:4px">'
+        +    '<span style="font-size:14px;font-weight:700;color:#f1f5f9">'+stockQty+'</span>'
+        +    '<span style="font-size:10px;color:#94a3b8">/ QTY:'+p.qty+'</span>'
+        +  '</div>'
+        +  '<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:'+stBg+';color:'+stColor+';font-weight:600">'+stLabel+'</span>'
+        +'</div>'
+        +'<span class="tx-s-arrow">›</span>'
+        +'</a>';
+    }).join('');
+
+    html += '<div class="tx-stroke-footer" style="grid-column:1/-1"><a href="pages/stock.html">មើល Stock ទាំងអស់ →</a></div>';
+    el.innerHTML = html;
+  }
+
+  document.addEventListener('DOMContentLoaded', renderStockOverview);
+  window.addEventListener('storage', function(e){
+    if(e.key==='cambo_stock_v2') renderStockOverview();
+  });
+})();
+</script>
+<script src="assets/js/sw-register.js"></script>
+</body>
+</html>

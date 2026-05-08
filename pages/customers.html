@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+  <title>Customers - CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .cw{display:grid;gap:18px}
+    .stats-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .kpi{padding:16px 18px;border-radius:20px}
+    .kpi span{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .kpi strong{display:block;margin-top:8px;font-size:24px;color:var(--text)}
+    .cg{display:grid;grid-template-columns:1fr 1.1fr;gap:18px}
+    .cp{padding:20px 22px;border-radius:22px}
+    .cp-title{margin:0 0 14px;font-size:16px;font-weight:700;color:var(--text)}
+    .tools{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+    .tools input,.tools select{min-height:38px;padding:0 12px;border-radius:10px;font-size:13px}
+    .clist{display:grid;gap:7px;max-height:62vh;overflow-y:auto}
+    .ci{padding:13px 15px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);cursor:pointer;transition:.15s}
+    .ci:hover{border-color:rgba(6,182,212,.28)}
+    .ci.active{border-color:rgba(125,211,252,.4);background:rgba(6,182,212,.07)}
+    .ci b{display:block;color:var(--text);font-size:13px}
+    .ci small{color:var(--muted);font-size:12px}
+    .ci-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .tag{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid}
+    .tag-b{background:rgba(6,182,212,.1);color:#7dd3fc;border-color:rgba(6,182,212,.2)}
+    .tag-g{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.2)}
+    .tag-p{background:rgba(139,92,246,.1);color:#c4b5fd;border-color:rgba(139,92,246,.2)}
+    .tag-def{background:rgba(255,255,255,.06);color:var(--text);border-color:var(--line)}
+    .dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+    .dhead h3{margin:0;font-size:17px;color:var(--text)}
+    .dhead p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+    .sg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+    .sb{padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1)}
+    .sb span{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .sb strong{display:block;margin-top:5px;font-size:18px;color:var(--text)}
+    .hl{display:grid;gap:8px;max-height:55vh;overflow-y:auto}
+    .hr{padding:11px 13px;border-radius:13px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1)}
+    .hr-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+    .hr b{font-size:13px;color:var(--text)}
+    .hr small{font-size:12px;color:var(--muted);display:block;margin-top:3px}
+    .hr-foot{display:flex;justify-content:space-between;margin-top:6px;font-size:12px}
+    .st{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid}
+    .s-c{background:rgba(34,197,94,.12);color:#86efac;border-color:rgba(34,197,94,.2)}
+    .s-p{background:rgba(251,191,36,.1);color:#fde68a;border-color:rgba(251,191,36,.18)}
+    .s-pr{background:rgba(6,182,212,.1);color:#7dd3fc;border-color:rgba(6,182,212,.2)}
+    .s-s{background:rgba(139,92,246,.1);color:#c4b5fd;border-color:rgba(139,92,246,.2)}
+    .empty-det{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
+    @media(max-width:1080px){.cg{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+<div class="background"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+<div class="dashboard">
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar" id="sharedSidebar"></aside>
+  <main class="main-content">
+    <div class="shared-topbar" id="sharedHeader"></div>
+    <div class="cw">
+
+      <section class="glass-card" style="padding:20px 24px;border-radius:22px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+          <div><h2 style="margin:0 0 4px;color:var(--text)">Customers</h2><p style="margin:0;color:var(--muted);font-size:14px">គ្រប់គ្រងអតិថិជន និងមើលប្រវត្តិការទិញ</p></div>
+          <div class="tools" style="margin:0">
+            <input type="text" id="srch" placeholder="ស្វែងរកឈ្មោះ / ទូរស័ព្ទ..." oninput="fc()">
+            <select id="fprov" onchange="fc()"><option value="">All Provinces</option></select>
+          </div>
+        </div>
+      </section>
+
+      <div class="stats-row">
+        <article class="glass-card kpi"><span>Total Customers</span><strong id="stCust">0</strong></article>
+        <article class="glass-card kpi"><span>Total Orders</span><strong id="stOrds">0</strong></article>
+        <article class="glass-card kpi"><span>Total Revenue</span><strong id="stRev">$0</strong></article>
+        <article class="glass-card kpi"><span>Avg. Order</span><strong id="stAvg">$0</strong></article>
+      </div>
+
+      <div class="cg">
+        <article class="glass-card cp">
+          <h3 class="cp-title">Customer List <span id="cnt" style="font-size:12px;font-weight:400;color:var(--muted)"></span></h3>
+          <div class="clist" id="cList"></div>
+        </article>
+        <article class="glass-card cp">
+          <div id="emptyDet" class="empty-det">👆 ចុចលើអតិថិជន ដើម្បីមើល detail</div>
+          <div id="detPanel" hidden>
+            <div class="dhead">
+              <div><h3 id="dName">-</h3><p id="dMeta">-</p></div>
+              <span class="tag tag-b" id="dProv">-</span>
+            </div>
+            <div class="sg">
+              <div class="sb"><span>Orders</span><strong id="dOrd">0</strong></div>
+              <div class="sb"><span>Total Spend</span><strong id="dSpend">$0</strong></div>
+              <div class="sb"><span>Last Order</span><strong id="dLast" style="font-size:13px">-</strong></div>
+            </div>
+            <div class="hl" id="dHist"></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../assets/js/layout.js"></script>
+<script src="../assets/js/dashboard-layout.js"></script>
+<script>
+const DATA=[
+  {id:1,name:'សុខ ដារ៉ា',phone:'012 345 678',prov:'ភ្នំពេញ',orders:[
+    {id:'ORD001',date:'2025-04-20',prod:'JELY Gluta x2, BB Cream',total:29,st:'Completed'},
+    {id:'ORD002',date:'2025-04-10',prod:'SUNSCREEN x1',total:12,st:'Completed'}]},
+  {id:2,name:'ចន្ទ លក្ខណា',phone:'078 123 456',prov:'សៀមរាប',orders:[
+    {id:'ORD003',date:'2025-04-22',prod:'Body Lotion x3',total:28.5,st:'Processing'},
+    {id:'ORD004',date:'2025-04-10',prod:'Coffee CCR',total:18,st:'Completed'}]},
+  {id:3,name:'ហេង សុភាព',phone:'096 777 888',prov:'កំពង់ចាម',orders:[
+    {id:'ORD005',date:'2025-04-23',prod:'Serum JELY x2',total:30,st:'Pending'}]},
+  {id:4,name:'ណាត ចន្ទ',phone:'011 999 000',prov:'ភ្នំពេញ',orders:[
+    {id:'ORD006',date:'2025-04-21',prod:'ម៉ាស់ 6D x5',total:30,st:'Completed'},
+    {id:'ORD007',date:'2025-04-14',prod:'Shampoo x2',total:14,st:'Completed'},
+    {id:'ORD008',date:'2025-03-28',prod:'CC Serum x1',total:15,st:'Completed'}]},
+  {id:5,name:'ស្រី មាស',phone:'089 654 321',prov:'បាត់ដំបង',orders:[
+    {id:'ORD009',date:'2025-04-19',prod:'Fibery x2, Coffee x1',total:50,st:'Shipped'}]},
+  {id:6,name:'ទន្ត វណ្ណ',phone:'015 333 444',prov:'ភ្នំពេញ',orders:[
+    {id:'ORD010',date:'2025-04-24',prod:'JELY Gluta x1',total:8.5,st:'Pending'},
+    {id:'ORD011',date:'2025-04-16',prod:'BB Cream x2',total:24,st:'Completed'}]},
+  {id:7,name:'ម៉ករា ចាន់',phone:'012 888 999',prov:'ព្រះសីហនុ',orders:[
+    {id:'ORD012',date:'2025-04-21',prod:'Sunscreen x2',total:20,st:'Completed'}]},
+];
+let filtered=[...DATA];
+function fc(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  const pv=document.getElementById('fprov').value;
+  filtered=DATA.filter(c=>(!q||c.name.toLowerCase().includes(q)||c.phone.includes(q))&&(!pv||c.prov===pv));
+  renderList();
+}
+function renderList(){
+  document.getElementById('cnt').textContent='('+filtered.length+')';
+  const el=document.getElementById('cList');
+  if(!filtered.length){el.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">មិនមានអតិថិជន</div>';return;}
+  el.innerHTML=filtered.map(c=>{
+    const rev=c.orders.reduce((s,o)=>s+o.total,0);
+    return `<div class="ci" onclick="showDet(${c.id})">
+      <b>${c.name}</b><small>${c.phone}</small>
+      <div class="ci-meta">
+        <span class="tag tag-b">${c.prov}</span>
+        <span class="tag tag-def">${c.orders.length} orders</span>
+        <span class="tag tag-g">$${rev.toFixed(2)}</span>
+      </div></div>`;}).join('');
+}
+function showDet(id){
+  const c=DATA.find(x=>x.id===id);
+  document.querySelectorAll('.ci').forEach(el=>el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('emptyDet').hidden=true;
+  document.getElementById('detPanel').hidden=false;
+  document.getElementById('dName').textContent=c.name;
+  document.getElementById('dMeta').textContent=c.phone+' · '+c.prov;
+  document.getElementById('dProv').textContent=c.prov;
+  const rev=c.orders.reduce((s,o)=>s+o.total,0);
+  document.getElementById('dOrd').textContent=c.orders.length;
+  document.getElementById('dSpend').textContent='$'+rev.toFixed(2);
+  document.getElementById('dLast').textContent=c.orders[0]?.date||'-';
+  const sc={Completed:'s-c',Pending:'s-p',Processing:'s-pr',Shipped:'s-s'};
+  document.getElementById('dHist').innerHTML=c.orders.map(o=>`
+    <div class="hr">
+      <div class="hr-top"><b>${o.id}</b><span class="st ${sc[o.st]||'s-def'}">${o.st}</span></div>
+      <small>${o.prod}</small>
+      <div class="hr-foot"><span style="color:var(--muted)">${o.date}</span><b style="color:#7dd3fc">$${o.total.toFixed(2)}</b></div>
+    </div>`).join('');
+}
+function initStats(){
+  const rev=DATA.reduce((s,c)=>s+c.orders.reduce((a,o)=>a+o.total,0),0);
+  const ords=DATA.reduce((s,c)=>s+c.orders.length,0);
+  document.getElementById('stCust').textContent=DATA.length;
+  document.getElementById('stOrds').textContent=ords;
+  document.getElementById('stRev').textContent='$'+rev.toFixed(0);
+  document.getElementById('stAvg').textContent='$'+(rev/ords).toFixed(2);
+  const provs=[...new Set(DATA.map(c=>c.prov))];
+  const sel=document.getElementById('fprov');
+  provs.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o);});
+}
+document.addEventListener('DOMContentLoaded',()=>{initStats();renderList();});
+</script>
+<script src="../assets/js/sw-register.js"></script>
+</body>
+</html>

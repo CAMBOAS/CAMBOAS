@@ -1,0 +1,327 @@
+﻿<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+  <title>Stock - CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    .sw{display:grid;gap:18px}
+    .stats-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .kpi{padding:16px 18px;border-radius:20px}
+    .kpi span{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .kpi strong{display:block;margin-top:8px;font-size:24px;color:var(--text)}
+    .slayout{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
+    .sp{padding:20px 22px;border-radius:22px}
+    .sp-title{margin:0 0 14px;font-size:16px;font-weight:700;color:var(--text)}
+    .tools{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .tools input,.tools select{min-height:38px;padding:0 12px;border-radius:10px;font-size:13px}
+    table{width:100%;border-collapse:collapse}
+    thead th{text-align:left;padding:9px 12px;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--line)}
+    tbody td{padding:10px 12px;border-bottom:1px solid rgba(148,163,200,.06);font-size:13px;color:var(--text)}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:hover td{background:rgba(255,255,255,.02)}
+    .bw{display:flex;align-items:center;gap:8px}
+    .btrack{height:6px;border-radius:999px;background:rgba(148,163,200,.14);flex:1;overflow:hidden}
+    .bfill{height:100%;border-radius:999px}
+    .bf-g{background:linear-gradient(90deg,#10b981,#6ee7b7)}
+    .bf-a{background:linear-gradient(90deg,#f59e0b,#fde68a)}
+    .bf-r{background:linear-gradient(90deg,#ef4444,#fca5a5)}
+    .pill{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid}
+    .p-g{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.2)}
+    .p-a{background:rgba(251,191,36,.1);color:#fde68a;border-color:rgba(251,191,36,.18)}
+    .p-r{background:rgba(239,68,68,.1);color:#fca5a5;border-color:rgba(239,68,68,.2)}
+    .p-b{background:rgba(6,182,212,.1);color:#7dd3fc;border-color:rgba(6,182,212,.2)}
+    .alerts{display:grid;gap:8px}
+    .alert{padding:11px 13px;border-radius:13px;background:rgba(255,255,255,.04);border-left:3px solid}
+    .alert.warn{border-color:#f59e0b;background:rgba(245,158,11,.06)}
+    .alert.danger{border-color:#ef4444;background:rgba(239,68,68,.06)}
+    .alert b{font-size:13px;color:var(--text);display:block}
+    .alert small{font-size:12px;color:var(--muted)}
+    .adj-wrap{padding:14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-top:14px}
+    .adj-wrap h4{margin:0 0 10px;font-size:13px;color:var(--text)}
+    .adj-row{display:grid;grid-template-columns:1fr 70px auto;gap:8px;align-items:end}
+    .adj-row select,.adj-row input{min-height:36px;padding:0 10px;border-radius:9px;font-size:12px}
+    .abtn{min-height:36px;padding:0 14px;border-radius:9px;border:none;background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;font-weight:700;cursor:pointer;font-size:12px;font-family:inherit;white-space:nowrap}
+    @media(max-width:1000px){.slayout{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+    /* Clickable rows */
+    tbody tr{cursor:pointer;transition:background .15s}
+    tbody tr:hover td{background:rgba(139,92,246,.08)!important}
+    tbody tr.st-out td{border-left:3px solid #ef4444}
+    tbody tr.st-low td:first-child{border-left:3px solid #f59e0b}
+    tbody tr.st-ok td:first-child{border-left:3px solid #10b981}
+
+    /* Edit Modal */
+    .edit-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(2px)}
+    .edit-overlay.open{opacity:1;pointer-events:all}
+    .edit-modal{
+      background:#1a1a2e;
+      border:1.5px solid rgba(139,92,246,.35);
+      border-radius:20px;padding:28px 28px 22px;
+      width:100%;max-width:500px;
+      box-shadow:0 0 0 1px rgba(255,255,255,.05), 0 32px 80px rgba(0,0,0,.8);
+    }
+    .edit-modal h3{margin:0 0 16px;font-size:16px;font-weight:700;color:#f1f5f9;display:flex;align-items:center;gap:8px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+    .edit-field{display:flex;flex-direction:column;gap:6px}
+    .edit-field.full{grid-column:1/-1}
+    .edit-field label{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em}
+    .edit-field input{
+      min-height:40px;padding:0 14px;
+      border-radius:10px;font-size:14px;
+      width:100%;box-sizing:border-box;
+      background:#0f0f1a;
+      border:1.5px solid rgba(255,255,255,.12);
+      color:#f1f5f9;
+      font-family:inherit;
+      transition:border-color .15s;
+    }
+    .edit-field input:focus{outline:none;border-color:#8b5cf6}
+    .edit-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+    .ebtn{min-height:40px;padding:0 24px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:opacity .15s}
+    .ebtn-save{background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff}
+    .ebtn-cancel{background:rgba(255,255,255,.06);color:#94a3b8;border:1.5px solid rgba(255,255,255,.1)}
+    .ebtn-save:hover{opacity:.88} .ebtn-cancel:hover{background:rgba(255,255,255,.1);color:#f1f5f9}
+    .stock-indicator{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-size:13px;border:1px solid rgba(255,255,255,.08)}
+  </style>
+</head>
+<body>
+<div class="background"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+<div class="dashboard">
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar" id="sharedSidebar"></aside>
+  <main class="main-content">
+    <div class="shared-topbar" id="sharedHeader"></div>
+    <div class="sw">
+
+      <div class="stats-row">
+        <article class="glass-card kpi"><span>Total Items</span><strong id="sTot">0</strong></article>
+        <article class="glass-card kpi"><span>In Stock</span><strong id="sIn" style="color:#86efac">0</strong></article>
+        <article class="glass-card kpi"><span>Low Stock</span><strong id="sLo" style="color:#fde68a">0</strong></article>
+        <article class="glass-card kpi"><span>Out of Stock</span><strong id="sOut" style="color:#fca5a5">0</strong></article>
+      </div>
+      <div class="slayout">
+        <article class="glass-card sp">
+          <h3 class="sp-title">Stock Inventory</h3>
+          <div class="tools">
+            <input type="text" id="srch" placeholder="ស្វែងរក..." oninput="rt()">
+            <select id="flt" onchange="rt()">
+              <option value="">All</option>
+              <option value="ok">In Stock</option>
+              <option value="low">Low Stock</option>
+              <option value="out">Out of Stock</option>
+            </select>
+          </div>
+          <table><thead><tr><th>ផលិតផល</th><th>ប្រភេទ</th><th>Box</th><th>Pack</th><th>Bottles</th><th>QTY លក់</th><th>Stock Level</th><th>Status</th></tr></thead>
+          <tbody id="tbody"></tbody></table>
+        </article>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Edit Product Modal -->
+<div class="edit-overlay" id="editOverlay" onclick="closeEdit(event)">
+  <div class="edit-modal">
+    <h3>✏️ កែប្រែផលិតផល</h3>
+    <div class="stock-indicator" id="editStockIndicator"></div>
+    <div class="edit-grid">
+      <div class="edit-field full">
+        <label>ឈ្មោះផលិតផល</label>
+        <input type="text" id="eN" placeholder="ឈ្មោះផលិតផល">
+      </div>
+      <div class="edit-field full">
+        <label>ប្រភេទ (Types)</label>
+        <input type="text" id="eCat" placeholder="Face Care / Body Care ...">
+      </div>
+      <div class="edit-field">
+        <label>Box</label>
+        <input type="number" id="eBox" min="0" placeholder="0">
+      </div>
+      <div class="edit-field">
+        <label>Pack</label>
+        <input type="number" id="ePack" min="0" placeholder="0">
+      </div>
+      <div class="edit-field">
+        <label>Bottles</label>
+        <input type="number" id="eBott" min="0" placeholder="0">
+      </div>
+      <div class="edit-field">
+        <label>QTY លក់</label>
+        <input type="number" id="eQty" min="0" placeholder="0">
+      </div>
+      <div class="edit-field full">
+        <label>Stock បច្ចុប្បន្ន (+/- បន្ថែម/ដក)</label>
+        <input type="number" id="eStock" placeholder="0">
+      </div>
+    </div>
+    <div class="edit-actions">
+      <button class="ebtn ebtn-cancel" onclick="closeEdit()">បោះបង់</button>
+      <button class="ebtn ebtn-save" onclick="saveEdit()">💾 រក្សាទុក</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/layout.js"></script>
+<script src="../assets/js/dashboard-layout.js"></script>
+<script>
+let S=[
+  // Drinks
+  {id:1, name:'ហ្វៃប័រផាសិន CCR',      cat:'Drinks',    box:1, pack:28, bottles:84, qty:3, stock:84, max:84},
+  {id:2, name:'កាហ្វេសម្រក CCR',         cat:'Drinks',    box:1, pack:28, bottles:84, qty:3, stock:84, max:84},
+  // Face Care
+  {id:3, name:'សាប៊ូដុសមុខ JELY Gluta', cat:'Face Care', box:1, pack:50, bottles:100,qty:5, stock:100,max:100},
+  {id:4, name:'សាប៊ូដុសមុខ យ៉ែងស៊ីន CCR',cat:'Face Care',box:1, pack:0,  bottles:0,  qty:6, stock:50, max:100},
+  {id:5, name:'ហ្យូមណ្ដាមមុខ (Facial Foam)',cat:'Face Care',box:1,pack:0, bottles:0,  qty:2, stock:40, max:80},
+  {id:6, name:'ម៉ាស់បិទមុខ 6D CCR',      cat:'Face Care', box:1, pack:0,  bottles:0,  qty:3, stock:30, max:60},
+  {id:7, name:'ម៉ាស់ហ្មមុខ 24k',          cat:'Face Care', box:1, pack:0,  bottles:0,  qty:0, stock:0,  max:50},
+  {id:8, name:'ស័ម្ភីតាម៉ីស JELY Mask Pad',cat:'Face Care',box:1, pack:0, bottles:0,  qty:2, stock:20, max:60},
+  {id:9, name:'BB Cream CCR',             cat:'Face Care', box:1, pack:0,  bottles:0,  qty:2, stock:28, max:80},
+  {id:10,name:'SUNSCREEN CCR',            cat:'Face Care', box:1, pack:0,  bottles:0,  qty:2, stock:34, max:80},
+  {id:11,name:'ថ្នាំុសផ្ញើ CCR',          cat:'Face Care', box:1, pack:14, bottles:72, qty:5, stock:72, max:100},
+  {id:12,name:'លលុតមុខស្អាត JELY',        cat:'Face Care', box:1, pack:0,  bottles:0,  qty:3, stock:25, max:60},
+  {id:13,name:'CC SERUM PINK TONE JELY',  cat:'Face Care', box:1, pack:0,  bottles:0,  qty:2, stock:15, max:60},
+  {id:14,name:'ស័ម្ភីតាម៉ីស JELY Mask Pad',cat:'Face Care',box:1, pack:0, bottles:0,  qty:2, stock:20, max:60},
+  {id:15,name:'សេរ៉ូមបណ្ដូ Body Serum JELY',cat:'Face Care',box:1,pack:0, bottles:0,  qty:2, stock:18, max:60},
+  // Body Care
+  {id:16,name:'សាប៊ូដុសសខ្លួ មាសក្លិនទីកអ្នក 5',cat:'Body Care',box:1,pack:0,bottles:0,qty:4,stock:40,max:100},
+  {id:17,name:'សាប៊ូដុសសខ្លួ គ្នាកុលាប',  cat:'Body Care', box:1, pack:0,  bottles:0,  qty:4, stock:50, max:100},
+  {id:18,name:'សាប៊ូកក់ ទឹងដុសសខ្លួ CCR', cat:'Body Care', box:1, pack:0,  bottles:0,  qty:3, stock:30, max:80},
+  {id:19,name:'ឡេដួ JELY (Body Lotion)',   cat:'Body Care', box:1, pack:0,  bottles:0,  qty:2, stock:32, max:80},
+  {id:20,name:'ឡេដួ Gluta SUDO',           cat:'Body Care', box:1, pack:0,  bottles:0,  qty:2, stock:5,  max:60},
+  {id:21,name:'សេរ៉ូមបណ្ដូ JELY Body Serum',cat:'Body Care',box:1, pack:0, bottles:0,  qty:2, stock:18, max:60},
+  {id:22,name:'ទឹកអគ្រាម៉ាយ JELY',         cat:'Body Care', box:1, pack:20, bottles:60, qty:3, stock:60, max:100},
+  {id:23,name:'ឡេក្រ្លែក SUDO',            cat:'Body Care', box:1, pack:0,  bottles:0,  qty:2, stock:20, max:60},
+  {id:24,name:'ស្ក្រ្លែក SUDO',             cat:'Body Care', box:0, pack:0,  bottles:0,  qty:2, stock:0,  max:50},
+  // Hair Care
+  {id:25,name:'សាប៊ូកក់សក់ ទឹងសួរសក់ JELY កក់',cat:'Hair Care',box:1,pack:0,bottles:0,qty:2,stock:22,max:60},
+  {id:26,name:'សាប៊ូកក់សក់ ទឹងសួរសក់ JELY អប់', cat:'Hair Care',box:0,pack:0,bottles:0,qty:2,stock:0, max:50},
+  {id:27,name:'សាប៊ូកក់សក់ ទឹងម៉ាសសក់ CCR កក់',cat:'Hair Care',box:1,pack:0,bottles:0,qty:2,stock:20,max:60},
+  {id:28,name:'សាប៊ូកក់សក់ ទឹងម៉ាសសក់ CCR អប់', cat:'Hair Care',box:0,pack:0,bottles:0,qty:2,stock:0, max:50},
+  {id:29,name:'សាប៊ូកក់សក់ ទឹងម៉ាសសក់ VIP 5in1 CCR កក់',cat:'Hair Care',box:1,pack:0,bottles:0,qty:2,stock:15,max:50},
+  {id:30,name:'សាប៊ូកក់សក់ ទឹងម៉ាសសក់ VIP 5in1 CCR អប់',cat:'Hair Care',box:0,pack:0,bottles:0,qty:2,stock:0,max:50},
+  {id:31,name:'សាប៊ូកក់សក់ ទឹងម៉ាសសក់ Premium CCR កក់',cat:'Hair Care',box:1,pack:0,bottles:0,qty:2,stock:12,max:50},
+  {id:32,name:'សាប៊ូកក់សក់ ទឹងម៉ាសសក់ Premium CCR អប់',cat:'Hair Care',box:0,pack:0,bottles:0,qty:2,stock:0,max:50},
+  {id:33,name:'ស្ប្រ្យាយបណ្ដៅសក់ CCR (Hair Spray)',cat:'Hair Care',box:1,pack:0,bottles:0,qty:2,stock:10,max:50},
+  {id:34,name:'ប្រេងណ្ដាសក់ CCR ប្រេងសេរ៉ូមសក់ VIP',cat:'Hair Care',box:1,pack:0,bottles:0,qty:2,stock:8,max:50},
+];
+function gs(p){return p.stock===0?'out':p.stock/p.max<0.15?'low':'ok';}
+function pc(s){return s==='ok'?'p-g':s==='low'?'p-a':'p-r';}
+function pl(s){return s==='ok'?'In Stock':s==='low'?'Low Stock':'Out of Stock';}
+function bc(s){return s==='ok'?'bf-g':s==='low'?'bf-a':'bf-r';}
+function rt(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  const f=document.getElementById('flt').value;
+  // Sort: out(0) → low(1) → ok(2)
+  const ORDER={out:0,low:1,ok:2};
+  const list=S
+    .filter(p=>(!q||p.name.toLowerCase().includes(q))&&(!f||gs(p)===f))
+    .sort((a,b)=>ORDER[gs(a)]-ORDER[gs(b)]);
+  document.getElementById('tbody').innerHTML=list.map(p=>{
+    const s=gs(p),pct=p.max>0?Math.round(p.stock/p.max*100):0;
+    const rowClass='st-'+s;
+    return `<tr class="${rowClass}" onclick="openEdit(${p.id})" title="ចុចដើម្បីកែប្រែ">
+    <td style="font-weight:600">${p.name} <span style="font-size:10px;color:var(--muted);font-weight:400">✏️</span></td>
+    <td><span class="pill p-b" style="font-size:10px">${p.cat}</span></td>
+    <td style="text-align:center">${p.box||'-'}</td>
+    <td style="text-align:center">${p.pack||'-'}</td>
+    <td style="text-align:center">${p.bottles||'-'}</td>
+    <td style="text-align:center;font-weight:700;color:var(--emerald)">${p.qty}</td>
+    <td><div class="bw"><div class="btrack"><div class="bfill ${bc(s)}" style="width:${pct}%"></div></div><span style="min-width:26px;font-weight:700">${p.stock}</span></div></td>
+    <td><span class="pill ${pc(s)}">${pl(s)}</span></td></tr>`;
+  }).join('');
+  ra();us();
+}
+function ra(){
+  const al=S.filter(p=>gs(p)!=='ok');
+  const el=document.getElementById('alertsEl');
+  if(!al.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:14px">✓ All items OK</div>';return;}
+  el.innerHTML=al.map(p=>`<div class="alert ${gs(p)==='out'?'danger':'warn'}"><b>${p.name}</b><small>${gs(p)==='out'?'Out of stock':'Only '+p.stock+' remaining'}</small></div>`).join('');
+}
+function us(){
+  document.getElementById('sTot').textContent=S.length;
+  document.getElementById('sIn').textContent=S.filter(p=>gs(p)==='ok').length;
+  document.getElementById('sLo').textContent=S.filter(p=>gs(p)==='low').length;
+  document.getElementById('sOut').textContent=S.filter(p=>p.stock===0).length;
+}
+function doAdj(){
+  const id=parseInt(document.getElementById('adjP').value);
+  const q=parseInt(document.getElementById('adjQ').value)||0;
+  const p=S.find(x=>x.id===id);
+  if(p){p.stock=Math.max(0,(p.stock||0)+q);rt();saveStock();document.getElementById('adjMsg').textContent='✓ Updated: '+p.name+' → '+p.stock;}
+}
+function saveStock(){ try{ localStorage.setItem('cambo_stock_v2', JSON.stringify(S)); }catch(e){} }
+
+/* ── Edit Modal ── */
+var _editId = null;
+function openEdit(id){
+  var p = S.find(function(x){return x.id===id;});
+  if(!p) return;
+  _editId = id;
+  document.getElementById('eN').value    = p.name;
+  document.getElementById('eCat').value  = p.cat;
+  document.getElementById('eBox').value  = p.box||0;
+  document.getElementById('ePack').value = p.pack||0;
+  document.getElementById('eBott').value = p.bottles||0;
+  document.getElementById('eQty').value  = p.qty||0;
+  document.getElementById('eStock').value= p.stock||0;
+
+  var s = gs(p);
+  var stBg    = s==='ok'?'rgba(16,185,129,.12)':s==='low'?'rgba(245,158,11,.12)':'rgba(239,68,68,.12)';
+  var stColor = s==='ok'?'#86efac':s==='low'?'#fde68a':'#fca5a5';
+  var stLabel = s==='ok'?'✅ In Stock':s==='low'?'⚠️ Low Stock':'🔴 Out of Stock';
+  var pct     = p.max>0?Math.round(p.stock/p.max*100):0;
+  document.getElementById('editStockIndicator').innerHTML =
+    '<span style="color:'+stColor+';font-weight:700">'+stLabel+'</span>' +
+    '<span style="color:var(--muted);font-size:12px;margin-left:8px">'+p.stock+' / '+p.max+' ('+pct+'%)</span>';
+  document.getElementById('editStockIndicator').style.background = stBg;
+  document.getElementById('editOverlay').classList.add('open');
+}
+
+function closeEdit(e){
+  if(e && e.target !== document.getElementById('editOverlay')) return;
+  document.getElementById('editOverlay').classList.remove('open');
+  _editId = null;
+}
+
+function saveEdit(){
+  if(!_editId) return;
+  var p = S.find(function(x){return x.id===_editId;});
+  if(!p) return;
+  p.name    = document.getElementById('eN').value.trim() || p.name;
+  p.cat     = document.getElementById('eCat').value.trim() || p.cat;
+  p.box     = parseInt(document.getElementById('eBox').value)||0;
+  p.pack    = parseInt(document.getElementById('ePack').value)||0;
+  p.bottles = parseInt(document.getElementById('eBott').value)||0;
+  p.qty     = parseInt(document.getElementById('eQty').value)||0;
+  p.stock   = Math.max(0, parseInt(document.getElementById('eStock').value)||0);
+
+  saveStock();
+  rt();
+  // Update adj dropdown
+  var sel = document.getElementById('adjP');
+  var opt = sel.querySelector('option[value="'+_editId+'"]');
+  if(opt) opt.textContent = p.name;
+
+  document.getElementById('editOverlay').classList.remove('open');
+  _editId = null;
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  // Always use latest hardcoded data — save to localStorage for dashboard sync
+  saveStock();
+
+  const sel=document.getElementById('adjP');
+  S.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name;sel.appendChild(o);});
+  rt();
+});
+</script>
+<script src="../assets/js/sw-register.js"></script>
+</body>
+</html>

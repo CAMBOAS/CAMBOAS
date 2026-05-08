@@ -1,0 +1,1264 @@
+(function(){
+'use strict';
+
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzd1g4M2oIFIl5MYkUnVd-WtxTzaEgXXepuIXYJ-KZboRNJGIOXfPOd8ANWX-dzay-ynQ/exec';
+var LS_KEY = 'cambo_search_edit_orders_v3';
+
+var _orders = [], _sel = new Set();
+var _qrOn = true; // QR Code toggle state
+var _sort = {col:'date', dir:'desc'};
+var _q = '', _f = {};
+var _date = {preset:'today', start:'', end:'', label:'Today'};
+
+/* ── helpers ── */
+function $id(id){ return document.getElementById(id); }
+function isDark(){ return document.documentElement.getAttribute('data-theme') !== 'light'; }
+function themeVal(dark, light){ return isDark() ? dark : light; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* Convert any date string → DD/MM/YYYY */
+function fmtDisplay(s){
+  if(!s) return '';
+  // Already DD/MM/YYYY
+  if(/^\d{2}\/\d{2}\/\d{4}/.test(s)) return s.slice(0,10);
+  // YYYY-MM-DD
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)){ var p=s.slice(0,10).split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+  // Any JS date string (e.g. "Wed Apr 08 2026 00:00:00 GMT+0700")
+  try{
+    var d = new Date(s);
+    if(!isNaN(d)){
+      return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
+    }
+  }catch(e){}
+  return s;
+}
+
+/* ── toggle dropdown ── */
+function toggle(dropId, btnId){
+  var drop = $id(dropId);
+  var btn  = $id(btnId);
+  if(!drop) return;
+  var isOpen = drop.classList.contains('open');
+  // close all first
+  document.querySelectorAll('.ol-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+  if(!isOpen){ drop.classList.add('open'); }
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.ol-dropdown') && !e.target.closest('[id$="Btn"]') && !e.target.closest('[id$="Btn2"]')){
+    document.querySelectorAll('.ol-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+  }
+});
+
+/* ── data ── */
+async function loadOrders(){
+  try{
+    var r = await fetch(SCRIPT_URL+'?action=list&limit=1000&_='+Date.now());
+    var d = await r.json();
+    var arr = Array.isArray(d?.orders)?d.orders
+             :Array.isArray(d?.data?.orders)?d.data.orders
+             :Array.isArray(d?.rows)?d.rows
+             :Array.isArray(d?.data)?d.data
+             :null;
+    if(arr) return normalizeOrders(arr);
+    return local();
+  }catch(e){ return local(); }
+}
+function fixPhone(v){
+  var ph = String(v||'').trim();
+  if(ph && /^[1-9]\d{7,9}$/.test(ph)) ph = '0' + ph;
+  return ph;
+}
+function normalizeOrders(arr){
+  return (Array.isArray(arr)?arr:[]).map(function(o){
+    // Normalize field names: Sheet may return Capital or camelCase keys
+    function pick(keys){ for(var i=0;i<keys.length;i++){ if(o[keys[i]]!==undefined&&o[keys[i]]!==null&&o[keys[i]]!=='') return o[keys[i]]; } return ''; }
+    var norm = {
+      id:           o.id||o.ID||o.orderId||o.OrderId||(Date.now()+Math.random()),
+      date:         pick(['date','Date','dateTime','DateTime','ORDER DATE']),
+      customer:     pick(['customer','Customer','CUSTOMER','name','Name']),
+      phone:        pick(['phone','Phone','PHONE','tel','Tel']),
+      province:     pick(['province','Province','PROVINCE']),
+      addressDetail:pick(['addressDetail','address','Address','detailAddress','Detail Address']),
+      address:      pick(['addressDetail','address','Address','detailAddress','Detail Address']),
+      page:         pick(['page','Page','PAGE','pages','Pages']),
+      pages:        pick(['page','Page','pages','Pages']),
+      closeBy:      pick(['closeBy','CloseBy','CLOSEBY','closeby','close_by']),
+      closeby:      pick(['closeBy','CloseBy','closeby']),
+      status:       pick(['status','Status','STATUS','orderStatus'])||'Pending',
+      orderStatus:  pick(['status','Status','orderStatus'])||'Pending',
+      priority:     pick(['priority','Priority'])||'Medium',
+      payment:      pick(['payment','Payment','PAYMENT']),
+      deliveryName: pick(['deliveryName','delivery','DeliveryName','Delivery','DELIVERY','delivery_name']),
+      deliveryFee:  Number(pick(['deliveryFee','DeliveryFee','delivery_fee','Delivery Fee'])||0),
+      note:         pick(['note','Note','NOTE']),
+      receiptNo:    pick(['receiptNo','ReceiptNo','receipt_no']),
+      products:     o.products||o.Products||o.items||[],
+    };
+    // Fix phone leading zero
+    norm.phone = fixPhone(norm.phone||o.phone||'');
+    // Keep original fields too (for compatibility)
+    Object.assign(norm, o);
+    // Override with normalized values
+    norm.customer     = norm.customer     || pick(['customer','Customer','name','Name']);
+    norm.phone        = fixPhone(pick(['phone','Phone','tel','Tel']));
+    norm.date         = pick(['date','Date','dateTime','DateTime']);
+    norm.province     = pick(['province','Province']);
+    norm.page         = pick(['page','Page','pages','Pages']);
+    norm.closeBy      = pick(['closeBy','CloseBy','closeby']);
+    norm.status       = pick(['status','Status','orderStatus'])||'Pending';
+    norm.deliveryName = pick(['deliveryName','delivery','DeliveryName','Delivery']);
+    norm.deliveryFee  = Number(pick(['deliveryFee','DeliveryFee','delivery_fee'])||0);
+    norm.note         = pick(['note','Note']);
+    norm.addressDetail= pick(['addressDetail','address','Address','detailAddress']);
+    norm.address      = norm.addressDetail;
+    return norm;
+  });
+}
+function local(){
+  try{
+    var orders = JSON.parse(localStorage.getItem(LS_KEY)||'[]');
+    return normalizeOrders(orders);
+  }catch(e){ return []; }
+}
+
+/* ── date ── */
+function todayYMD(){ var d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function pad(n){ return String(n).padStart(2,'0'); }
+function shiftDate(ymd,n){ var d=new Date(ymd+'T00:00:00'); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function monthRange(d){ var s=new Date(d.getFullYear(),d.getMonth(),1),e=new Date(d.getFullYear(),d.getMonth()+1,0); return {start:fmt(s),end:fmt(e)}; }
+function fmt(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function displayDate(ymd){ if(!ymd) return ''; var p=ymd.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+
+function getPreset(p){
+  var t=todayYMD(), now=new Date(t+'T00:00:00');
+  if(p==='today')     return {start:t,end:t,label:'Today'};
+  if(p==='yesterday') { var y=shiftDate(t,-1); return {start:y,end:y,label:'Yesterday'}; }
+  if(p==='last7')     return {start:shiftDate(t,-6),end:t,label:'Last 7 Days'};
+  if(p==='lastMonth') { var m=new Date(now.getFullYear(),now.getMonth()-1,1); var r=monthRange(m); return {...r,label:'Last Month'}; }
+  if(p==='all')       return {start:'',end:'',label:'All Time'};
+  var r=monthRange(now); return {...r,label:'This Month'};
+}
+
+function parseD(s){
+  if(!s) return null;
+  s = String(s).trim();
+  if(!s) return null;
+  // DD/MM/YYYY (optional time after)
+  var m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  if(m){
+    var hh = m[4]||'00', mi = m[5]||'00', ss = m[6]||'00';
+    return new Date(m[3]+'-'+m[2]+'-'+m[1]+'T'+hh+':'+mi+':'+ss);
+  }
+  // YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS or with Z
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)){
+    var d = new Date(s);
+    if(!isNaN(d)) return d;
+    return new Date(s.slice(0,10)+'T00:00:00');
+  }
+  // Try general parse
+  var dt = new Date(s);
+  return isNaN(dt) ? null : dt;
+}
+function inDate(o){
+  // 'all' preset → show ALL orders (including no-date)
+  if(_date.preset==='all') return true;
+  // No date filter set → show all
+  if(!_date.start && !_date.end) return true;
+  var d=parseD(o.date);
+  // Order has no date or invalid date → HIDE (date filter active, exclude unknown dates)
+  if(!d||isNaN(d)) return false;
+  var t=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  if(_date.start){ var s=new Date(_date.start+'T00:00:00'); if(t<s) return false; }
+  if(_date.end)  { var e=new Date(_date.end  +'T00:00:00'); if(t>e) return false; }
+  return true;
+}
+
+/* ── helper: get product lines regardless of field name ── */
+function getProds(o){
+  return (Array.isArray(o.items)    && o.items.length    ? o.items    : null)
+      || (Array.isArray(o.products) && o.products.length ? o.products : null)
+      || [];
+}
+
+/* ── filter ── */
+function orderTotal(o){ return getProds(o).reduce(function(s,p){return s+Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0);},0)+Number(o.deliveryFee||0); }
+
+function getFiltered(){
+  return _orders.filter(function(o){
+    if(_q && !(o.customer||'').toLowerCase().includes(_q) && !(o.phone||'').includes(_q)) return false;
+    if(_f.delivery){
+      var dn = normalizeDeliveryName(o.deliveryName||'');
+      if(dn!==_f.delivery) return false;
+    }
+    if(_f.province){
+      var pv=(o.province||'').trim();
+      if(_f.province==='រាជធានីភ្នំពេញ'){
+        // Exact match Phnom Penh
+        if(pv!=='រាជធានីភ្នំពេញ') return false;
+      } else if(_f.province==='ខេត្ត'){
+        // All other provinces
+        if(pv==='រាជធានីភ្នំពេញ'||pv==='') return false;
+      } else {
+        if(!pv.includes(_f.province)) return false;
+      }
+    }
+    if(_f.status   && (o.status||o.orderStatus||'')!==_f.status) return false;
+    if(_f.pages){
+      var pg=(o.page||o.pages||'').trim();
+      if(pg!==_f.pages) return false;
+    }
+    if(_f.priority && (o.priority||'')!==_f.priority) return false;
+    if(_f.closeBy){
+      var cb=(o.closeBy||o.closeby||'').trim();
+      if(cb.toLowerCase()!==_f.closeBy.toLowerCase()) return false;
+    }
+    if(!inDate(o)) return false;
+    return true;
+  }).sort(function(a,b){
+    var av,bv;
+    if(_sort.col==='date'){av=parseD(a.date)||0;bv=parseD(b.date)||0;}
+    else if(_sort.col==='customer'){av=(a.customer||'').toLowerCase();bv=(b.customer||'').toLowerCase();}
+    else if(_sort.col==='total'){av=orderTotal(a);bv=orderTotal(b);}
+    else return 0;
+    return _sort.dir==='asc'?(av<bv?-1:av>bv?1:0):(av>bv?-1:av<bv?1:0);
+  });
+}
+
+/* ── stats ── */
+function updateStats(rows){
+  // Stats based on FILTERED rows (not all orders)
+  var t    = rows.length;
+  var pend = rows.filter(function(o){ return (o.status||o.orderStatus||'').toLowerCase()==='pending'; }).length;
+  var del  = rows.filter(function(o){ return (o.status||o.orderStatus||'').toLowerCase()==='delivered'; }).length;
+  var rev  = rows.reduce(function(s,o){ return s+orderTotal(o); }, 0);
+
+  $id('olTotal').textContent    = t;
+  $id('olPending').textContent  = pend;
+  $id('olDelivered').textContent= del;
+  $id('olRevenue').textContent  = '$'+rev.toFixed(2);
+  $id('olFooter').textContent   = 'Showing '+rows.length+' of '+_orders.length+' records';
+}
+
+/* ── render ── */
+function render(){
+  var rows = getFiltered();
+  updateStats(rows);
+
+  // Selected badge
+  var sel = $id('olSel'), cnt = $id('olSelCnt');
+  if(sel){ sel.classList.toggle('show', _sel.size>0); }
+  if(cnt) cnt.textContent = _sel.size;
+
+  // Select all checkbox
+  var chkAll = $id('olChkAll');
+  if(chkAll){ chkAll.checked = rows.length>0 && rows.every(function(o){return _sel.has(String(o.id));}); chkAll.indeterminate = _sel.size>0 && !chkAll.checked; }
+
+  var tbody = $id('olBody');
+  if(!tbody) return;
+
+  if(!rows.length){
+    var emptyMsg = _date.preset === 'today'
+      ? '📭 គ្មាន Order ថ្ងៃនេះ (' + displayDate(todayYMD()) + ')'
+      : _date.preset === 'all'
+        ? '📭 គ្មាន Order ទាំងអស់'
+        : '📭 គ្មាន Order ' + (_date.start === _date.end
+            ? displayDate(_date.start)
+            : displayDate(_date.start) + ' → ' + displayDate(_date.end));
+    tbody.innerHTML = '<tr><td colspan="10" class="ol-empty">' + emptyMsg + '</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map(function(o, idx){
+    var total = orderTotal(o);
+    var prods = getProds(o);
+    // Show first product + (+N) for rest
+    var first = prods[0] ? esc(prods[0].name||'')+(prods[0].qty>1?' <b style="color:#8b5cf6">×'+prods[0].qty+'</b>':'') : '';
+    var ptxt = first;
+    if(prods.length > 1){
+      ptxt += ' <span style="color:#8b5cf6;font-weight:700;background:rgba(139,92,246,.1);padding:1px 6px;border-radius:6px;font-size:11px;margin-left:4px">+'+(prods.length-1)+'</span>';
+    }
+    var pmore = '';
+    var selected = _sel.has(String(o.id));
+    return '<tr class="'+(selected?'sel':'')+'" data-id="'+o.id+'">'
+      +'<td class="ol-cb-th ol-col-cb"><input type="checkbox" class="ol-chk" data-id="'+o.id+'" '+(selected?'checked':'')+' onclick="event.stopPropagation()"></td>'
+      +'<td class="ol-col-num">'+(idx+1)+'</td>'
+      +'<td class="ol-muted ol-col-date">'+fmtDisplay(o.date)+'</td>'
+      +'<td class="ol-customer ol-col-cust">'+esc(o.customer||'—')+'</td>'
+      +'<td class="ol-phone ol-col-tel">'+esc(o.phone||'')+'</td>'
+      +'<td class="ol-col-prov">'+esc(o.province||'')+'</td>'
+      +'<td class="ol-col-prod">'+ptxt+'</td>'
+      +'<td class="ol-muted ol-col-page">'+esc(o.page||o.pages||'')+'</td>'
+      +'<td class="ol-muted ol-col-cb2">'+esc(o.closeBy||o.closeby||'')+'</td>'
+      +'<td class="ol-total ol-col-tot">$'+total.toFixed(2)+'</td>'
+      +'</tr>';
+  }).join('');
+
+  // Sync card view
+  if(typeof window._olRenderCards==='function') window._olRenderCards(rows);
+
+  // Row click → open drawer
+  // Checkbox click → toggle selection
+  tbody.querySelectorAll('tr').forEach(function(tr){
+    // Row click (not on checkbox) → open drawer
+    tr.addEventListener('click', function(e){
+      if(e.target.classList.contains('ol-chk') || e.target.closest('.ol-cb-th')) return;
+      olOpenDrawer(tr.dataset.id);
+    });
+  });
+
+  // Checkbox change → toggle _sel
+  tbody.querySelectorAll('.ol-chk').forEach(function(chk){
+    chk.addEventListener('change', function(e){
+      e.stopPropagation();
+      var id = String(chk.dataset.id);
+      if(chk.checked){ _sel.add(id); } else { _sel.delete(id); }
+      // Update row highlight
+      var row = chk.closest('tr');
+      if(row) row.classList.toggle('sel', chk.checked);
+      updateSelBadge();
+    });
+    // Also handle click to prevent row click firing
+    chk.addEventListener('click', function(e){ e.stopPropagation(); });
+  });
+}
+
+function updateSelBadge(){
+  var sel=$id('olSel'),cnt=$id('olSelCnt');
+  if(sel) sel.classList.toggle('show',_sel.size>0);
+  if(cnt) cnt.textContent=_sel.size;
+}
+
+/* ── date label ── */
+function updateDateBtn(){
+  var btn  = $id('olDateBtn');
+  var chip = $id('olDateChip');
+  if(btn) btn.textContent = _date.label || 'Date';
+  if(chip){
+    // Show chip ONLY for custom date range (start ≠ end)
+    // Hide for: today, yesterday, last7, thisMonth, lastMonth, all
+    var singlePresets = ['today','yesterday','last7','thisMonth','lastMonth','all'];
+    var isCustomRange = _date.preset === 'custom' && _date.start && _date.end && _date.start !== _date.end;
+    var show = isCustomRange;
+    chip.classList.toggle('show', show);
+    if(show) chip.textContent = displayDate(_date.start)+' → '+displayDate(_date.end);
+  }
+  // highlight active in popup
+  document.querySelectorAll('#olDatePop [data-p]').forEach(function(b){
+    b.classList.toggle('active', b.dataset.p===_date.preset);
+  });
+}
+
+/* ── export / print ── */
+function getSrc(){
+  if(_sel.size > 0){
+    return _orders.filter(function(o){ return _sel.has(String(o.id)); });
+  }
+  return getFiltered();
+}
+
+function exportCSV(){
+  var src=getSrc();
+  var rows=[['Date','Customer','Phone','Province','Products','Page','CloseBy','Total','Status']];
+  src.forEach(function(o){ rows.push([o.date||'',o.customer||'',o.phone||'',o.province||'',getProds(o).map(function(p){return p.name+'×'+(p.qty||1);}).join('|'),o.page||o.pages||'',o.closeBy||o.closeby||'',orderTotal(o).toFixed(2),o.status||o.orderStatus||'']); });
+  var csv=rows.map(function(r){return r.map(function(v){return '"'+(v||'')+'"';}).join(',');}).join('\n');
+  var a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv); a.download='orders_'+todayYMD()+'.csv'; a.click();
+}
+
+function printTable(){
+  var src = getFiltered();
+  if(!src.length){ alert('⚠️ គ្មានទិន្នន័យ'); return; }
+  if(typeof ReceiptPrinter === 'undefined'){ alert('❌ ReceiptPrinter not loaded'); return; }
+
+  var receiptNo = ($id('olReceiptNo')?.value||'').trim();
+  var qrOn      = _qrOn;
+  var rielRate  = 4100;
+
+  var startNo = receiptNo !== '' ? parseInt(receiptNo, 10) : null;
+  var allData = src.map(function(o, i){
+    var prods = getProds(o);
+    var subtotal = prods.reduce(function(s,p){
+      return s+Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0);
+    },0);
+    var deliveryFee = Number(o.deliveryFee||0);
+    var grandTotal  = subtotal+deliveryFee;
+    var pay = (o.payment||'').toUpperCase();
+    var qrPath='';
+    if(qrOn){
+      if(pay.includes('ABA'))     qrPath='../images/qr/ABA.png';
+      else if(pay.includes('AC')) qrPath='../images/qr/AC.png';
+    }
+    var dName=o.deliveryName||'';
+    if(dName.trim().toLowerCase()==='delivery') dName='-';
+    var rNo = (startNo !== null && !isNaN(startNo)) ? String(startNo + i) : '';
+    return {
+      title:'វិក្កយបត្រ', paperWidth:'80mm',
+      customer:o.customer||'', phone:o.phone||'',
+      address:((o.addressDetail||o.address||'')?(o.addressDetail||o.address||'')+' ៖ ':'')+( o.province||''),
+      date:fmtDisplay(o.date)||'', deliveryName:dName||'-',
+      note:o.note||'-', page:o.page||o.pages||'',
+      closeBy:o.closeBy||o.closeby||'', payment:o.payment||'',
+      servicePhone:'015 58 68 78 / 089 58 68 78',
+      qrImage:qrPath,
+      qrLabel:pay.includes('ABA')?'ABA':pay.includes('AC')?'AC':(o.payment||''),
+      accountName:'CHEA CHANROTHA', receiptNo:rNo,
+      items:prods.map(function(p){
+        return {product:p.name||'',qty:Number(p.qty||1),price:Number(p.price||0),
+          discount:Number(p.discount||0),
+          subtotal:Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0)};
+      }),
+      subtotal:subtotal, deliveryFee:deliveryFee,
+      grandTotal:grandTotal, grandRiel:Math.round(grandTotal*rielRate)
+    };
+  });
+
+  ReceiptPrinter.printBatch(allData);
+}
+
+function printSelected(){
+  var src = getSrc();
+  if(!src.length){ alert('⚠️ សូមជ្រើសរើស order មុន'); return; }
+  if(typeof ReceiptPrinter === 'undefined'){ alert('❌ ReceiptPrinter not loaded'); return; }
+
+  var receiptNo = ($id('olReceiptNo')?.value||'').trim();
+  var qrOn      = _qrOn;
+  var rielRate  = 4100;
+
+  var startNo = receiptNo !== '' ? parseInt(receiptNo, 10) : null;
+  var allData = src.map(function(o, i){
+    var prods = getProds(o);
+    var subtotal = prods.reduce(function(s,p){
+      return s+Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0);
+    },0);
+    var deliveryFee = Number(o.deliveryFee||0);
+    var grandTotal  = subtotal+deliveryFee;
+    var pay = (o.payment||'').toUpperCase();
+    var qrPath='';
+    if(qrOn){
+      if(pay.includes('ABA'))     qrPath='../images/qr/ABA.png';
+      else if(pay.includes('AC')) qrPath='../images/qr/AC.png';
+    }
+    var dName=o.deliveryName||'';
+    if(dName.trim().toLowerCase()==='delivery') dName='-';
+    var rNo = (startNo !== null && !isNaN(startNo)) ? String(startNo + i) : '';
+    return {
+      title:'វិក្កយបត្រ', paperWidth:'80mm',
+      customer:o.customer||'', phone:o.phone||'',
+      address:((o.addressDetail||o.address||'')?(o.addressDetail||o.address||'')+' ៖ ':'')+( o.province||''),
+      date:fmtDisplay(o.date)||'', deliveryName:dName||'-',
+      note:o.note||'-', page:o.page||o.pages||'',
+      closeBy:o.closeBy||o.closeby||'', payment:o.payment||'',
+      servicePhone:'015 58 68 78 / 089 58 68 78',
+      qrImage:qrPath,
+      qrLabel:pay.includes('ABA')?'ABA':pay.includes('AC')?'AC':(o.payment||''),
+      accountName:'CHEA CHANROTHA', receiptNo:rNo,
+      items:prods.map(function(p){
+        return {product:p.name||'',qty:Number(p.qty||1),price:Number(p.price||0),
+          discount:Number(p.discount||0),
+          subtotal:Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0)};
+      }),
+      subtotal:subtotal, deliveryFee:deliveryFee,
+      grandTotal:grandTotal, grandRiel:Math.round(grandTotal*rielRate)
+    };
+  });
+
+  ReceiptPrinter.printBatch(allData);
+}
+
+function markStatus(status){
+  if(_sel.size===0){ alert('Please select orders first'); return; }
+  _sel.forEach(function(id){ var o=_orders.find(function(x){return String(x.id)===id;}); if(o){o.status=status;o.orderStatus=status;} });
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(_orders)); }catch(e){}
+  render();
+}
+
+/* ── Share IMG (using ShareReceipt.js) ── */
+function shareImg(){
+  var src = getSrc();
+  if(!src.length){ alert('⚠️ សូមជ្រើសរើស order មុន'); return; }
+  if(typeof ShareReceipt === 'undefined'){ alert('❌ ShareReceipt not loaded'); return; }
+
+  var o = src[0]; // share first selected order
+  var prods = getProds(o);
+  var subtotal = prods.reduce(function(s,p){
+    return s + Number(p.qty||0)*Number(p.price||0) - Number(p.discount||0);
+  }, 0);
+  var deliveryFee = Number(o.deliveryFee||0);
+  var grandTotal  = subtotal + deliveryFee;
+  var payMethod   = (o.payment||'').toUpperCase();
+
+  // QR: only show if _qrOn is true
+  var qrPath = '';
+  if(_qrOn){
+    if(payMethod.includes('ABA'))     qrPath = '../images/qr/ABA.png';
+    else if(payMethod.includes('AC')) qrPath = '../images/qr/AC.png';
+  }
+
+  // Receipt number: only use if user typed something
+  var receiptNo = (document.getElementById('olReceiptNo')?.value || '').trim();
+
+  var data = {
+    title:        'វិក្កយបត្រ',
+    date:         fmtDisplay(o.date) || '',
+    customer:     o.customer      || '',
+    phone:        o.phone         || '',
+    address:      ((o.addressDetail||o.address||'') ? (o.addressDetail||o.address||'') + ' ៖ ' : '') + (o.province||''),
+    deliveryName: (function(){
+      var v = o.deliveryName || o.delivery || o.DeliveryName || o['Delivery Name'] || '';
+      // Skip if value is just the column header "Delivery"
+      if(v.trim().toLowerCase() === 'delivery') return '-';
+      return v || '-';
+    })(),
+    note:         o.note          || '-',
+    page:         o.page || o.pages || '',
+    closeBy:      o.closeBy || o.closeby || '',
+    payment:      o.payment       || '',
+    servicePhone: '015 58 68 78 / 089 58 68 78',
+    qrImage:      qrPath,
+    qrLabel:      payMethod.includes('ABA') ? 'ABA' : payMethod.includes('AC') ? 'AC' : (o.payment||''),
+    accountName:  'CHEA CHANROTHA',
+    receiptNo:    receiptNo, // blank = not shown in receipt
+    items: prods.map(function(p){
+      return {
+        product:  p.name || '',
+        qty:      Number(p.qty||1),
+        price:    Number(p.price||0),
+        discount: Number(p.discount||0),
+        subtotal: Number(p.qty||0)*Number(p.price||0) - Number(p.discount||0)
+      };
+    }),
+    subtotal:    subtotal,
+    deliveryFee: deliveryFee,
+    grandTotal:  grandTotal,
+    grandRiel:   Math.round(grandTotal * 4100)
+  };
+
+  if(typeof html2canvas !== 'function'){
+    alert('❌ html2canvas មិនទាន់ load ទេ។ សូម Reload ទំព័រហើយព្យាយាមម្តងទៀត។');
+    return;
+  }
+
+  var target = document.getElementById('olPrintArea');
+  if(!target){
+    alert('❌ Print area មិនមានទេ (olPrintArea)');
+    return;
+  }
+
+  // Show loading toast
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#60a5fa;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4)';
+  toast.textContent = '⏳ កំពុង Generate រូបភាព...';
+  document.body.appendChild(toast);
+
+  ShareReceipt.share(data, {
+    target:   target,
+    fileName: 'receipt-' + (o.customer||'order').replace(/\s+/g,'_') + '.png',
+    title:    'វិក្កយបត្រ — ' + (o.customer||''),
+    text:     'Order from CAMBO MINI'
+  }).then(function(result){
+    toast.remove();
+    var t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#4ade80;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4)';
+    t.textContent = result.mode==='share' ? '✅ Share បានហើយ!' : '✅ រូបបាន Download!';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 2500);
+  }).catch(function(err){
+    toast.remove();
+    alert('❌ Share មានបញ្ហា:\n' + (err && err.message ? err.message : String(err)));
+  });
+}
+
+/* ══════════ DRAWER — View + Edit Order ══════════ */
+var _drawerOrderId = null;
+var _editMode = false;
+
+function olOpenDrawer(id){
+  var o = _orders.find(function(x){ return String(x.id)===String(id); });
+  if(!o) return;
+  _drawerOrderId = String(id);
+  _editMode = false;
+
+  var drawer  = $id('olDrawer');
+  var overlay = $id('olOverlay');
+  var foot    = $id('olDrFoot');
+  var editBtn = $id('olDrEditBtn');
+
+  if(drawer)  { drawer.style.display  = 'flex'; }
+  if(overlay) { overlay.style.display = 'block'; }
+  if(foot)    { foot.style.display    = 'flex'; }  // always show footer
+  if(editBtn) { editBtn.textContent   = '✏️ Edit'; }
+  // Hide save/cancel in view mode
+  var saveBtn   = $id('olDrSaveBtn');
+  var cancelBtn = $id('olDrCancelBtn');
+  if(saveBtn)   saveBtn.style.display   = 'none';
+  if(cancelBtn) cancelBtn.style.display = 'none';
+
+  $id('olDrTitle').textContent = o.customer || 'Order Detail';
+  renderDrawerView(o);
+  document.body.style.overflow = 'hidden';
+}
+
+function olCloseDrawer(){
+  $id('olDrawer').style.display  = 'none';
+  $id('olOverlay').style.display = 'none';
+  document.body.style.overflow   = '';
+  _drawerOrderId = null; _editMode = false;
+}
+
+function olToggleEdit(){
+  if(!_drawerOrderId) return;
+  var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
+  if(!o) return;
+  _editMode = !_editMode;
+  var foot   = $id('olDrFoot');
+  var editBtn = $id('olDrEditBtn');
+  foot.style.display   = _editMode ? 'flex' : 'none';
+  editBtn.textContent  = _editMode ? '👁 View' : '✏️ Edit';
+  _editMode ? renderDrawerEdit(o) : renderDrawerView(o);
+  // Show/hide save+cancel in footer
+  var saveBtn   = $id('olDrSaveBtn');
+  var cancelBtn = $id('olDrCancelBtn');
+  if(saveBtn)   saveBtn.style.display   = _editMode ? 'block' : 'none';
+  if(cancelBtn) cancelBtn.style.display = _editMode ? 'block' : 'none';
+}
+
+function olCancelEdit(){
+  _editMode = false;
+  var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
+  if(o) renderDrawerView(o);
+  var saveBtn   = $id('olDrSaveBtn');
+  var cancelBtn = $id('olDrCancelBtn');
+  if(saveBtn)   saveBtn.style.display   = 'none';
+  if(cancelBtn) cancelBtn.style.display = 'none';
+  $id('olDrEditBtn').textContent = '✏️ Edit';
+}
+
+function olSaveEdit(){
+  var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
+  if(!o) return;
+
+  // Read edited values
+  o.customer     = $id('drCustomer')?.value    || o.customer;
+  o.phone        = $id('drPhone')?.value       || o.phone;
+  o.province     = $id('drProvince')?.value    || o.province;
+  var _addr = $id('drAddress')?.value || '';
+  o.addressDetail = _addr || o.addressDetail;
+  o.address       = _addr || o.address;
+  o.deliveryName = $id('drDelivery')?.value    || o.deliveryName;
+  o.deliveryFee  = Number($id('drDeliveryFee')?.value||0);
+  o.payment      = $id('drPayment')?.value     || o.payment;
+  o.status       = $id('drStatus')?.value      || o.status;
+  o.note         = $id('drNote')?.value        || '';
+  o.page         = $id('drPage')?.value        || o.page;
+  o.closeBy      = $id('drCloseBy')?.value     || o.closeBy;
+  o.priority     = $id('drPriority')?.value    || o.priority;
+
+  // Read products from edit rows — use #drProdList direct children to avoid duplicates
+  var prodList = document.getElementById('drProdList');
+  if(prodList){
+    var newProds = [];
+    // Get only direct children that have dr-prod-name input
+    Array.from(prodList.children).forEach(function(row){
+      var nameEl = row.querySelector('.dr-prod-name');
+      if(!nameEl) return;
+      var name = nameEl.value.trim();
+      var qty  = Number(row.querySelector('.dr-prod-qty')?.value||1);
+      var price= Number(row.querySelector('.dr-prod-price')?.value||0);
+      var disc = Number(row.querySelector('.dr-prod-disc')?.value||0);
+      if(name) newProds.push({name:name, qty:qty, price:price, discount:disc});
+    });
+    if(newProds.length) o.products = newProds;
+  }
+
+  // 1. Save to localStorage immediately
+  try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); } catch(e){}
+
+  // 2. Update UI right away
+  render();
+  olCancelEdit();
+  $id('olDrTitle').textContent = o.customer || 'Order Detail';
+  renderDrawerView(o);
+  $id('olDrFoot').style.display = 'none';
+
+  // 3. Show saving toast
+  function showToast(msg, color){
+    var t=document.createElement('div');
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:'+color+';padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;border-left:3px solid '+color+';box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .3s';
+    t.textContent=msg; document.body.appendChild(t);
+    setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove();},300);},2500);
+  }
+  showToast('⏳ កំពុង Save...', '#60a5fa');
+
+  // 4. Sync to Google Sheet
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify({action: 'update', orderId: o.id, order: o})
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(data){
+    if(data && data.ok === false){
+      showToast('⚠️ Save local ✓ | Sheet: ' + (data.message||'Error'), '#f59e0b');
+    } else {
+      showToast('✅ Save បានជោគជ័យ!', '#4ade80');
+    }
+  })
+  .catch(function(){
+    // Google Sheet failed but localStorage already saved
+    showToast('✅ Saved locally (Sheet offline)', '#fbbf24');
+  });
+}
+
+/* ── View mode ── */
+function renderDrawerView(o){
+  var total = orderTotal(o);
+  var prods = getProds(o);
+  $id('olDrBody').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:16px">'
+
+    // Customer info card
+    +'<div style="background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);border-radius:12px;padding:14px">'
+    +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">👤 ព័ត៌មានអតិថិជន</div>'
+    +drRow('ឈ្មោះ', o.customer||'—')
+    +drRow('ទូរស័ព្ទ', '<span style="color:#60a5fa">'+esc(o.phone||'—')+'</span>')
+    +drRow('អាសយដ្ឋាន', (o.addressDetail||o.address||'')||'—')
+    +drRow('ខេត្ត/ក្រុង', o.province||'—')
+    +drRow('ថ្ងៃ/ម៉ោង', (function(){
+      var d=o.date; if(!d) return '—';
+      // Try parse as ISO or DD/MM/YYYY
+      var dt = new Date(d);
+      if(isNaN(dt)) return fmtDisplay(d)||'—';
+      var dd=String(dt.getDate()).padStart(2,'0');
+      var mm=String(dt.getMonth()+1).padStart(2,'0');
+      var yy=dt.getFullYear();
+      var hh=String(dt.getHours()).padStart(2,'0');
+      var mi=String(dt.getMinutes()).padStart(2,'0');
+      // Only show time if hours/minutes are not zero
+      if(hh==='00'&&mi==='00') return dd+'/'+mm+'/'+yy;
+      return dd+'/'+mm+'/'+yy+' '+hh+':'+mi;
+    })())
+    +drRow('ដឹកជញ្ជូន', o.deliveryName||'—')
+    +drRow('ថ្លៃដឹក', o.deliveryFee ? '$'+Number(o.deliveryFee).toFixed(2) : 'ហ្វ្រីដឹក')
+    +drRow('Payment', o.payment||'—')
+    +drRow('Pages', o.page||o.pages||'—')
+    +drRow('CloseBy', o.closeBy||o.closeby||'—')
+    +drRow('Priority', o.priority||'Medium')
+    +drRow('Status', '<span style="background:rgba(245,158,11,.15);color:#fbbf24;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">'+esc(o.status||o.orderStatus||'Pending')+'</span>')
+    +(o.note ? drRow('Note', '<span style="color:#f87171">'+esc(o.note)+'</span>') : '')
+    +'</div>'
+
+    // Products card
+    +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:12px;padding:14px">'
+    +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">🛍️ ផលិតផល</div>'
+    +'<div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 12px;font-size:12px">'
+    +'<span style="color:#64748b;font-weight:700;padding-bottom:6px;border-bottom:1px solid rgba(148,163,200,.1)">ឈ្មោះ</span>'
+    +'<span style="color:#64748b;font-weight:700;text-align:center;padding-bottom:6px;border-bottom:1px solid rgba(148,163,200,.1)">ចំ</span>'
+    +'<span style="color:#64748b;font-weight:700;text-align:right;padding-bottom:6px;border-bottom:1px solid rgba(148,163,200,.1)">តម្លៃ</span>'
+    +'<span style="color:#64748b;font-weight:700;text-align:right;padding-bottom:6px;border-bottom:1px solid rgba(148,163,200,.1)">សរុប</span>'
+    +prods.map(function(p){
+      var sub=Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0);
+      return '<span style="color:#e2e8f0;padding:5px 0;border-bottom:1px solid rgba(148,163,200,.06)">'+esc(p.name||'')+'</span>'
+        +'<span style="text-align:center;color:#94a3b8;border-bottom:1px solid rgba(148,163,200,.06)">'+p.qty+'</span>'
+        +'<span style="text-align:right;color:#94a3b8;border-bottom:1px solid rgba(148,163,200,.06)">$'+Number(p.price||0).toFixed(2)+'</span>'
+        +'<span style="text-align:right;color:#7dd3fc;font-weight:700;border-bottom:1px solid rgba(148,163,200,.06)">$'+sub.toFixed(2)+'</span>';
+    }).join('')
+    +'</div>'
+    +'<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:2px solid rgba(148,163,200,.12);font-size:15px;font-weight:800">'
+    +'<span style="color:#94a3b8">Grand Total</span>'
+    +'<span style="color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+total.toFixed(2)+'</span>'
+    +'</div>'
+    +'</div>'
+    +'</div>';
+}
+
+function drRow(label, value){
+  return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
+    +'<span class="dr-label" style="color:#64748b">'+label+'</span>'
+    +'<span style="color:'+themeVal('#e2e8f0','#0f172a')+';font-weight:600;text-align:left;word-break:break-word">'+value+'</span>'
+    +'</div>';
+}
+
+/* ── Edit mode (same layout as view, just inputs instead of text) ── */
+function renderDrawerEdit(o){
+  var inputStyle = 'width:100%;height:30px;padding:0 8px;border-radius:6px;border:1px solid rgba(148,163,200,.25);background:rgba(255,255,255,.06);color:'+themeVal('#e2e8f0','#0f172a')+';font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:600';
+  function rowInp(id, val, label, type){
+    type = type||'text';
+    return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
+      +'<span style="color:#64748b">'+label+'</span>'
+      +'<input id="'+id+'" type="'+type+'" value="'+esc(val||'')+'" style="'+inputStyle+'">'
+      +'</div>';
+  }
+  function rowSel(id, val, label, opts){
+    return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
+      +'<span style="color:#64748b">'+label+'</span>'
+      +'<select id="'+id+'" style="'+inputStyle+'">'
+      +opts.map(function(op){ return '<option value="'+op+'" '+(op===val?'selected':'')+'>'+op+'</option>'; }).join('')
+      +'</select></div>';
+  }
+  function rowTx(id, val, label){
+    return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
+      +'<span style="color:#64748b;padding-top:5px">'+label+'</span>'
+      +'<textarea id="'+id+'" rows="2" style="'+inputStyle+';height:auto;padding:6px 8px;resize:vertical">'+esc(val||'')+'</textarea>'
+      +'</div>';
+  }
+
+  $id('olDrBody').innerHTML =
+    '<div style="font-size:13px;font-weight:700;color:#8b5cf6;padding:8px 0;display:flex;align-items:center;gap:6px">👤 ព័ត៌មានអតិថិជន</div>'
+    +rowInp('drCustomer',   o.customer||'',     'ឈ្មោះ')
+    +rowInp('drPhone',      o.phone||'',        'ទូរស័ព្ទ')
+    +rowInp('drAddress',    (o.addressDetail||o.address||'')||'','អាសយដ្ឋាន')
+    +rowInp('drProvince',   o.province||'',     'ខេត្ត/ក្រុង')
+    +rowInp('drDate',       (o.date||'').replace('Z','').slice(0,16), 'ថ្ងៃ/ម៉ោង', 'datetime-local')
+    +rowInp('drDelivery',   (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:''), 'ដឹកជញ្ជូន')
+    +rowInp('drDeliveryFee',o.deliveryFee||0,   'ថ្លៃដឹក', 'number')
+    +rowInp('drPayment',    o.payment||'',      'Payment')
+    +rowInp('drPage',       o.page||o.pages||'','Pages')
+    +rowInp('drCloseBy',    o.closeBy||o.closeby||'','CloseBy')
+    +rowSel('drPriority',   o.priority||'Medium','Priority',['High','Medium','Low'])
+    +rowSel('drStatus',     o.status||o.orderStatus||'Pending','Status',['Pending','Delivered','Cancelled'])
+    +rowTx ('drNote',       o.note||'',         'Note')
+
+    // Products editor section
+    +'<div style="margin-top:16px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+    +'<span style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase">🛍️ ផលិតផល</span>'
+    +'<button onclick="olAddProdRow()" type="button" style="height:28px;padding:0 12px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>'
+    +'</div>'
+    // Header
+    +'<div style="display:grid;grid-template-columns:1fr 60px 70px 60px 32px;gap:6px;margin-bottom:6px;font-size:10px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase">'
+    +'<span>ឈ្មោះ</span><span style="text-align:center">ចំនួន</span><span style="text-align:center">តម្លៃ</span><span style="text-align:center">បញ្ចុះ</span><span></span>'
+    +'</div>'
+    +'<div id="drProdList">'
+    +getProds(o).map(function(p,i){
+      return drProdRow(p.name||'', p.qty||1, p.price||0, p.discount||0);
+    }).join('')
+    +'</div>'
+    +'</div>';
+
+  // Re-bind remove buttons after render
+  setTimeout(function(){
+    document.querySelectorAll('.dr-prod-remove').forEach(function(btn){
+      btn.addEventListener('click', function(){ btn.closest('.dr-prod-row').remove(); });
+    });
+  }, 0);
+}
+
+/* Expose to window for inline onclick */
+window.olCloseDrawer = olCloseDrawer;
+
+/* ── Drawer QR toggle ── */
+var _drQrOn = true;
+window.olDrToggleQr = function(){
+  _drQrOn = !_drQrOn;
+  var btn = $id('olDrQrBtn');
+  if(!btn) return;
+  btn.innerHTML  = 'QR Code<br>' + (_drQrOn ? 'ON' : 'OFF');
+  btn.style.borderColor  = _drQrOn ? 'rgba(34,197,94,.3)'  : 'rgba(239,68,68,.3)';
+  btn.style.background   = _drQrOn ? 'rgba(34,197,94,.1)'  : 'rgba(239,68,68,.1)';
+  btn.style.color        = _drQrOn ? '#4ade80'              : '#f87171';
+};
+
+/* ── Drawer Delete ── */
+window.olDeleteOrder = function(){
+  if(!_drawerOrderId) return;
+  var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
+  if(!o) return;
+  if(!confirm('លុប Order របស់ '+o.customer+'?')) return;
+  // 1. Remove from local
+  _orders = _orders.filter(function(x){ return String(x.id)!==_drawerOrderId; });
+  try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); }catch(e){}
+  olCloseDrawer();
+  render();
+  // 2. Sync delete to Google Sheet
+  fetch(SCRIPT_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action:'delete', orderId: o.id})
+  }).then(function(r){ return r.json(); })
+  .then(function(d){
+    if(d && d.ok === false) console.warn('Sheet delete failed:', d.message);
+  }).catch(function(e){ console.warn('Sheet delete error:', e); });
+};
+
+/* ── Drawer Copy Text (Receipt) ── */
+
+
+/* ── Drawer Share IMG ── */
+window.olDrShare = function(){
+  if(!_drawerOrderId) return;
+  // Set _qrOn from drawer toggle
+  _qrOn = _drQrOn;
+  // Set receipt no from drawer input
+  var rno = $id('olDrReceiptNo')?.value || '';
+  // Temporarily override olReceiptNo
+  var fake = document.createElement('input');
+  fake.id = 'olReceiptNo'; fake.value = rno; fake.style.display='none';
+  document.body.appendChild(fake);
+  // Select this order
+  var prev = new Set(_sel);
+  _sel.clear(); _sel.add(_drawerOrderId);
+  shareImg();
+  // Restore
+  setTimeout(function(){ _sel = prev; fake.remove(); }, 100);
+};
+
+/* ── Drawer Print ── */
+window.olDrPrint = function(){
+  if(!_drawerOrderId) return;
+  _qrOn = _drQrOn;
+  var rno = $id('olDrReceiptNo')?.value || '';
+  var fake = document.createElement('input');
+  fake.id = 'olReceiptNo'; fake.value = rno; fake.style.display='none';
+  document.body.appendChild(fake);
+  var prev = new Set(_sel);
+  _sel.clear(); _sel.add(_drawerOrderId);
+  printSelected();
+  setTimeout(function(){ _sel = prev; fake.remove(); }, 100);
+};
+window.olAddProdRow  = function(){
+  var list = $id('drProdList'); if(!list) return;
+  var div = document.createElement('div');
+  div.className = 'dr-prod-row';
+  div.innerHTML = drProdRow('',1,0,0);
+  list.appendChild(div);
+  div.querySelector('.dr-prod-remove')?.addEventListener('click', function(){ div.remove(); });
+};
+
+function drProdRow(name, qty, price, disc){
+  var s = 'height:32px;padding:0 8px;border-radius:7px;border:1px solid rgba(148,163,200,.2);background:rgba(255,255,255,.08);color:#e2e8f0;font-size:12px;font-family:inherit;outline:none;width:100%;box-sizing:border-box';
+  return '<div class="dr-prod-row" style="display:grid;grid-template-columns:1fr 60px 70px 60px 32px;gap:6px;margin-bottom:6px;align-items:center">'
+    +'<input class="dr-prod-name"  type="text"   value="'+esc(name)+'"  placeholder="ឈ្មោះផលិតផល" style="'+s+'">'
+    +'<input class="dr-prod-qty"   type="number" value="'+qty+'"         min="1"  style="'+s+';text-align:center">'
+    +'<input class="dr-prod-price" type="number" value="'+price+'"       min="0" step="0.01" style="'+s+';text-align:center">'
+    +'<input class="dr-prod-disc"  type="number" value="'+disc+'"        min="0" step="0.01" style="'+s+';text-align:center">'
+    +'<button class="dr-prod-remove" type="button" style="width:28px;height:28px;border-radius:7px;border:none;background:rgba(239,68,68,.15);color:#f87171;font-size:14px;cursor:pointer;flex-shrink:0">✕</button>'
+    +'</div>';
+}
+window.olToggleEdit  = olToggleEdit;
+window.olCancelEdit  = olCancelEdit;
+window.olSaveEdit    = olSaveEdit;
+
+/* ── INIT ── */
+function normalizeDeliveryName(raw){
+  if(!raw) return '';
+  var r = raw.trim();
+  var lo = r.toLowerCase().replace(/\s+/g,'');
+  // J&T
+  if(/j[&+]t|jnt/i.test(lo)||lo==='jandt') return 'J&T';
+  // DRSB
+  if(/d[rn]s[bp]/i.test(r)) return 'DRSB';
+  // វិរៈ ប៊ុនថាំ
+  if(/vireak|buntham/i.test(r)||r.indexOf('វិរ')===0||r.indexOf('វីរ')===0||r.indexOf('វ឵រ')===0) return 'វិរៈ ប៊ុនថាំ';
+  // ភ្នំពេញ តាធំ
+  if(/តាធំ/.test(r)||/tathom|ta thom/i.test(r)) return 'ភ្នំពេញ តាធំ';
+  // ភ្នំពេញ តាតូច
+  if(/តាតូច/.test(r)||/tatoch|ta toch/i.test(r)) return 'ភ្នំពេញ តាតូច';
+  // ដឹកខ្លួនឯង
+  if(/ដឹកខ្លួន|ខ្លួនអើង|self|pickup/i.test(r)) return 'ដឹកខ្លួនឯង';
+  return '';
+}
+
+function populateFilterOptions(){
+  // Province: only 2 groups
+  var provEl = $id('olProvince');
+  if(provEl){
+    var cur = provEl.value;
+    var hasPP = _orders.some(function(o){ return (o.province||'').trim()==='រាជធានីភ្នំពេញ'; });
+    var hasOther = _orders.some(function(o){ var p=(o.province||'').trim(); return p && p!=='រាជធានីភ្នំពេញ'; });
+    var opts = '<option value="">All</option>';
+    if(hasPP)    opts += '<option'+(cur==='រាជធានីភ្នំពេញ'?' selected':'')+'>រាជធានីភ្នំពេញ</option>';
+    if(hasOther) opts += '<option'+(cur==='ខេត្ត'?' selected':'')+'>ខេត្ត</option>';
+    provEl.innerHTML = opts;
+  }
+  // Delivery: keep static HTML options (J&T, DRSB, វិរៈ ប៊ុនថាំ, ភ្នំពេញ តាធំ, ភ្នំពេញ តាតូច, ដឹកខ្លួនឯង)
+  // Do NOT overwrite — HTML already has correct options
+}
+
+async function init(){
+  var r = getPreset('today');
+  _date = {preset:'today', start:r.start, end:r.end, label:r.label};
+  updateDateBtn();
+
+  _orders = await loadOrders();
+  // Auto-populate filter dropdowns from loaded data
+  populateFilterOptions();
+
+  // Show actual filtered data (no auto-switch).
+  // Default preset = Today. User can manually switch via filter button.
+  render();
+
+  /* Search */
+  $id('olSearch')?.addEventListener('input', function(e){ _q=e.target.value.trim().toLowerCase(); render(); });
+
+  /* Select all */
+  $id('olChkAll')?.addEventListener('change', function(e){
+    var rows = getFiltered();
+    rows.forEach(function(o){
+      e.target.checked ? _sel.add(String(o.id)) : _sel.delete(String(o.id));
+    });
+    render(); // re-render to show checked state on all rows
+  });
+
+  /* Sort */
+  document.querySelectorAll('.ol-sortable').forEach(function(th){
+    th.addEventListener('click', function(){
+      var col = th.dataset.col;
+      _sort.dir = (_sort.col===col && _sort.dir==='asc') ? 'desc' : 'asc';
+      _sort.col = col;
+      // Reset all arrows
+      document.querySelectorAll('.ol-arr').forEach(function(a){ a.className='ol-arr'; });
+      // Set active arrow
+      var arr = document.getElementById('arr-'+col);
+      if(arr) arr.className = 'ol-arr ' + _sort.dir;
+      render();
+    });
+  });
+
+  /* ── FILTER button ── */
+  $id('olFilterBtn')?.addEventListener('click', function(e){
+    e.stopPropagation();
+    var d=$id('olFilterDropdown'); if(!d) return;
+    var opening = !d.classList.contains('open');
+    document.querySelectorAll('.ol-dropdown.open').forEach(function(x){x.classList.remove('open');});
+    if(opening) d.classList.add('open');
+  });
+
+  /* Filter selects */
+  $id('olClearFilter')?.addEventListener('click', function(e){
+    e.stopPropagation();
+    ['olDelivery','olProvince','olStatus','olPages','olPriority','olCloseBy'].forEach(function(id){ var el=$id(id); if(el) el.value=''; });
+    _f={}; $id('olFilterDot')?.classList.remove('show'); render();
+  });
+  ['olDelivery','olProvince','olStatus','olPages','olPriority','olCloseBy'].forEach(function(id){
+    $id(id)?.addEventListener('change', function(){
+      _f.delivery=$id('olDelivery')?.value||'';
+      _f.province=$id('olProvince')?.value||'';
+      _f.status  =$id('olStatus')?.value  ||'';
+      _f.pages   =$id('olPages')?.value   ||'';
+      _f.priority=$id('olPriority')?.value||'';
+      _f.closeBy =$id('olCloseBy')?.value ||'';
+      var any=Object.values(_f).some(function(v){return !!v;});
+      $id('olFilterDot')?.classList.toggle('show', any);
+      render();
+    });
+  });
+
+  /* ── DATE button ── */
+  $id('olDateBtn')?.addEventListener('click', function(e){
+    e.stopPropagation();
+    var d=$id('olDatePop'); if(!d) return;
+    var opening = !d.classList.contains('open');
+    document.querySelectorAll('.ol-dropdown.open').forEach(function(x){x.classList.remove('open');});
+    if(opening) d.classList.add('open');
+  });
+  document.querySelectorAll('#olDatePop [data-p]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var r=getPreset(btn.dataset.p);
+      _date={preset:btn.dataset.p,start:r.start,end:r.end,label:r.label};
+      updateDateBtn(); render();
+      $id('olDatePop')?.classList.remove('open');
+    });
+  });
+  $id('olDApply')?.addEventListener('click', function(e){
+    e.stopPropagation();
+    var s=$id('olDs')?.value, en=$id('olDe')?.value;
+    if(!s&&!en) return;
+    _date={preset:'custom',start:s||en,end:en||s,label:'Custom'};
+    updateDateBtn(); render();
+    $id('olDatePop')?.classList.remove('open');
+  });
+
+  /* ── ACTIONS button ── */
+  $id('olActBtn')?.addEventListener('click', function(e){
+    e.stopPropagation();
+    var d=$id('olActDrop'); if(!d) return;
+    var opening = !d.classList.contains('open');
+    document.querySelectorAll('.ol-dropdown.open').forEach(function(x){x.classList.remove('open');});
+    if(opening) d.classList.add('open');
+  });
+  $id('olActDrop')?.addEventListener('click', function(e){
+    var btn=e.target.closest('[data-a]'); if(!btn) return;
+    var a=btn.dataset.a;
+    if(a==='qrtoggle'){
+      _qrOn = !_qrOn;
+      var qBtn = document.getElementById('olQrToggle');
+      if(qBtn){
+        qBtn.textContent = _qrOn ? 'QR Code: ON' : 'QR Code: OFF';
+        qBtn.style.borderColor   = _qrOn ? 'rgba(34,197,94,.3)'   : 'rgba(239,68,68,.3)';
+        qBtn.style.background    = _qrOn ? 'rgba(34,197,94,.12)'  : 'rgba(239,68,68,.1)';
+        qBtn.style.color         = _qrOn ? '#4ade80'              : '#f87171';
+      }
+      return; // don't close panel
+    }
+    if(a==='shareimg') shareImg();
+    if(a==='export')   exportCSV();
+    if(a==='printall') printTable();
+    if(a==='printsel') printSelected();
+    if(a==='reportdelivery') reportDelivery();
+    if(a==='markdel')  markStatus('Delivered');
+    if(a==='markpend') markStatus('Pending');
+    $id('olActDrop')?.classList.remove('open');
+  });
+
+  /* Close all on outside click */
+  document.addEventListener('click', function(){
+    document.querySelectorAll('.ol-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+  });
+  document.querySelectorAll('.ol-dropdown').forEach(function(d){
+    d.addEventListener('click', function(e){ e.stopPropagation(); });
+  });
+}
+
+/* ── Report Delivery ── */
+function reportDelivery(){
+  var src = getSrc();
+  if(!src.length){ alert('⚠️ មិនមានទិន្នន័យ'); return; }
+  if(typeof window.CamboDeliveryReport === 'undefined'){
+    alert('\u274c CamboDeliveryReport not loaded'); return;
+  }
+  var rows = src.map(function(o){
+    var prods = getProds(o).map(function(p){
+      return (p.name||'') + (p.qty && p.qty>1 ? ' x'+p.qty : '');
+    }).join(', ');
+    var total = getProds(o).reduce(function(s,p){
+      return s + Number(p.qty||1)*Number(p.price||0) - Number(p.discount||0);
+    },0) + Number(o.deliveryFee||0);
+    return {
+      id:    o.id || '',
+      name:  o.customer || '',
+      phone: o.phone || '',
+      addr:  (o.addressDetail||o.address||'') || o.detailAddress || o.address || o.province || '-',
+      prod:  prods,
+      amt:   total,
+      st:    o.status || o.orderStatus || '',
+      date:  o.date || '',
+      deliveryName: o.deliveryName || ''
+    };
+  });
+  var dName = src.map(function(o){ return (o.deliveryName||'').trim(); }).filter(Boolean)[0] || 'ភ្នំពេញ';
+  window.CamboDeliveryReport.exportRows(rows, { exchangeRate: 4100, title: dName });
+}
+
+/* ── Drawer Copy Text (Receipt format) ── */
+window.olDrCopyText = function(){
+  if(!_drawerOrderId) return;
+  var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
+  if(!o) return;
+
+  // Support both o.items (new format) and o.products (old/sheet format)
+  var rawLines = Array.isArray(o.items) && o.items.length ? o.items
+               : Array.isArray(o.products) && o.products.length ? o.products
+               : [];
+
+  var total    = orderTotal(o);
+  var subtotal = rawLines.reduce(function(s,p){
+    return s + Number(p.qty||0)*Number(p.price||0) - Number(p.discount||0);
+  }, 0);
+  var dp = (o.date||'').slice(0,10).split('-');
+  var dateStr = dp.length===3 ? dp[2]+'/'+dp[1]+'/'+dp[0] : (o.date||'-');
+
+  function showCopyToast(){
+    var t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#4ade80;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4)';
+    t.textContent = '✅ Copy Text បានហើយ!';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 2000);
+  }
+  function fallbackCopy(txt){
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+
+  // Use CopyReceipt module if available, otherwise fall back to inline
+  if(window.CopyReceipt){
+    var mappedItems = rawLines.map(function(p){
+      var qty   = Number(p.qty||1);
+      var price = Number(p.price||0);
+      var disc  = Number(p.discount||0);
+      return { product: p.name||p.product||'', qty: qty, price: price, subtotal: qty*price-disc };
+    });
+    window.CopyReceipt.copy({
+      date:         dateStr,
+      customer:     o.customer||'-',
+      phone:        o.phone||'-',
+      address:      o.addressDetail||o.address||o.province||'-',
+      deliveryName: o.deliveryName||'-',
+      note:         o.note||'-',
+      page:         o.page||'-',
+      closeBy:      o.closeBy||'-',
+      payment:      o.payment||'-',
+      items:        mappedItems,
+      subtotal:     subtotal,
+      deliveryFee:  Number(o.deliveryFee||0),
+      grandTotal:   total,
+      grandRiel:    Math.round(total * (window.KHR_RATE||4100))
+    }).then(showCopyToast).catch(showCopyToast);
+  } else {
+    var dot  = '................................................';
+    var fee  = Number(o.deliveryFee||0);
+    var riel = Math.round(total*(window.KHR_RATE||4100)).toLocaleString();
+    var prods = rawLines.map(function(p,i){
+      var qty=Number(p.qty||1),price=Number(p.price||0),disc=Number(p.discount||0);
+      return (i+1)+'. '+(p.name||p.product||'')+'\n   ចំនួន '+qty+' ឈុត x $'+price+'      = $'+(qty*price-disc);
+    }).join('\n');
+    var text = [
+      '🧾 វិក័យប័ត្រ 📅 '+dateStr, dot,
+      '👤 ឈ្មោះ:\t'+(o.customer||'-'),
+      '📞 លេខទូរសព្ទ:\t'+(o.phone||'-'),
+      '📍 ទីតាំង:\t'+(o.addressDetail||o.address||o.province||'-'),
+      '🚚 អ្នកដឹកជញ្ជូន:\t'+(o.deliveryName||'-'),
+      '📝 Note:\t\t'+(o.note||'-'), dot,
+      '📦 ផលិតផល:', dot, prods, dot,
+      '💵 សរុបទំនិញ: $'+subtotal,
+      '🚛 សេវាដឹក: '+(fee>0?'$'+fee:'ហ្វ្រីដឹក'),
+      '💳 ការទូទាត់: '+(o.payment||'-'),
+      '💰 តម្លៃសរុប: $'+total,
+      '🇰🇭 ប្រាក់រៀល: '+riel+'៛', dot,
+      '📄 Page: '+(o.page||'-')+' | CloseBy: '+(o.closeBy||'-'),
+      '☎️ លេខបម្រើអតិថិជន: 015 58 68 78 / 089 58 68 78', dot
+    ].join('\n');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(showCopyToast).catch(function(){ fallbackCopy(text); showCopyToast(); });
+    } else { fallbackCopy(text); showCopyToast(); }
+  }
+};
+
+document.addEventListener('DOMContentLoaded', init);
+})();
+
+/* ── Responsive: Mobile Card View ── */
+(function(){
+  var _origRender = window._olRenderCards;
+  var _renderCards = function(rows){
+    var cardList = document.getElementById('olCardList');
+    if(!cardList) return;
+    if(!rows || !rows.length){ cardList.innerHTML=''; return; }
+    cardList.innerHTML = rows.map(function(o, idx){
+      var total = orderTotal(o);
+      var prods = getProds(o).map(function(p){
+        return (p.name||'')+(p.qty>1?' x'+p.qty:'');
+      }).join(' / ');
+      var th = typeof fmtDisplay==='function' ? fmtDisplay(o.date) : (o.date||'-');
+      return '<div class="ol-card" data-id="'+o.id+'">'
+        +'<div class="ol-card-top">'
+          +'<span class="ol-card-num">#'+(idx+1)+'</span>'
+          +'<span class="ol-card-name">'+(o.customer||'—')+'</span>'
+          +'<span class="ol-card-total">$'+total.toFixed(2)+'</span>'
+        +'</div>'
+        +'<div class="ol-card-meta">'
+          +'<span>'+th+'</span>'
+          +'<span>'+(o.phone||'-')+'</span>'
+          +'<span>'+(o.province||'-')+'</span>'
+          +'<span>'+(o.page||o.pages||'-')+'</span>'
+        +'</div>'
+        +(prods?'<div class="ol-card-prod">'+prods+'</div>':'')
+        +'</div>';
+    }).join('');
+    cardList.querySelectorAll('.ol-card').forEach(function(c){
+      c.addEventListener('click',function(){ if(typeof olOpenDrawer==='function') olOpenDrawer(this.dataset.id); });
+    });
+  };
+  window._olRenderCards = _renderCards;
+})();
