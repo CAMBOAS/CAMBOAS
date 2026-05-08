@@ -95,7 +95,7 @@
             <h2 style="margin:0 0 4px;color:var(--text)">Commission</h2>
             <p style="margin:0;color:var(--muted);font-size:14px">គ្រប់គ្រង commission CloseBy និង payout report</p>
           </div>
-          <select id="mFilter" onchange="ra()" style="min-height:36px;padding:0 14px;border-radius:10px;font-size:13px"></select>
+          <select id="mFilter" style="min-height:36px;padding:0 14px;border-radius:10px;font-size:13px"></select>
         </div>
       </section>
 
@@ -185,52 +185,50 @@
 </div>
 <script src="../assets/js/layout.js"></script>
 <script src="../assets/js/dashboard-layout.js"></script>
+<script src="../assets/js/orders-data.js"></script>
 <script>
 (function(){
-  const ORDERS_KEY = 'cambo_search_edit_orders_v3';
-  const COMM_KEY   = 'commission_settings_v2';
+  const COMM_KEY = 'commission_settings_v2';
 
   /* ── settings ── */
   function loadSett(){ try{return JSON.parse(localStorage.getItem(COMM_KEY)||'{}')}catch{return{}} }
   function saveSett(s){ localStorage.setItem(COMM_KEY,JSON.stringify(s)) }
 
   /* ── helpers ── */
-  function getItems(o){
-    return (Array.isArray(o.items)&&o.items.length ? o.items
-          : Array.isArray(o.products)&&o.products.length ? o.products : []);
-  }
-
-  function parseDate(o){
-    const raw = String(o.createdAt||o.date||'');
-    if(!raw) return null;
-    let m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  function parseYM(o){
+    var raw=String(o.date||o.createdAt||'');
+    var m=raw.match(/^(\d{4})-(\d{2})/);
     if(m) return {y:+m[1],mo:+m[2]};
-    m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    m=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
     if(m) return {y:+m[3],mo:+m[2]};
     return null;
   }
 
   function fmtDate(o){
-    const raw = String(o.createdAt||o.date||'');
-    const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if(m) return m[3]+'/'+m[2]+'/'+m[1];
-    const m2 = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-    if(m2) return raw.slice(0,10);
-    return '-';
+    if(window.CamboOrdersData) return CamboOrdersData.formatDate(o.date||o.createdAt||'');
+    var raw=String(o.date||'');
+    var m=raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? m[3]+'/'+m[2]+'/'+m[1] : raw||'-';
+  }
+
+  function getOrderTotal(o){
+    if(window.CamboOrdersData) return CamboOrdersData.calcOrderTotal(o);
+    return +(o.grandTotal||o.subtotal||0);
   }
 
   function moneyFmt(n){
     return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2});
   }
 
-  /* ── month filter ── */
+  /* ── all orders cache (loaded once from Google Sheets) ── */
+  var _allOrders = [];
+
   var MONTHS_KM=['','មករា','កុម្ភៈ','មីនា','មេសា','ឧសភា','មិថុនា','កក្កដា','សីហា','កញ្ញា','តុលា','វិច្ឆិកា','ធ្នូ'];
 
-  function buildMonthFilter(){
-    var orders = JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');
+  function buildMonthFilter(orders){
     var seen={};
     orders.forEach(function(o){
-      var d=parseDate(o); if(!d) return;
+      var d=parseYM(o); if(!d) return;
       var k=d.y+'-'+String(d.mo).padStart(2,'0');
       seen[k]={y:d.y,mo:d.mo};
     });
@@ -249,11 +247,10 @@
   }
 
   function getFilteredOrders(){
-    var orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');
     var val=document.getElementById('mFilter').value;
-    if(!val) return orders;
+    if(!val) return _allOrders;
     var parts=val.split('-'); var fy=+parts[0],fm=+parts[1];
-    return orders.filter(function(o){var d=parseDate(o);return d&&d.y===fy&&d.mo===fm;});
+    return _allOrders.filter(function(o){var d=parseYM(o);return d&&d.y===fy&&d.mo===fm;});
   }
 
   /* ── group by closeBy ── */
@@ -262,7 +259,7 @@
     var defRate=Number(document.getElementById('defRate').value)||0;
     var groups={};
     orders.forEach(function(o){
-      var cb=(o.closeBy||o.CloseBy||'').trim()||'Unknown';
+      var cb=(o.closeBy||'').trim()||'Unknown';
       if(!groups[cb]){
         groups[cb]={
           name:cb,
@@ -274,16 +271,16 @@
           orders:[]
         };
       }
-      var items=getItems(o);
-      var itemQty=items.reduce(function(s,it){return s+(+it.qty||1);},0);
-      var sale=+(o.grandTotal||o.subtotal||0);
+      var prods=Array.isArray(o.products)?o.products:[];
+      var itemQty=prods.reduce(function(s,it){return s+(+it.qty||1);},0);
+      var sale=getOrderTotal(o);
       groups[cb].totalOrders++;
       groups[cb].totalItems+=itemQty;
       groups[cb].totalSales+=sale;
       groups[cb].orders.push({
         date:fmtDate(o),
         customer:o.customer||'-',
-        itemsCount:items.length,
+        itemsCount:prods.length,
         itemQty:itemQty,
         total:sale,
         receiptNo:o.receiptNo||o.id||''
@@ -435,8 +432,31 @@
     document.getElementById('exampleCalc').textContent='10 orders × '+r.toLocaleString()+'៛ = '+(10*r).toLocaleString()+'៛';
   }
 
-  /* ── main render ── */
-  function ra(){
+  /* ── loading state ── */
+  function setLoading(on){
+    document.getElementById('tbody').innerHTML = on
+      ? '<tr><td colspan="8"><div class="no-data">⏳ កំពុងទាញទិន្នន័យពី Google Sheets...</div></td></tr>'
+      : '';
+  }
+
+  /* ── main render (async — fetches from Google Sheets) ── */
+  async function ra(){
+    setLoading(true);
+    try{
+      if(window.CamboOrdersData){
+        _allOrders = await CamboOrdersData.fetchOrders(5000);
+      }
+    }catch(e){
+      console.warn('Commission fetch error',e);
+    }
+    buildMonthFilter(_allOrders);
+    var orders=getFilteredOrders();
+    _agents=groupByCloseBy(orders);
+    rt(); rlb(); rchart();
+  }
+
+  /* ── filter change (no re-fetch, just re-filter) ── */
+  function raFilter(){
     var orders=getFilteredOrders();
     _agents=groupByCloseBy(orders);
     rt(); rlb(); rchart();
@@ -447,8 +467,8 @@
     var s=loadSett();
     if(s._default!==undefined) document.getElementById('defRate').value=s._default;
     document.getElementById('defRate').addEventListener('input',updateExample);
+    document.getElementById('mFilter').addEventListener('change',raFilter);
     updateExample();
-    buildMonthFilter();
     ra();
   });
 })();
