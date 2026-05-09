@@ -241,27 +241,21 @@
         </article>
       </div>
 
-      <!-- 3. Setup strip -->
+      <!-- 3. Setup strip — minimal -->
       <section class="glass-card cm-setup">
-        <span class="cm-setup-label">គណនាតាម</span>
         <div class="cm-mode-group">
           <button class="cm-mode-btn active" id="modeOrders" onclick="setCalcMode('orders')">Orders</button>
-          <button class="cm-mode-btn" id="modeItems"  onclick="setCalcMode('items')">Items</button>
+          <button class="cm-mode-btn" id="modeItems" onclick="setCalcMode('items')">Items</button>
         </div>
-        <div class="cm-rate-wrap">
-          <span class="cm-setup-label" id="rateLabel">Rate / Order</span>
-          <input type="number" id="defRate" class="cm-rate-inp" value="200" min="0" step="50">
-          <span class="cm-rate-unit">៛</span>
-        </div>
-        <div class="cm-ex" id="exCalc">10 orders × <b>200៛</b> = <b>2,000៛</b></div>
-        <div class="cm-setup-actions">
-          <button class="cm-apply" onclick="applyDefRate()">✅ Apply to All</button>
-          <button class="cm-export" onclick="exportCommCSV()">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Export CSV
-          </button>
-        </div>
-        <span style="font-size:11px;color:var(--muted);margin-left:auto" id="sumRangeLabel"></span>
+        <span class="cm-setup-label" id="rateLabel">Rate</span>
+        <input type="number" id="defRate" class="cm-rate-inp" value="200" min="0" step="50">
+        <span class="cm-rate-unit">៛</span>
+        <button class="cm-apply" onclick="applyDefRate()">Apply</button>
+        <button class="cm-export" onclick="exportCommCSV()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          CSV
+        </button>
+        <span class="cm-range-tag" id="sumRangeLabel" style="margin-left:auto"></span>
       </section>
 
       <!-- 4. Main content -->
