@@ -161,26 +161,13 @@
   [data-theme="light"] .cm-top-orders{color:#4f46e5}
   .cm-top-comm{font-size:10px;color:var(--muted);white-space:nowrap}
 
-  /* ── Filter Dropdown ── */
-  .fil-drop{position:fixed;z-index:9999;background:var(--card-bg,#1e293b);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:0 16px 40px rgba(0,0,0,.4);display:none;width:270px;max-width:calc(100vw - 24px);box-sizing:border-box;opacity:0;transform:translateY(-5px);transition:opacity .16s,transform .16s}
-  .fil-drop.open{display:block;opacity:1;transform:translateY(0)}
-  [data-theme="light"] .fil-drop{background:#fff;box-shadow:0 8px 32px rgba(15,23,42,.12)}
-  .fil-drop-title{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-  .fil-presets{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
-  .df-btn{padding:5px 11px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .13s}
-  .df-btn:hover{border-color:rgba(139,92,246,.35);color:var(--text)}
-  .df-btn.active{background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.4);color:#c4b5fd}
-  [data-theme="light"] .df-btn.active{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);color:#4f46e5}
-  .df-custom{display:none;flex-direction:column;gap:7px;margin-top:6px}
-  .df-custom.show{display:flex}
-  .df-row{display:flex;align-items:center;gap:7px}
-  .df-lbl{font-size:11px;color:var(--muted);width:28px;flex-shrink:0}
-  .df-input{flex:1;padding:6px 9px;border-radius:7px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);font-size:12px;font-family:inherit}
-  [data-theme="light"] .df-input{background:#f8fafc}
-  .df-input:focus{outline:none;border-color:rgba(139,92,246,.4)}
-  .fil-range-label{font-size:10px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid rgba(148,163,200,.08)}
-  .fil-backdrop{display:none;position:fixed;inset:0;z-index:9998}
-  .fil-backdrop.show{display:block}
+  /* ── Custom date row (inline, below filter bar) ── */
+  .cm-custom-row{display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 20px;border-radius:14px;margin-top:-8px}
+  .cm-custom-row.show{display:flex}
+  .cm-custom-lbl{font-size:11px;color:var(--muted);font-weight:600;flex-shrink:0}
+  .cm-custom-inp{height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);font-size:12px;font-family:inherit;outline:none}
+  .cm-custom-inp:focus{border-color:rgba(139,92,246,.4)}
+  [data-theme="light"] .cm-custom-inp{background:#fff}
 
   /* ── Responsive ── */
   @media(max-width:1000px){.cm-main{grid-template-columns:1fr}}
@@ -225,6 +212,14 @@
           </button>
         </div>
       </section>
+
+      <!-- Custom date range (inline, shows only when Custom tab active) -->
+      <div class="glass-card cm-custom-row" id="customDateBar">
+        <span class="cm-custom-lbl">ពី</span>
+        <input type="date" id="dateFrom" class="cm-custom-inp" onchange="applyFilter()">
+        <span class="cm-custom-lbl">ដល់</span>
+        <input type="date" id="dateTo" class="cm-custom-inp" onchange="applyFilter()">
+      </div>
 
       <!-- 2. KPI cards -->
       <div class="cm-kpi">
@@ -293,12 +288,6 @@
               <option value="Pending">Pending</option>
               <option value="Processing">Processing</option>
             </select>
-            <button class="fil-btn" id="filBtn" onclick="toggleFilDrop(event)">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-              Filter
-              <span class="fil-dot"></span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="filChevron" style="transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
           </div>
 
           <!-- Panel content -->
@@ -359,60 +348,14 @@
   }
   function $m(n){ return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2}); }
 
-  /* ══ FILTER DROPDOWN ══ */
-  window.toggleFilDrop=function(e){
-    e.stopPropagation();
-    var drop=document.getElementById('filDrop');
-    var btn=document.getElementById('filBtn');
-    var bdrop=document.getElementById('filBackdrop');
-    var chev=document.getElementById('filChevron');
-    var isOpen=drop.classList.contains('open');
-    if(!isOpen&&btn){
-      var rect=btn.getBoundingClientRect();
-      var vw=window.innerWidth;
-      var dropW=Math.min(270,vw-24);
-      var left=rect.right-dropW;
-      if(left<12) left=12;
-      if(left+dropW>vw-12) left=vw-dropW-12;
-      drop.style.top=(rect.bottom+6)+'px';
-      drop.style.left=left+'px';
-      drop.style.width=dropW+'px';
-    }
-    drop.classList.toggle('open',!isOpen);
-    if(bdrop) bdrop.classList.toggle('show',!isOpen);
-    if(chev)  chev.style.transform=!isOpen?'rotate(180deg)':'';
-  };
-  window.closeFilDrop=function(){
-    var drop=document.getElementById('filDrop');
-    var bdrop=document.getElementById('filBackdrop');
-    var chev=document.getElementById('filChevron');
-    if(drop)  drop.classList.remove('open');
-    if(bdrop) bdrop.classList.remove('show');
-    if(chev)  chev.style.transform='';
-  };
-  document.addEventListener('click',function(e){
-    var drop=document.getElementById('filDrop');
-    var btn=document.getElementById('filBtn');
-    if(drop&&drop.classList.contains('open')&&btn&&!btn.contains(e.target)&&!drop.contains(e.target)) closeFilDrop();
-  });
-
   /* ══ DATE FILTER ══ */
   window.setMode=function(m){
     _mode=m;
     document.querySelectorAll('.cm-tab').forEach(function(b){
       b.classList.toggle('active',b.dataset.mode===m);
     });
-    document.querySelectorAll('.df-btn').forEach(function(b){
-      b.classList.toggle('active',b.dataset.mode===m);
-    });
-    document.getElementById('customRange').classList.toggle('show',m==='custom');
-    var btn=document.getElementById('filBtn');
-    var nonDefault=['today','week','lastmonth','all','custom'];
-    if(btn) btn.classList.toggle('has-filter',nonDefault.indexOf(m)!==-1);
-    if(m!=='custom'){
-      var drop=document.getElementById('filDrop');
-      if(drop) setTimeout(function(){closeFilDrop();},280);
-    }
+    var customBar=document.getElementById('customDateBar');
+    if(customBar) customBar.classList.toggle('show',m==='custom');
     applyFilter();
   };
 
@@ -718,23 +661,5 @@
 </script>
 <script src="../assets/js/sw-register.js"></script>
 
-<!-- Dropdown moved to body — avoids backdrop-filter stacking context -->
-<div class="fil-backdrop" id="filBackdrop" onclick="closeFilDrop()"></div>
-<div class="fil-drop" id="filDrop">
-  <div class="fil-drop-title">📅 Filter តាមថ្ងៃខែ</div>
-  <div class="fil-presets">
-    <button class="df-btn" data-mode="today"     onclick="setMode('today')">ថ្ងៃនេះ</button>
-    <button class="df-btn" data-mode="week"      onclick="setMode('week')">សប្ដាហ៍នេះ</button>
-    <button class="df-btn active" data-mode="month" onclick="setMode('month')">ខែនេះ</button>
-    <button class="df-btn" data-mode="lastmonth" onclick="setMode('lastmonth')">ខែមុន</button>
-    <button class="df-btn" data-mode="all"       onclick="setMode('all')">ទាំងអស់</button>
-    <button class="df-btn" data-mode="custom"    onclick="setMode('custom')">Custom</button>
-  </div>
-  <div class="df-custom" id="customRange">
-    <div class="df-row"><span class="df-lbl">ពី</span><input type="date" id="dateFrom" class="df-input" onchange="applyFilter()"></div>
-    <div class="df-row"><span class="df-lbl">ដល់</span><input type="date" id="dateTo"   class="df-input" onchange="applyFilter()"></div>
-  </div>
-  <div class="fil-range-label" id="rangeLabel2"></div>
-</div>
 </body>
 </html>
