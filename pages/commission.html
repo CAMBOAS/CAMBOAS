@@ -10,172 +10,189 @@
   <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
   <link rel="stylesheet" href="../assets/css/main.css">
   <style>
-    .cw{display:grid;gap:18px}
+  /* ── Page grid ── */
+  .cw{display:grid;gap:16px;padding:4px 0 16px}
 
-    /* ── KPI ── */
-    .stats-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-    .kpi{padding:16px 18px;border-radius:20px}
-    .kpi-label{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-    .kpi-val{display:block;margin-top:8px;font-size:22px;font-weight:800;color:var(--text)}
+  /* ── Filter bar ── */
+  .cm-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 20px;border-radius:18px}
+  .cm-bar-left h2{margin:0 0 2px;font-size:18px;font-weight:800;color:var(--text)}
+  .cm-bar-left p{margin:0;font-size:12px;color:var(--muted)}
+  .cm-bar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .cm-tabs{display:flex;gap:4px;background:rgba(0,0,0,.06);border-radius:10px;padding:3px}
+  [data-theme="light"] .cm-tabs{background:rgba(0,0,0,.06)}
+  .cm-tab{padding:5px 12px;border-radius:7px;border:none;background:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .14s;white-space:nowrap}
+  .cm-tab.active{background:#fff;color:#1e293b;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  [data-theme="dark"] .cm-tab.active{background:rgba(139,92,246,.25);color:#c4b5fd;box-shadow:none}
+  .cm-btn-refresh{display:flex;align-items:center;gap:6px;height:34px;padding:0 16px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;white-space:nowrap}
+  .cm-btn-refresh:hover{opacity:.85}
 
-    /* ── Filter Button + Dropdown ── */
-    .fil-wrap{flex-shrink:0}
-    .fil-btn{display:flex;align-items:center;gap:6px;padding:0 14px;height:36px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
-    .fil-btn:hover{border-color:rgba(139,92,246,.4);color:var(--text)}
-    .fil-btn.has-filter{border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.12);color:#c4b5fd}
-    .fil-dot{width:6px;height:6px;border-radius:50%;background:#c4b5fd;display:none}
-    .fil-btn.has-filter .fil-dot{display:block}
+  /* ── KPI ── */
+  .cm-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .cm-kpi-card{padding:16px 18px;border-radius:16px}
+  .cm-kpi-label{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .cm-kpi-val{font-size:22px;font-weight:800;color:var(--text);margin-top:6px;display:block}
 
-    /* Dropdown: position:fixed controlled by JS — never overflows viewport */
-    .fil-drop{
-      position:fixed;
-      z-index:9999;
-      background:var(--card-bg,#1e293b);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px 16px;
-      box-shadow:0 16px 48px rgba(0,0,0,.45);
-      display:none;
-      width:280px;
-      max-width:calc(100vw - 24px);
-      box-sizing:border-box;
-      /* animate */
-      opacity:0;
-      transform:translateY(-6px);
-      transition:opacity .18s,transform .18s;
-    }
-    .fil-drop.open{display:block;opacity:1;transform:translateY(0)}
-    .fil-drop-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-    .fil-presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-    .df-btn{padding:6px 13px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
-    .df-btn:hover{border-color:rgba(139,92,246,.4);color:var(--text)}
-    .df-btn.active{background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.5);color:#c4b5fd}
-    .df-custom{display:none;flex-direction:column;gap:8px;margin-top:6px}
-    .df-custom.show{display:flex}
-    .df-custom-row{display:flex;align-items:center;gap:8px}
-    .df-input{padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:12px;font-family:inherit;flex:1;width:100%;box-sizing:border-box}
-    .df-input:focus{outline:none;border-color:rgba(139,92,246,.4)}
-    .fil-range-label{font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid rgba(148,163,200,.08)}
-    /* Backdrop for mobile tap-to-close */
-    .fil-backdrop{display:none;position:fixed;inset:0;z-index:9998}
-    .fil-backdrop.show{display:block}
+  /* ── Setup strip ── */
+  .cm-setup{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 18px;border-radius:16px}
+  .cm-setup-label{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
+  .cm-mode-group{display:flex;gap:4px;background:rgba(0,0,0,.06);border-radius:8px;padding:2px}
+  .cm-mode-btn{padding:4px 12px;border-radius:6px;border:none;background:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .14s}
+  .cm-mode-btn.active{background:#fff;color:#1e293b;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+  [data-theme="dark"] .cm-mode-btn.active{background:rgba(139,92,246,.25);color:#c4b5fd;box-shadow:none}
+  .cm-rate-wrap{display:flex;align-items:center;gap:6px}
+  .cm-rate-inp{width:72px;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:14px;font-weight:800;text-align:center;font-family:inherit}
+  .cm-rate-inp:focus{outline:none;border-color:rgba(139,92,246,.5)}
+  .cm-rate-unit{font-size:12px;color:var(--muted);font-weight:700}
+  .cm-ex{font-size:11px;color:var(--muted);padding:4px 10px;border-radius:7px;background:rgba(255,255,255,.04);border:1px dashed rgba(148,163,200,.12)}
+  [data-theme="light"] .cm-ex{background:rgba(0,0,0,.03)}
+  .cm-setup-actions{display:flex;gap:8px;margin-left:auto}
+  .cm-apply{padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);color:#c4b5fd;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+  .cm-apply:hover{background:rgba(139,92,246,.25)}
+  [data-theme="light"] .cm-apply{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.25);color:#4f46e5}
+  .cm-export{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);color:#7dd3fc;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+  .cm-export:hover{background:rgba(6,182,212,.16)}
+  [data-theme="light"] .cm-export{color:#0284c7;border-color:rgba(2,132,199,.25);background:rgba(2,132,199,.06)}
 
-    /* ── Main layout ── */
-    .clayout{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start}
-    .cp{padding:20px 22px;border-radius:22px}
-    .cp-title{margin:0 0 16px;font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+  /* ── Main layout ── */
+  .cm-main{display:grid;grid-template-columns:1fr 280px;gap:16px;align-items:start}
 
-    /* ── Breadcrumb ── */
-    .breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:14px;font-size:12px}
-    .bc-item{color:var(--muted);cursor:pointer;padding:3px 8px;border-radius:6px;transition:background .12s}
-    .bc-item:hover{background:rgba(255,255,255,.06);color:var(--text)}
-    .bc-item.active{color:var(--text);font-weight:700;cursor:default}
-    .bc-sep{color:var(--muted);font-size:10px}
+  /* ── Table card ── */
+  .cm-table-card{padding:16px 18px;border-radius:18px}
+  .cm-table-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .cm-panel-title{font-size:14px;font-weight:700;color:var(--text);margin:0}
+  .cm-range-tag{font-size:11px;color:var(--muted);padding:3px 9px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+  [data-theme="light"] .cm-range-tag{background:rgba(0,0,0,.04)}
 
-    /* ── Search ── */
-    .srch-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-    .srch-bar input,.srch-bar select{min-height:36px;padding:0 12px;border-radius:10px;font-size:12px;font-family:inherit}
-    .srch-bar input{flex:1;min-width:120px}
+  /* Breadcrumb */
+  .cm-bc{display:flex;align-items:center;gap:5px;margin-bottom:10px;font-size:12px}
+  .bc-item{color:var(--muted);cursor:pointer;padding:2px 7px;border-radius:6px;transition:background .12s}
+  .bc-item:hover{background:rgba(255,255,255,.06);color:var(--text)}
+  .bc-item.active{color:var(--text);font-weight:700;cursor:default;background:none}
+  .bc-sep{color:var(--muted);opacity:.5}
 
-    /* ── Table ── */
-    .tbl-wrap{overflow-x:auto}
-    table{width:100%;border-collapse:collapse}
-    thead th{text-align:left;padding:8px 12px;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--line);white-space:nowrap}
-    tbody td{padding:10px 12px;border-bottom:1px solid rgba(148,163,200,.06);font-size:13px;color:var(--text);vertical-align:middle}
-    tbody tr:last-child td{border-bottom:none}
-    tbody tr:hover td{background:rgba(255,255,255,.03);cursor:pointer}
-    .no-data{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;line-height:2}
+  /* Search row */
+  .cm-search-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .cm-search-row input,.cm-search-row select{height:34px;padding:0 10px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font-size:12px;font-family:inherit;outline:none}
+  .cm-search-row input{flex:1;min-width:120px}
+  .cm-search-row input::placeholder{color:var(--muted)}
+  .cm-search-row input:focus,.cm-search-row select:focus{border-color:rgba(139,92,246,.4)}
+  [data-theme="light"] .cm-search-row input,[data-theme="light"] .cm-search-row select{background:#fff}
 
-    /* ── Agent row ── */
-    .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,rgba(139,92,246,.4),rgba(6,182,212,.3));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800;flex-shrink:0}
-    .ai{display:flex;align-items:center;gap:10px}
-    .ai-name{font-weight:700;color:var(--text)}
-    .badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:20px;padding:0 7px;border-radius:999px;font-size:11px;font-weight:800;border:1px solid}
-    .badge-purple{background:rgba(139,92,246,.15);color:#c4b5fd;border-color:rgba(139,92,246,.25)}
-    .badge-teal{background:rgba(6,182,212,.1);color:#7dd3fc;border-color:rgba(6,182,212,.2)}
-    .comm-val{color:#fde68a;font-weight:800;font-size:13px}
-    .sales-val{color:var(--text);font-weight:700}
-    .click-hint{font-size:10px;color:var(--muted);margin-top:2px}
-    .arrow-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;padding:3px 8px;border-radius:6px;transition:background .12s;font-family:inherit}
-    .arrow-btn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+  /* Filter button */
+  .fil-btn{display:flex;align-items:center;gap:5px;height:34px;padding:0 12px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .14s;white-space:nowrap}
+  .fil-btn:hover{border-color:rgba(139,92,246,.35);color:var(--text)}
+  .fil-btn.has-filter{border-color:rgba(139,92,246,.45);background:rgba(139,92,246,.1);color:#c4b5fd}
+  .fil-dot{width:5px;height:5px;border-radius:50%;background:#c4b5fd;display:none}
+  .fil-btn.has-filter .fil-dot{display:block}
 
-    /* ── Rate input ── */
-    .rate-inp{width:80px;padding:4px 8px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:12px;text-align:center;font-family:inherit}
-    .rate-inp:focus{outline:none;border-color:rgba(139,92,246,.4)}
-    .stchange{background:rgba(255,255,255,.06)!important;border:1px solid var(--line)!important;border-radius:8px!important;color:var(--text)!important;padding:4px 8px!important;font-size:11px!important;cursor:pointer;min-height:auto!important;font-family:inherit}
+  /* ── Table ── */
+  .cm-tbl-wrap{overflow-x:auto}
+  .cm-tbl{width:100%;border-collapse:collapse}
+  .cm-tbl thead th{text-align:left;padding:7px 10px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--line);white-space:nowrap}
+  .cm-tbl tbody td{padding:10px 10px;border-bottom:1px solid rgba(148,163,200,.05);font-size:13px;color:var(--text);vertical-align:middle}
+  .cm-tbl tbody tr:last-child td{border-bottom:none}
+  .cm-tbl tbody tr:hover td{background:rgba(255,255,255,.03);cursor:pointer}
+  [data-theme="light"] .cm-tbl tbody tr:hover td{background:rgba(0,0,0,.02)}
+  .no-data{text-align:center;padding:36px 20px;color:var(--muted);font-size:13px;line-height:2}
 
-    /* ── Order detail view ── */
-    .order-card{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,200,.08);margin-bottom:6px;cursor:pointer;transition:background .12s}
-    .order-card:hover{background:rgba(255,255,255,.06)}
-    .order-card-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-    .order-card-meta{display:flex;gap:10px;align-items:center;font-size:11px;color:var(--muted);margin-top:4px;flex-wrap:wrap}
-    .order-card-name{font-weight:700;color:var(--text);font-size:13px}
-    .order-card-total{font-weight:800;color:#7dd3fc;font-size:13px;white-space:nowrap}
-    .meta-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.05);font-size:11px}
+  /* Agent cell */
+  .cm-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,rgba(139,92,246,.35),rgba(6,182,212,.25));display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;flex-shrink:0}
+  .cm-ai{display:flex;align-items:center;gap:9px}
+  .cm-ai-name{font-weight:700;color:var(--text);font-size:13px}
+  .cm-hint{font-size:10px;color:var(--muted);margin-top:1px}
 
-    /* ── Product detail view ── */
-    .prod-row{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,200,.06);margin-bottom:5px;font-size:13px}
-    .prod-name{color:var(--text);font-weight:600}
-    .prod-qty{color:#c4b5fd;text-align:right;font-size:12px}
-    .prod-price{color:var(--muted);text-align:right;font-size:12px}
-    .prod-sub{color:#7dd3fc;font-weight:700;text-align:right}
+  /* Badges + values */
+  .cm-badge{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:20px;padding:0 7px;border-radius:999px;font-size:11px;font-weight:800;background:rgba(139,92,246,.12);color:#c4b5fd;border:1px solid rgba(139,92,246,.2)}
+  [data-theme="light"] .cm-badge{background:rgba(99,102,241,.1);color:#4f46e5;border-color:rgba(99,102,241,.2)}
+  .cm-comm{color:#fde68a;font-weight:800;font-size:13px}
+  [data-theme="light"] .cm-comm{color:#d97706}
+  .cm-sales{font-weight:700;color:var(--text)}
+  .cm-items{font-size:12px;color:var(--muted)}
 
-    /* ── Top CloseBy ── */
-    .top-row{display:grid;grid-template-columns:28px 1fr auto auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,200,.08);margin-bottom:6px}
-    .rk{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
-    .r1{background:linear-gradient(135deg,#f59e0b,#fde68a);color:#78350f}
-    .r2{background:linear-gradient(135deg,#94a3b8,#e2e8f0);color:#1e293b}
-    .r3{background:linear-gradient(135deg,#b45309,#fbbf24);color:#fff}
-    .rn{background:rgba(255,255,255,.08);color:var(--muted);font-size:10px}
-    .top-info b{display:block;font-size:13px;color:var(--text);font-weight:700}
-    .top-info small{font-size:11px;color:var(--muted)}
-    .top-orders{font-size:13px;font-weight:800;color:#c4b5fd;text-align:right;white-space:nowrap}
-    .top-comm{font-size:12px;font-weight:700;color:#fde68a;text-align:right;white-space:nowrap}
+  /* Rate input inline */
+  .cm-rate-cell{width:70px;padding:4px 7px;border-radius:7px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font-size:12px;text-align:center;font-family:inherit}
+  .cm-rate-cell:focus{outline:none;border-color:rgba(139,92,246,.4)}
+  [data-theme="light"] .cm-rate-cell{background:#fff}
 
-    /* ── Commission Quick Summary ── */
-    .csumm{margin-top:18px;display:flex;flex-direction:column;gap:14px}
-    .csumm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .csumm-stat{padding:11px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);text-align:center;transition:background .15s}
-    .csumm-stat:hover{background:rgba(255,255,255,.07)}
-    .csumm-stat-ico{font-size:18px;margin-bottom:4px}
-    .csumm-stat-val{font-size:17px;font-weight:800;color:var(--text)}
-    .csumm-stat-lbl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-top:2px}
-    .csumm-bottom{display:flex;flex-direction:column;gap:8px}
-    .csumm-bar-head{display:flex;justify-content:space-between;align-items:center;font-size:11px}
-    .csumm-bar-title{font-weight:700;color:var(--muted)}
-    .csumm-bar-legend{display:flex;gap:10px}
-    .csumm-legend-dot{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
-    .csumm-legend-dot::before{content:'';width:8px;height:8px;border-radius:50%;display:inline-block}
-    .csumm-legend-dot.paid::before{background:#4ade80}
-    .csumm-legend-dot.pend::before{background:#fbbf24}
-    .csumm-bar-track{height:8px;border-radius:20px;background:rgba(148,163,200,.12);overflow:hidden;position:relative}
-    .csumm-bar-paid{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#22c55e,#4ade80);border-radius:20px;transition:width .6s ease}
-    .csumm-bar-pend{position:absolute;top:0;height:100%;background:linear-gradient(90deg,#f59e0b,#fbbf24);border-radius:20px;transition:width .6s ease, left .6s ease}
-    .csumm-export{display:flex;align-items:center;justify-content:flex-end;gap:8px}
-    .exp-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:9px;border:1px solid rgba(6,182,212,.3);background:rgba(6,182,212,.08);color:#7dd3fc;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
-    .exp-btn:hover{background:rgba(6,182,212,.16);border-color:rgba(6,182,212,.5)}
+  /* Status select */
+  .cm-status-sel{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:7px;color:var(--text);padding:3px 7px;font-size:11px;cursor:pointer;font-family:inherit}
+  [data-theme="light"] .cm-status-sel{background:#fff}
 
-    /* ── Setup card v2 ── */
-    .su-wrap{display:flex;flex-direction:column;gap:12px}
-    .su-mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .su-mode-btn{padding:10px 8px;border-radius:13px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.3}
-    .su-mode-btn:hover{border-color:rgba(139,92,246,.35);color:var(--text);background:rgba(139,92,246,.05)}
-    .su-mode-btn.active{border-color:rgba(139,92,246,.55);background:rgba(139,92,246,.13);color:#c4b5fd}
-    .su-mode-ico{font-size:22px;line-height:1}
-    .su-mode-name{font-size:12px;font-weight:800}
-    .su-mode-sub{font-size:10px;font-weight:500;opacity:.7}
-    .su-rate-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:13px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1)}
-    .su-rate-lbl{flex:1;font-size:12px;color:var(--muted);font-weight:600;line-height:1.4}
-    .su-rate-lbl span{display:block;font-size:10px;color:var(--muted);opacity:.7;margin-top:1px}
-    .su-rate-inp{width:72px;padding:5px 8px;border-radius:9px;border:1.5px solid rgba(139,92,246,.35);background:rgba(139,92,246,.08);color:#c4b5fd;font-size:18px;text-align:center;font-family:inherit;font-weight:800;transition:border-color .15s}
-    .su-rate-inp:focus{outline:none;border-color:rgba(139,92,246,.65);background:rgba(139,92,246,.14)}
-    .su-rate-unit{font-size:14px;font-weight:800;color:var(--muted);flex-shrink:0}
-    .su-example{font-size:11px;color:var(--muted);text-align:center;padding:7px 10px;border-radius:9px;background:rgba(255,255,255,.03);border:1px dashed rgba(148,163,200,.1)}
-    .su-example b{color:var(--text)}
-    .su-apply{width:100%;padding:10px;border-radius:12px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(6,182,212,.15));border:1px solid rgba(139,92,246,.35);color:#c4b5fd;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;letter-spacing:.02em}
-    .su-apply:hover{background:linear-gradient(135deg,rgba(139,92,246,.38),rgba(6,182,212,.25));border-color:rgba(139,92,246,.55)}
+  /* ── Order cards ── */
+  .cm-order-card{padding:10px 12px;border-radius:11px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,200,.07);margin-bottom:6px;cursor:pointer;transition:background .12s}
+  .cm-order-card:hover{background:rgba(255,255,255,.06)}
+  [data-theme="light"] .cm-order-card{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.06)}
+  [data-theme="light"] .cm-order-card:hover{background:rgba(0,0,0,.04)}
+  .cm-order-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .cm-order-name{font-weight:700;color:var(--text);font-size:13px}
+  .cm-order-total{font-weight:800;color:#7dd3fc;font-size:13px;white-space:nowrap}
+  [data-theme="light"] .cm-order-total{color:#0284c7}
+  .cm-order-meta{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);margin-top:5px;flex-wrap:wrap}
+  .cm-chip{padding:2px 7px;border-radius:5px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.08);font-size:11px}
+  [data-theme="light"] .cm-chip{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.07)}
 
-    @media(max-width:1080px){.clayout{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  /* ── Product rows ── */
+  .cm-prod-row{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,200,.06);margin-bottom:5px;font-size:13px}
+  [data-theme="light"] .cm-prod-row{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.06)}
+  .cm-prod-name{color:var(--text);font-weight:600}
+  .cm-prod-qty{color:#c4b5fd;text-align:right;font-size:12px}
+  [data-theme="light"] .cm-prod-qty{color:#6d28d9}
+  .cm-prod-price{color:var(--muted);text-align:right;font-size:12px}
+  .cm-prod-sub{color:#7dd3fc;font-weight:700;text-align:right}
+  [data-theme="light"] .cm-prod-sub{color:#0284c7}
+
+  /* ── Right column ── */
+  .cm-right{display:grid;gap:14px;align-content:start}
+
+  /* Top CloseBy card */
+  .cm-top-card{padding:14px 16px;border-radius:18px}
+  .cm-top-title{font-size:13px;font-weight:700;color:var(--text);margin:0 0 10px;display:flex;align-items:center;gap:6px}
+  .cm-top-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,200,.07);margin-bottom:5px}
+  [data-theme="light"] .cm-top-row{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.06)}
+  .cm-rk{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;background:rgba(255,255,255,.08);color:var(--muted)}
+  .cm-r1{background:linear-gradient(135deg,#f59e0b,#fde68a);color:#78350f}
+  .cm-r2{background:linear-gradient(135deg,#94a3b8,#e2e8f0);color:#1e293b}
+  .cm-r3{background:linear-gradient(135deg,#b45309,#fbbf24);color:#fff}
+  .cm-top-info{flex:1;min-width:0}
+  .cm-top-info b{display:block;font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cm-top-info small{font-size:10px;color:var(--muted)}
+  .cm-top-nums{text-align:right;flex-shrink:0}
+  .cm-top-orders{font-size:12px;font-weight:800;color:#c4b5fd;white-space:nowrap}
+  [data-theme="light"] .cm-top-orders{color:#4f46e5}
+  .cm-top-comm{font-size:10px;color:var(--muted);white-space:nowrap}
+
+  /* ── Filter Dropdown ── */
+  .fil-drop{position:fixed;z-index:9999;background:var(--card-bg,#1e293b);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:0 16px 40px rgba(0,0,0,.4);display:none;width:270px;max-width:calc(100vw - 24px);box-sizing:border-box;opacity:0;transform:translateY(-5px);transition:opacity .16s,transform .16s}
+  .fil-drop.open{display:block;opacity:1;transform:translateY(0)}
+  [data-theme="light"] .fil-drop{background:#fff;box-shadow:0 8px 32px rgba(15,23,42,.12)}
+  .fil-drop-title{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .fil-presets{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  .df-btn{padding:5px 11px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .13s}
+  .df-btn:hover{border-color:rgba(139,92,246,.35);color:var(--text)}
+  .df-btn.active{background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.4);color:#c4b5fd}
+  [data-theme="light"] .df-btn.active{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);color:#4f46e5}
+  .df-custom{display:none;flex-direction:column;gap:7px;margin-top:6px}
+  .df-custom.show{display:flex}
+  .df-row{display:flex;align-items:center;gap:7px}
+  .df-lbl{font-size:11px;color:var(--muted);width:28px;flex-shrink:0}
+  .df-input{flex:1;padding:6px 9px;border-radius:7px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);font-size:12px;font-family:inherit}
+  [data-theme="light"] .df-input{background:#f8fafc}
+  .df-input:focus{outline:none;border-color:rgba(139,92,246,.4)}
+  .fil-range-label{font-size:10px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid rgba(148,163,200,.08)}
+  .fil-backdrop{display:none;position:fixed;inset:0;z-index:9998}
+  .fil-backdrop.show{display:block}
+
+  /* ── Responsive ── */
+  @media(max-width:1000px){.cm-main{grid-template-columns:1fr}}
+  @media(max-width:700px){
+    .cm-kpi{grid-template-columns:repeat(2,1fr)}
+    .cm-bar{flex-direction:column;align-items:stretch}
+    .cm-bar-right{flex-direction:column}
+    .cm-tabs{flex-wrap:wrap}
+    .cm-setup{flex-direction:column;align-items:stretch}
+    .cm-setup-actions{margin-left:0}
+  }
+  @media(max-width:420px){.cm-kpi{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -187,125 +204,88 @@
     <div class="shared-topbar" id="sharedHeader"></div>
     <div class="cw">
 
-      <!-- KPI Stats -->
-      <div class="stats-row">
-        <article class="glass-card kpi"><div class="kpi-label">Total Commission</div><strong class="kpi-val" id="sTot">0 ៛</strong></article>
-        <article class="glass-card kpi"><div class="kpi-label">Paid Out</div><strong class="kpi-val" id="sPaid" style="color:#86efac">0 ៛</strong></article>
-        <article class="glass-card kpi"><div class="kpi-label">Pending</div><strong class="kpi-val" id="sPend" style="color:#fde68a">0 ៛</strong></article>
-        <article class="glass-card kpi"><div class="kpi-label">Active CloseBy</div><strong class="kpi-val" id="sAg">0</strong></article>
-      </div>
-
-      <!-- Header + Commission Setup (same row, simplified) -->
-      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:stretch">
-        <section class="glass-card" style="padding:20px 24px;border-radius:22px">
-          <!-- Header row -->
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-            <div>
-              <h2 style="margin:0 0 3px;color:var(--text)">Commission</h2>
-              <p style="margin:0;color:var(--muted);font-size:13px">គ្រប់គ្រង commission CloseBy និង payout report</p>
-            </div>
-            <button onclick="loadData()" style="padding:6px 14px;border-radius:9px;background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);color:#7dd3fc;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">🔄 Refresh</button>
+      <!-- 1. Filter bar -->
+      <section class="glass-card cm-bar">
+        <div class="cm-bar-left">
+          <h2>Commission</h2>
+          <p>Commission report CloseBy និង payout</p>
+        </div>
+        <div class="cm-bar-right">
+          <div class="cm-tabs">
+            <button class="cm-tab" data-mode="today"     onclick="setMode('today')">ថ្ងៃនេះ</button>
+            <button class="cm-tab" data-mode="week"      onclick="setMode('week')">សប្ដាហ៍</button>
+            <button class="cm-tab active" data-mode="month" onclick="setMode('month')">ខែនេះ</button>
+            <button class="cm-tab" data-mode="lastmonth" onclick="setMode('lastmonth')">ខែមុន</button>
+            <button class="cm-tab" data-mode="all"       onclick="setMode('all')">ទាំងអស់</button>
+            <button class="cm-tab" data-mode="custom"    onclick="setMode('custom')">Custom</button>
           </div>
+          <button class="cm-btn-refresh" onclick="loadData()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+      </section>
 
-          <!-- Quick Summary -->
-          <div class="csumm">
-            <!-- 3 stat chips -->
-            <div class="csumm-stats">
-              <div class="csumm-stat">
-                <div class="csumm-stat-ico">📋</div>
-                <div class="csumm-stat-val" id="sumOrders">—</div>
-                <div class="csumm-stat-lbl">Orders</div>
-              </div>
-              <div class="csumm-stat">
-                <div class="csumm-stat-ico">📦</div>
-                <div class="csumm-stat-val" id="sumItems">—</div>
-                <div class="csumm-stat-lbl">Items</div>
-              </div>
-              <div class="csumm-stat">
-                <div class="csumm-stat-ico">💵</div>
-                <div class="csumm-stat-val" id="sumSales">—</div>
-                <div class="csumm-stat-lbl">Total Sales</div>
-              </div>
-            </div>
-
-            <!-- Commission status progress bar -->
-            <div class="csumm-bottom">
-              <div class="csumm-bar-head">
-                <span class="csumm-bar-title">Commission Status</span>
-                <div class="csumm-bar-legend">
-                  <span class="csumm-legend-dot paid" id="legendPaid">Paid 0%</span>
-                  <span class="csumm-legend-dot pend" id="legendPend">Pending 0%</span>
-                </div>
-              </div>
-              <div class="csumm-bar-track">
-                <div class="csumm-bar-paid"  id="barPaid" style="width:0%"></div>
-                <div class="csumm-bar-pend"  id="barPend" style="width:0%;left:0%"></div>
-              </div>
-              <div class="csumm-export">
-                <span style="font-size:11px;color:var(--muted)" id="sumRangeLabel"></span>
-                <button class="exp-btn" onclick="exportCommCSV()">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  Export CSV
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Commission Setup (top right) — v2 clean -->
-        <article class="glass-card cp">
-          <div class="cp-title" style="margin-bottom:14px">⚙️ Commission Setup</div>
-          <div class="su-wrap">
-
-            <!-- Mode: Orders / Items -->
-            <div class="su-mode-grid">
-              <button class="su-mode-btn active" id="modeOrders" onclick="setCalcMode('orders')">
-                <span class="su-mode-ico">📋</span>
-                <span class="su-mode-name">Orders</span>
-                <span class="su-mode-sub">Orders × Rate</span>
-              </button>
-              <button class="su-mode-btn" id="modeItems" onclick="setCalcMode('items')">
-                <span class="su-mode-ico">📦</span>
-                <span class="su-mode-name">Items</span>
-                <span class="su-mode-sub">Items × Rate</span>
-              </button>
-            </div>
-
-            <!-- Rate input -->
-            <div class="su-rate-row">
-              <div class="su-rate-lbl">
-                <span id="rateLabel">Rate / Order</span>
-                <span id="modeFormula">Orders × Rate = Commission</span>
-              </div>
-              <input type="number" id="defRate" class="su-rate-inp" value="200" min="0" step="50">
-              <span class="su-rate-unit">៛</span>
-            </div>
-
-            <!-- Example calc -->
-            <div class="su-example" id="exCalc">10 orders × <b>200៛</b> = <b>2,000៛</b></div>
-
-            <!-- Apply -->
-            <button class="su-apply" onclick="applyDefRate()">✅ Apply to All</button>
-          </div>
+      <!-- 2. KPI cards -->
+      <div class="cm-kpi">
+        <article class="glass-card cm-kpi-card">
+          <div class="cm-kpi-label">Total Commission</div>
+          <strong class="cm-kpi-val" id="sTot">0 ៛</strong>
+        </article>
+        <article class="glass-card cm-kpi-card">
+          <div class="cm-kpi-label">Paid Out</div>
+          <strong class="cm-kpi-val" id="sPaid" style="color:#86efac">0 ៛</strong>
+        </article>
+        <article class="glass-card cm-kpi-card">
+          <div class="cm-kpi-label">Pending</div>
+          <strong class="cm-kpi-val" id="sPend" style="color:#fde68a">0 ៛</strong>
+        </article>
+        <article class="glass-card cm-kpi-card">
+          <div class="cm-kpi-label">Active CloseBy</div>
+          <strong class="cm-kpi-val" id="sAg">0</strong>
         </article>
       </div>
 
-      <!-- Main layout -->
-      <div class="clayout">
+      <!-- 3. Setup strip -->
+      <section class="glass-card cm-setup">
+        <span class="cm-setup-label">គណនាតាម</span>
+        <div class="cm-mode-group">
+          <button class="cm-mode-btn active" id="modeOrders" onclick="setCalcMode('orders')">Orders</button>
+          <button class="cm-mode-btn" id="modeItems"  onclick="setCalcMode('items')">Items</button>
+        </div>
+        <div class="cm-rate-wrap">
+          <span class="cm-setup-label" id="rateLabel">Rate / Order</span>
+          <input type="number" id="defRate" class="cm-rate-inp" value="200" min="0" step="50">
+          <span class="cm-rate-unit">៛</span>
+        </div>
+        <div class="cm-ex" id="exCalc">10 orders × <b>200៛</b> = <b>2,000៛</b></div>
+        <div class="cm-setup-actions">
+          <button class="cm-apply" onclick="applyDefRate()">✅ Apply to All</button>
+          <button class="cm-export" onclick="exportCommCSV()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+        </div>
+        <span style="font-size:11px;color:var(--muted);margin-left:auto" id="sumRangeLabel"></span>
+      </section>
 
-        <!-- LEFT: Commission Records (drill-down) -->
-        <article class="glass-card cp">
-          <div class="cp-title">
-            <span id="panelTitle">Commission Records</span>
+      <!-- 4. Main content -->
+      <div class="cm-main">
+
+        <!-- Left: Commission Records -->
+        <article class="glass-card cm-table-card">
+          <div class="cm-table-head">
+            <h3 class="cm-panel-title" id="panelTitle">Commission Records</h3>
+            <span class="cm-range-tag" id="rangeLabel"></span>
           </div>
 
           <!-- Breadcrumb -->
-          <div class="breadcrumb" id="breadcrumb">
+          <div class="cm-bc" id="breadcrumb">
             <span class="bc-item active" onclick="navTo('agents')">ទាំងអស់</span>
           </div>
 
-          <!-- Search bar (agents view only) -->
-          <div class="srch-bar" id="srchBar">
+          <!-- Search row (agents view) -->
+          <div class="cm-search-row" id="srchBar">
             <input type="text" id="srch" placeholder="ស្វែងរក CloseBy..." oninput="renderAgents()">
             <select id="fst" onchange="renderAgents()">
               <option value="">All Status</option>
@@ -313,34 +293,30 @@
               <option value="Pending">Pending</option>
               <option value="Processing">Processing</option>
             </select>
-
-            <!-- Filter Button (Block 2) -->
-            <div class="fil-wrap" id="filWrap">
-              <button class="fil-btn" id="filBtn" onclick="toggleFilDrop(event)">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-                Filter
-                <span class="fil-dot"></span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="filChevron" style="transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
-            </div>
-
+            <button class="fil-btn" id="filBtn" onclick="toggleFilDrop(event)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filter
+              <span class="fil-dot"></span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="filChevron" style="transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
           </div>
 
           <!-- Panel content -->
           <div id="panelContent"></div>
         </article>
 
-        <!-- RIGHT -->
-        <div style="display:grid;gap:18px;align-content:start">
+        <!-- Right column -->
+        <div class="cm-right">
 
-          <!-- Top CloseBy (SEPARATE TABLE) -->
-          <article class="glass-card cp">
-            <div class="cp-title">🏆 Top CloseBy <span style="font-size:11px;font-weight:400;color:var(--muted)">(តាមចំនួន Order)</span></div>
+          <!-- Top CloseBy -->
+          <article class="glass-card cm-top-card">
+            <h3 class="cm-top-title">🏆 Top CloseBy</h3>
             <div id="topList"></div>
           </article>
 
         </div>
       </div>
+
     </div>
   </main>
 </div>
@@ -357,8 +333,8 @@
   /* ══ STATE ══ */
   var _all=[], _filtered=[], _agents=[];
   var _mode='month';
-  var _calcMode='orders'; // 'orders' | 'items'
-  var _view='agents'; // 'agents' | 'orders' | 'products'
+  var _calcMode='orders';
+  var _view='agents';
   var _selAgent=null;
   var _selOrder=null;
 
@@ -383,23 +359,23 @@
   }
   function $m(n){ return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2}); }
 
-  /* ══ FILTER BUTTON TOGGLE ══ */
+  /* ══ FILTER DROPDOWN ══ */
   window.toggleFilDrop=function(e){
     e.stopPropagation();
-    var drop =document.getElementById('filDrop');
-    var btn  =document.getElementById('filBtn');
+    var drop=document.getElementById('filDrop');
+    var btn=document.getElementById('filBtn');
     var bdrop=document.getElementById('filBackdrop');
-    var chev =document.getElementById('filChevron');
+    var chev=document.getElementById('filChevron');
     var isOpen=drop.classList.contains('open');
     if(!isOpen&&btn){
       var rect=btn.getBoundingClientRect();
       var vw=window.innerWidth;
-      var dropW=Math.min(280,vw-24);
+      var dropW=Math.min(270,vw-24);
       var left=rect.right-dropW;
       if(left<12) left=12;
       if(left+dropW>vw-12) left=vw-dropW-12;
-      drop.style.top  =(rect.bottom+6)+'px';
-      drop.style.left =left+'px';
+      drop.style.top=(rect.bottom+6)+'px';
+      drop.style.left=left+'px';
       drop.style.width=dropW+'px';
     }
     drop.classList.toggle('open',!isOpen);
@@ -407,37 +383,35 @@
     if(chev)  chev.style.transform=!isOpen?'rotate(180deg)':'';
   };
   window.closeFilDrop=function(){
-    var drop =document.getElementById('filDrop');
+    var drop=document.getElementById('filDrop');
     var bdrop=document.getElementById('filBackdrop');
-    var chev =document.getElementById('filChevron');
+    var chev=document.getElementById('filChevron');
     if(drop)  drop.classList.remove('open');
     if(bdrop) bdrop.classList.remove('show');
     if(chev)  chev.style.transform='';
   };
   document.addEventListener('click',function(e){
     var drop=document.getElementById('filDrop');
-    var btn =document.getElementById('filBtn');
-    if(drop&&drop.classList.contains('open')&&btn&&!btn.contains(e.target)&&!drop.contains(e.target)){
-      closeFilDrop();
-    }
+    var btn=document.getElementById('filBtn');
+    if(drop&&drop.classList.contains('open')&&btn&&!btn.contains(e.target)&&!drop.contains(e.target)) closeFilDrop();
   });
 
   /* ══ DATE FILTER ══ */
   window.setMode=function(m){
     _mode=m;
-    // Sync preset buttons inside dropdown
+    document.querySelectorAll('.cm-tab').forEach(function(b){
+      b.classList.toggle('active',b.dataset.mode===m);
+    });
     document.querySelectorAll('.df-btn').forEach(function(b){
       b.classList.toggle('active',b.dataset.mode===m);
     });
     document.getElementById('customRange').classList.toggle('show',m==='custom');
-    // Update Filter button appearance
     var btn=document.getElementById('filBtn');
     var nonDefault=['today','week','lastmonth','all','custom'];
-    if(btn) btn.classList.toggle('has-filter', nonDefault.indexOf(m)!==-1);
-    // Close dropdown after selecting (except custom — keep open for date inputs)
+    if(btn) btn.classList.toggle('has-filter',nonDefault.indexOf(m)!==-1);
     if(m!=='custom'){
       var drop=document.getElementById('filDrop');
-      if(drop) setTimeout(function(){ drop.classList.remove('open'); var chev=document.getElementById('filChevron'); if(chev) chev.style.transform=''; },300);
+      if(drop) setTimeout(function(){closeFilDrop();},280);
     }
     applyFilter();
   };
@@ -448,21 +422,10 @@
     _filtered=_all.filter(function(o){
       var d=toDate(o); if(!d) return false;
       if(_mode==='all') return true;
-      if(_mode==='today'){
-        return d>=today&&d<=now;
-      }
-      if(_mode==='week'){
-        var s=new Date(today); s.setDate(today.getDate()-today.getDay());
-        return d>=s&&d<=now;
-      }
-      if(_mode==='month'){
-        return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
-      }
-      if(_mode==='lastmonth'){
-        var s=new Date(now.getFullYear(),now.getMonth()-1,1);
-        var e=new Date(now.getFullYear(),now.getMonth(),0,23,59,59);
-        return d>=s&&d<=e;
-      }
+      if(_mode==='today') return d>=today&&d<=now;
+      if(_mode==='week'){var s=new Date(today);s.setDate(today.getDate()-today.getDay());return d>=s&&d<=now;}
+      if(_mode==='month') return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+      if(_mode==='lastmonth'){var s=new Date(now.getFullYear(),now.getMonth()-1,1);var e=new Date(now.getFullYear(),now.getMonth(),0,23,59,59);return d>=s&&d<=e;}
       if(_mode==='custom'){
         var from=document.getElementById('dateFrom').value;
         var to=document.getElementById('dateTo').value;
@@ -482,41 +445,28 @@
   };
 
   function updateRangeLabel(){
-    var labels={today:'ថ្ងៃនេះ',week:'សប្ដាហ៍នេះ',month:'ខែនេះ',lastmonth:'ខែមុន',custom:'Custom range',all:'ទាំងអស់'};
+    var labels={today:'ថ្ងៃនេះ',week:'សប្ដាហ៍នេះ',month:'ខែនេះ',lastmonth:'ខែមុន',custom:'Custom',all:'ទាំងអស់'};
     var el=document.getElementById('rangeLabel');
-    if(el) el.textContent='📊 '+_filtered.length+' orders · '+(labels[_mode]||_mode);
+    if(el) el.textContent=_filtered.length+' orders · '+(labels[_mode]||_mode);
   }
 
   /* ══ CALC MODE ══ */
   window.setCalcMode=function(mode){
     _calcMode=mode;
-    // Update su-mode-btn buttons
-    document.getElementById('modeOrders').classList.toggle('active', mode==='orders');
-    document.getElementById('modeItems').classList.toggle('active',  mode==='items');
-    // Update label + formula hint
-    var lbl = document.getElementById('rateLabel');
-    var fml = document.getElementById('modeFormula');
-    if(mode==='orders'){
-      if(lbl) lbl.textContent='Rate / Order';
-      if(fml) fml.textContent='Orders × Rate = Commission';
-    } else {
-      if(lbl) lbl.textContent='Rate / Item';
-      if(fml) fml.textContent='Items × Rate = Commission';
-    }
-    // Save mode
+    document.getElementById('modeOrders').classList.toggle('active',mode==='orders');
+    document.getElementById('modeItems').classList.toggle('active',mode==='items');
+    var lbl=document.getElementById('rateLabel');
+    if(lbl) lbl.textContent=mode==='orders'?'Rate / Order':'Rate / Item';
     var s=loadS(); s._calcMode=mode; saveS(s);
     updateExCalc();
     renderAgents(); renderKPI(); renderTop(); updateSummary();
   };
 
-  /* Helper: total items for an agent */
   function agentItems(a){
     return a.orders.reduce(function(s,o){
       return s+(Array.isArray(o.products)?o.products.reduce(function(ss,p){return ss+(+p.qty||1);},0):0);
     },0);
   }
-
-  /* Helper: commission value for an agent */
   function calcComm(a){
     var r=a.rate!==undefined?a.rate:(Number(document.getElementById('defRate').value)||0);
     if(_calcMode==='items') return agentItems(a)*r;
@@ -550,24 +500,23 @@
   };
 
   function renderBreadcrumb(){
-    var h='<span class="bc-item'+(  _view==='agents'?' active':'')+'" onclick="navTo(\'agents\')">ទាំងអស់</span>';
+    var h='<span class="bc-item'+(_view==='agents'?' active':'')+'" onclick="navTo(\'agents\')">ទាំងអស់</span>';
     if(_view==='orders'||_view==='products'){
       h+='<span class="bc-sep">›</span>';
-      h+='<span class="bc-item'+(_view==='orders'?' active':'')+'" onclick="navTo(\'orders\',\''+encodeURIComponent(_selAgent||'')+'\')">'+((_selAgent||'').length>20?(_selAgent||'').slice(0,20)+'…':(_selAgent||''))+'</span>';
+      h+='<span class="bc-item'+(_view==='orders'?' active':'')+'" onclick="navTo(\'orders\',\''+encodeURIComponent(_selAgent||'')+'\')">'+((_selAgent||'').length>22?(_selAgent||'').slice(0,22)+'…':(_selAgent||''))+'</span>';
     }
     if(_view==='products'&&_selOrder!==null){
       var ag=_agents.find(function(a){return a.name===_selAgent;});
       var ord=ag&&ag.orders[_selOrder];
       if(ord){
-        h+='<span class="bc-sep">›</span>';
-        h+='<span class="bc-item active">'+(ord.customer||'Order').slice(0,18)+'</span>';
+        h+='<span class="bc-sep">›</span><span class="bc-item active">'+(ord.customer||'Order').slice(0,18)+'</span>';
       }
     }
     document.getElementById('breadcrumb').innerHTML=h;
   }
 
   function updatePanelTitle(){
-    var t={agents:'Commission Records',orders:'Orders របស់ '+((_selAgent||'').length>20?(_selAgent||'').slice(0,20)+'…':(_selAgent||'')),products:'ផលិតផល'};
+    var t={agents:'Commission Records',orders:'Orders — '+((_selAgent||'').length>22?(_selAgent||'').slice(0,22)+'…':(_selAgent||'')),products:'ផលិតផល'};
     document.getElementById('panelTitle').textContent=t[_view]||'';
   }
 
@@ -575,9 +524,7 @@
   window.renderAgents=function(){
     var q=(document.getElementById('srch').value||'').toLowerCase();
     var f=document.getElementById('fst').value;
-    var list=_agents.filter(function(a){
-      return (!q||a.name.toLowerCase().includes(q))&&(!f||a.status===f);
-    });
+    var list=_agents.filter(function(a){return (!q||a.name.toLowerCase().includes(q))&&(!f||a.status===f);});
     if(!list.length){
       document.getElementById('panelContent').innerHTML='<div class="no-data">គ្មានទិន្នន័យ CloseBy<br><small>Orders ត្រូវបំពេញ CloseBy field</small></div>';
       return;
@@ -589,75 +536,73 @@
       var comm=calcComm(a);
       var enc=encodeURIComponent(a.name);
       var init=(a.name.replace(/\s+/g,'').slice(0,2)||'??').toUpperCase();
-      var stCls=a.status==='Paid'?'p-paid':a.status==='Processing'?'p-processing':'p-pending';
       return '<tr onclick="navTo(\'orders\',\''+enc+'\')">'
-        +'<td><div class="ai"><div class="av">'+init+'</div><div>'
-        +'<div class="ai-name">'+a.name+'</div>'
-        +'<div class="click-hint">ចុចដើម្បីមើល orders</div>'
+        +'<td><div class="cm-ai"><div class="cm-av">'+init+'</div><div>'
+        +'<div class="cm-ai-name">'+a.name+'</div>'
+        +'<div class="cm-hint">ចុចដើម្បីមើល orders</div>'
         +'</div></div></td>'
-        +'<td><span class="badge badge-purple">'+cnt+'</span></td>'
-        +'<td style="color:var(--muted);font-size:12px">'+items+'</td>'
-        +'<td><span class="sales-val">$'+$m(sales)+'</span></td>'
-        +'<td onclick="event.stopPropagation()"><input type="number" class="rate-inp" value="'+a.rate+'" min="0" step="50" onchange="_ur(\''+enc+'\',this.value)"> <span style="font-size:10px;color:var(--muted)">៛</span></td>'
-        +'<td><span class="comm-val">'+comm.toLocaleString()+'៛</span></td>'
-        +'<td onclick="event.stopPropagation()"><select class="stchange" onchange="_us(\''+enc+'\',this.value)">'+['Paid','Pending','Processing'].map(function(s){return'<option'+(s===a.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td>'
+        +'<td><span class="cm-badge">'+cnt+'</span></td>'
+        +'<td class="cm-items">'+items+'</td>'
+        +'<td class="cm-sales">$'+$m(sales)+'</td>'
+        +'<td onclick="event.stopPropagation()"><input type="number" class="cm-rate-cell" value="'+a.rate+'" min="0" step="50" onchange="_ur(\''+enc+'\',this.value)"></td>'
+        +'<td class="cm-comm">'+comm.toLocaleString()+'៛</td>'
+        +'<td onclick="event.stopPropagation()"><select class="cm-status-sel" onchange="_us(\''+enc+'\',this.value)">'+['Paid','Pending','Processing'].map(function(s){return'<option'+(s===a.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td>'
         +'</tr>';
     }).join('');
 
-    document.getElementById('panelContent').innerHTML='<div class="tbl-wrap"><table>'
-      +'<thead><tr><th>CloseBy</th><th>Orders</th><th>Items</th><th>Sales</th><th>Rate(៛)</th><th>Commission</th><th>Status</th></tr></thead>'
+    document.getElementById('panelContent').innerHTML=
+      '<div class="cm-tbl-wrap"><table class="cm-tbl">'
+      +'<thead><tr><th>CloseBy</th><th>Orders</th><th>Items</th><th>Sales</th><th>Rate ៛</th><th>Commission</th><th>Status</th></tr></thead>'
       +'<tbody>'+rows+'</tbody></table></div>';
     renderKPI();
   };
 
-  /* ══ VIEW 2: ORDERS OF AN AGENT ══ */
+  /* ══ VIEW 2: ORDERS ══ */
   window.renderOrders=function(){
     var name=decodeURIComponent(_selAgent||'');
     var ag=_agents.find(function(a){return a.name===name;});
     if(!ag){document.getElementById('panelContent').innerHTML='<div class="no-data">រកមិនឃើញ</div>';return;}
-    var h='<div style="margin-bottom:8px;font-size:12px;color:var(--muted)">'+ag.orders.length+' orders · ចុចអតិថិជន ដើម្បីមើលផលិតផល</div>';
+    var h='<div style="margin-bottom:10px;font-size:12px;color:var(--muted)">'+ag.orders.length+' orders · ចុចអតិថិជន ដើម្បីមើលផលិតផល</div>';
     h+=ag.orders.map(function(o,i){
       var prods=Array.isArray(o.products)?o.products:[];
       var qty=prods.reduce(function(s,p){return s+(+p.qty||1);},0);
       var enc=encodeURIComponent(ag.name);
-      return '<div class="order-card" onclick="navTo(\'products\',\''+enc+'\','+i+')">'
-        +'<div class="order-card-row">'
-        +'<span class="order-card-name">'+(o.customer||'Unknown')+'</span>'
-        +'<span class="order-card-total">$'+$m(total(o))+'</span>'
+      return '<div class="cm-order-card" onclick="navTo(\'products\',\''+enc+'\','+i+')">'
+        +'<div class="cm-order-row">'
+        +'<span class="cm-order-name">'+(o.customer||'Unknown')+'</span>'
+        +'<span class="cm-order-total">$'+$m(total(o))+'</span>'
         +'</div>'
-        +'<div class="order-card-meta">'
-        +'<span class="meta-chip">📅 '+fmtD(o)+'</span>'
-        +'<span class="meta-chip">📦 '+prods.length+' ផ្សសផលិតផល · '+qty+' ឈុត</span>'
-        +(o.payment?'<span class="meta-chip">💳 '+o.payment+'</span>':'')
-        +(o.receiptNo?'<span class="meta-chip">#'+o.receiptNo+'</span>':'')
-        +'</div>'
-        +'</div>';
+        +'<div class="cm-order-meta">'
+        +'<span class="cm-chip">📅 '+fmtD(o)+'</span>'
+        +'<span class="cm-chip">📦 '+qty+' ឈុត</span>'
+        +(o.payment?'<span class="cm-chip">'+o.payment+'</span>':'')
+        +(o.receiptNo?'<span class="cm-chip">#'+o.receiptNo+'</span>':'')
+        +'</div></div>';
     }).join('');
     document.getElementById('panelContent').innerHTML=h;
   };
 
-  /* ══ VIEW 3: PRODUCTS OF AN ORDER ══ */
+  /* ══ VIEW 3: PRODUCTS ══ */
   window.renderProducts=function(){
     var name=decodeURIComponent(_selAgent||'');
     var ag=_agents.find(function(a){return a.name===name;});
     var ord=ag&&ag.orders[_selOrder];
     if(!ord){document.getElementById('panelContent').innerHTML='<div class="no-data">រកមិនឃើញ</div>';return;}
     var prods=Array.isArray(ord.products)?ord.products:[];
-    var h='<div style="margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted)">'
+    var h='<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:10px">'
       +'<span>👤 <b style="color:var(--text)">'+(ord.customer||'-')+'</b></span>'
       +'<span>📅 '+fmtD(ord)+'</span>'
-      +'<span>💵 $'+$m(total(ord))+'</span>'
-      +'</div>';
+      +'<span>💵 $'+$m(total(ord))+'</span></div>';
     if(!prods.length){
       h+='<div class="no-data">គ្មានផលិតផល</div>';
     } else {
       h+=prods.map(function(p){
         var sub=((+p.qty||1)*(+p.price||0))-(+p.discount||0);
-        return '<div class="prod-row">'
-          +'<span class="prod-name">'+(p.name||p.product||'-')+'</span>'
-          +'<span class="prod-qty">×'+(p.qty||1)+' ឈុត</span>'
-          +'<span class="prod-price">$'+(+p.price||0)+'</span>'
-          +'<span class="prod-sub">$'+$m(sub)+'</span>'
+        return '<div class="cm-prod-row">'
+          +'<span class="cm-prod-name">'+(p.name||p.product||'-')+'</span>'
+          +'<span class="cm-prod-qty">×'+(p.qty||1)+' ឈុត</span>'
+          +'<span class="cm-prod-price">$'+(+p.price||0)+'</span>'
+          +'<span class="cm-prod-sub">$'+$m(sub)+'</span>'
           +'</div>';
       }).join('');
     }
@@ -666,37 +611,34 @@
 
   /* ══ KPI ══ */
   function renderKPI(){
-    var agents=_agents;
-    var tot =agents.reduce(function(s,a){return s+calcComm(a);},0);
-    var paid=agents.filter(function(a){return a.status==='Paid';}).reduce(function(s,a){return s+calcComm(a);},0);
-    var pend=agents.filter(function(a){return a.status==='Pending';}).reduce(function(s,a){return s+calcComm(a);},0);
+    var tot =_agents.reduce(function(s,a){return s+calcComm(a);},0);
+    var paid=_agents.filter(function(a){return a.status==='Paid';}).reduce(function(s,a){return s+calcComm(a);},0);
+    var pend=_agents.filter(function(a){return a.status==='Pending';}).reduce(function(s,a){return s+calcComm(a);},0);
     document.getElementById('sTot').textContent =tot.toLocaleString()+'៛';
     document.getElementById('sPaid').textContent=paid.toLocaleString()+'៛';
     document.getElementById('sPend').textContent=pend.toLocaleString()+'៛';
-    document.getElementById('sAg').textContent  =agents.length;
+    document.getElementById('sAg').textContent  =_agents.length;
   }
 
-  /* ══ TOP CLOSEBY (separate sorted table) ══ */
+  /* ══ TOP CLOSEBY ══ */
   function renderTop(){
     var sorted=[..._agents].sort(function(a,b){return b.orders.length-a.orders.length;});
-    if(!sorted.length){document.getElementById('topList').innerHTML='<div class="no-data">គ្មានទិន្នន័យ</div>';return;}
-    var rc=function(i){return i===0?'r1':i===1?'r2':i===2?'r3':'rn';};
+    if(!sorted.length){document.getElementById('topList').innerHTML='<div class="no-data" style="padding:20px">គ្មានទិន្នន័យ</div>';return;}
+    var rc=function(i){return i===0?'cm-r1':i===1?'cm-r2':i===2?'cm-r3':'';};
     var em=['🥇','🥈','🥉'];
-    var def=Number(document.getElementById('defRate').value)||0;
     document.getElementById('topList').innerHTML=sorted.map(function(a,i){
       var comm=calcComm(a);
       var baseVal=_calcMode==='items'?agentItems(a):a.orders.length;
       var baseLabel=_calcMode==='items'?'items':'orders';
-      return '<div class="top-row">'
-        +'<div class="rk '+rc(i)+'">'+(i<3?em[i]:i+1)+'</div>'
-        +'<div class="top-info"><b>'+a.name+'</b><small>'+a.orders.length+' orders'+(  _calcMode==='items'?' · '+agentItems(a)+' items':'')+'</small></div>'
-        +'<div style="text-align:right"><div class="top-orders">'+baseVal+'</div><div style="font-size:10px;color:var(--muted)">'+baseLabel+'</div></div>'
-        +'<div style="text-align:right"><div class="top-comm">'+comm.toLocaleString()+'៛</div><div style="font-size:10px;color:var(--muted)">commission</div></div>'
+      return '<div class="cm-top-row">'
+        +'<div class="cm-rk '+rc(i)+'">'+(i<3?em[i]:i+1)+'</div>'
+        +'<div class="cm-top-info"><b>'+a.name+'</b><small>'+a.orders.length+' orders'+(  _calcMode==='items'?' · '+agentItems(a)+' items':'')+'</small></div>'
+        +'<div class="cm-top-nums"><div class="cm-top-orders">'+baseVal+' '+baseLabel+'</div><div class="cm-top-comm">'+comm.toLocaleString()+'៛</div></div>'
         +'</div>';
     }).join('');
   }
 
-  /* ══ RATE / STATUS CALLBACKS ══ */
+  /* ══ RATE / STATUS ══ */
   window._ur=function(enc,val){
     var n=decodeURIComponent(enc);
     var s=loadS(); if(!s[n])s[n]={}; s[n].rate=+val||0; saveS(s);
@@ -714,9 +656,7 @@
   window.applyDefRate=function(){
     var r=Number(document.getElementById('defRate').value)||0;
     var s=loadS(); s._default=r; saveS(s);
-    _agents.forEach(function(a){
-      if(!(s[a.name]&&s[a.name].rate!==undefined)) a.rate=r;
-    });
+    _agents.forEach(function(a){ if(!(s[a.name]&&s[a.name].rate!==undefined)) a.rate=r; });
     updateExCalc();
     renderAgents(); renderKPI(); renderTop(); updateSummary();
   };
@@ -725,40 +665,16 @@
     var r=Number(document.getElementById('defRate').value)||0;
     var el=document.getElementById('exCalc');
     if(!el) return;
-    if(_calcMode==='items'){
-      el.innerHTML='50 items × <b>'+r.toLocaleString()+'៛</b> = <b>'+(50*r).toLocaleString()+'៛</b>';
-    } else {
-      el.innerHTML='10 orders × <b>'+r.toLocaleString()+'៛</b> = <b>'+(10*r).toLocaleString()+'៛</b>';
-    }
+    if(_calcMode==='items') el.innerHTML='50 items × <b>'+r.toLocaleString()+'៛</b> = <b>'+(50*r).toLocaleString()+'៛</b>';
+    else el.innerHTML='10 orders × <b>'+r.toLocaleString()+'៛</b> = <b>'+(10*r).toLocaleString()+'៛</b>';
   }
 
-  /* ══ QUICK SUMMARY ══ */
+  /* ══ SUMMARY ══ */
   function updateSummary(){
-    var agents=_agents;
     var totalOrders=_filtered.length;
-    var totalItems =_filtered.reduce(function(s,o){
-      return s+(Array.isArray(o.products)?o.products.reduce(function(ss,p){return ss+(+p.qty||1);},0):0);
-    },0);
-    var totalSales =_filtered.reduce(function(s,o){return s+total(o);},0);
-
-    var el=function(id){return document.getElementById(id);};
-    if(el('sumOrders')) el('sumOrders').textContent=totalOrders.toLocaleString();
-    if(el('sumItems'))  el('sumItems').textContent =totalItems.toLocaleString();
-    if(el('sumSales'))  el('sumSales').textContent ='$'+$m(totalSales);
-
-    // Progress bar: paid vs pending
-    var paidComm=agents.filter(function(a){return a.status==='Paid';}).reduce(function(s,a){return s+calcComm(a);},0);
-    var totComm =agents.reduce(function(s,a){return s+calcComm(a);},0);
-    var paidPct = totComm>0 ? Math.round(paidComm/totComm*100) : 0;
-    var pendPct = totComm>0 ? Math.round((totComm-paidComm)/totComm*100) : 0;
-    if(el('barPaid')) el('barPaid').style.width=paidPct+'%';
-    if(el('barPend')){ el('barPend').style.width=pendPct+'%'; el('barPend').style.left=paidPct+'%'; }
-    if(el('legendPaid')) el('legendPaid').textContent='Paid '+paidPct+'%';
-    if(el('legendPend')) el('legendPend').textContent='Pending '+pendPct+'%';
-
-    // Range label
     var labels={today:'ថ្ងៃនេះ',week:'សប្ដាហ៍នេះ',month:'ខែនេះ',lastmonth:'ខែមុន',custom:'Custom',all:'ទាំងអស់'};
-    if(el('sumRangeLabel')) el('sumRangeLabel').textContent='📅 '+(labels[_mode]||_mode)+' · '+totalOrders+' orders';
+    var el=document.getElementById('sumRangeLabel');
+    if(el) el.textContent='📅 '+(labels[_mode]||_mode)+' · '+totalOrders+' orders';
   }
 
   /* ══ EXPORT CSV ══ */
@@ -773,8 +689,7 @@
     var csv=rows.map(function(r){return r.map(function(v){return '"'+String(v||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
     var a=document.createElement('a');
     a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
-    var labels={today:'today',week:'week',month:'month',lastmonth:'lastmonth',all:'all',custom:'custom'};
-    a.download='commission_'+(labels[_mode]||_mode)+'_'+new Date().toISOString().slice(0,10)+'.csv';
+    a.download='commission_'+(_mode)+'_'+new Date().toISOString().slice(0,10)+'.csv';
     a.click();
     macUI&&macUI.toast('Export CSV រួចរាល់!','success');
   };
@@ -782,9 +697,8 @@
   /* ══ LOAD DATA ══ */
   window.loadData=async function(){
     document.getElementById('panelContent').innerHTML='<div class="no-data">⏳ កំពុងទាញទិន្នន័យ...</div>';
-    try{
-      if(window.CamboOrdersData) _all=await CamboOrdersData.fetchOrders(5000);
-    }catch(e){ console.warn('Commission fetch error',e); }
+    try{ if(window.CamboOrdersData) _all=await CamboOrdersData.fetchOrders(5000); }
+    catch(e){ console.warn('Commission fetch error',e); }
     applyFilter();
   };
 
@@ -792,12 +706,10 @@
   document.addEventListener('DOMContentLoaded',function(){
     var s=loadS();
     if(s._default!==undefined) document.getElementById('defRate').value=s._default;
-    // Restore saved calc mode
     if(s._calcMode==='items') setCalcMode('items');
     else setCalcMode('orders');
     document.getElementById('defRate').addEventListener('input',function(){
-      updateExCalc();
-      renderAgents(); renderKPI(); renderTop();
+      updateExCalc(); renderAgents(); renderKPI(); renderTop();
     });
     updateExCalc();
     loadData();
@@ -806,8 +718,7 @@
 </script>
 <script src="../assets/js/sw-register.js"></script>
 
-<!-- Filter backdrop + dropdown — must be direct children of body so
-     position:fixed uses the viewport, not a backdrop-filter ancestor -->
+<!-- Dropdown moved to body — avoids backdrop-filter stacking context -->
 <div class="fil-backdrop" id="filBackdrop" onclick="closeFilDrop()"></div>
 <div class="fil-drop" id="filDrop">
   <div class="fil-drop-title">📅 Filter តាមថ្ងៃខែ</div>
@@ -820,16 +731,10 @@
     <button class="df-btn" data-mode="custom"    onclick="setMode('custom')">Custom</button>
   </div>
   <div class="df-custom" id="customRange">
-    <div class="df-custom-row">
-      <span style="font-size:11px;color:var(--muted);flex-shrink:0;width:34px">ពី</span>
-      <input type="date" id="dateFrom" class="df-input" onchange="applyFilter()">
-    </div>
-    <div class="df-custom-row">
-      <span style="font-size:11px;color:var(--muted);flex-shrink:0;width:34px">ដល់</span>
-      <input type="date" id="dateTo" class="df-input" onchange="applyFilter()">
-    </div>
+    <div class="df-row"><span class="df-lbl">ពី</span><input type="date" id="dateFrom" class="df-input" onchange="applyFilter()"></div>
+    <div class="df-row"><span class="df-lbl">ដល់</span><input type="date" id="dateTo"   class="df-input" onchange="applyFilter()"></div>
   </div>
-  <div class="fil-range-label" id="rangeLabel"></div>
+  <div class="fil-range-label" id="rangeLabel2"></div>
 </div>
 </body>
 </html>
