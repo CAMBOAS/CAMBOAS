@@ -18,15 +18,47 @@
     .kpi-label{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
     .kpi-val{display:block;margin-top:8px;font-size:22px;font-weight:800;color:var(--text)}
 
-    /* ── Date Filter ── */
-    .df-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .df-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+    /* ── Filter Button + Dropdown ── */
+    .fil-wrap{flex-shrink:0}
+    .fil-btn{display:flex;align-items:center;gap:6px;padding:0 14px;height:36px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+    .fil-btn:hover{border-color:rgba(139,92,246,.4);color:var(--text)}
+    .fil-btn.has-filter{border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.12);color:#c4b5fd}
+    .fil-dot{width:6px;height:6px;border-radius:50%;background:#c4b5fd;display:none}
+    .fil-btn.has-filter .fil-dot{display:block}
+
+    /* Dropdown: position:fixed controlled by JS — never overflows viewport */
+    .fil-drop{
+      position:fixed;
+      z-index:9999;
+      background:var(--card-bg,#1e293b);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px 16px;
+      box-shadow:0 16px 48px rgba(0,0,0,.45);
+      display:none;
+      width:280px;
+      max-width:calc(100vw - 24px);
+      box-sizing:border-box;
+      /* animate */
+      opacity:0;
+      transform:translateY(-6px);
+      transition:opacity .18s,transform .18s;
+    }
+    .fil-drop.open{display:block;opacity:1;transform:translateY(0)}
+    .fil-drop-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .fil-presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+    .df-btn{padding:6px 13px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
     .df-btn:hover{border-color:rgba(139,92,246,.4);color:var(--text)}
     .df-btn.active{background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.5);color:#c4b5fd}
-    .df-custom{display:none;gap:6px;align-items:center}
+    .df-custom{display:none;flex-direction:column;gap:8px;margin-top:6px}
     .df-custom.show{display:flex}
-    .df-input{padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:12px;font-family:inherit}
+    .df-custom-row{display:flex;align-items:center;gap:8px}
+    .df-input{padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:12px;font-family:inherit;flex:1;width:100%;box-sizing:border-box}
     .df-input:focus{outline:none;border-color:rgba(139,92,246,.4)}
+    .fil-range-label{font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid rgba(148,163,200,.08)}
+    /* Backdrop for mobile tap-to-close */
+    .fil-backdrop{display:none;position:fixed;inset:0;z-index:9998}
+    .fil-backdrop.show{display:block}
 
     /* ── Main layout ── */
     .clayout{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start}
@@ -100,15 +132,48 @@
     .top-orders{font-size:13px;font-weight:800;color:#c4b5fd;text-align:right;white-space:nowrap}
     .top-comm{font-size:12px;font-weight:700;color:#fde68a;text-align:right;white-space:nowrap}
 
-    /* ── Setup card ── */
-    .setup-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(148,163,200,.08)}
-    .setup-row:last-child{border-bottom:none;padding-bottom:0}
-    .setup-label{font-size:13px;color:var(--text);font-weight:600}
-    .setup-sub{font-size:11px;color:var(--muted);margin-top:2px}
-    .big-inp{width:90px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:14px;text-align:center;font-family:inherit;font-weight:700}
-    .big-inp:focus{outline:none;border-color:rgba(139,92,246,.4)}
-    .apply-btn{margin-top:10px;padding:7px 18px;border-radius:10px;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.3);color:#c4b5fd;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
-    .apply-btn:hover{background:rgba(139,92,246,.3)}
+    /* ── Commission Quick Summary ── */
+    .csumm{margin-top:18px;display:flex;flex-direction:column;gap:14px}
+    .csumm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .csumm-stat{padding:11px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);text-align:center;transition:background .15s}
+    .csumm-stat:hover{background:rgba(255,255,255,.07)}
+    .csumm-stat-ico{font-size:18px;margin-bottom:4px}
+    .csumm-stat-val{font-size:17px;font-weight:800;color:var(--text)}
+    .csumm-stat-lbl{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+    .csumm-bottom{display:flex;flex-direction:column;gap:8px}
+    .csumm-bar-head{display:flex;justify-content:space-between;align-items:center;font-size:11px}
+    .csumm-bar-title{font-weight:700;color:var(--muted)}
+    .csumm-bar-legend{display:flex;gap:10px}
+    .csumm-legend-dot{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+    .csumm-legend-dot::before{content:'';width:8px;height:8px;border-radius:50%;display:inline-block}
+    .csumm-legend-dot.paid::before{background:#4ade80}
+    .csumm-legend-dot.pend::before{background:#fbbf24}
+    .csumm-bar-track{height:8px;border-radius:20px;background:rgba(148,163,200,.12);overflow:hidden;position:relative}
+    .csumm-bar-paid{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#22c55e,#4ade80);border-radius:20px;transition:width .6s ease}
+    .csumm-bar-pend{position:absolute;top:0;height:100%;background:linear-gradient(90deg,#f59e0b,#fbbf24);border-radius:20px;transition:width .6s ease, left .6s ease}
+    .csumm-export{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+    .exp-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:9px;border:1px solid rgba(6,182,212,.3);background:rgba(6,182,212,.08);color:#7dd3fc;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+    .exp-btn:hover{background:rgba(6,182,212,.16);border-color:rgba(6,182,212,.5)}
+
+    /* ── Setup card v2 ── */
+    .su-wrap{display:flex;flex-direction:column;gap:12px}
+    .su-mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .su-mode-btn{padding:10px 8px;border-radius:13px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;line-height:1.3}
+    .su-mode-btn:hover{border-color:rgba(139,92,246,.35);color:var(--text);background:rgba(139,92,246,.05)}
+    .su-mode-btn.active{border-color:rgba(139,92,246,.55);background:rgba(139,92,246,.13);color:#c4b5fd}
+    .su-mode-ico{font-size:22px;line-height:1}
+    .su-mode-name{font-size:12px;font-weight:800}
+    .su-mode-sub{font-size:10px;font-weight:500;opacity:.7}
+    .su-rate-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:13px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1)}
+    .su-rate-lbl{flex:1;font-size:12px;color:var(--muted);font-weight:600;line-height:1.4}
+    .su-rate-lbl span{display:block;font-size:10px;color:var(--muted);opacity:.7;margin-top:1px}
+    .su-rate-inp{width:72px;padding:5px 8px;border-radius:9px;border:1.5px solid rgba(139,92,246,.35);background:rgba(139,92,246,.08);color:#c4b5fd;font-size:18px;text-align:center;font-family:inherit;font-weight:800;transition:border-color .15s}
+    .su-rate-inp:focus{outline:none;border-color:rgba(139,92,246,.65);background:rgba(139,92,246,.14)}
+    .su-rate-unit{font-size:14px;font-weight:800;color:var(--muted);flex-shrink:0}
+    .su-example{font-size:11px;color:var(--muted);text-align:center;padding:7px 10px;border-radius:9px;background:rgba(255,255,255,.03);border:1px dashed rgba(148,163,200,.1)}
+    .su-example b{color:var(--text)}
+    .su-apply{width:100%;padding:10px;border-radius:12px;background:linear-gradient(135deg,rgba(139,92,246,.25),rgba(6,182,212,.15));border:1px solid rgba(139,92,246,.35);color:#c4b5fd;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;letter-spacing:.02em}
+    .su-apply:hover{background:linear-gradient(135deg,rgba(139,92,246,.38),rgba(6,182,212,.25));border-color:rgba(139,92,246,.55)}
 
     @media(max-width:1080px){.clayout{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
   </style>
@@ -130,29 +195,100 @@
         <article class="glass-card kpi"><div class="kpi-label">Active CloseBy</div><strong class="kpi-val" id="sAg">0</strong></article>
       </div>
 
-      <!-- Header + Date Filter -->
-      <section class="glass-card" style="padding:20px 24px;border-radius:22px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:14px">
-          <div>
-            <h2 style="margin:0 0 3px;color:var(--text)">Commission</h2>
-            <p style="margin:0;color:var(--muted);font-size:13px">គ្រប់គ្រង commission CloseBy និង payout report</p>
+      <!-- Header + Commission Setup (same row, simplified) -->
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:stretch">
+        <section class="glass-card" style="padding:20px 24px;border-radius:22px">
+          <!-- Header row -->
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+            <div>
+              <h2 style="margin:0 0 3px;color:var(--text)">Commission</h2>
+              <p style="margin:0;color:var(--muted);font-size:13px">គ្រប់គ្រង commission CloseBy និង payout report</p>
+            </div>
+            <button onclick="loadData()" style="padding:6px 14px;border-radius:9px;background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);color:#7dd3fc;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0">🔄 Refresh</button>
           </div>
-          <button onclick="loadData()" style="padding:7px 16px;border-radius:10px;background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.3);color:#7dd3fc;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🔄 Refresh</button>
-        </div>
-        <div class="df-bar">
-          <button class="df-btn" data-mode="today" onclick="setMode('today')">ថ្ងៃនេះ</button>
-          <button class="df-btn" data-mode="week" onclick="setMode('week')">សប្ដាហ៍នេះ</button>
-          <button class="df-btn active" data-mode="month" onclick="setMode('month')">ខែនេះ</button>
-          <button class="df-btn" data-mode="lastmonth" onclick="setMode('lastmonth')">ខែមុន</button>
-          <button class="df-btn" data-mode="custom" onclick="setMode('custom')">Custom</button>
-          <div class="df-custom" id="customRange">
-            <input type="date" id="dateFrom" class="df-input" onchange="applyFilter()">
-            <span style="color:var(--muted);font-size:12px">→</span>
-            <input type="date" id="dateTo" class="df-input" onchange="applyFilter()">
+
+          <!-- Quick Summary -->
+          <div class="csumm">
+            <!-- 3 stat chips -->
+            <div class="csumm-stats">
+              <div class="csumm-stat">
+                <div class="csumm-stat-ico">📋</div>
+                <div class="csumm-stat-val" id="sumOrders">—</div>
+                <div class="csumm-stat-lbl">Orders</div>
+              </div>
+              <div class="csumm-stat">
+                <div class="csumm-stat-ico">📦</div>
+                <div class="csumm-stat-val" id="sumItems">—</div>
+                <div class="csumm-stat-lbl">Items</div>
+              </div>
+              <div class="csumm-stat">
+                <div class="csumm-stat-ico">💵</div>
+                <div class="csumm-stat-val" id="sumSales">—</div>
+                <div class="csumm-stat-lbl">Total Sales</div>
+              </div>
+            </div>
+
+            <!-- Commission status progress bar -->
+            <div class="csumm-bottom">
+              <div class="csumm-bar-head">
+                <span class="csumm-bar-title">Commission Status</span>
+                <div class="csumm-bar-legend">
+                  <span class="csumm-legend-dot paid" id="legendPaid">Paid 0%</span>
+                  <span class="csumm-legend-dot pend" id="legendPend">Pending 0%</span>
+                </div>
+              </div>
+              <div class="csumm-bar-track">
+                <div class="csumm-bar-paid"  id="barPaid" style="width:0%"></div>
+                <div class="csumm-bar-pend"  id="barPend" style="width:0%;left:0%"></div>
+              </div>
+              <div class="csumm-export">
+                <span style="font-size:11px;color:var(--muted)" id="sumRangeLabel"></span>
+                <button class="exp-btn" onclick="exportCommCSV()">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export CSV
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-        <div style="margin-top:10px;font-size:12px;color:var(--muted)" id="rangeLabel"></div>
-      </section>
+        </section>
+
+        <!-- Commission Setup (top right) — v2 clean -->
+        <article class="glass-card cp">
+          <div class="cp-title" style="margin-bottom:14px">⚙️ Commission Setup</div>
+          <div class="su-wrap">
+
+            <!-- Mode: Orders / Items -->
+            <div class="su-mode-grid">
+              <button class="su-mode-btn active" id="modeOrders" onclick="setCalcMode('orders')">
+                <span class="su-mode-ico">📋</span>
+                <span class="su-mode-name">Orders</span>
+                <span class="su-mode-sub">Orders × Rate</span>
+              </button>
+              <button class="su-mode-btn" id="modeItems" onclick="setCalcMode('items')">
+                <span class="su-mode-ico">📦</span>
+                <span class="su-mode-name">Items</span>
+                <span class="su-mode-sub">Items × Rate</span>
+              </button>
+            </div>
+
+            <!-- Rate input -->
+            <div class="su-rate-row">
+              <div class="su-rate-lbl">
+                <span id="rateLabel">Rate / Order</span>
+                <span id="modeFormula">Orders × Rate = Commission</span>
+              </div>
+              <input type="number" id="defRate" class="su-rate-inp" value="200" min="0" step="50">
+              <span class="su-rate-unit">៛</span>
+            </div>
+
+            <!-- Example calc -->
+            <div class="su-example" id="exCalc">10 orders × <b>200៛</b> = <b>2,000៛</b></div>
+
+            <!-- Apply -->
+            <button class="su-apply" onclick="applyDefRate()">✅ Apply to All</button>
+          </div>
+        </article>
+      </div>
 
       <!-- Main layout -->
       <div class="clayout">
@@ -177,6 +313,17 @@
               <option value="Pending">Pending</option>
               <option value="Processing">Processing</option>
             </select>
+
+            <!-- Filter Button (Block 2) -->
+            <div class="fil-wrap" id="filWrap">
+              <button class="fil-btn" id="filBtn" onclick="toggleFilDrop(event)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                Filter
+                <span class="fil-dot"></span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="filChevron" style="transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
+
           </div>
 
           <!-- Panel content -->
@@ -185,28 +332,6 @@
 
         <!-- RIGHT -->
         <div style="display:grid;gap:18px;align-content:start">
-
-          <!-- Commission Setup -->
-          <article class="glass-card cp">
-            <div class="cp-title">⚙️ Commission Setup</div>
-            <div class="setup-row">
-              <div>
-                <div class="setup-label">Rate ក្នុងមួយ Order</div>
-                <div class="setup-sub">Orders × Rate = Commission</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:6px">
-                <input type="number" id="defRate" class="big-inp" value="200" min="0" step="50">
-                <span style="color:var(--muted);font-size:13px;font-weight:700">៛</span>
-              </div>
-            </div>
-            <div class="setup-row">
-              <div>
-                <div class="setup-label">ឧទាហរណ៍</div>
-                <div class="setup-sub" id="exCalc">10 orders × 200៛ = 2,000៛</div>
-              </div>
-            </div>
-            <button class="apply-btn" onclick="applyDefRate()">✅ Apply to All</button>
-          </article>
 
           <!-- Top CloseBy (SEPARATE TABLE) -->
           <article class="glass-card cp">
@@ -232,6 +357,7 @@
   /* ══ STATE ══ */
   var _all=[], _filtered=[], _agents=[];
   var _mode='month';
+  var _calcMode='orders'; // 'orders' | 'items'
   var _view='agents'; // 'agents' | 'orders' | 'products'
   var _selAgent=null;
   var _selOrder=null;
@@ -257,13 +383,62 @@
   }
   function $m(n){ return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2}); }
 
+  /* ══ FILTER BUTTON TOGGLE ══ */
+  window.toggleFilDrop=function(e){
+    e.stopPropagation();
+    var drop =document.getElementById('filDrop');
+    var btn  =document.getElementById('filBtn');
+    var bdrop=document.getElementById('filBackdrop');
+    var chev =document.getElementById('filChevron');
+    var isOpen=drop.classList.contains('open');
+    if(!isOpen&&btn){
+      var rect=btn.getBoundingClientRect();
+      var vw=window.innerWidth;
+      var dropW=Math.min(280,vw-24);
+      var left=rect.right-dropW;
+      if(left<12) left=12;
+      if(left+dropW>vw-12) left=vw-dropW-12;
+      drop.style.top  =(rect.bottom+6)+'px';
+      drop.style.left =left+'px';
+      drop.style.width=dropW+'px';
+    }
+    drop.classList.toggle('open',!isOpen);
+    if(bdrop) bdrop.classList.toggle('show',!isOpen);
+    if(chev)  chev.style.transform=!isOpen?'rotate(180deg)':'';
+  };
+  window.closeFilDrop=function(){
+    var drop =document.getElementById('filDrop');
+    var bdrop=document.getElementById('filBackdrop');
+    var chev =document.getElementById('filChevron');
+    if(drop)  drop.classList.remove('open');
+    if(bdrop) bdrop.classList.remove('show');
+    if(chev)  chev.style.transform='';
+  };
+  document.addEventListener('click',function(e){
+    var drop=document.getElementById('filDrop');
+    var btn =document.getElementById('filBtn');
+    if(drop&&drop.classList.contains('open')&&btn&&!btn.contains(e.target)&&!drop.contains(e.target)){
+      closeFilDrop();
+    }
+  });
+
   /* ══ DATE FILTER ══ */
   window.setMode=function(m){
     _mode=m;
+    // Sync preset buttons inside dropdown
     document.querySelectorAll('.df-btn').forEach(function(b){
       b.classList.toggle('active',b.dataset.mode===m);
     });
     document.getElementById('customRange').classList.toggle('show',m==='custom');
+    // Update Filter button appearance
+    var btn=document.getElementById('filBtn');
+    var nonDefault=['today','week','lastmonth','all','custom'];
+    if(btn) btn.classList.toggle('has-filter', nonDefault.indexOf(m)!==-1);
+    // Close dropdown after selecting (except custom — keep open for date inputs)
+    if(m!=='custom'){
+      var drop=document.getElementById('filDrop');
+      if(drop) setTimeout(function(){ drop.classList.remove('open'); var chev=document.getElementById('filChevron'); if(chev) chev.style.transform=''; },300);
+    }
     applyFilter();
   };
 
@@ -272,9 +447,9 @@
     var today=new Date(); today.setHours(0,0,0,0);
     _filtered=_all.filter(function(o){
       var d=toDate(o); if(!d) return false;
+      if(_mode==='all') return true;
       if(_mode==='today'){
-        var s=new Date(today); var e=new Date(now);
-        return d>=s&&d<=e;
+        return d>=today&&d<=now;
       }
       if(_mode==='week'){
         var s=new Date(today); s.setDate(today.getDate()-today.getDay());
@@ -303,11 +478,49 @@
     navTo('agents');
     renderKPI();
     renderTop();
+    updateSummary();
   };
 
   function updateRangeLabel(){
-    var labels={today:'ថ្ងៃនេះ',week:'សប្ដាហ៍នេះ',month:'ខែនេះ',lastmonth:'ខែមុន',custom:'Custom range'};
-    document.getElementById('rangeLabel').textContent='📊 '+_filtered.length+' orders · '+labels[_mode];
+    var labels={today:'ថ្ងៃនេះ',week:'សប្ដាហ៍នេះ',month:'ខែនេះ',lastmonth:'ខែមុន',custom:'Custom range',all:'ទាំងអស់'};
+    var el=document.getElementById('rangeLabel');
+    if(el) el.textContent='📊 '+_filtered.length+' orders · '+(labels[_mode]||_mode);
+  }
+
+  /* ══ CALC MODE ══ */
+  window.setCalcMode=function(mode){
+    _calcMode=mode;
+    // Update su-mode-btn buttons
+    document.getElementById('modeOrders').classList.toggle('active', mode==='orders');
+    document.getElementById('modeItems').classList.toggle('active',  mode==='items');
+    // Update label + formula hint
+    var lbl = document.getElementById('rateLabel');
+    var fml = document.getElementById('modeFormula');
+    if(mode==='orders'){
+      if(lbl) lbl.textContent='Rate / Order';
+      if(fml) fml.textContent='Orders × Rate = Commission';
+    } else {
+      if(lbl) lbl.textContent='Rate / Item';
+      if(fml) fml.textContent='Items × Rate = Commission';
+    }
+    // Save mode
+    var s=loadS(); s._calcMode=mode; saveS(s);
+    updateExCalc();
+    renderAgents(); renderKPI(); renderTop(); updateSummary();
+  };
+
+  /* Helper: total items for an agent */
+  function agentItems(a){
+    return a.orders.reduce(function(s,o){
+      return s+(Array.isArray(o.products)?o.products.reduce(function(ss,p){return ss+(+p.qty||1);},0):0);
+    },0);
+  }
+
+  /* Helper: commission value for an agent */
+  function calcComm(a){
+    var r=a.rate!==undefined?a.rate:(Number(document.getElementById('defRate').value)||0);
+    if(_calcMode==='items') return agentItems(a)*r;
+    return a.orders.length*r;
   }
 
   /* ══ BUILD AGENTS ══ */
@@ -371,9 +584,9 @@
     }
     var rows=list.map(function(a){
       var cnt=a.orders.length;
-      var items=a.orders.reduce(function(s,o){return s+(Array.isArray(o.products)?o.products.reduce(function(ss,p){return ss+(+p.qty||1);},0):0);},0);
+      var items=agentItems(a);
       var sales=a.orders.reduce(function(s,o){return s+total(o);},0);
-      var comm=cnt*a.rate;
+      var comm=calcComm(a);
       var enc=encodeURIComponent(a.name);
       var init=(a.name.replace(/\s+/g,'').slice(0,2)||'??').toUpperCase();
       var stCls=a.status==='Paid'?'p-paid':a.status==='Processing'?'p-processing':'p-pending';
@@ -453,13 +666,10 @@
 
   /* ══ KPI ══ */
   function renderKPI(){
-    var sett=loadS();
-    var def=Number(document.getElementById('defRate').value)||0;
     var agents=_agents;
-    function rate(a){return a.rate!==undefined?a.rate:def;}
-    var tot =agents.reduce(function(s,a){return s+a.orders.length*rate(a);},0);
-    var paid=agents.filter(function(a){return a.status==='Paid';}).reduce(function(s,a){return s+a.orders.length*rate(a);},0);
-    var pend=agents.filter(function(a){return a.status==='Pending';}).reduce(function(s,a){return s+a.orders.length*rate(a);},0);
+    var tot =agents.reduce(function(s,a){return s+calcComm(a);},0);
+    var paid=agents.filter(function(a){return a.status==='Paid';}).reduce(function(s,a){return s+calcComm(a);},0);
+    var pend=agents.filter(function(a){return a.status==='Pending';}).reduce(function(s,a){return s+calcComm(a);},0);
     document.getElementById('sTot').textContent =tot.toLocaleString()+'៛';
     document.getElementById('sPaid').textContent=paid.toLocaleString()+'៛';
     document.getElementById('sPend').textContent=pend.toLocaleString()+'៛';
@@ -474,11 +684,13 @@
     var em=['🥇','🥈','🥉'];
     var def=Number(document.getElementById('defRate').value)||0;
     document.getElementById('topList').innerHTML=sorted.map(function(a,i){
-      var comm=a.orders.length*(a.rate!==undefined?a.rate:def);
+      var comm=calcComm(a);
+      var baseVal=_calcMode==='items'?agentItems(a):a.orders.length;
+      var baseLabel=_calcMode==='items'?'items':'orders';
       return '<div class="top-row">'
         +'<div class="rk '+rc(i)+'">'+(i<3?em[i]:i+1)+'</div>'
-        +'<div class="top-info"><b>'+a.name+'</b><small>'+a.orders.length+' orders</small></div>'
-        +'<div style="text-align:right"><div class="top-orders">'+a.orders.length+'</div><div style="font-size:10px;color:var(--muted)">orders</div></div>'
+        +'<div class="top-info"><b>'+a.name+'</b><small>'+a.orders.length+' orders'+(  _calcMode==='items'?' · '+agentItems(a)+' items':'')+'</small></div>'
+        +'<div style="text-align:right"><div class="top-orders">'+baseVal+'</div><div style="font-size:10px;color:var(--muted)">'+baseLabel+'</div></div>'
         +'<div style="text-align:right"><div class="top-comm">'+comm.toLocaleString()+'៛</div><div style="font-size:10px;color:var(--muted)">commission</div></div>'
         +'</div>';
     }).join('');
@@ -506,17 +718,70 @@
       if(!(s[a.name]&&s[a.name].rate!==undefined)) a.rate=r;
     });
     updateExCalc();
-    renderAgents(); renderKPI(); renderTop();
+    renderAgents(); renderKPI(); renderTop(); updateSummary();
   };
 
   function updateExCalc(){
     var r=Number(document.getElementById('defRate').value)||0;
-    document.getElementById('exCalc').textContent='10 orders × '+r.toLocaleString()+'៛ = '+(10*r).toLocaleString()+'៛';
+    var el=document.getElementById('exCalc');
+    if(!el) return;
+    if(_calcMode==='items'){
+      el.innerHTML='50 items × <b>'+r.toLocaleString()+'៛</b> = <b>'+(50*r).toLocaleString()+'៛</b>';
+    } else {
+      el.innerHTML='10 orders × <b>'+r.toLocaleString()+'៛</b> = <b>'+(10*r).toLocaleString()+'៛</b>';
+    }
   }
+
+  /* ══ QUICK SUMMARY ══ */
+  function updateSummary(){
+    var agents=_agents;
+    var totalOrders=_filtered.length;
+    var totalItems =_filtered.reduce(function(s,o){
+      return s+(Array.isArray(o.products)?o.products.reduce(function(ss,p){return ss+(+p.qty||1);},0):0);
+    },0);
+    var totalSales =_filtered.reduce(function(s,o){return s+total(o);},0);
+
+    var el=function(id){return document.getElementById(id);};
+    if(el('sumOrders')) el('sumOrders').textContent=totalOrders.toLocaleString();
+    if(el('sumItems'))  el('sumItems').textContent =totalItems.toLocaleString();
+    if(el('sumSales'))  el('sumSales').textContent ='$'+$m(totalSales);
+
+    // Progress bar: paid vs pending
+    var paidComm=agents.filter(function(a){return a.status==='Paid';}).reduce(function(s,a){return s+calcComm(a);},0);
+    var totComm =agents.reduce(function(s,a){return s+calcComm(a);},0);
+    var paidPct = totComm>0 ? Math.round(paidComm/totComm*100) : 0;
+    var pendPct = totComm>0 ? Math.round((totComm-paidComm)/totComm*100) : 0;
+    if(el('barPaid')) el('barPaid').style.width=paidPct+'%';
+    if(el('barPend')){ el('barPend').style.width=pendPct+'%'; el('barPend').style.left=paidPct+'%'; }
+    if(el('legendPaid')) el('legendPaid').textContent='Paid '+paidPct+'%';
+    if(el('legendPend')) el('legendPend').textContent='Pending '+pendPct+'%';
+
+    // Range label
+    var labels={today:'ថ្ងៃនេះ',week:'សប្ដាហ៍នេះ',month:'ខែនេះ',lastmonth:'ខែមុន',custom:'Custom',all:'ទាំងអស់'};
+    if(el('sumRangeLabel')) el('sumRangeLabel').textContent='📅 '+(labels[_mode]||_mode)+' · '+totalOrders+' orders';
+  }
+
+  /* ══ EXPORT CSV ══ */
+  window.exportCommCSV=function(){
+    if(!_agents.length){ macUI&&macUI.toast('គ្មានទិន្នន័យ','warning'); return; }
+    var rows=[['CloseBy','Orders','Items','Sales ($)','Rate (៛)','Commission (៛)','Status']];
+    _agents.forEach(function(a){
+      var items=agentItems(a);
+      var sales=a.orders.reduce(function(s,o){return s+total(o);},0);
+      rows.push([a.name, a.orders.length, items, sales.toFixed(2), a.rate||0, calcComm(a), a.status||'Pending']);
+    });
+    var csv=rows.map(function(r){return r.map(function(v){return '"'+String(v||'').replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+    var a=document.createElement('a');
+    a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
+    var labels={today:'today',week:'week',month:'month',lastmonth:'lastmonth',all:'all',custom:'custom'};
+    a.download='commission_'+(labels[_mode]||_mode)+'_'+new Date().toISOString().slice(0,10)+'.csv';
+    a.click();
+    macUI&&macUI.toast('Export CSV រួចរាល់!','success');
+  };
 
   /* ══ LOAD DATA ══ */
   window.loadData=async function(){
-    document.getElementById('panelContent').innerHTML='<div class="no-data">⏳ កំពុងទាញទិន្នន័យពី Google Sheets...</div>';
+    document.getElementById('panelContent').innerHTML='<div class="no-data">⏳ កំពុងទាញទិន្នន័យ...</div>';
     try{
       if(window.CamboOrdersData) _all=await CamboOrdersData.fetchOrders(5000);
     }catch(e){ console.warn('Commission fetch error',e); }
@@ -527,12 +792,44 @@
   document.addEventListener('DOMContentLoaded',function(){
     var s=loadS();
     if(s._default!==undefined) document.getElementById('defRate').value=s._default;
-    document.getElementById('defRate').addEventListener('input',updateExCalc);
+    // Restore saved calc mode
+    if(s._calcMode==='items') setCalcMode('items');
+    else setCalcMode('orders');
+    document.getElementById('defRate').addEventListener('input',function(){
+      updateExCalc();
+      renderAgents(); renderKPI(); renderTop();
+    });
     updateExCalc();
     loadData();
   });
 })();
 </script>
 <script src="../assets/js/sw-register.js"></script>
+
+<!-- Filter backdrop + dropdown — must be direct children of body so
+     position:fixed uses the viewport, not a backdrop-filter ancestor -->
+<div class="fil-backdrop" id="filBackdrop" onclick="closeFilDrop()"></div>
+<div class="fil-drop" id="filDrop">
+  <div class="fil-drop-title">📅 Filter តាមថ្ងៃខែ</div>
+  <div class="fil-presets">
+    <button class="df-btn" data-mode="today"     onclick="setMode('today')">ថ្ងៃនេះ</button>
+    <button class="df-btn" data-mode="week"      onclick="setMode('week')">សប្ដាហ៍នេះ</button>
+    <button class="df-btn active" data-mode="month" onclick="setMode('month')">ខែនេះ</button>
+    <button class="df-btn" data-mode="lastmonth" onclick="setMode('lastmonth')">ខែមុន</button>
+    <button class="df-btn" data-mode="all"       onclick="setMode('all')">ទាំងអស់</button>
+    <button class="df-btn" data-mode="custom"    onclick="setMode('custom')">Custom</button>
+  </div>
+  <div class="df-custom" id="customRange">
+    <div class="df-custom-row">
+      <span style="font-size:11px;color:var(--muted);flex-shrink:0;width:34px">ពី</span>
+      <input type="date" id="dateFrom" class="df-input" onchange="applyFilter()">
+    </div>
+    <div class="df-custom-row">
+      <span style="font-size:11px;color:var(--muted);flex-shrink:0;width:34px">ដល់</span>
+      <input type="date" id="dateTo" class="df-input" onchange="applyFilter()">
+    </div>
+  </div>
+  <div class="fil-range-label" id="rangeLabel"></div>
+</div>
 </body>
 </html>

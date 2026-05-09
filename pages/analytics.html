@@ -8,46 +8,222 @@
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="apple-touch-icon" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
   <link rel="stylesheet" href="../assets/css/main.css">
   <style>
-    .analytics-wrap{display:grid;gap:20px;padding:4px 0 8px}.analytics-hero{padding:22px 24px;border-radius:24px}.hero-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.hero-top h2{margin:0 0 6px;color:var(--text)}.hero-top p{margin:0;color:var(--muted)}.analytics-filters{display:flex;gap:10px;flex-wrap:wrap}.analytics-filters input,.analytics-filters select{min-height:42px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);padding:0 14px}.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}.kpi-card{padding:18px 18px 16px;border-radius:22px}.kpi-label{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#8fb6d9}.kpi-value{display:block;margin-top:12px;font-size:28px;font-weight:800;color:var(--text)}.kpi-note{margin-top:8px;color:var(--muted);font-size:13px}.analytics-grid{display:grid;grid-template-columns:1.35fr .95fr;gap:18px}.chart-card,.list-card{padding:20px;border-radius:24px}.card-title{margin:0 0 4px;color:var(--text);font-size:20px}.card-sub{margin:0 0 18px;color:var(--muted)}.chart-box{height:320px;position:relative}.mini-list{display:grid;gap:12px}.mini-item{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.14)}.mini-item strong{color:var(--text)}.mini-item span{color:var(--muted);font-size:13px}.priority-breakdown,.status-breakdown{display:grid;gap:10px}.progress-row{display:grid;gap:8px}.progress-head{display:flex;justify-content:space-between;color:var(--text);font-weight:700}.progress-track{height:10px;border-radius:999px;background:rgba(148,163,184,.16);overflow:hidden}.progress-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,#8b5cf6,#06b6d4)}@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.analytics-grid{grid-template-columns:1fr}}@media(max-width:680px){.kpi-grid{grid-template-columns:1fr}.analytics-hero,.chart-card,.list-card{padding:16px}.chart-box{height:260px}}
+  /* ── Layout ── */
+  .aw{display:grid;gap:18px;padding:4px 0 12px}
+
+  /* ── Filter Bar ── */
+  .an-filter-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 22px;border-radius:20px}
+  .an-filter-left{display:flex;flex-direction:column;gap:2px}
+  .an-filter-left h2{margin:0;font-size:20px;font-weight:800;color:var(--text)}
+  .an-filter-left p{margin:0;font-size:12px;color:var(--muted)}
+  .an-filter-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .an-date-group{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+  .an-date-group svg{opacity:.5;flex-shrink:0}
+  .an-date-sep{font-size:11px;color:var(--muted);padding:0 2px}
+  .an-date-group input[type=date]{background:none;border:none;outline:none;color:var(--text);font-size:12px;font-family:inherit;width:110px;cursor:pointer}
+  .an-sel{height:36px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font-size:12px;font-family:inherit;cursor:pointer;outline:none}
+  .an-refresh{display:flex;align-items:center;gap:6px;height:36px;padding:0 18px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;white-space:nowrap}
+  .an-refresh:hover{opacity:.88}
+  .an-refresh svg{flex-shrink:0}
+
+  /* ── KPI ── */
+  .an-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+  .kpi-c{padding:18px 20px;border-radius:20px;position:relative;overflow:hidden}
+  .kpi-c::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0}
+  .kpi-c.kc1::before{background:linear-gradient(90deg,#06b6d4,#22d3ee)}
+  .kpi-c.kc2::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+  .kpi-c.kc3::before{background:linear-gradient(90deg,#10b981,#34d399)}
+  .kpi-c.kc4::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+  .kpi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+  .kpi-ico{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .kc1 .kpi-ico{background:rgba(6,182,212,.15);color:#22d3ee}
+  .kc2 .kpi-ico{background:rgba(139,92,246,.15);color:#a78bfa}
+  .kc3 .kpi-ico{background:rgba(16,185,129,.15);color:#34d399}
+  .kc4 .kpi-ico{background:rgba(245,158,11,.15);color:#fbbf24}
+  .kpi-lbl{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .kpi-val{font-size:26px;font-weight:800;color:var(--text);line-height:1;margin-top:2px}
+  .kpi-note{font-size:11px;color:var(--muted);margin-top:6px}
+
+  /* ── Grid ── */
+  .an-card{padding:16px 18px;border-radius:20px}
+  .an-card-head{margin-bottom:12px}
+  .an-card-head h3{margin:0 0 2px;font-size:15px;font-weight:700;color:var(--text)}
+  .an-card-head p{margin:0;font-size:11px;color:var(--muted)}
+  /* Chart: full width — no height competition */
+  .an-chart-card{padding:16px 18px;border-radius:20px}
+  .chart-box{height:220px;position:relative}
+  /* 3-col grid for lists */
+  .an-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start}
+  @media(max-width:1100px){.an-grid-3{grid-template-columns:1fr 1fr}}
+  @media(max-width:640px){.an-grid-3{grid-template-columns:1fr}}
+
+  /* ── Mini list (Products / Pages) ── */
+  .mini-list{display:grid;gap:6px}
+  .ml-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.1);transition:background .14s}
+  .ml-item:hover{background:rgba(255,255,255,.06)}
+  .ml-rank{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;background:rgba(139,92,246,.15);color:#a78bfa}
+  .ml-rank.r1{background:linear-gradient(135deg,#f59e0b,#fde68a);color:#78350f}
+  .ml-rank.r2{background:linear-gradient(135deg,#94a3b8,#e2e8f0);color:#1e293b}
+  .ml-rank.r3{background:linear-gradient(135deg,#b45309,#fbbf24);color:#fff}
+  .ml-info{flex:1;min-width:0}
+  .ml-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ml-sub{font-size:11px;color:var(--muted);margin-top:2px}
+  .ml-bar-wrap{margin-top:5px;height:4px;border-radius:4px;background:rgba(148,163,184,.14);overflow:hidden}
+  .ml-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,#8b5cf6,#06b6d4);transition:width .5s ease}
+  .ml-amt{font-size:13px;font-weight:800;color:#7dd3fc;flex-shrink:0;white-space:nowrap}
+  [data-theme="light"] .ml-amt{color:#4f46e5}
+
+  /* ── Status / Priority breakdown ── */
+  .sb-section{display:grid;gap:10px}
+  .sb-row{display:grid;gap:5px}
+  .sb-head{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+  .sb-label{font-weight:700;color:var(--text)}
+  .sb-count{font-size:12px;color:var(--muted)}
+  .sb-track{height:8px;border-radius:999px;background:rgba(148,163,184,.14);overflow:hidden}
+  .sb-fill{height:100%;border-radius:999px;transition:width .6s ease}
+  .sb-pending .sb-fill{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+  .sb-confirmed .sb-fill{background:linear-gradient(90deg,#06b6d4,#22d3ee)}
+  .sb-delivered .sb-fill{background:linear-gradient(90deg,#10b981,#34d399)}
+  .sb-cancel .sb-fill{background:linear-gradient(90deg,#ef4444,#fca5a5)}
+  .sb-high .sb-fill{background:linear-gradient(90deg,#ef4444,#fca5a5)}
+  .sb-medium .sb-fill{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+  .sb-low .sb-fill{background:linear-gradient(90deg,#10b981,#34d399)}
+  .sb-divider{height:1px;background:rgba(148,163,184,.1);margin:8px 0}
+  .sb-section-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+  @media(max-width:1100px){.an-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.an-grid{grid-template-columns:1fr}}
+  @media(max-width:600px){.an-kpi{grid-template-columns:1fr}.an-filter-bar{flex-direction:column;align-items:stretch}.an-filter-right{flex-direction:column}.an-date-group,.an-sel,.an-refresh{width:100%;box-sizing:border-box}}
   </style>
 </head>
 <body>
 <div class="background"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
-<div class="dashboard"><div class="sidebar-overlay"></div><aside class="sidebar" id="sharedSidebar"></aside><main class="main-content"><div class="shared-topbar" id="sharedHeader"></div>
-<div class="analytics-wrap">
-  <section class="glass-card analytics-hero">
-    <div class="hero-top">
-      <div><h2>Report & Analytics</h2><p>Revenue, orders, products, pages និង priority សម្រាប់ CAMBO MINI</p></div>
-      <div class="analytics-filters">
-        <input id="analyticsStart" type="date">
-        <input id="analyticsEnd" type="date">
-        <select id="analyticsPage"><option value="">All Pages</option></select>
-        <button class="btn btn-primary" id="analyticsRefresh" type="button">Refresh</button>
-      </div>
+<div class="dashboard">
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar" id="sharedSidebar"></aside>
+  <main class="main-content">
+    <div class="shared-topbar" id="sharedHeader"></div>
+    <div class="aw">
+
+      <!-- Filter Bar -->
+      <section class="glass-card an-filter-bar">
+        <div class="an-filter-left">
+          <h2>Report &amp; Analytics</h2>
+          <p>Revenue, orders, products, pages និង priority សម្រាប់ CAMBO MINI</p>
+        </div>
+        <div class="an-filter-right">
+          <!-- Date range -->
+          <div class="an-date-group">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input id="analyticsStart" type="date">
+            <span class="an-date-sep">→</span>
+            <input id="analyticsEnd" type="date">
+          </div>
+          <!-- Page filter -->
+          <select id="analyticsPage" class="an-sel">
+            <option value="">All Pages</option>
+          </select>
+          <!-- Refresh -->
+          <button class="an-refresh" id="analyticsRefresh" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+      </section>
+
+      <!-- KPI -->
+      <section class="an-kpi">
+        <article class="glass-card kpi-c kc1">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-lbl">Total Revenue</div>
+              <div class="kpi-val" id="kpiRevenue">$0</div>
+            </div>
+            <div class="kpi-ico">💵</div>
+          </div>
+          <div class="kpi-note" id="kpiRevenueNote">711 filtered orders</div>
+        </article>
+        <article class="glass-card kpi-c kc2">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-lbl">Total Orders</div>
+              <div class="kpi-val" id="kpiOrders">0</div>
+            </div>
+            <div class="kpi-ico">📋</div>
+          </div>
+          <div class="kpi-note" id="kpiOrdersNote">All filtered records</div>
+        </article>
+        <article class="glass-card kpi-c kc3">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-lbl">Customers</div>
+              <div class="kpi-val" id="kpiCustomers">0</div>
+            </div>
+            <div class="kpi-ico">👥</div>
+          </div>
+          <div class="kpi-note">Unique customers</div>
+        </article>
+        <article class="glass-card kpi-c kc4">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-lbl">Average Order</div>
+              <div class="kpi-val" id="kpiAverage">$0</div>
+            </div>
+            <div class="kpi-ico">📈</div>
+          </div>
+          <div class="kpi-note">Average value per order</div>
+        </article>
+      </section>
+
+      <!-- Chart: full width — no height competition -->
+      <article class="glass-card an-chart-card">
+        <div class="an-card-head">
+          <h3>Revenue by Day</h3>
+          <p>មើលចំណូលតាមថ្ងៃក្នុង date range</p>
+        </div>
+        <div class="chart-box"><canvas id="revenueAnalyticsChart"></canvas></div>
+      </article>
+
+      <!-- 3-col: Products | Pages | Status -->
+      <section class="an-grid-3">
+        <article class="glass-card an-card">
+          <div class="an-card-head">
+            <h3>Top Products</h3>
+            <p>លក់ច្រើនជាងគេ</p>
+          </div>
+          <div class="mini-list" id="topProductsList"></div>
+        </article>
+        <article class="glass-card an-card">
+          <div class="an-card-head">
+            <h3>Top Pages</h3>
+            <p>Page ដែលបិទការលក់បានច្រើន</p>
+          </div>
+          <div class="mini-list" id="topPagesList"></div>
+        </article>
+        <article class="glass-card an-card">
+          <div class="an-card-head">
+            <h3>Status &amp; Priority</h3>
+            <p>ស្ថានភាព និងអាទិភាព</p>
+          </div>
+          <div class="sb-section-lbl">Order Status</div>
+          <div class="sb-section" id="statusBreakdown"></div>
+          <div class="sb-divider"></div>
+          <div class="sb-section-lbl">Priority</div>
+          <div class="sb-section" id="priorityBreakdown"></div>
+        </article>
+      </section>
+
     </div>
-  </section>
-  <section class="kpi-grid">
-    <article class="glass-card kpi-card"><span class="kpi-label">Total Revenue</span><strong class="kpi-value" id="kpiRevenue">$0</strong><div class="kpi-note" id="kpiRevenueNote">Filtered revenue</div></article>
-    <article class="glass-card kpi-card"><span class="kpi-label">Total Orders</span><strong class="kpi-value" id="kpiOrders">0</strong><div class="kpi-note" id="kpiOrdersNote">All filtered records</div></article>
-    <article class="glass-card kpi-card"><span class="kpi-label">Customers</span><strong class="kpi-value" id="kpiCustomers">0</strong><div class="kpi-note">Unique customers</div></article>
-    <article class="glass-card kpi-card"><span class="kpi-label">Average Order</span><strong class="kpi-value" id="kpiAverage">$0</strong><div class="kpi-note">Average value per order</div></article>
-  </section>
-  <section class="analytics-grid">
-    <article class="glass-card chart-card"><h3 class="card-title">Revenue by Day</h3><p class="card-sub">មើលចំណូលតាមថ្ងៃក្នុង date range</p><div class="chart-box"><canvas id="revenueAnalyticsChart"></canvas></div></article>
-    <article class="glass-card list-card"><h3 class="card-title">Top Products</h3><p class="card-sub">លក់ច្រើនជាងគេ</p><div class="mini-list" id="topProductsList"></div></article>
-  </section>
-  <section class="analytics-grid">
-    <article class="glass-card list-card"><h3 class="card-title">Top Pages</h3><p class="card-sub">Page ដែលបិទការលក់បានច្រើន</p><div class="mini-list" id="topPagesList"></div></article>
-    <article class="glass-card list-card"><h3 class="card-title">Status & Priority</h3><p class="card-sub">ស្ថានភាព និងអាទិភាព</p><div class="status-breakdown" id="statusBreakdown"></div><div style="height:18px"></div><div class="priority-breakdown" id="priorityBreakdown"></div></article>
-  </section>
-</div></main></div>
+  </main>
+</div>
 <script src="../assets/js/layout.js"></script>
 <script src="../assets/js/dashboard-layout.js"></script>
 <script src="../assets/js/vendor/chart-lite.js"></script>
 <script src="../assets/js/orders-data.js"></script>
 <script src="../assets/js/analytics-live.js"></script>
 <script src="../assets/js/sw-register.js"></script>
-</body></html>
+</body>
+</html>

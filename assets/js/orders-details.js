@@ -557,11 +557,12 @@ function attachProductRowActions() {
 
   // Delete button → remove with confirm
   document.querySelectorAll(".row-del-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       const rowId = Number(btn.dataset.rowid);
       const item  = items.find((x) => x.rowId === rowId);
       if (!item) return;
-      if (!confirm('លុប "' + item.name + '" ចេញ?')) return;
+      const ok = await macUI.confirm('លុប "' + item.name + '" ចេញ?', 'លុបទំនិញ', true);
+      if (!ok) return;
       const wasEditing = currentEditRowId === rowId;
       items = items.filter((x) => x.rowId !== rowId);
       if (wasEditing) closeProductDrawer();
@@ -929,9 +930,9 @@ async function handleSave() {
     localStorage.setItem("camboOrders", JSON.stringify(savedOrders));
 
     if (result.telegram && result.telegram.ok === false) {
-      toast("Saved to Google Sheet. Telegram failed.", "info");
+      toast("Order saved. Telegram failed.", "info");
     } else {
-      toast("Saved to Google Sheet successfully.", "success");
+      toast("Order saved successfully.", "success");
     }
 
     clearOrderForm();
@@ -2040,15 +2041,13 @@ function formatDisplayMoney(num) {
 }
 
 function toast(message, type = "info") {
-  if (!els.toastContainer) return alert(message);
+  if (window.macUI) { macUI.toast(message, type); return; }
+  if (!els.toastContainer) return;
   const el = document.createElement("div");
   el.className = `toast ${type}`;
   el.textContent = message;
   els.toastContainer.appendChild(el);
-  setTimeout(() => {
-    el.style.opacity = "0";
-    el.style.transform = "translateY(-8px)";
-  }, 2200);
+  setTimeout(() => { el.style.opacity = "0"; el.style.transform = "translateY(-8px)"; }, 2200);
   setTimeout(() => el.remove(), 2600);
 }
 

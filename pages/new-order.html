@@ -337,6 +337,7 @@ function escHtml(s){
 }
 
 function toast(msg, type){
+  if(window.macUI){ macUI.toast(msg, type||'info'); return; }
   var el = document.createElement('div');
   el.className = 'toast ' + (type || 'info');
   el.textContent = msg;
@@ -572,7 +573,7 @@ async function submitOrder(){
 
     toast(
       result.telegram && result.telegram.ok === false
-        ? 'Saved to Google Sheet. Telegram failed.'
+        ? 'Order saved. Telegram failed.'
         : 'Order saved successfully!',
       'success'
     );

@@ -313,7 +313,8 @@ function toggleFromDetail(id){
 /* ── Helpers ── */
 function qs(id){return document.getElementById(id);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function toast(msg){
+function toast(msg, type){
+  if(window.macUI){ macUI.toast(msg, type||'success'); return; }
   const t=document.createElement('div');
   t.className='pkg-toast'; t.textContent=msg;
   document.body.appendChild(t);

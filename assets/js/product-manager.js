@@ -212,10 +212,12 @@ function loadList(q){
       });
     });
     el.querySelectorAll('.pmi-del').forEach(function(b){
-      b.addEventListener('click', function(){
+      b.addEventListener('click', async function(){
         var id = b.dataset.id;
         var p  = list.find(function(x){ return String(x.id)===String(id); });
-        if(!p || !confirm('លុប "'+p.name+'" ?\nមិនអាចត្រឡប់ក្រោយ!')) return;
+        if(!p) return;
+        var ok = await macUI.confirm('លុប "'+p.name+'" ? មិនអាចត្រឡប់ក្រោយ!', 'លុបផលិតផល', true);
+        if(!ok) return;
         dbDelete(String(id), function(){ reloadAndRefresh(function(){ loadList(document.getElementById('pmSearch').value); }); });
       });
     });

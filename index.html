@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="assets/css/templatemo-glass-admin-style.css">
     <link rel="stylesheet" href="assets/css/main.css">
 <style>
+/* ── Stock list ── */
 .tx-stroke-item:active{transform:scale(.99)}
 .tx-s-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;color:#fff}
 .tx-s-info{flex:1;min-width:0}
@@ -32,6 +33,27 @@
 .tx-stroke-footer{margin-top:8px}
 .tx-stroke-footer a{display:block;text-align:center;padding:8px;border-radius:8px;border:1px solid rgba(148,163,184,.2);font-size:12px;color:#94a3b8;text-decoration:none;transition:background .15s}
 .tx-stroke-footer a:hover{background:rgba(148,163,184,.08)}
+
+/* ── KPI Cards Enhanced ── */
+.stat-card-enhanced{position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.stat-card-enhanced:hover{transform:translateY(-3px);box-shadow:0 20px 48px rgba(0,0,0,.35)}
+.sc-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:20px 20px 0 0}
+.sc-accent-cyan  {background:linear-gradient(90deg,#06b6d4,#22d3ee)}
+.sc-accent-purple{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+.sc-accent-orange{background:linear-gradient(90deg,#f97316,#fb923c)}
+.sc-accent-green {background:linear-gradient(90deg,#22c55e,#4ade80)}
+.sc-today{font-size:10px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:5px}
+.sc-today-val{font-weight:700;color:var(--text);font-size:11px}
+
+/* ── Dynamic Calendar ── */
+.cal-day-name{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:center;padding:4px 0}
+.cal-day{display:flex;align-items:center;justify-content:center;height:34px;border-radius:10px;font-size:13px;font-weight:500;color:var(--text);cursor:default;transition:background .15s}
+.cal-day:hover{background:rgba(255,255,255,.06)}
+.cal-day.cal-today{background:linear-gradient(135deg,rgba(139,92,246,.5),rgba(6,182,212,.3));color:#fff;font-weight:800;box-shadow:0 4px 12px rgba(139,92,246,.3)}
+.cal-day.cal-other{color:var(--muted);opacity:.45}
+
+@media(max-width:1080px){.qa-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:640px){.qa-row{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -47,19 +69,20 @@
         <main class="main-content">
             <div class="shared-topbar" id="sharedHeader"></div>
             <div class="live-pill" style="margin-bottom:18px;"><span class="live-dot"></span>Realtime Data Sync</div>
-            <!-- Top Navbar -->
 
             <!-- Stats Cards -->
             <section class="stats-grid">
-                <div class="glass-card glass-card-3d stat-card">
+                <div class="glass-card glass-card-3d stat-card stat-card-enhanced">
+                    <div class="sc-accent sc-accent-cyan"></div>
                     <div class="stat-card-inner">
                         <div class="stat-info">
                             <h3>Total Revenue</h3>
-                            <div class="stat-value">$84,254</div>
+                            <div class="stat-value">$0</div>
                             <span class="stat-change positive">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
-                                +12.5%
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                                All time
                             </span>
+                            <div class="sc-today">ថ្ងៃនេះ: <span class="sc-today-val" id="todayRevenue">$0</span></div>
                         </div>
                         <div class="stat-icon cyan">
                             <svg viewBox="0 0 24 24" fill="none" stroke="var(--emerald-light)" stroke-width="2">
@@ -69,15 +92,17 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-3d stat-card">
+                <div class="glass-card glass-card-3d stat-card stat-card-enhanced">
+                    <div class="sc-accent sc-accent-purple"></div>
                     <div class="stat-card-inner">
                         <div class="stat-info">
-                            <h3>Active Users</h3>
-                            <div class="stat-value">24,521</div>
+                            <h3>អតិថិជន</h3>
+                            <div class="stat-value">0</div>
                             <span class="stat-change positive">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
-                                +8.2%
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                                Unique
                             </span>
+                            <div class="sc-today">ថ្ងៃនេះ: <span class="sc-today-val" id="todayCustomers">0</span></div>
                         </div>
                         <div class="stat-icon magenta">
                             <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2">
@@ -88,15 +113,17 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-3d stat-card">
+                <div class="glass-card glass-card-3d stat-card stat-card-enhanced">
+                    <div class="sc-accent sc-accent-orange"></div>
                     <div class="stat-card-inner">
                         <div class="stat-info">
                             <h3>Total Orders</h3>
-                            <div class="stat-value">8,461</div>
-                            <span class="stat-change negative">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
-                                -3.1%
+                            <div class="stat-value">0</div>
+                            <span class="stat-change positive" id="pendingBadge">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                0 Pending
                             </span>
+                            <div class="sc-today">ថ្ងៃនេះ: <span class="sc-today-val" id="todayOrders">0</span></div>
                         </div>
                         <div class="stat-icon purple">
                             <svg viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="2">
@@ -107,15 +134,17 @@
                     </div>
                 </div>
 
-                <div class="glass-card glass-card-3d stat-card">
+                <div class="glass-card glass-card-3d stat-card stat-card-enhanced">
+                    <div class="sc-accent sc-accent-green"></div>
                     <div class="stat-card-inner">
                         <div class="stat-info">
-                            <h3>Conversion Rate</h3>
-                            <div class="stat-value">3.24%</div>
+                            <h3>Delivered</h3>
+                            <div class="stat-value">0%</div>
                             <span class="stat-change positive">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
-                                +2.4%
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                Success rate
                             </span>
+                            <div class="sc-today">Delivered: <span class="sc-today-val" id="deliveredCount">0</span></div>
                         </div>
                         <div class="stat-icon success">
                             <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2">
@@ -209,23 +238,16 @@
 
             <!-- Bottom Grid -->
             <section class="bottom-grid">
-                <!-- Calendar Widget -->
+                <!-- Calendar Widget (dynamic) -->
                 <div class="glass-card">
                     <div class="calendar-header">
-                        <h2 class="card-title">January 2025</h2>
+                        <h2 class="card-title" id="calTitle">—</h2>
                         <div class="calendar-nav">
-                            <button class="calendar-nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-                            <button class="calendar-nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+                            <button class="calendar-nav-btn" id="calPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+                            <button class="calendar-nav-btn" id="calNext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
                         </div>
                     </div>
-                    <div class="calendar-grid">
-                        <span class="calendar-day-name">Sun</span><span class="calendar-day-name">Mon</span><span class="calendar-day-name">Tue</span><span class="calendar-day-name">Wed</span><span class="calendar-day-name">Thu</span><span class="calendar-day-name">Fri</span><span class="calendar-day-name">Sat</span>
-                        <span class="calendar-day other-month">29</span><span class="calendar-day other-month">30</span><span class="calendar-day other-month">31</span><span class="calendar-day today">1</span><span class="calendar-day">2</span><span class="calendar-day">3</span><span class="calendar-day">4</span>
-                        <span class="calendar-day">5</span><span class="calendar-day">6</span><span class="calendar-day">7</span><span class="calendar-day">8</span><span class="calendar-day">9</span><span class="calendar-day">10</span><span class="calendar-day">11</span>
-                        <span class="calendar-day">12</span><span class="calendar-day">13</span><span class="calendar-day">14</span><span class="calendar-day">15</span><span class="calendar-day">16</span><span class="calendar-day">17</span><span class="calendar-day">18</span>
-                        <span class="calendar-day">19</span><span class="calendar-day">20</span><span class="calendar-day">21</span><span class="calendar-day">22</span><span class="calendar-day">23</span><span class="calendar-day">24</span><span class="calendar-day">25</span>
-                        <span class="calendar-day">26</span><span class="calendar-day">27</span><span class="calendar-day">28</span><span class="calendar-day">29</span><span class="calendar-day">30</span><span class="calendar-day">31</span><span class="calendar-day other-month">1</span>
-                    </div>
+                    <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px"></div>
                 </div>
 
                 <!-- Donut Chart -->

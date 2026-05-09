@@ -100,13 +100,13 @@
   .ol-btn-purple:hover{background:rgba(139,92,246,.22)!important;border-color:rgba(139,92,246,.5)!important}
   [data-theme="light"] .ol-btn-purple{background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.25);color:#4f46e5}
 
-  /* ── DROPDOWN PANELS ── */
-  .ol-dropdown{position:absolute;top:calc(100% + 8px);right:0;z-index:9999;border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.35);background:#1e293b;border:1px solid rgba(148,163,200,.2);min-width:200px;padding:6px;display:none}
+  /* ── DROPDOWN PANELS — position:fixed so they never overflow viewport ── */
+  .ol-dropdown{position:fixed;z-index:9999;border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.35);background:#1e293b;border:1px solid rgba(148,163,200,.2);width:200px;max-width:calc(100vw - 24px);box-sizing:border-box;padding:6px;display:none}
   [data-theme="light"] .ol-dropdown{background:#fff;border-color:#e2e8f0;box-shadow:0 8px 32px rgba(15,23,42,.12)}
   .ol-dropdown.open{display:block}
 
   /* Filter panel wider */
-  #olFilterDropdown{min-width:260px;right:auto;left:0;padding:0;overflow:hidden}
+  #olFilterDropdown{width:260px;padding:0;overflow:hidden}
   .ol-fd-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid #f1f5f9}
   [data-theme="dark"] .ol-fd-head{border-bottom-color:rgba(148,163,200,.1)}
   .ol-fd-head strong{font-size:15px;font-weight:700;color:var(--text)}
@@ -295,9 +295,10 @@
   [data-theme="light"] .ol-dp-grid button{background:#f8fafc;border-color:#e2e8f0;color:#1e293b}
   [data-theme="light"] .ol-dp-grid button:hover,[data-theme="light"] .ol-dp-grid button.active{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.3);color:#4f46e5}
   .ol-dp-row{display:flex;gap:6px;align-items:center}
-  .ol-dp-row input{flex:1;height:32px;padding:0 8px;border-radius:8px;border:1px solid rgba(148,163,200,.18);background:rgba(255,255,255,.07);color:var(--text);font-size:12px;font-family:inherit;outline:none}
+  .ol-dp-row input{flex:1;min-width:0;height:32px;padding:0 8px;border-radius:8px;border:1px solid rgba(148,163,200,.18);background:rgba(255,255,255,.07);color:var(--text);font-size:12px;font-family:inherit;outline:none;box-sizing:border-box;width:100%}
   [data-theme="light"] .ol-dp-row input{background:#f8fafc;border-color:#e2e8f0;color:#1e293b}
   .ol-dp-row span{color:var(--muted);font-size:12px}
+  .ol-dp-row-lbl{font-size:11px;color:var(--muted);flex-shrink:0;width:28px;font-weight:600}
   .ol-dp-apply{height:32px;padding:0 12px;border-radius:8px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 
   @media(max-width:900px){.ol-stats{grid-template-columns:1fr 1fr}}
@@ -327,95 +328,20 @@
           <input id="olSearch" type="text" placeholder="ស្វែងរក...">
         </div>
         <!-- Filter button -->
-        <div style="position:relative">
-          <button class="ol-btn" id="olFilterBtn" style="position:relative">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:5px"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>Filter
-            <span class="ol-filter-dot" id="olFilterDot"></span>
-          </button>
-          <!-- Filter dropdown -->
-          <div class="ol-dropdown" id="olFilterDropdown">
-            <div class="ol-fd-head">
-              <strong>Filter</strong>
-              <button class="ol-fd-clear" id="olClearFilter">Clear all</button>
-            </div>
-            <div class="ol-fd-body">
-              <div class="ol-fd-field"><label>DELIVERY</label>
-                <select id="olDelivery"><option value="">All</option><option>J&T</option><option>DRSB</option><option>វិរៈ ប៊ុនថាំ</option><option>ភ្នំពេញ តាធំ</option><option>ភ្នំពេញ តាតូច</option><option>ដឹកខ្លួនឯង</option></select></div>
-              <div class="ol-fd-field"><label>PROVINCE</label>
-                <select id="olProvince"><option value="">All</option><option>រាជធានីភ្នំពេញ</option><option>ខេត្ត</option></select></div>
-              <div class="ol-fd-field"><label>STATUS</label>
-                <select id="olStatus"><option value="">All</option><option>Pending</option><option>Delivered</option><option>Cancelled</option></select></div>
-              <div class="ol-fd-field"><label>PAGES</label>
-                <select id="olPages"><option value="">All</option>
-<option>Helen CCR</option><option>ហេឡេន CCR</option>
-<option>Brand1 CCR</option><option>ចង់ទិញ CCR</option>
-<option>ស្រីម៉ៅ JELY</option><option>សប្បាយទិញ CCR</option>
-<option>JELY CCR BRAND</option><option>ចែម៉ៅ CCR BRAND</option>
-<option>ចែម៉ៅ ចែលី BRAND</option><option>ចង់ស្អាត By HELEN</option>
-<option>ស្រីម៉ៅ JELY BRAND</option><option>JELY BRAND BY HELEN</option></select></div>
-              <div class="ol-fd-field"><label>PRIORITY</label>
-                <select id="olPriority"><option value="">All</option><option>High</option><option>Medium</option><option>Low</option></select></div>
-              <div class="ol-fd-field"><label>CLOSEBY</label>
-                <select id="olCloseBy"><option value="">All</option><option>Jonh Helen</option><option>Srey LeanG</option><option>Srey Pichh</option><option>Srey Phear</option><option>Bong Phear</option><option>Admin</option></select></div>
-            </div>
-          </div>
-        </div>
+        <button class="ol-btn" id="olFilterBtn" style="position:relative">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:5px"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>Filter
+          <span class="ol-filter-dot" id="olFilterDot"></span>
+        </button>
       </div>
 
       <div class="ol-tr">
         <!-- Selected badge -->
         <span class="ol-sel" id="olSel">Selected: <b id="olSelCnt">0</b></span>
         <!-- Date button -->
-        <div style="position:relative">
-          <button class="ol-btn" id="olDateBtn">Today</button>
-          <span class="ol-date-chip" id="olDateChip"></span>
-          <!-- Date dropdown -->
-          <div class="ol-dropdown" id="olDatePop">
-            <div class="ol-dp-grid">
-              <button data-p="today" class="active">Today</button>
-              <button data-p="yesterday">Yesterday</button>
-              <button data-p="last7">Last 7 Days</button>
-              <button data-p="thisMonth">This Month</button>
-              <button data-p="lastMonth">Last Month</button>
-              <button data-p="all">All Time</button>
-            </div>
-            <div class="ol-dp-row">
-              <input type="date" id="olDs"><span>→</span>
-              <input type="date" id="olDe">
-              <button class="ol-dp-apply" id="olDApply">OK</button>
-            </div>
-          </div>
-        </div>
+        <button class="ol-btn" id="olDateBtn">Today</button>
+        <span class="ol-date-chip" id="olDateChip"></span>
         <!-- Actions button -->
-        <div style="position:relative">
-          <button class="ol-btn ol-btn-purple" id="olActBtn">Actions ▾</button>
-          <div class="ol-dropdown" id="olActDrop">
-            <!-- Receipt No input -->
-            <div style="padding:8px 12px 4px">
-              <div style="font-size:10px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase;margin-bottom:4px">លេខប៉ុង</div>
-              <input id="olReceiptNo" type="text" placeholder="បញ្ចូលលេខប៉ុង (optional)"
-                onclick="event.stopPropagation()"
-                style="width:100%;height:32px;padding:0 8px;border-radius:7px;border:1px solid rgba(148,163,200,.25);background:rgba(255,255,255,.08);color:var(--text);font-size:12px;font-family:inherit;outline:none;box-sizing:border-box">
-            </div>
-            <!-- QR toggle -->
-            <div style="padding:4px 12px 8px">
-              <button id="olQrToggle" data-a="qrtoggle"
-                style="width:100%;height:32px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.12);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
-                QR Code: ON
-              </button>
-            </div>
-            <div class="ol-divider" style="margin:2px 0"></div>
-            <button data-a="shareimg">🖼️ Share IMG</button>
-            <div class="ol-divider"></div>
-            <button data-a="export">📤 Export CSV</button>
-            <button data-a="printall">📋 Print Table</button>
-            <button data-a="printsel">🖨️ Print Selected</button>
-            <button data-a="reportdelivery">📋 Report Delivery</button>
-            <div class="ol-divider"></div>
-            <button data-a="markdel">✅ Mark Delivered</button>
-            <button data-a="markpend">🔴 Mark Pending</button>
-          </div>
-        </div>
+        <button class="ol-btn ol-btn-purple" id="olActBtn">Actions ▾</button>
       </div>
     </div>
 
@@ -500,6 +426,83 @@
   </div>
 
   <div id="olPrintArea" style="position:fixed;left:-9999px;top:0;z-index:-1;width:1px;height:1px;overflow:hidden"></div>
+
+  <!-- All dropdowns at body level so position:fixed uses the real viewport -->
+  <div class="ol-dropdown" id="olFilterDropdown" style="width:260px;padding:0;overflow:hidden">
+    <div class="ol-fd-head">
+      <strong>Filter</strong>
+      <button class="ol-fd-clear" id="olClearFilter">Clear all</button>
+    </div>
+    <div class="ol-fd-body">
+      <div class="ol-fd-field"><label>DELIVERY</label>
+        <select id="olDelivery"><option value="">All</option><option>J&T</option><option>DRSB</option><option>វិរៈ ប៊ុនថាំ</option><option>ភ្នំពេញ តាធំ</option><option>ភ្នំពេញ តាតូច</option><option>ដឹកខ្លួនឯង</option></select></div>
+      <div class="ol-fd-field"><label>PROVINCE</label>
+        <select id="olProvince"><option value="">All</option><option>រាជធានីភ្នំពេញ</option><option>ខេត្ត</option></select></div>
+      <div class="ol-fd-field"><label>STATUS</label>
+        <select id="olStatus"><option value="">All</option><option>Pending</option><option>Delivered</option><option>Cancelled</option></select></div>
+      <div class="ol-fd-field"><label>PAGES</label>
+        <select id="olPages"><option value="">All</option>
+          <option>Helen CCR</option><option>ហេឡេន CCR</option>
+          <option>Brand1 CCR</option><option>ចង់ទិញ CCR</option>
+          <option>ស្រីម៉ៅ JELY</option><option>សប្បាយទិញ CCR</option>
+          <option>JELY CCR BRAND</option><option>ចែម៉ៅ CCR BRAND</option>
+          <option>ចែម៉ៅ ចែលី BRAND</option><option>ចង់ស្អាត By HELEN</option>
+          <option>ស្រីម៉ៅ JELY BRAND</option><option>JELY BRAND BY HELEN</option></select></div>
+      <div class="ol-fd-field"><label>PRIORITY</label>
+        <select id="olPriority"><option value="">All</option><option>High</option><option>Medium</option><option>Low</option></select></div>
+      <div class="ol-fd-field"><label>CLOSEBY</label>
+        <select id="olCloseBy"><option value="">All</option><option>Jonh Helen</option><option>Srey LeanG</option><option>Srey Pichh</option><option>Srey Phear</option><option>Bong Phear</option><option>Admin</option></select></div>
+    </div>
+  </div>
+
+  <div class="ol-dropdown" id="olDatePop" style="width:240px;padding:10px">
+    <div class="ol-dp-grid">
+      <button data-p="today" class="active">Today</button>
+      <button data-p="yesterday">Yesterday</button>
+      <button data-p="last7">Last 7 Days</button>
+      <button data-p="thisMonth">This Month</button>
+      <button data-p="lastMonth">Last Month</button>
+      <button data-p="all">All Time</button>
+    </div>
+    <!-- date inputs stacked vertically — fits any phone width -->
+    <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px">
+      <div class="ol-dp-row" style="gap:6px">
+        <span class="ol-dp-row-lbl">ពី</span>
+        <input type="date" id="olDs" style="flex:1;min-width:0">
+      </div>
+      <div class="ol-dp-row" style="gap:6px">
+        <span class="ol-dp-row-lbl">ដល់</span>
+        <input type="date" id="olDe" style="flex:1;min-width:0">
+      </div>
+      <button class="ol-dp-apply" id="olDApply" style="width:100%;margin-top:2px">OK</button>
+    </div>
+  </div>
+
+  <div class="ol-dropdown" id="olActDrop" style="width:220px">
+    <div style="padding:8px 12px 4px">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase;margin-bottom:4px">លេខប៉ុង</div>
+      <input id="olReceiptNo" type="text" placeholder="បញ្ចូលលេខប៉ុង (optional)"
+        onclick="event.stopPropagation()"
+        style="width:100%;height:32px;padding:0 8px;border-radius:7px;border:1px solid rgba(148,163,200,.25);background:rgba(255,255,255,.08);color:var(--text);font-size:12px;font-family:inherit;outline:none;box-sizing:border-box">
+    </div>
+    <div style="padding:4px 12px 8px">
+      <button id="olQrToggle" data-a="qrtoggle"
+        style="width:100%;height:32px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.12);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+        QR Code: ON
+      </button>
+    </div>
+    <div class="ol-divider" style="margin:2px 0"></div>
+    <button data-a="shareimg">🖼️ Share IMG</button>
+    <div class="ol-divider"></div>
+    <button data-a="export">📤 Export CSV</button>
+    <button data-a="printall">📋 Print Table</button>
+    <button data-a="printsel">🖨️ Print Selected</button>
+    <button data-a="reportdelivery">📋 Report Delivery</button>
+    <div class="ol-divider"></div>
+    <button data-a="markdel">✅ Mark Delivered</button>
+    <button data-a="markpend">🔴 Mark Pending</button>
+  </div>
+
   <script src="../assets/js/vendor/html2canvas-lite.js"></script>
   <script src="../assets/js/export-delivery-report.js"></script>
   <script src="../assets/js/copy-receipt.js"></script>

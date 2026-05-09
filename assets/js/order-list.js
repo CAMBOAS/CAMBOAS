@@ -33,19 +33,26 @@ function fmtDisplay(s){
   return s;
 }
 
-/* ── toggle dropdown ── */
-function toggle(dropId, btnId){
-  var drop = $id(dropId);
-  var btn  = $id(btnId);
-  if(!drop) return;
-  var isOpen = drop.classList.contains('open');
-  // close all first
-  document.querySelectorAll('.ol-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
-  if(!isOpen){ drop.classList.add('open'); }
+/* ── position:fixed dropdown helper ── */
+function positionDrop(drop, btn){
+  var rect = btn.getBoundingClientRect();
+  var vw   = window.innerWidth;
+  var w    = drop.offsetWidth || parseInt(drop.style.width) || 200;
+  // prefer aligning right edge of drop with right edge of btn
+  var left = rect.right - w;
+  if(left < 12) left = 12;
+  if(left + w > vw - 12) left = vw - w - 12;
+  drop.style.top  = (rect.bottom + 6) + 'px';
+  drop.style.left = left + 'px';
 }
+
+function closeAllDrops(){
+  document.querySelectorAll('.ol-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+}
+
 document.addEventListener('click', function(e){
   if(!e.target.closest('.ol-dropdown') && !e.target.closest('[id$="Btn"]') && !e.target.closest('[id$="Btn2"]')){
-    document.querySelectorAll('.ol-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+    closeAllDrops();
   }
 });
 
@@ -681,6 +688,10 @@ function olSaveEdit(){
 
   // 3. Show saving toast
   function showToast(msg, color){
+    if(window.macUI){
+      var type = color==='#4ade80'||color==='#22c55e' ? 'success' : color==='#f59e0b'||color==='#fbbf24' ? 'warning' : color==='#f87171'||color==='#ef4444' ? 'error' : 'info';
+      macUI.toast(msg, type); return;
+    }
     var t=document.createElement('div');
     t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:'+color+';padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;border-left:3px solid '+color+';box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .3s';
     t.textContent=msg; document.body.appendChild(t);
@@ -858,11 +869,12 @@ window.olDrToggleQr = function(){
 };
 
 /* ── Drawer Delete ── */
-window.olDeleteOrder = function(){
+window.olDeleteOrder = async function(){
   if(!_drawerOrderId) return;
   var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
   if(!o) return;
-  if(!confirm('លុប Order របស់ '+o.customer+'?')) return;
+  var ok = await macUI.confirm('លុប Order របស់ '+o.customer+'?', 'លុប Order', true);
+  if(!ok) return;
   // 1. Remove from local
   _orders = _orders.filter(function(x){ return String(x.id)!==_drawerOrderId; });
   try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); }catch(e){}
@@ -1018,8 +1030,8 @@ async function init(){
     e.stopPropagation();
     var d=$id('olFilterDropdown'); if(!d) return;
     var opening = !d.classList.contains('open');
-    document.querySelectorAll('.ol-dropdown.open').forEach(function(x){x.classList.remove('open');});
-    if(opening) d.classList.add('open');
+    closeAllDrops();
+    if(opening){ positionDrop(d, e.currentTarget); d.classList.add('open'); }
   });
 
   /* Filter selects */
@@ -1047,8 +1059,8 @@ async function init(){
     e.stopPropagation();
     var d=$id('olDatePop'); if(!d) return;
     var opening = !d.classList.contains('open');
-    document.querySelectorAll('.ol-dropdown.open').forEach(function(x){x.classList.remove('open');});
-    if(opening) d.classList.add('open');
+    closeAllDrops();
+    if(opening){ positionDrop(d, e.currentTarget); d.classList.add('open'); }
   });
   document.querySelectorAll('#olDatePop [data-p]').forEach(function(btn){
     btn.addEventListener('click', function(e){
@@ -1073,8 +1085,8 @@ async function init(){
     e.stopPropagation();
     var d=$id('olActDrop'); if(!d) return;
     var opening = !d.classList.contains('open');
-    document.querySelectorAll('.ol-dropdown.open').forEach(function(x){x.classList.remove('open');});
-    if(opening) d.classList.add('open');
+    closeAllDrops();
+    if(opening){ positionDrop(d, e.currentTarget); d.classList.add('open'); }
   });
   $id('olActDrop')?.addEventListener('click', function(e){
     var btn=e.target.closest('[data-a]'); if(!btn) return;

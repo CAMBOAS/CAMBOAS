@@ -59,7 +59,7 @@
       const cls    = danger ? 'sb-link sb-link-danger' : 'sb-link';
       const prefix = page.startsWith('pages/') ? (cur.startsWith('pages/') ? '' : 'pages/') : (cur.startsWith('pages/') ? '../' : '');
       const href   = cur.startsWith('pages/') ? (page.startsWith('pages/') ? page.replace('pages/','') : '../' + page) : page;
-      return `<li><a href="${href}" class="${cls} ${active}" data-page="${page}"><span class="sb-icon">${icon}</span><span class="sb-label">${label}</span><span class="sb-active-dot"></span></a></li>`;
+      return `<li><a href="${href}" class="${cls} ${active}" data-page="${page}" data-tooltip="${label}"><span class="sb-icon">${icon}</span><span class="sb-label">${label}</span><span class="sb-active-dot"></span></a></li>`;
     }
 
     const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
@@ -68,10 +68,15 @@
         <div class="sb-logo">
           <img src="${cur.startsWith('pages/') ? '../' : ''}images/logo/LOGO CAMBOMINI.png" alt="CAMBO MINI" onerror="this.style.display='none'">
         </div>
-        <div>
+        <div class="sb-brand-text">
           <div class="sb-brand-name">CAMBO MINI</div>
           <div class="sb-brand-sub">Premium Workspace</div>
         </div>
+      </div>
+      <div class="sb-toggle-row">
+        <button class="sb-toggle-btn" id="sbToggleBtn" title="Toggle sidebar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
       </div>
       <div class="sb-divider"></div>
       <nav class="sb-nav">
@@ -268,6 +273,28 @@
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNotify(); });
 
+    /* ── Sidebar collapse ── */
+    const _chevL = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+    const _chevR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+    function applyCollapse(collapsed) {
+      const sb = document.querySelector('.sidebar');
+      if (sb) sb.classList.toggle('sb-collapsed', collapsed);
+      document.body.classList.toggle('sb-collapsed', collapsed);
+      const btn = document.getElementById('sbToggleBtn');
+      if (btn) btn.innerHTML = collapsed ? _chevR : _chevL;
+    }
+
+    function bindToggleBtn() {
+      const btn = document.getElementById('sbToggleBtn');
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        const collapsed = !document.querySelector('.sidebar')?.classList.contains('sb-collapsed');
+        localStorage.setItem('sb_collapsed', collapsed ? '1' : '0');
+        applyCollapse(collapsed);
+      });
+    }
+
     /* Dark mode toggle — smooth with localStorage */
     function applyTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
@@ -289,10 +316,14 @@
         if (sidebar) {
           sidebar.innerHTML = buildSidebar();
           bindThemeBtn();
+          applyCollapse(localStorage.getItem('sb_collapsed') === '1');
+          bindToggleBtn();
         }
       });
     }
     bindThemeBtn();
+    applyCollapse(localStorage.getItem('sb_collapsed') === '1');
+    bindToggleBtn();
 
     /* Scroll FABs */
     const scrollUp   = document.getElementById('scrollFabUp');
@@ -319,4 +350,89 @@
   } else {
     init();
   }
+})();
+
+/* ══ macUI — macOS-style Notifications ══ */
+(function(){
+  var ICONS  = {success:'✅', error:'❌', warning:'⚠️', info:'ℹ️'};
+  var LABELS = {success:'Success', error:'Error', warning:'Warning', info:'Info'};
+
+  function getStack(){
+    var s = document.getElementById('mac-toast-stack');
+    if(!s){ s=document.createElement('div'); s.id='mac-toast-stack'; document.body.appendChild(s); }
+    return s;
+  }
+
+  function macToast(message, type){
+    type = type||'info';
+    var stack = getStack();
+    var el = document.createElement('div');
+    el.className = 'mac-toast '+type;
+    el.innerHTML =
+      '<div class="mac-t-icon">'+(ICONS[type]||'🔔')+'</div>'
+      +'<div class="mac-t-body">'
+        +'<div class="mac-t-title">'+(LABELS[type]||'')+'</div>'
+        +'<div class="mac-t-msg">'+String(message)+'</div>'
+      +'</div>'
+      +'<button class="mac-t-close">✕</button>';
+    stack.appendChild(el);
+    var timer = setTimeout(function(){
+      el.classList.add('hide');
+      setTimeout(function(){ el.remove(); }, 250);
+    }, 3200);
+    el.querySelector('.mac-t-close').addEventListener('click', function(){
+      clearTimeout(timer); el.remove();
+    });
+    requestAnimationFrame(function(){ el.classList.add('show'); });
+  }
+
+  function macAlert(message, title, icon){
+    return new Promise(function(resolve){
+      var ov = document.createElement('div');
+      ov.className = 'mac-modal-overlay';
+      ov.innerHTML =
+        '<div class="mac-modal">'
+          +'<div class="mac-modal-ico">'+(icon||'ℹ️')+'</div>'
+          +'<div class="mac-modal-title">'+String(title||'ជូនដំណឹង')+'</div>'
+          +'<div class="mac-modal-msg">'+String(message)+'</div>'
+          +'<div class="mac-modal-btns"><button class="mac-btn-ok">យល់ព្រម</button></div>'
+        +'</div>';
+      document.body.appendChild(ov);
+      requestAnimationFrame(function(){ ov.classList.add('show'); });
+      ov.querySelector('.mac-btn-ok').addEventListener('click', function(){
+        ov.classList.remove('show');
+        setTimeout(function(){ ov.remove(); resolve(); }, 200);
+      });
+    });
+  }
+
+  function macConfirm(message, title, danger){
+    return new Promise(function(resolve){
+      var ov = document.createElement('div');
+      ov.className = 'mac-modal-overlay';
+      ov.innerHTML =
+        '<div class="mac-modal">'
+          +'<div class="mac-modal-ico">'+(danger?'🗑️':'❓')+'</div>'
+          +'<div class="mac-modal-title">'+String(title||'បញ្ជាក់')+'</div>'
+          +'<div class="mac-modal-msg">'+String(message)+'</div>'
+          +'<div class="mac-modal-btns">'
+            +'<button class="mac-btn-cancel">បោះបង់</button>'
+            +'<button class="mac-btn-ok'+(danger?' danger':'')+'">'+(danger?'លុប':'យល់ព្រម')+'</button>'
+          +'</div>'
+        +'</div>';
+      document.body.appendChild(ov);
+      requestAnimationFrame(function(){ ov.classList.add('show'); });
+      ov.querySelector('.mac-btn-cancel').addEventListener('click', function(){
+        ov.classList.remove('show');
+        setTimeout(function(){ ov.remove(); resolve(false); }, 200);
+      });
+      ov.querySelector('.mac-btn-ok').addEventListener('click', function(){
+        ov.classList.remove('show');
+        setTimeout(function(){ ov.remove(); resolve(true); }, 200);
+      });
+    });
+  }
+
+  window.macUI = { toast: macToast, alert: macAlert, confirm: macConfirm };
+  window.alert = function(msg){ macAlert(String(msg)); };
 })();
