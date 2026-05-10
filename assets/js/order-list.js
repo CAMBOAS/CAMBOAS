@@ -349,8 +349,8 @@ function render(){
       +'</tr>';
   }).join('');
 
-  // Sync card view
-  if(typeof window._olRenderCards==='function') window._olRenderCards(rows);
+  // Sync card view (wrapped so any error doesn't prevent row-click setup below)
+  try { if(typeof window._olRenderCards==='function') window._olRenderCards(rows); } catch(e) { console.warn('Card render error:', e); }
 
   // Row click → open drawer
   // Checkbox click → toggle selection
@@ -914,9 +914,12 @@ function renderDrawerEdit(o){
   }, 0);
 }
 
-/* Expose to window for inline onclick */
+/* Expose to window for inline onclick + cross-IIFE helpers */
 window.olCloseDrawer = olCloseDrawer;
 window.olOpenDrawer  = olOpenDrawer;
+window.getProds      = getProds;
+window.orderTotal    = orderTotal;
+window.fmtDisplay    = fmtDisplay;
 
 /* ── Drawer QR toggle ── */
 var _drQrOn = true;
@@ -1397,7 +1400,7 @@ document.addEventListener('DOMContentLoaded', init);
         +'</div>';
     }).join('');
     cardList.querySelectorAll('.ol-card').forEach(function(c){
-      c.addEventListener('click',function(){ if(typeof olOpenDrawer==='function') olOpenDrawer(this.dataset.id); });
+      c.addEventListener('click',function(){ if(typeof window.olOpenDrawer==='function') window.olOpenDrawer(this.dataset.id); });
     });
   };
   window._olRenderCards = _renderCards;
