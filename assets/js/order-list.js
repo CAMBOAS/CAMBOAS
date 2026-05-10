@@ -19,9 +19,9 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 /* Convert any date string → DD/MM/YYYY */
 function fmtDisplay(s){
   if(!s) return '';
-  // Already DD/MM/YYYY
+  // Already DD/MM/YYYY (with optional time after)
   if(/^\d{2}\/\d{2}\/\d{4}/.test(s)) return s.slice(0,10);
-  // YYYY-MM-DD
+  // YYYY-MM-DD or YYYY-MM-DDTHH:MM
   if(/^\d{4}-\d{2}-\d{2}/.test(s)){ var p=s.slice(0,10).split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
   // Any JS date string (e.g. "Wed Apr 08 2026 00:00:00 GMT+0700")
   try{
@@ -31,6 +31,25 @@ function fmtDisplay(s){
     }
   }catch(e){}
   return s;
+}
+
+/* fmtDisplayFull — show date + time when time is available (not midnight 00:00) */
+function fmtDisplayFull(s){
+  if(!s) return '';
+  var str = String(s).trim();
+  // DD/MM/YYYY HH:MM... → show date + time
+  var m1 = str.match(/^(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})/);
+  if(m1) return m1[1]+' '+m1[2];
+  // YYYY-MM-DDTHH:MM → convert
+  var m2 = str.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if(m2){
+    var dateStr = m2[3]+'/'+m2[2]+'/'+m2[1];
+    var hh = m2[4], mm = m2[5];
+    // Hide midnight (00:00) — date-only orders saved without real time
+    return (hh==='00' && mm==='00') ? dateStr : dateStr+' '+hh+':'+mm;
+  }
+  // Fallback to date-only
+  return fmtDisplay(s);
 }
 
 /* Convert any date format → "YYYY-MM-DDTHH:MM" for datetime-local input */
@@ -838,8 +857,8 @@ function renderDrawerView(o){
     +drRow('ទូរស័ព្ទ', '<span style="color:#60a5fa">'+esc(o.phone||'—')+'</span>')
     +drRow('អាសយដ្ឋាន', (o.addressDetail||o.address||'')||'—')
     +drRow('ខេត្ត/ក្រុង', o.province||'—')
-    // Date — read-only text in view mode (edit via Edit button)
-    +drRow('ថ្ងៃ/ម៉ោង', fmtDisplay(o.date)||'—')
+    // Date — read-only text in view mode (edit via Edit button only)
+    +drRow('ថ្ងៃ/ម៉ោង', fmtDisplayFull(o.date)||'—')
     +drRow('ដឹកជញ្ជូន', o.deliveryName||'—')
     +drRow('ថ្លៃដឹក', o.deliveryFee ? '$'+Number(o.deliveryFee).toFixed(2) : 'ហ្វ្រីដឹក')
     +drRow('Payment', o.payment||'—')
