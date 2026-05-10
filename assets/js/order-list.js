@@ -916,6 +916,7 @@ function renderDrawerEdit(o){
 
 /* Expose to window for inline onclick */
 window.olCloseDrawer = olCloseDrawer;
+window.olOpenDrawer  = olOpenDrawer;
 
 /* ── Drawer QR toggle ── */
 var _drQrOn = true;
