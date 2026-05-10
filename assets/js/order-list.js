@@ -673,8 +673,8 @@ function olToggleEdit(){
   // Show/hide save+cancel in footer
   var saveBtn   = $id('olDrSaveBtn');
   var cancelBtn = $id('olDrCancelBtn');
-  if(saveBtn)   saveBtn.style.display   = _editMode ? 'block' : 'none';
-  if(cancelBtn) cancelBtn.style.display = _editMode ? 'block' : 'none';
+  if(saveBtn)   saveBtn.style.display   = _editMode ? 'flex' : 'none';
+  if(cancelBtn) cancelBtn.style.display = _editMode ? 'flex' : 'none';
 }
 
 function olCancelEdit(){
@@ -923,10 +923,11 @@ window.olDrToggleQr = function(){
   _drQrOn = !_drQrOn;
   var btn = $id('olDrQrBtn');
   if(!btn) return;
-  btn.innerHTML  = 'QR Code<br>' + (_drQrOn ? 'ON' : 'OFF');
-  btn.style.borderColor  = _drQrOn ? 'rgba(34,197,94,.3)'  : 'rgba(239,68,68,.3)';
-  btn.style.background   = _drQrOn ? 'rgba(34,197,94,.1)'  : 'rgba(239,68,68,.1)';
-  btn.style.color        = _drQrOn ? '#4ade80'              : '#f87171';
+  // Only change colors — SVG icon stays intact
+  btn.style.borderColor = _drQrOn ? 'rgba(34,197,94,.4)'  : 'rgba(239,68,68,.4)';
+  btn.style.background  = _drQrOn ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)';
+  btn.style.color       = _drQrOn ? '#4ade80'             : '#f87171';
+  btn.title = 'QR Code: ' + (_drQrOn ? 'ON' : 'OFF');
 };
 
 /* ── Drawer Delete ── */
