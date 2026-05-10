@@ -85,6 +85,27 @@ document.addEventListener('click', function(e){
 });
 
 /* ── data ── */
+/* ── Local date-edits overlay (persists across Sheet reloads) ── */
+var DATE_EDITS_KEY = 'cambo_ol_date_edits_v1';
+
+function getLocalDateEdits(){
+  try{ return JSON.parse(localStorage.getItem(DATE_EDITS_KEY)||'{}'); }catch(e){ return {}; }
+}
+function saveLocalDateEdit(orderId, newDate){
+  var edits = getLocalDateEdits();
+  edits[String(orderId)] = newDate;
+  try{ localStorage.setItem(DATE_EDITS_KEY, JSON.stringify(edits)); }catch(e){}
+}
+function applyLocalDateEdits(orders){
+  var edits = getLocalDateEdits();
+  if(!Object.keys(edits).length) return orders;
+  return orders.map(function(o){
+    var edited = edits[String(o.id)];
+    if(edited) return Object.assign({}, o, { date: edited });
+    return o;
+  });
+}
+
 async function loadOrders(){
   try{
     var r = await fetch(SCRIPT_URL+'?action=list&limit=1000&_='+Date.now());
@@ -94,9 +115,9 @@ async function loadOrders(){
              :Array.isArray(d?.rows)?d.rows
              :Array.isArray(d?.data)?d.data
              :null;
-    if(arr) return normalizeOrders(arr);
-    return local();
-  }catch(e){ return local(); }
+    if(arr) return applyLocalDateEdits(normalizeOrders(arr)); // ← merge local edits on top
+    return applyLocalDateEdits(local());
+  }catch(e){ return applyLocalDateEdits(local()); }
 }
 function fixPhone(v){
   var ph = String(v||'').trim();
@@ -1007,7 +1028,9 @@ window.olSaveInlineDate = function(){
   var time  = parts[1] || '00:00';
   o.date = dp[2]+'/'+dp[1]+'/'+dp[0]+' '+time;
 
-  // 1. Save to localStorage
+  // 1. Save to local edits overlay (survives Sheet reload)
+  saveLocalDateEdit(o.id, o.date);
+  // Also save full orders snapshot
   try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); } catch(e){}
 
   // 2. Refresh table row
