@@ -3,7 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+  <script>
+    /* Theme restore */
+    (function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
+    /* Desktop redirect — send to full Smart Order page */
+    if (window.matchMedia('(min-width: 981px)').matches) {
+      window.location.replace('orders-details.html');
+    }
+  </script>
   <title>Smart Orders Mobile - CAMBO MINI</title>
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
@@ -1223,203 +1230,7 @@
       }
     }
 
-    /* ─────────────────────────────────────────────
-       DESKTOP (≥981px) — Full orders-details layout
-       Sidebar offset + CSS Grid card arrangement
-    ───────────────────────────────────────────── */
-    @media (min-width: 981px) {
-      /* ── Sidebar offset ── */
-      .mob-page {
-        margin-left: var(--sb-w, 240px);
-        padding: 20px 24px calc(80px + 20px) !important;
-        /* CSS Grid: 2 columns for Note(55%) + Total(45%) row */
-        display: grid !important;
-        grid-template-columns: 55fr 45fr !important;
-        grid-template-rows: auto !important;
-        gap: 16px !important;
-        align-items: start;
-      }
-
-      /* Remove max-width cap — full page width */
-      .mob-page > * { max-width: unset !important; width: 100% !important; }
-
-      /* ── Grid placement for each section ── */
-      .mob-desktop-notice { grid-column: 1 / -1; grid-row: 1; }
-      #custCard           { grid-column: 1 / -1; grid-row: 2; }
-      #productsCard       { grid-column: 1 / -1; grid-row: 3; }
-      #noteCard           { grid-column: 1;       grid-row: 4; }  /* Left 55% */
-      #totalCard          { grid-column: 2;       grid-row: 4; }  /* Right 45% */
-      #tableCard          { grid-column: 1 / -1; grid-row: 5; }
-
-      /* ── Cards: match orders-details glass-card ── */
-      .mob-card {
-        border-radius: 16px !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-
-      /* ── Hide "go to desktop version" notice — already on desktop ── */
-      .mob-desktop-notice { display: none !important; }
-
-      /* ── Section titles: show header, disable toggle ── */
-      .mob-card-head {
-        display: flex !important;
-        cursor: default !important;
-        pointer-events: none !important;
-        padding: 18px 22px 14px !important;
-        border-bottom: 1px solid var(--line, rgba(0,0,0,0.07)) !important;
-      }
-      .mob-card-head h3 { font-size: 16px !important; font-weight: 700 !important; }
-      .mob-card-head .mob-toggle-icon { display: none !important; }
-      .mob-card-body        { display: block !important; padding: 18px 22px 22px !important; }
-      .mob-card-body.is-hidden { display: block !important; }
-
-      /* Note textarea: taller on desktop */
-      .mob-note textarea { min-height: 140px !important; font-size: 14px !important; }
-
-      /* ── Products head: section title row ── */
-      .mob-prod-head { padding: 18px 22px 0 !important; }
-      .mob-prod-head h3 { font-size: 16px !important; font-weight: 700 !important; }
-
-      /* ── 3-column form grid (like orders-details) ── */
-      .mob-form-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 14px !important;
-      }
-      /* All span-2 → 1 col on desktop (clean 3-col rows, no gaps) */
-      .mob-form-grid .span-2 { grid-column: span 1 !important; }
-
-      /*
-       Grid auto-placement result with all fields span-1:
-       Row 1: [Pages]    [CloseBy]   [Status]
-       Row 2: [Date]     [Customer]  [Phone]
-       Row 3: [Address]  [Province]  [Delivery]
-       Row 4: [Fee]      [Payment ── col 2→end ──────────]
-      */
-      /* Payment: right 2/3 of last row — shares row with DeliveryFee */
-      .mob-form-grid .pay-field { grid-column: 2 / -1 !important; }
-
-      /* Payment buttons: natural auto-width, compact, left-aligned */
-      .mob-form-grid .pay-field .mob-payment-row {
-        justify-content: flex-start !important;
-      }
-      .mob-form-grid .pay-field .mob-payment-row .payment-btn {
-        height: 38px !important;
-        font-size: 13px !important;
-        flex: 0 0 auto !important;
-        min-width: 68px !important;
-        max-width: 120px !important;
-        padding: 0 14px !important;
-      }
-
-      /* ── Form inputs + labels: desktop sizing (like orders-details) ── */
-      .mob-field input,
-      .mob-field select,
-      .mob-field .searchable-select input.combo-input {
-        height: 40px !important;
-        font-size: 14px !important;
-        border-radius: 9px !important;
-      }
-      .mob-field label {
-        font-size: 12px !important;
-        font-weight: 600 !important;
-        text-transform: none !important;
-        letter-spacing: 0 !important;
-        color: var(--muted, #6b7898) !important;
-      }
-
-      /* ── Product grid: CSS grid like desktop ── */
-      #productGrid.product-grid {
-        display: grid !important;
-        flex-direction: unset !important;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-        gap: 12px !important;
-        padding: 14px 22px !important;
-      }
-      #productGrid.product-grid .product-card {
-        display: flex !important;
-        flex-direction: column !important;
-        padding: 12px !important;
-        border-radius: 12px !important;
-        border: 1px solid var(--line, rgba(0,0,0,0.08)) !important;
-        background: var(--card, rgba(255,255,255,0.7)) !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
-        gap: 8px !important;
-      }
-      #productGrid .product-image {
-        width: 100% !important;
-        height: 120px !important;
-        border-radius: 10px !important;
-        margin-right: 0 !important;
-        margin-bottom: 6px !important;
-      }
-      #productGrid .product-info { flex: unset !important; }
-      #productGrid .product-info h4 { font-size: 13px !important; white-space: normal !important; }
-      #productGrid .product-controls {
-        flex-direction: column !important;
-        gap: 6px !important;
-        margin-top: auto !important;
-      }
-      #productGrid .pc-field input {
-        height: 34px !important;
-        font-size: 13px !important;
-      }
-      #productGrid .add-btn {
-        width: 100% !important;
-        height: 34px !important;
-        font-size: 18px !important;
-        align-self: stretch !important;
-      }
-
-      /* ── Quick-add bar ── */
-      .mob-quick-add { padding: 14px 22px 20px !important; }
-
-      /* ── Total panel: card-style ── */
-      .mob-total-panel { padding: 20px 22px !important; }
-      .mob-total-row #grandTotal { font-size: 32px !important; }
-      .mob-khr { margin-top: 12px; }
-
-      /* ── Table: full-width, no horizontal scroll ── */
-      .mob-table-wrap { padding: 0 22px 4px !important; }
-      .mob-table-wrap table { min-width: 0 !important; width: 100% !important; }
-
-      /* ── Bottom bar: desktop-style (match orders-details) ── */
-      .mob-bottom-bar {
-        left: var(--sb-w, 240px) !important;
-        transform: translateY(0) !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        height: 64px !important;
-        padding: 0 24px !important;
-        background: var(--card, rgba(255,255,255,0.95)) !important;
-        border-top: 1px solid var(--line, rgba(0,0,0,0.09)) !important;
-        box-shadow: 0 -2px 20px rgba(0,0,0,0.06) !important;
-      }
-      .mob-action-btns .btn {
-        height: 40px !important;
-        padding: 0 18px !important;
-        font-size: 13.5px !important;
-        border-radius: 10px !important;
-      }
-      #toggleQrBtn.toggle-qr-btn {
-        height: 40px !important;
-        padding: 0 14px !important;
-        font-size: 12.5px !important;
-        border-radius: 10px !important;
-      }
-      #receiptNo { height: 36px !important; font-size: 14px !important; border-radius: 9px !important; }
-
-      /* ── Section title — show above cards ── */
-      .mob-card::before { display: none; }
-    }
-
-    /* Collapsed sidebar desktop */
-    body.sb-collapsed .mob-page {
-      margin-left: var(--sb-w-col, 64px) !important;
-    }
-    body.sb-collapsed .mob-bottom-bar {
-      left: var(--sb-w-col, 64px) !important;
-    }
+    /* Desktop (≥981px) → redirected to orders-details.html via JS */
 
     /* ══ Scroll top / bottom buttons ══ */
     #scrollBtns {
