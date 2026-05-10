@@ -1258,6 +1258,9 @@
         margin: 0 !important;
       }
 
+      /* ── Hide "go to desktop version" notice — already on desktop ── */
+      .mob-desktop-notice { display: none !important; }
+
       /* ── Section titles: show header, disable toggle ── */
       .mob-card-head {
         display: flex !important;
@@ -1283,21 +1286,33 @@
         grid-template-columns: repeat(3, 1fr) !important;
         gap: 14px !important;
       }
-      /* All span-2 → 1 col by default on desktop (no more forced full-width) */
+      /* All span-2 → 1 col on desktop (clean 3-col rows, no gaps) */
       .mob-form-grid .span-2 { grid-column: span 1 !important; }
-      /* Province: keep 2 cols (needs width for long names) */
-      .mob-form-grid .province-field { grid-column: span 2 !important; }
-      /* Payment: full row width */
-      .mob-form-grid .pay-field { grid-column: 1 / -1 !important; }
-      /* Payment buttons: compact for desktop */
+
+      /*
+       Grid auto-placement result with all fields span-1:
+       Row 1: [Pages]    [CloseBy]   [Status]
+       Row 2: [Date]     [Customer]  [Phone]
+       Row 3: [Address]  [Province]  [Delivery]
+       Row 4: [Fee]      [Payment ── col 2→end ──────────]
+      */
+      /* Payment: right 2/3 of last row — shares row with DeliveryFee */
+      .mob-form-grid .pay-field { grid-column: 2 / -1 !important; }
+
+      /* Payment buttons: natural auto-width, compact, left-aligned */
+      .mob-form-grid .pay-field .mob-payment-row {
+        justify-content: flex-start !important;
+      }
       .mob-form-grid .pay-field .mob-payment-row .payment-btn {
         height: 38px !important;
         font-size: 13px !important;
-        max-width: 160px !important;
-        flex: 0 1 auto !important;
+        flex: 0 0 auto !important;
+        min-width: 68px !important;
+        max-width: 120px !important;
+        padding: 0 14px !important;
       }
 
-      /* ── Form inputs: desktop sizing ── */
+      /* ── Form inputs + labels: desktop sizing (like orders-details) ── */
       .mob-field input,
       .mob-field select,
       .mob-field .searchable-select input.combo-input {
@@ -1305,15 +1320,21 @@
         font-size: 14px !important;
         border-radius: 9px !important;
       }
-      .mob-field label { font-size: 11.5px !important; }
+      .mob-field label {
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        text-transform: none !important;
+        letter-spacing: 0 !important;
+        color: var(--muted, #6b7898) !important;
+      }
 
-      /* ── Product grid: CSS grid like desktop (not flex column) ── */
+      /* ── Product grid: CSS grid like desktop ── */
       #productGrid.product-grid {
         display: grid !important;
         flex-direction: unset !important;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-        gap: 10px !important;
-        padding: 12px 22px !important;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+        gap: 12px !important;
+        padding: 14px 22px !important;
       }
       #productGrid.product-grid .product-card {
         display: flex !important;
