@@ -504,17 +504,30 @@ function clearAll(){
 
 // ── Build order payload ───────────────────────────────────────────────────────
 function buildPayload(){
-  var now     = new Date();
-  var dateVal = _el('date').value || now.toISOString().split('T')[0];
-  var timeStr = String(now.getHours()).padStart(2,'0')
-              + ':' + String(now.getMinutes()).padStart(2,'0')
-              + ':' + String(now.getSeconds()).padStart(2,'0');
-  var dateTime = /^\d{4}-\d{2}-\d{2}$/.test(dateVal)
-    ? dateVal + 'T' + timeStr
-    : dateVal;
-  var createdAt = /^\d{4}-\d{2}-\d{2}$/.test(dateVal)
-    ? new Date(dateVal + 'T' + timeStr).toISOString()
-    : now.toISOString();
+  var now = new Date();
+  var pad = function(x){ return String(x).padStart(2,'0'); };
+
+  // Read datetime-local value (format: "YYYY-MM-DDTHH:MM")
+  // Fallback: use LOCAL date+time (not toISOString which is UTC)
+  var rawVal = _el('date') ? _el('date').value : '';
+  if(!rawVal){
+    rawVal = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())
+            +'T'+pad(now.getHours())+':'+pad(now.getMinutes());
+  }
+
+  // Convert to "DD/MM/YYYY HH:MM" — timezone-safe, Apps Script won't shift the date
+  var dateTime;
+  var m = rawVal.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if(m){
+    dateTime = m[3]+'/'+m[2]+'/'+m[1]+' '+m[4]+':'+m[5]; // DD/MM/YYYY HH:MM
+  } else if(/^\d{2}\/\d{2}\/\d{4}/.test(rawVal)){
+    dateTime = rawVal; // already DD/MM/YYYY format
+  } else {
+    dateTime = rawVal; // fallback as-is
+  }
+
+  // createdAt stays as UTC ISO for server logging (Apps Script)
+  var createdAt = now.toISOString();
 
   return {
     id:           Date.now(),

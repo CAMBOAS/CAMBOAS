@@ -859,17 +859,29 @@ function getDeliveryFeeValue() {
 
 function buildOrderPayload() {
   var _now = new Date();
-  var _d   = els.date && els.date.value;
-  var _hh  = String(_now.getHours()).padStart(2,'0');
-  var _mm  = String(_now.getMinutes()).padStart(2,'0');
-  var _ss  = String(_now.getSeconds()).padStart(2,'0');
-  var _timeStr = _hh + ':' + _mm + ':' + _ss;
-  var _dateTime = _d && /^\d{4}-\d{2}-\d{2}$/.test(_d)
-    ? _d + 'T' + _timeStr
-    : (_d || _now.toISOString());
-  var _createdAt = _d && /^\d{4}-\d{2}-\d{2}$/.test(_d)
-    ? new Date(_d + 'T' + _timeStr).toISOString()
-    : _now.toISOString();
+  var _pad = function(x){ return String(x).padStart(2,'0'); };
+
+  // Read datetime-local value ("YYYY-MM-DDTHH:MM")
+  // Fallback: build from LOCAL time (never use toISOString which is UTC)
+  var _rawVal = (els.date && els.date.value) || '';
+  if(!_rawVal){
+    _rawVal = _now.getFullYear()+'-'+_pad(_now.getMonth()+1)+'-'+_pad(_now.getDate())
+             +'T'+_pad(_now.getHours())+':'+_pad(_now.getMinutes());
+  }
+
+  // Convert to "DD/MM/YYYY HH:MM" — timezone-safe, Apps Script won't shift the date
+  var _dateTime;
+  var _m = _rawVal.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if(_m){
+    _dateTime = _m[3]+'/'+_m[2]+'/'+_m[1]+' '+_m[4]+':'+_m[5]; // DD/MM/YYYY HH:MM
+  } else if(/^\d{2}\/\d{2}\/\d{4}/.test(_rawVal)){
+    _dateTime = _rawVal; // already DD/MM/YYYY format
+  } else {
+    _dateTime = _rawVal; // fallback
+  }
+
+  // createdAt stays UTC ISO for server logging
+  var _createdAt = _now.toISOString();
 
   return {
     id: Date.now(),
