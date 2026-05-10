@@ -1012,48 +1012,55 @@ window.olSaveEdit    = olSaveEdit;
 
 /* ── Inline date save (view mode, no full edit needed) ── */
 window.olSaveInlineDate = function(){
-  var o = _orders.find(function(x){ return String(x.id) === _drawerOrderId; });
-  if(!o) return;
-  var inp = document.getElementById('drInlineDate');
-  if(!inp || !inp.value) return;
+  /* ── 1. Find order ── */
+  var o = _orders.find(function(x){ return String(x.id) === String(_drawerOrderId); });
+  if(!o){
+    if(window.macUI) macUI.toast('⚠️ រកមិនឃើញ Order', 'error');
+    return;
+  }
 
-  var newDate = inp.value; // datetime-local gives "YYYY-MM-DDTHH:MM"
+  /* ── 2. Get input value ── */
+  var inp = document.getElementById('drInlineDate');
+  if(!inp){
+    if(window.macUI) macUI.toast('⚠️ Input មិនមាន', 'error');
+    return;
+  }
+  var newDate = inp.value; // browser gives "YYYY-MM-DDTHH:MM"
   if(!newDate){
     if(window.macUI) macUI.toast('⚠️ សូមជ្រើសរើសថ្ងៃខែ', 'warning');
     return;
   }
-  // Convert "YYYY-MM-DDTHH:MM" → "DD/MM/YYYY HH:MM" to match Sheet format
-  var parts = newDate.split('T');
-  var dp    = parts[0].split('-');   // [YYYY, MM, DD]
-  var time  = parts[1] || '00:00';
-  o.date = dp[2]+'/'+dp[1]+'/'+dp[0]+' '+time;
 
-  // 1. Save to local edits overlay (survives Sheet reload)
-  saveLocalDateEdit(o.id, o.date);
-  // Also save full orders snapshot
+  /* ── 3. Convert "YYYY-MM-DDTHH:MM" → "DD/MM/YYYY HH:MM" ── */
+  var parts = newDate.split('T');
+  var dp    = parts[0].split('-');        // ["YYYY","MM","DD"]
+  var time  = (parts[1] || '00:00').slice(0, 5);
+  var formatted = dp[2]+'/'+dp[1]+'/'+dp[0]+' '+time;
+  o.date = formatted;
+
+  /* ── 4. Persist: local edits overlay + full snapshot ── */
+  saveLocalDateEdit(o.id, formatted);
   try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); } catch(e){}
 
-  // 2. Refresh table row
-  render();
-
-  // 3. Re-render drawer view with updated date
-  renderDrawerView(o);
-
-  // 4. Toast notification
-  function showToast(msg, type){
-    if(window.macUI){ macUI.toast(msg, type||'success'); return; }
-    var t = document.createElement('div');
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);'
-      +'background:#1e293b;color:#4ade80;padding:10px 20px;border-radius:12px;'
-      +'font-size:13px;font-weight:700;z-index:9999;border-left:3px solid #4ade80;'
-      +'box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .3s';
-    t.textContent = msg;
-    document.body.appendChild(t);
-    setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 300); }, 2500);
+  /* ── 5. Button feedback — show ✅ so user knows it worked ── */
+  var btn = document.querySelector('button[onclick="olSaveInlineDate()"]');
+  if(btn){
+    var origText = btn.textContent;
+    var origBg   = btn.style.background;
+    btn.textContent      = '✅ Saved!';
+    btn.style.background = 'rgba(34,197,94,.25)';
+    btn.style.color      = '#16a34a';
+    setTimeout(function(){
+      btn.textContent      = origText;
+      btn.style.background = origBg;
+      btn.style.color      = '#8b5cf6';
+    }, 2000);
   }
-  showToast('⏳ កំពុង Save...', 'info');
 
-  // 5. Sync to Google Sheet
+  /* ── 6. Toast with actual saved value ── */
+  if(window.macUI) macUI.toast('✅ ថ្ងៃខែ: '+formatted, 'success');
+
+  /* ── 7. Sync to Google Sheet (background, non-blocking) ── */
   fetch(SCRIPT_URL, {
     method: 'POST',
     headers: {'Content-Type': 'text/plain;charset=utf-8'},
@@ -1061,15 +1068,11 @@ window.olSaveInlineDate = function(){
   })
   .then(function(res){ return res.json(); })
   .then(function(data){
-    if(data && data.ok === false){
-      showToast('⚠️ Local ✓ | Sheet: ' + (data.message||'Error'), 'warning');
-    } else {
-      showToast('✅ ថ្ងៃខែបានរក្សាទុក!', 'success');
+    if(data && data.ok === false && window.macUI){
+      macUI.toast('⚠️ Local ✓ | Sheet: '+(data.message||'Error'), 'warning');
     }
   })
-  .catch(function(){
-    showToast('✅ Saved locally (Sheet offline)', 'warning');
-  });
+  .catch(function(){ /* Sheet offline — local save already done */ });
 };
 
 /* ── INIT ── */
