@@ -172,7 +172,7 @@
   @media(min-width:641px){
     #olCardList { display:none !important; }
   }
-  #olCardList { flex-direction:column; gap:8px; padding:4px 0; }
+  #olCardList { flex-direction:column; gap:8px; padding:8px 0 80px; }
   .ol-card {
     background:var(--glass-bg,rgba(255,255,255,.04));
     border:1px solid rgba(148,163,184,.12);
@@ -345,7 +345,7 @@
       </div>
     </div>
 
-    <!-- Table -->
+    <!-- Table (desktop) -->
     <div class="glass-card" style="padding:0;overflow:hidden">
       <div class="ol-table-wrap">
         <table class="ol-table">
@@ -367,10 +367,11 @@
           <tbody id="olBody"><tr><td colspan="10" class="ol-empty">⏳ Loading...</td></tr></tbody>
         </table>
       </div>
-      <!-- Mobile card list — shown ≤640px instead of table -->
-      <div id="olCardList"></div>
       <div class="ol-footer" id="olFooter">Showing 0 records</div>
     </div>
+
+    <!-- Mobile card list — outside glass-card to avoid overflow:hidden clipping -->
+    <div id="olCardList"></div>
   </div>
 
   <!-- Order Detail Drawer -->
