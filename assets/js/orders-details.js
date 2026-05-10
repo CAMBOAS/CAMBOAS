@@ -329,11 +329,18 @@ function init() {
 
 function setToday() {
   if (!els.date) return;
-  const today = new Date();
-  const y = today.getFullYear();
-  const m = String(today.getMonth() + 1).padStart(2, "0");
-  const d = String(today.getDate()).padStart(2, "0");
-  if (!els.date.value) els.date.value = `${y}-${m}-${d}`;
+  const now = new Date();
+  const y  = now.getFullYear();
+  const mo = String(now.getMonth() + 1).padStart(2, "0");
+  const d  = String(now.getDate()).padStart(2, "0");
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  // Always overwrite — never keep a stale date from a previous session
+  if (els.date.type === 'datetime-local') {
+    els.date.value = `${y}-${mo}-${d}T${hh}:${mm}`;
+  } else {
+    els.date.value = `${y}-${mo}-${d}`;
+  }
 }
 
 function bindCategoryTabs() {
@@ -738,7 +745,9 @@ function getSelectedQrMeta() {
 
 function formatDateForReceipt(value) {
   if (!value) return "-";
-  const parts = String(value).split("-");
+  // Extract date part only (handles "YYYY-MM-DD" and "YYYY-MM-DDTHH:MM")
+  const dateOnly = String(value).slice(0, 10);
+  const parts = dateOnly.split("-");
   if (parts.length !== 3) return value;
   return `${parts[2]}/${parts[1]}/${parts[0]}`;
 }
@@ -929,6 +938,17 @@ async function handleSave() {
 
     savedOrders.push(order);
     localStorage.setItem("camboOrders", JSON.stringify(savedOrders));
+
+    // ── Mirror to Order List key so new orders appear immediately ──
+    // (Order List reads 'cambo_search_edit_orders_v3', not 'camboOrders')
+    try {
+      var _OL_KEY = 'cambo_search_edit_orders_v3';
+      var _olArr  = JSON.parse(localStorage.getItem(_OL_KEY) || '[]');
+      // Remove any old entry with same id (avoid duplicates)
+      _olArr = _olArr.filter(function(o){ return String(o.id) !== String(order.id); });
+      _olArr.unshift(order); // newest first
+      localStorage.setItem(_OL_KEY, JSON.stringify(_olArr));
+    } catch(_e) {}
 
     if (result.telegram && result.telegram.ok === false) {
       toast("Order saved. Telegram failed.", "info");
@@ -1198,6 +1218,8 @@ function clearOrderForm() {
     els.paymentOptions.querySelectorAll(".payment-btn").forEach((btn) => btn.classList.remove("active"));
   }
 
+  // Clear date first so setToday() always refreshes to NOW (not stuck on old date)
+  if (els.date) els.date.value = '';
   showQrEnabled = true;
   syncQrToggleButton();
   setToday();
@@ -2028,7 +2050,9 @@ const lines = items.length
 
 function formatDateKH(dateStr) {
   if (!dateStr) return "-";
-  const [y, m, d] = dateStr.split("-");
+  // Extract date part only (handles "YYYY-MM-DD" and "YYYY-MM-DDTHH:MM")
+  const dateOnly = String(dateStr).slice(0, 10);
+  const [y, m, d] = dateOnly.split("-");
   return `${d}/${m}/${y}`;
 }
 

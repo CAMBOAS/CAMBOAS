@@ -106,7 +106,20 @@ function applyLocalDateEdits(orders){
   });
 }
 
+/* Load locally-saved orders from Smart Orderer/Mobile (key: "camboOrders") */
+function localCamboOrders(){
+  try{ return normalizeOrders(JSON.parse(localStorage.getItem('camboOrders')||'[]')); }catch(e){ return []; }
+}
+
+/* Merge two order arrays — Sheet wins on duplicate IDs, local-only appended */
+function mergeOrders(sheetOrders, localOrders){
+  var sheetIds = new Set(sheetOrders.map(function(o){ return String(o.id); }));
+  var localOnly = localOrders.filter(function(o){ return !sheetIds.has(String(o.id)); });
+  return sheetOrders.concat(localOnly);
+}
+
 async function loadOrders(){
+  var camboLocal = localCamboOrders(); // orders from Smart Orderer not yet on Sheet
   try{
     var r = await fetch(SCRIPT_URL+'?action=list&limit=1000&_='+Date.now());
     var d = await r.json();
@@ -115,9 +128,13 @@ async function loadOrders(){
              :Array.isArray(d?.rows)?d.rows
              :Array.isArray(d?.data)?d.data
              :null;
-    if(arr) return applyLocalDateEdits(normalizeOrders(arr)); // ← merge local edits on top
-    return applyLocalDateEdits(local());
-  }catch(e){ return applyLocalDateEdits(local()); }
+    if(arr){
+      // Merge Sheet data with local orders not yet synced to Sheet
+      var merged = mergeOrders(normalizeOrders(arr), camboLocal);
+      return applyLocalDateEdits(merged);
+    }
+    return applyLocalDateEdits(mergeOrders(local(), camboLocal));
+  }catch(e){ return applyLocalDateEdits(mergeOrders(local(), camboLocal)); }
 }
 function fixPhone(v){
   var ph = String(v||'').trim();
@@ -665,10 +682,11 @@ function olToggleEdit(){
   var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
   if(!o) return;
   _editMode = !_editMode;
-  var foot   = $id('olDrFoot');
+  var foot    = $id('olDrFoot');
   var editBtn = $id('olDrEditBtn');
-  foot.style.display   = _editMode ? 'flex' : 'none';
-  editBtn.textContent  = _editMode ? '👁 View' : '✏️ Edit';
+  // Footer always stays visible — only Save/Cancel toggle
+  if(foot) foot.style.display = 'flex';
+  if(editBtn) editBtn.textContent = _editMode ? '👁 View' : '✏️ Edit';
   _editMode ? renderDrawerEdit(o) : renderDrawerView(o);
   // Show/hide save+cancel in footer
   var saveBtn   = $id('olDrSaveBtn');
@@ -683,95 +701,127 @@ function olCancelEdit(){
   if(o) renderDrawerView(o);
   var saveBtn   = $id('olDrSaveBtn');
   var cancelBtn = $id('olDrCancelBtn');
+  var editBtn   = $id('olDrEditBtn');
+  var foot      = $id('olDrFoot');
   if(saveBtn)   saveBtn.style.display   = 'none';
   if(cancelBtn) cancelBtn.style.display = 'none';
-  $id('olDrEditBtn').textContent = '✏️ Edit';
+  if(editBtn)   editBtn.textContent     = '✏️ Edit';
+  if(foot)      foot.style.display      = 'flex'; // always keep footer visible
+}
+
+function _olShowToast(msg, color){
+  if(window.macUI){
+    var type = color==='#4ade80'||color==='#22c55e' ? 'success'
+             : color==='#f59e0b'||color==='#fbbf24' ? 'warning'
+             : color==='#f87171'||color==='#ef4444' ? 'error' : 'info';
+    macUI.toast(msg, type); return;
+  }
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);'
+    +'background:#1e293b;color:'+color+';padding:10px 20px;border-radius:12px;'
+    +'font-size:13px;font-weight:700;z-index:9999;border-left:3px solid '+color+';'
+    +'box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .3s';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 300); }, 2500);
 }
 
 function olSaveEdit(){
-  var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
-  if(!o) return;
+  // Guard: must have an open order
+  var o = _orders.find(function(x){ return String(x.id) === String(_drawerOrderId); });
+  if(!o){ alert('⚠️ Order រកមិនឃើញ'); return; }
 
-  // Read edited values
-  o.customer     = $id('drCustomer')?.value    || o.customer;
-  o.phone        = $id('drPhone')?.value       || o.phone;
-  o.province     = $id('drProvince')?.value    || o.province;
-  var _addr = $id('drAddress')?.value || '';
-  o.addressDetail = _addr || o.addressDetail;
-  o.address       = _addr || o.address;
-  var _dateVal = $id('drDate')?.value || ''; // "YYYY-MM-DDTHH:MM"
-  if(_dateVal){
-    var _dp = _dateVal.split('T');
-    var _d  = _dp[0].split('-');             // [YYYY, MM, DD]
-    o.date  = _d[2]+'/'+_d[1]+'/'+_d[0]+' '+(_dp[1]||'00:00'); // → "DD/MM/YYYY HH:MM"
-  }
-  o.deliveryName = $id('drDelivery')?.value    || o.deliveryName;
-  o.deliveryFee  = Number($id('drDeliveryFee')?.value||0);
-  o.payment      = $id('drPayment')?.value     || o.payment;
-  o.status       = $id('drStatus')?.value      || o.status;
-  o.note         = $id('drNote')?.value        || '';
-  o.page         = $id('drPage')?.value        || o.page;
-  o.closeBy      = $id('drCloseBy')?.value     || o.closeBy;
-  o.priority     = $id('drPriority')?.value    || o.priority;
+  try {
+    // ── 1. Read edited values from form ──
+    var custEl    = document.getElementById('drCustomer');
+    var phoneEl   = document.getElementById('drPhone');
+    var addrEl    = document.getElementById('drAddress');
+    var provEl    = document.getElementById('drProvince');
+    var dateEl    = document.getElementById('drDate');
+    var delivEl   = document.getElementById('drDelivery');
+    var feeEl     = document.getElementById('drDeliveryFee');
+    var payEl     = document.getElementById('drPayment');
+    var statEl    = document.getElementById('drStatus');
+    var noteEl    = document.getElementById('drNote');
+    var pageEl    = document.getElementById('drPage');
+    var closeEl   = document.getElementById('drCloseBy');
+    var priorEl   = document.getElementById('drPriority');
 
-  // Read products from edit rows — use #drProdList direct children to avoid duplicates
-  var prodList = document.getElementById('drProdList');
-  if(prodList){
-    var newProds = [];
-    // Get only direct children that have dr-prod-name input
-    Array.from(prodList.children).forEach(function(row){
-      var nameEl = row.querySelector('.dr-prod-name');
-      if(!nameEl) return;
-      var name = nameEl.value.trim();
-      var qty  = Number(row.querySelector('.dr-prod-qty')?.value||1);
-      var price= Number(row.querySelector('.dr-prod-price')?.value||0);
-      var disc = Number(row.querySelector('.dr-prod-disc')?.value||0);
-      if(name) newProds.push({name:name, qty:qty, price:price, discount:disc});
-    });
-    if(newProds.length) o.products = newProds;
-  }
-
-  // 1. Save to localStorage immediately
-  try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); } catch(e){}
-
-  // 2. Update UI right away
-  render();
-  olCancelEdit();
-  $id('olDrTitle').textContent = o.customer || 'Order Detail';
-  renderDrawerView(o);
-  $id('olDrFoot').style.display = 'none';
-
-  // 3. Show saving toast
-  function showToast(msg, color){
-    if(window.macUI){
-      var type = color==='#4ade80'||color==='#22c55e' ? 'success' : color==='#f59e0b'||color==='#fbbf24' ? 'warning' : color==='#f87171'||color==='#ef4444' ? 'error' : 'info';
-      macUI.toast(msg, type); return;
+    if(custEl)  o.customer     = custEl.value  || o.customer;
+    if(phoneEl) o.phone        = phoneEl.value || o.phone;
+    if(provEl)  o.province     = provEl.value  || o.province;
+    if(addrEl){ var _addr = addrEl.value; o.addressDetail = _addr; o.address = _addr; }
+    if(dateEl && dateEl.value){
+      var _dp = dateEl.value.split('T');
+      var _d  = _dp[0].split('-');
+      o.date  = _d[2]+'/'+_d[1]+'/'+_d[0]+' '+(_dp[1]||'00:00');
     }
-    var t=document.createElement('div');
-    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:'+color+';padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;border-left:3px solid '+color+';box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .3s';
-    t.textContent=msg; document.body.appendChild(t);
-    setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove();},300);},2500);
-  }
-  showToast('⏳ កំពុង Save...', '#60a5fa');
+    if(delivEl) o.deliveryName = delivEl.value  || o.deliveryName;
+    if(feeEl)   o.deliveryFee  = Number(feeEl.value||0);
+    if(payEl)   o.payment      = payEl.value   || o.payment;
+    if(statEl)  o.status       = statEl.value  || o.status;
+    if(noteEl)  o.note         = noteEl.value;
+    if(pageEl)  o.page         = pageEl.value  || o.page;
+    if(closeEl) o.closeBy      = closeEl.value || o.closeBy;
+    if(priorEl) o.priority     = priorEl.value || o.priority;
 
-  // 4. Sync to Google Sheet
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: {'Content-Type': 'text/plain;charset=utf-8'},
-    body: JSON.stringify({action: 'update', orderId: o.id, order: o})
-  })
-  .then(function(res){ return res.json(); })
-  .then(function(data){
-    if(data && data.ok === false){
-      showToast('⚠️ Save local ✓ | Sheet: ' + (data.message||'Error'), '#f59e0b');
-    } else {
-      showToast('✅ Save បានជោគជ័យ!', '#4ade80');
+    // ── 2. Read products ──
+    var prodList = document.getElementById('drProdList');
+    if(prodList){
+      var newProds = [];
+      Array.from(prodList.children).forEach(function(row){
+        var nameEl2 = row.querySelector('.dr-prod-name');
+        if(!nameEl2) return;
+        var nm  = nameEl2.value.trim();
+        var qEl = row.querySelector('.dr-prod-qty');
+        var pEl = row.querySelector('.dr-prod-price');
+        var dEl = row.querySelector('.dr-prod-disc');
+        var qty  = Number(qEl  ? qEl.value  : 1);
+        var pr   = Number(pEl  ? pEl.value  : 0);
+        var disc = Number(dEl  ? dEl.value  : 0);
+        if(nm) newProds.push({name:nm, qty:qty, price:pr, discount:disc});
+      });
+      if(newProds.length){ o.products = newProds; o.items = newProds; }
     }
-  })
-  .catch(function(){
-    // Google Sheet failed but localStorage already saved
-    showToast('✅ Saved locally (Sheet offline)', '#fbbf24');
-  });
+
+    // ── 3. Persist to localStorage ──
+    try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); }catch(e){}
+
+    // ── 4. Switch UI back to view mode (footer stays visible) ──
+    _editMode = false;
+    var foot      = document.getElementById('olDrFoot');
+    var saveBtn   = document.getElementById('olDrSaveBtn');
+    var cancelBtn = document.getElementById('olDrCancelBtn');
+    var editBtn   = document.getElementById('olDrEditBtn');
+    var titleEl   = document.getElementById('olDrTitle');
+    if(saveBtn)   saveBtn.style.display   = 'none';
+    if(cancelBtn) cancelBtn.style.display = 'none';
+    if(editBtn)   editBtn.textContent     = '✏️ Edit';
+    if(foot)      foot.style.display      = 'flex';  // KEEP footer visible
+    if(titleEl)   titleEl.textContent     = o.customer || 'Order Detail';
+    renderDrawerView(o);
+    render(); // refresh table row
+
+    // ── 5. Toast: saving ──
+    _olShowToast('⏳ កំពុង Save...', '#60a5fa');
+
+    // ── 6. Sync to Google Sheet (background) ──
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({action:'update', orderId:o.id, order:o})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d && d.ok === false) _olShowToast('⚠️ Local ✓ | Sheet: '+(d.message||'Error'), '#f59e0b');
+      else _olShowToast('✅ Save បានជោគជ័យ!', '#4ade80');
+    })
+    .catch(function(){ _olShowToast('✅ Saved locally (Sheet offline)', '#fbbf24'); });
+
+  } catch(err){
+    console.error('olSaveEdit error:', err);
+    alert('❌ Save មានបញ្ហា: '+(err && err.message ? err.message : String(err)));
+  }
 }
 
 /* ── View mode ── */
@@ -788,26 +838,8 @@ function renderDrawerView(o){
     +drRow('ទូរស័ព្ទ', '<span style="color:#60a5fa">'+esc(o.phone||'—')+'</span>')
     +drRow('អាសយដ្ឋាន', (o.addressDetail||o.address||'')||'—')
     +drRow('ខេត្ត/ក្រុង', o.province||'—')
-    // Date row — inline editable without entering full edit mode
-    +(function(){
-      var rawDate = toDatetimeLocal(o.date);
-      var inpSt = 'flex:1;min-width:0;height:30px;padding:0 8px;border-radius:6px;'
-        +'border:1.5px solid rgba(139,92,246,.35);background:rgba(139,92,246,.06);'
-        +'color:'+themeVal('#e2e8f0','#0f172a')+';font-size:12px;font-family:inherit;'
-        +'outline:none;box-sizing:border-box;font-weight:600;cursor:pointer;';
-      var btnSt = 'flex-shrink:0;height:30px;padding:0 10px;border-radius:6px;border:none;'
-        +'background:rgba(139,92,246,.18);color:#8b5cf6;font-size:11px;font-weight:700;'
-        +'cursor:pointer;font-family:inherit;white-space:nowrap;';
-      var rowSt = 'display:grid;grid-template-columns:90px 1fr;gap:8px;align-items:center;'
-        +'padding:7px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px';
-      return '<div style="'+rowSt+'">'
-        +'<span style="color:#64748b;font-size:12px">ថ្ងៃ/ម៉ោង</span>'
-        +'<div style="display:flex;align-items:center;gap:5px">'
-        +'<input id="drInlineDate" type="datetime-local" value="'+esc(rawDate)+'" style="'+inpSt+'">'
-        +'<button onclick="olSaveInlineDate()" type="button" style="'+btnSt+'">✓ រក្សា</button>'
-        +'</div>'
-        +'</div>';
-    })()
+    // Date — read-only text in view mode (edit via Edit button)
+    +drRow('ថ្ងៃ/ម៉ោង', fmtDisplay(o.date)||'—')
     +drRow('ដឹកជញ្ជូន', o.deliveryName||'—')
     +drRow('ថ្លៃដឹក', o.deliveryFee ? '$'+Number(o.deliveryFee).toFixed(2) : 'ហ្វ្រីដឹក')
     +drRow('Payment', o.payment||'—')
@@ -936,25 +968,60 @@ window.olDrToggleQr = function(){
 
 /* ── Drawer Delete ── */
 window.olDeleteOrder = async function(){
-  if(!_drawerOrderId) return;
-  var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
-  if(!o) return;
-  var ok = await macUI.confirm('លុប Order របស់ '+o.customer+'?', 'លុប Order', true);
-  if(!ok) return;
-  // 1. Remove from local
-  _orders = _orders.filter(function(x){ return String(x.id)!==_drawerOrderId; });
-  try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); }catch(e){}
-  olCloseDrawer();
-  render();
-  // 2. Sync delete to Google Sheet
-  fetch(SCRIPT_URL, {
-    method:'POST',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body: JSON.stringify({action:'delete', orderId: o.id})
-  }).then(function(r){ return r.json(); })
-  .then(function(d){
-    if(d && d.ok === false) console.warn('Sheet delete failed:', d.message);
-  }).catch(function(e){ console.warn('Sheet delete error:', e); });
+  try {
+    if(!_drawerOrderId){ alert('⚠️ គ្មាន Order ត្រូវបានជ្រើស'); return; }
+    var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
+    if(!o){ alert('⚠️ Order រកមិនឃើញ'); return; }
+
+    /* ── Confirm dialog: macUI if available, else native browser ── */
+    var ok = window.macUI
+      ? await macUI.confirm('លុប Order របស់ '+o.customer+'?', 'លុប Order', true)
+      : window.confirm('⚠️ លុប Order របស់ "'+o.customer+'"?\n\nចុច OK ដើម្បីបញ្ជាក់លុប');
+    if(!ok) return;
+
+    var deletedId = _drawerOrderId; // snapshot before close
+
+    /* ── 1. Remove from memory ── */
+    _orders = _orders.filter(function(x){ return String(x.id)!==deletedId; });
+
+    /* ── 2. Remove from ALL localStorage keys ── */
+    try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); }catch(e){}
+    try{
+      var _co = JSON.parse(localStorage.getItem('camboOrders')||'[]');
+      _co = _co.filter(function(x){ return String(x.id)!==deletedId; });
+      localStorage.setItem('camboOrders', JSON.stringify(_co));
+    }catch(e){}
+    try{
+      var _de = JSON.parse(localStorage.getItem('cambo_ol_date_edits_v1')||'{}');
+      delete _de[deletedId];
+      localStorage.setItem('cambo_ol_date_edits_v1', JSON.stringify(_de));
+    }catch(e){}
+
+    /* ── 3. Close drawer + re-render table ── */
+    olCloseDrawer();
+    render();
+
+    /* ── 4. Success toast ── */
+    var _t = document.createElement('div');
+    _t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#4ade80;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4)';
+    _t.textContent = '✅ Order "'+o.customer+'" ត្រូវបានលុបហើយ';
+    document.body.appendChild(_t);
+    setTimeout(function(){ _t.remove(); }, 2500);
+
+    /* ── 5. Sync delete to Google Sheet (background, non-blocking) ── */
+    fetch(SCRIPT_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({action:'delete', orderId: o.id})
+    }).then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d && d.ok === false) console.warn('Sheet delete failed:', d.message);
+    }).catch(function(e){ console.warn('Sheet delete error:', e); });
+
+  } catch(err) {
+    console.error('olDeleteOrder error:', err);
+    alert('❌ Delete មានបញ្ហា: ' + (err.message || String(err)));
+  }
 };
 
 /* ── Drawer Copy Text (Receipt) ── */
