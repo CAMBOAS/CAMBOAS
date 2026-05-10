@@ -711,10 +711,11 @@ function getReceiptNoValue() {
 function syncQrToggleButton() {
   if (!els.toggleQrBtn) return;
   const isOn = !!showQrEnabled;
-  els.toggleQrBtn.textContent = `QR Code: ${isOn ? "ON" : "OFF"}`;
+  // Do NOT set textContent — keeps the SVG icon intact; color changes via CSS classes
   els.toggleQrBtn.classList.toggle("is-on", isOn);
   els.toggleQrBtn.classList.toggle("is-off", !isOn);
   els.toggleQrBtn.setAttribute("aria-pressed", String(isOn));
+  els.toggleQrBtn.title = `QR Code: ${isOn ? "ON" : "OFF"}`;
 }
 
 function getSelectedQrMeta() {
