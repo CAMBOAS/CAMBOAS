@@ -52,6 +52,24 @@ function fmtDisplayFull(s){
   return fmtDisplay(s);
 }
 
+/* toDatetimeLocalEdit — like toDatetimeLocal but replaces midnight 00:00 with current time
+   Used in edit mode so old date-only orders don't show "12:00 AM" */
+function toDatetimeLocalEdit(s){
+  var base = toDatetimeLocal(s);
+  var now  = new Date();
+  var padN = function(x){ return String(x).padStart(2,'0'); };
+  var curTime = padN(now.getHours())+':'+padN(now.getMinutes());
+  if(!base){
+    // No date at all → full current datetime
+    return now.getFullYear()+'-'+padN(now.getMonth()+1)+'-'+padN(now.getDate())+'T'+curTime;
+  }
+  // If time is midnight (00:00) → replace with current time
+  if(base.slice(11,16) === '00:00'){
+    return base.slice(0,11)+curTime;
+  }
+  return base;
+}
+
 /* Convert any date format → "YYYY-MM-DDTHH:MM" for datetime-local input */
 function toDatetimeLocal(s){
   if(!s) return '';
@@ -930,7 +948,7 @@ function renderDrawerEdit(o){
     +rowInp('drPhone',      o.phone||'',        'ទូរស័ព្ទ')
     +rowInp('drAddress',    (o.addressDetail||o.address||'')||'','អាសយដ្ឋាន')
     +rowInp('drProvince',   o.province||'',     'ខេត្ត/ក្រុង')
-    +rowInp('drDate',       toDatetimeLocal(o.date), 'ថ្ងៃ/ម៉ោង', 'datetime-local')
+    +rowInp('drDate',       toDatetimeLocalEdit(o.date), 'ថ្ងៃ/ម៉ោង', 'datetime-local')
     +rowInp('drDelivery',   (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:''), 'ដឹកជញ្ជូន')
     +rowInp('drDeliveryFee',o.deliveryFee||0,   'ថ្លៃដឹក', 'number')
     +rowInp('drPayment',    o.payment||'',      'Payment')
