@@ -1258,15 +1258,23 @@
         margin: 0 !important;
       }
 
-      /* ── Hide mobile togglers — always open on desktop ── */
-      .mob-card-head        { display: none !important; }
-      .mob-card-body        { display: block !important; padding: 20px 22px 22px !important; }
+      /* ── Section titles: show header, disable toggle ── */
+      .mob-card-head {
+        display: flex !important;
+        cursor: default !important;
+        pointer-events: none !important;
+        padding: 18px 22px 14px !important;
+        border-bottom: 1px solid var(--line, rgba(0,0,0,0.07)) !important;
+      }
+      .mob-card-head h3 { font-size: 16px !important; font-weight: 700 !important; }
+      .mob-card-head .mob-toggle-icon { display: none !important; }
+      .mob-card-body        { display: block !important; padding: 18px 22px 22px !important; }
       .mob-card-body.is-hidden { display: block !important; }
 
       /* Note textarea: taller on desktop */
       .mob-note textarea { min-height: 140px !important; font-size: 14px !important; }
 
-      /* ── Products head: show as section title ── */
+      /* ── Products head: section title row ── */
       .mob-prod-head { padding: 18px 22px 0 !important; }
       .mob-prod-head h3 { font-size: 16px !important; font-weight: 700 !important; }
 
@@ -1275,10 +1283,19 @@
         grid-template-columns: repeat(3, 1fr) !important;
         gap: 14px !important;
       }
-      /* Override: span-2 fields get 2 cols in 3-col grid */
-      .mob-form-grid .span-2 { grid-column: span 2 !important; }
-      /* Payment row: full width in 3-col */
-      .mob-form-grid .mob-field:has(#paymentOptions) { grid-column: 1 / -1 !important; }
+      /* All span-2 → 1 col by default on desktop (no more forced full-width) */
+      .mob-form-grid .span-2 { grid-column: span 1 !important; }
+      /* Province: keep 2 cols (needs width for long names) */
+      .mob-form-grid .province-field { grid-column: span 2 !important; }
+      /* Payment: full row width */
+      .mob-form-grid .pay-field { grid-column: 1 / -1 !important; }
+      /* Payment buttons: compact for desktop */
+      .mob-form-grid .pay-field .mob-payment-row .payment-btn {
+        height: 38px !important;
+        font-size: 13px !important;
+        max-width: 160px !important;
+        flex: 0 1 auto !important;
+      }
 
       /* ── Form inputs: desktop sizing ── */
       .mob-field input,
@@ -1555,7 +1572,7 @@
               </div>
 
               <!-- Province -->
-              <div class="mob-field span-2">
+              <div class="mob-field span-2 province-field">
                 <label>ខេត្ត / ក្រុង</label>
                 <div class="searchable-select" id="provinceCombo">
                   <input type="text" class="combo-input" id="provinceInput" placeholder="ខេត្ត..." autocomplete="off" />
@@ -1579,7 +1596,7 @@
               </div>
 
               <!-- Payment -->
-              <div class="mob-field span-2">
+              <div class="mob-field span-2 pay-field">
                 <label>បង់ប្រាក់</label>
                 <div class="mob-payment-row" id="paymentOptions">
                   <button type="button" class="payment-btn" data-value="AC">AC</button>
