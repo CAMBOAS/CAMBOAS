@@ -1155,6 +1155,105 @@
     /* ══ Scrollbar hide ══ */
     .mob-page::-webkit-scrollbar { display: none; }
 
+    /* ══════════════════════════════════════════════
+       TABLET & DESKTOP RESPONSIVE LAYOUT
+       Centered cards, rounded corners, sidebar offset
+    ══════════════════════════════════════════════ */
+
+    /* ── Tablet (501px – 980px): centered card layout ── */
+    @media (min-width: 501px) {
+      /* Smooth sidebar transition */
+      .mob-page {
+        transition: margin-left 0.3s ease;
+      }
+
+      /* Centered column with max-width */
+      .mob-page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        padding-top: 16px;
+      }
+      .mob-page > * {
+        width: 100%;
+        max-width: 720px;
+      }
+
+      /* Cards: rounded corners + drop shadow */
+      .mob-card {
+        border-radius: 16px !important;
+        border: 1px solid var(--line, rgba(0,0,0,0.08)) !important;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.07) !important;
+        margin-bottom: 14px !important;
+      }
+
+      /* Padding inside cards */
+      .mob-card-head   { padding: 15px 20px 14px !important; }
+      .mob-card-body   { padding: 16px 20px 20px !important; }
+      .mob-prod-head   { padding: 14px 20px 0 !important; }
+      .mob-prod-tabs   { padding: 10px 20px 8px !important; }
+      #productGrid .product-card { padding: 14px 20px !important; }
+      .mob-quick-add   { padding: 14px 20px 18px !important; }
+      .mob-total-panel { padding: 16px 20px !important; }
+
+      /* Form: restore 2-column on tablet+ */
+      .mob-form-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px 14px !important;
+      }
+      .mob-form-grid .span-2 { grid-column: 1 / -1 !important; }
+
+      /* Table: restore normal table layout (card layout is mobile-only) */
+      .mob-table-wrap {
+        overflow-x: auto !important;
+        padding: 0 20px 4px !important;
+        margin: 0 !important;
+      }
+      .mob-table-wrap table {
+        display: table !important;
+        min-width: 500px !important;
+      }
+      .mob-table-wrap thead { display: table-header-group !important; }
+      .mob-table-wrap tbody { display: table-row-group !important; }
+      .mob-table-wrap tbody tr:not(.empty-row) {
+        display: table-row !important;
+        padding: 0 !important;
+        grid-template-columns: unset !important;
+        grid-template-rows: unset !important;
+      }
+      .mob-table-wrap tbody tr:not(.empty-row) td {
+        display: table-cell !important;
+        padding: 10px 10px !important;
+        border-bottom: 1px solid var(--line, rgba(0,0,0,0.06)) !important;
+      }
+      /* Show price + discount columns again */
+      .mob-table-wrap tbody tr:not(.empty-row) td:nth-child(3),
+      .mob-table-wrap tbody tr:not(.empty-row) td:nth-child(4),
+      .mob-table-wrap tbody tr:not(.empty-row) td:nth-child(6) {
+        display: table-cell !important;
+      }
+
+      /* Desktop notice: show on tablet too */
+      .mob-desktop-notice { margin-bottom: 4px; }
+    }
+
+    /* ── Desktop (≥981px): sidebar margin offset ── */
+    @media (min-width: 981px) {
+      .mob-page {
+        margin-left: var(--sb-w, 240px);
+        padding-left: 32px !important;
+        padding-right: 32px !important;
+      }
+      .mob-page > * { max-width: 760px; }
+    }
+
+    /* Collapsed sidebar: narrower offset */
+    body.sb-collapsed .mob-page {
+      margin-left: var(--sb-w-col, 64px) !important;
+    }
+
     /* ══ Scroll top / bottom buttons ══ */
     #scrollBtns {
       position: fixed;
