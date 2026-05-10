@@ -33,6 +33,34 @@ function fmtDisplay(s){
   return s;
 }
 
+/* Convert any date format → "YYYY-MM-DDTHH:MM" for datetime-local input */
+function toDatetimeLocal(s){
+  if(!s) return '';
+  // Already datetime-local: YYYY-MM-DDTHH:MM
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(s)) return s.slice(0,16);
+  // ISO with Z: YYYY-MM-DDTHH:MM:SS.sssZ
+  if(/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.replace('Z','').slice(0,16);
+  // YYYY-MM-DD only
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s+'T00:00';
+  // DD/MM/YYYY HH:MM or DD/MM/YYYY
+  if(/^\d{2}\/\d{2}\/\d{4}/.test(s)){
+    var parts = s.split(' ');
+    var dp = parts[0].split('/');          // [DD, MM, YYYY]
+    var dateStr = dp[2]+'-'+dp[1]+'-'+dp[0];
+    var timeStr = (parts[1]||'00:00').slice(0,5);
+    return dateStr+'T'+timeStr;
+  }
+  // Fallback: try JS Date parse
+  try{
+    var d = new Date(s);
+    if(!isNaN(d)){
+      return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())
+            +'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+    }
+  }catch(e){}
+  return '';
+}
+
 /* ── position:fixed dropdown helper ── */
 function positionDrop(drop, btn){
   var rect = btn.getBoundingClientRect();
@@ -650,6 +678,12 @@ function olSaveEdit(){
   var _addr = $id('drAddress')?.value || '';
   o.addressDetail = _addr || o.addressDetail;
   o.address       = _addr || o.address;
+  var _dateVal = $id('drDate')?.value || ''; // "YYYY-MM-DDTHH:MM"
+  if(_dateVal){
+    var _dp = _dateVal.split('T');
+    var _d  = _dp[0].split('-');             // [YYYY, MM, DD]
+    o.date  = _d[2]+'/'+_d[1]+'/'+_d[0]+' '+(_dp[1]||'00:00'); // → "DD/MM/YYYY HH:MM"
+  }
   o.deliveryName = $id('drDelivery')?.value    || o.deliveryName;
   o.deliveryFee  = Number($id('drDeliveryFee')?.value||0);
   o.payment      = $id('drPayment')?.value     || o.payment;
@@ -733,20 +767,26 @@ function renderDrawerView(o){
     +drRow('ទូរស័ព្ទ', '<span style="color:#60a5fa">'+esc(o.phone||'—')+'</span>')
     +drRow('អាសយដ្ឋាន', (o.addressDetail||o.address||'')||'—')
     +drRow('ខេត្ត/ក្រុង', o.province||'—')
-    +drRow('ថ្ងៃ/ម៉ោង', (function(){
-      var d=o.date; if(!d) return '—';
-      // Try parse as ISO or DD/MM/YYYY
-      var dt = new Date(d);
-      if(isNaN(dt)) return fmtDisplay(d)||'—';
-      var dd=String(dt.getDate()).padStart(2,'0');
-      var mm=String(dt.getMonth()+1).padStart(2,'0');
-      var yy=dt.getFullYear();
-      var hh=String(dt.getHours()).padStart(2,'0');
-      var mi=String(dt.getMinutes()).padStart(2,'0');
-      // Only show time if hours/minutes are not zero
-      if(hh==='00'&&mi==='00') return dd+'/'+mm+'/'+yy;
-      return dd+'/'+mm+'/'+yy+' '+hh+':'+mi;
-    })())
+    // Date row — inline editable without entering full edit mode
+    +(function(){
+      var rawDate = toDatetimeLocal(o.date);
+      var inpSt = 'flex:1;min-width:0;height:30px;padding:0 8px;border-radius:6px;'
+        +'border:1.5px solid rgba(139,92,246,.35);background:rgba(139,92,246,.06);'
+        +'color:'+themeVal('#e2e8f0','#0f172a')+';font-size:12px;font-family:inherit;'
+        +'outline:none;box-sizing:border-box;font-weight:600;cursor:pointer;';
+      var btnSt = 'flex-shrink:0;height:30px;padding:0 10px;border-radius:6px;border:none;'
+        +'background:rgba(139,92,246,.18);color:#8b5cf6;font-size:11px;font-weight:700;'
+        +'cursor:pointer;font-family:inherit;white-space:nowrap;';
+      var rowSt = 'display:grid;grid-template-columns:90px 1fr;gap:8px;align-items:center;'
+        +'padding:7px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px';
+      return '<div style="'+rowSt+'">'
+        +'<span style="color:#64748b;font-size:12px">ថ្ងៃ/ម៉ោង</span>'
+        +'<div style="display:flex;align-items:center;gap:5px">'
+        +'<input id="drInlineDate" type="datetime-local" value="'+esc(rawDate)+'" style="'+inpSt+'">'
+        +'<button onclick="olSaveInlineDate()" type="button" style="'+btnSt+'">✓ រក្សា</button>'
+        +'</div>'
+        +'</div>';
+    })()
     +drRow('ដឹកជញ្ជូន', o.deliveryName||'—')
     +drRow('ថ្លៃដឹក', o.deliveryFee ? '$'+Number(o.deliveryFee).toFixed(2) : 'ហ្វ្រីដឹក')
     +drRow('Payment', o.payment||'—')
@@ -818,7 +858,7 @@ function renderDrawerEdit(o){
     +rowInp('drPhone',      o.phone||'',        'ទូរស័ព្ទ')
     +rowInp('drAddress',    (o.addressDetail||o.address||'')||'','អាសយដ្ឋាន')
     +rowInp('drProvince',   o.province||'',     'ខេត្ត/ក្រុង')
-    +rowInp('drDate',       (o.date||'').replace('Z','').slice(0,16), 'ថ្ងៃ/ម៉ោង', 'datetime-local')
+    +rowInp('drDate',       toDatetimeLocal(o.date), 'ថ្ងៃ/ម៉ោង', 'datetime-local')
     +rowInp('drDelivery',   (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:''), 'ដឹកជញ្ជូន')
     +rowInp('drDeliveryFee',o.deliveryFee||0,   'ថ្លៃដឹក', 'number')
     +rowInp('drPayment',    o.payment||'',      'Payment')
@@ -948,6 +988,66 @@ function drProdRow(name, qty, price, disc){
 window.olToggleEdit  = olToggleEdit;
 window.olCancelEdit  = olCancelEdit;
 window.olSaveEdit    = olSaveEdit;
+
+/* ── Inline date save (view mode, no full edit needed) ── */
+window.olSaveInlineDate = function(){
+  var o = _orders.find(function(x){ return String(x.id) === _drawerOrderId; });
+  if(!o) return;
+  var inp = document.getElementById('drInlineDate');
+  if(!inp || !inp.value) return;
+
+  var newDate = inp.value; // datetime-local gives "YYYY-MM-DDTHH:MM"
+  if(!newDate){
+    if(window.macUI) macUI.toast('⚠️ សូមជ្រើសរើសថ្ងៃខែ', 'warning');
+    return;
+  }
+  // Convert "YYYY-MM-DDTHH:MM" → "DD/MM/YYYY HH:MM" to match Sheet format
+  var parts = newDate.split('T');
+  var dp    = parts[0].split('-');   // [YYYY, MM, DD]
+  var time  = parts[1] || '00:00';
+  o.date = dp[2]+'/'+dp[1]+'/'+dp[0]+' '+time;
+
+  // 1. Save to localStorage
+  try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); } catch(e){}
+
+  // 2. Refresh table row
+  render();
+
+  // 3. Re-render drawer view with updated date
+  renderDrawerView(o);
+
+  // 4. Toast notification
+  function showToast(msg, type){
+    if(window.macUI){ macUI.toast(msg, type||'success'); return; }
+    var t = document.createElement('div');
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);'
+      +'background:#1e293b;color:#4ade80;padding:10px 20px;border-radius:12px;'
+      +'font-size:13px;font-weight:700;z-index:9999;border-left:3px solid #4ade80;'
+      +'box-shadow:0 8px 24px rgba(0,0,0,.4);transition:opacity .3s';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 300); }, 2500);
+  }
+  showToast('⏳ កំពុង Save...', 'info');
+
+  // 5. Sync to Google Sheet
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action: 'update', orderId: o.id, order: o })
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(data){
+    if(data && data.ok === false){
+      showToast('⚠️ Local ✓ | Sheet: ' + (data.message||'Error'), 'warning');
+    } else {
+      showToast('✅ ថ្ងៃខែបានរក្សាទុក!', 'success');
+    }
+  })
+  .catch(function(){
+    showToast('✅ Saved locally (Sheet offline)', 'warning');
+  });
+};
 
 /* ── INIT ── */
 function normalizeDeliveryName(raw){
