@@ -55,7 +55,7 @@ function buildCopyText(data) {
   const separator = "................................................";
 
   // Header
-  lines.push(`🧾 ${data.title} 📅 ${data.date}`);
+  lines.push(`🧾 ${data.title}        កាលបរិច្ឆេទ: ${data.date}`);
   lines.push(separator);
 
   // Customer Info
@@ -87,6 +87,9 @@ function buildCopyText(data) {
   lines.push(separator);
   lines.push(`📄 Page: ${data.page} | CloseBy: ${data.closeBy}`);
   lines.push(`☎️ លេខបម្រើអតិថិជន: ${data.servicePhone}`);
+  if (data.receiptNo) {
+    lines.push(`🔢 លេខប៉ុង: ${data.receiptNo}`);
+  }
   lines.push(separator);
 
   return lines.join("\n");
