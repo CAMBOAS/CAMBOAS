@@ -80,17 +80,6 @@
     <div class="shared-topbar" id="sharedHeader"></div>
     <div class="no-wrap">
 
-      <!-- Hero -->
-      <section class="glass-card" style="padding:20px 24px;border-radius:22px">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-          <div>
-            <h2 style="margin:0 0 4px;color:var(--text)">New Order</h2>
-            <p style="margin:0;color:var(--muted);font-size:14px">បង្កើតការបញ្ជាទិញថ្មីសម្រាប់អតិថិជន</p>
-          </div>
-          <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
-        </div>
-      </section>
-
       <div class="no-grid">
         <!-- ═══ LEFT COLUMN ═══ -->
         <div style="display:grid;gap:18px">
@@ -102,46 +91,10 @@
               ព័ត៌មានអតិថិជន
             </h3>
 
-            <!-- Pages / CloseBy / Status -->
-            <div class="frow cols3">
-              <div class="fg">
-                <label>Pages</label>
-                <select id="page">
-                  <option value="">ជ្រើស...</option>
-                  <option>Helen CCR</option>
-                  <option>Brand1 CCR</option>
-                  <option>JELY BRAND BY HELEN</option>
-                  <option>JELY CCR BRAND</option>
-                  <option>ចែម៉ៅ CCR BRAND</option>
-                  <option>ហេឡេន CCR</option>
-                  <option>ស្រីម៉ៅ JELY</option>
-                  <option>ស្រីម៉ៅ JELY BRAND</option>
-                </select>
-              </div>
-              <div class="fg">
-                <label>CloseBy</label>
-                <input id="closeBy" type="text" placeholder="...">
-              </div>
-              <div class="fg">
-                <label>Status</label>
-                <select id="status">
-                  <option value="Pending">Pending</option>
-                  <option value="Confirmed">Confirmed</option>
-                  <option value="Done">Done</option>
-                  <option value="Cancel">Cancel</option>
-                </select>
-              </div>
-            </div>
-
             <!-- Customer / Phone -->
             <div class="frow">
               <div class="fg"><label>ឈ្មោះអតិថិជន</label><input id="customer" type="text" placeholder="customer..."></div>
               <div class="fg"><label>លេខទូរស័ព្ទ</label><input id="phone" type="text" placeholder="0xx xxx xxx"></div>
-            </div>
-
-            <!-- Date -->
-            <div class="frow full">
-              <div class="fg"><label>ថ្ងៃខែឆ្នាំ</label><input id="date" type="datetime-local"></div>
             </div>
 
             <!-- Address detail -->
@@ -202,6 +155,42 @@
                 <label>ថ្លៃដឹក ($)</label>
                 <input id="deliveryFee" type="number" value="2" min="0" step="0.5" placeholder="2">
               </div>
+            </div>
+
+            <!-- Pages / CloseBy / Status -->
+            <div class="frow cols3">
+              <div class="fg">
+                <label>Pages</label>
+                <select id="page">
+                  <option value="">ជ្រើស...</option>
+                  <option>Helen CCR</option>
+                  <option>Brand1 CCR</option>
+                  <option>JELY BRAND BY HELEN</option>
+                  <option>JELY CCR BRAND</option>
+                  <option>ចែម៉ៅ CCR BRAND</option>
+                  <option>ហេឡេន CCR</option>
+                  <option>ស្រីម៉ៅ JELY</option>
+                  <option>ស្រីម៉ៅ JELY BRAND</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label>CloseBy</label>
+                <input id="closeBy" type="text" placeholder="...">
+              </div>
+              <div class="fg">
+                <label>Status</label>
+                <select id="status">
+                  <option value="Pending">Pending</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Done">Done</option>
+                  <option value="Cancel">Cancel</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Date -->
+            <div class="frow full">
+              <div class="fg"><label>ថ្ងៃខែឆ្នាំ</label><input id="date" type="datetime-local"></div>
             </div>
 
             <!-- Payment -->

@@ -84,10 +84,10 @@
         <ul class="sb-list">
           ${link('index.html',                ic.dashboard,'Dashboard')}
           ${link('pages/analytics.html',      ic.analytics, 'Analytics')}
-          ${link('pages/orders-details.html', ic.orders,    'Smart Orderer')}
-          ${link('pages/smart-mobile.html',   ic.orders,    'Smart Mobile 📱')}
-          ${link('pages/order-list.html',        ic.orderlist, 'Order List')}
           ${link('pages/new-order.html',      ic.neworder,  'New Order')}
+          ${link('pages/orders-details.html', ic.orders,    'Smart Orders')}
+          ${link('pages/smart-mobile.html',   ic.orders,    'Smart Mobile 📱')}
+          ${link('pages/order-list.html',     ic.orderlist, 'Order List')}
         </ul>
         <div class="sb-divider sb-divider-sm"></div>
         <div class="sb-section-label">Management</div>
