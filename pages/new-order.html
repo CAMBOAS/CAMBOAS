@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="km">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
   <title>New Order - CAMBO MINI</title>
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
@@ -11,64 +11,211 @@
   <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css">
   <link rel="stylesheet" href="../assets/css/main.css">
   <style>
-    .no-wrap{display:grid;gap:20px;padding:4px 0}
-    .no-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start}
-    .no-card{padding:22px;border-radius:22px}
-    .no-title{margin:0 0 16px;font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
-    .no-title svg{width:17px;height:17px;opacity:.7;flex-shrink:0}
-    .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-    .frow.cols3{grid-template-columns:1fr 1fr 1fr}
-    .frow.full{grid-template-columns:1fr}
-    .fg{display:flex;flex-direction:column;gap:5px}
-    .fg label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
-    .fg input,.fg select,.fg textarea{min-height:40px;border-radius:10px;padding:0 12px;font-size:13px;width:100%;box-sizing:border-box}
-    .fg textarea{min-height:72px;padding:10px 12px;resize:vertical}
-    /* Payment buttons */
-    .payment-opts{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-    .pay-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
-    .pay-btn.active{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.5);color:var(--text)}
-    /* Product picker */
-    .ptabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-    .ptab{padding:5px 14px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
-    .ptab.active{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.4);color:var(--text)}
-    .psearch{display:flex;gap:8px;margin-bottom:10px}
-    .psearch input{flex:1;min-height:40px;border-radius:10px;padding:0 12px;font-size:13px}
-    .plist{display:grid;gap:6px;max-height:320px;overflow-y:auto}
-    .prow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);cursor:pointer;transition:.15s}
-    .prow:hover{border-color:rgba(6,182,212,.35);background:rgba(6,182,212,.07)}
-    .pthumb{width:36px;height:36px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(139,92,246,.12);overflow:hidden}
-    .pthumb img{width:36px;height:36px;object-fit:cover;border-radius:8px}
-    .pinfo{flex:1;min-width:0}
-    .pinfo b{display:block;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .pinfo span{font-size:11px;color:var(--muted)}
-    .pprice{font-size:13px;font-weight:800;color:#7dd3fc;white-space:nowrap}
-    /* Cart */
-    .cart-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
-    .citem{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);margin-bottom:6px}
-    .citem-name{flex:1;font-size:13px;color:var(--text);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .qty-ctrl{display:flex;align-items:center;gap:5px;flex-shrink:0}
-    .qbtn{width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--text);cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center}
-    .qval{min-width:24px;text-align:center;font-size:13px;font-weight:700;color:var(--text)}
-    .citem-price{font-size:13px;font-weight:800;color:#7dd3fc;min-width:52px;text-align:right;flex-shrink:0}
-    .rmvbtn{width:24px;height:24px;border-radius:7px;border:none;background:rgba(239,68,68,.14);color:#fca5a5;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    /* Summary */
-    .sum-box{padding:14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);margin:12px 0}
-    .srow{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;color:var(--muted)}
-    .srow.total{border-top:1px solid var(--line);margin-top:8px;padding-top:10px;font-size:15px;font-weight:700;color:var(--text)}
-    .srow.total span:last-child{color:#7dd3fc}
-    .srow.riel{font-size:12px}
-    /* Submit */
-    .submit-btn{width:100%;padding:13px;border-radius:13px;border:none;background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.02em;margin-top:4px;transition:.15s}
-    .submit-btn:hover{opacity:.88}
-    .submit-btn:disabled{opacity:.5;cursor:not-allowed}
-    /* Toast */
-    .toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-    .toast{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;color:#fff;max-width:300px;opacity:1;transition:opacity .4s,transform .4s}
-    .toast.success{background:rgba(22,163,74,.92)}
-    .toast.error{background:rgba(220,38,38,.92)}
-    .toast.info{background:rgba(59,130,246,.92)}
-    @media(max-width:980px){.no-grid{grid-template-columns:1fr}}
-    @media(max-width:600px){.frow,.frow.cols3{grid-template-columns:1fr}}
+    /* ══════════════════════════════════════════════════
+       LAYOUT
+    ══════════════════════════════════════════════════ */
+    .no-wrap  { display:grid; gap:14px; padding:4px 0 0 }
+    .no-grid  { display:grid; gap:14px; align-items:start }
+    .no-card  { padding:16px; border-radius:18px }
+    .no-title { margin:0 0 14px; font-size:14px; font-weight:700; color:var(--text);
+                display:flex; align-items:center; gap:8px }
+    .no-title svg { width:16px; height:16px; opacity:.7; flex-shrink:0 }
+
+    /* ══════════════════════════════════════════════════
+       FORM FIELDS  — touch-friendly 46 px minimum
+    ══════════════════════════════════════════════════ */
+    .frow      { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px }
+    .frow.cols3{ grid-template-columns:1fr 1fr 1fr }
+    .frow.full { grid-template-columns:1fr }
+    .fg        { display:flex; flex-direction:column; gap:4px }
+    .fg label  { font-size:11px; font-weight:700; color:var(--muted);
+                 letter-spacing:.06em; text-transform:uppercase }
+    .fg input,
+    .fg select,
+    .fg textarea { min-height:46px; border-radius:11px; padding:0 13px;
+                   font-size:14px; width:100%; box-sizing:border-box }
+    .fg textarea { min-height:80px; padding:11px 13px; resize:vertical }
+
+    /* ══════════════════════════════════════════════════
+       PAYMENT BUTTONS
+    ══════════════════════════════════════════════════ */
+    .payment-opts { display:flex; flex-wrap:wrap; gap:7px; margin-top:5px }
+    .pay-btn { flex:1; min-width:56px; padding:10px 10px; border-radius:10px;
+               border:1.5px solid var(--line); background:transparent;
+               color:var(--muted); font-size:13px; font-weight:700;
+               cursor:pointer; font-family:inherit; transition:.15s; text-align:center }
+    .pay-btn.active { background:rgba(139,92,246,.18);
+                      border-color:rgba(139,92,246,.5); color:var(--text) }
+    .pay-btn:active { transform:scale(.95) }
+
+    /* ══════════════════════════════════════════════════
+       PRODUCT PICKER
+    ══════════════════════════════════════════════════ */
+    /* Horizontal-scroll tabs — no scroll-within-scroll on mobile */
+    .ptabs { display:flex; gap:7px; margin-bottom:10px;
+             overflow-x:auto; padding-bottom:2px;
+             -webkit-overflow-scrolling:touch; scrollbar-width:none }
+    .ptabs::-webkit-scrollbar { display:none }
+    .ptab { padding:8px 18px; border-radius:9px; border:1.5px solid var(--line);
+            background:transparent; color:var(--muted); font-size:12px;
+            font-weight:600; cursor:pointer; font-family:inherit;
+            transition:.15s; white-space:nowrap; flex-shrink:0 }
+    .ptab.active { background:rgba(139,92,246,.18);
+                   border-color:rgba(139,92,246,.4); color:var(--text) }
+
+    .psearch { margin-bottom:10px }
+    .psearch input { width:100%; min-height:46px; border-radius:11px;
+                     padding:0 13px; font-size:14px; box-sizing:border-box }
+
+    /* Product list — no max-height on mobile (avoid scroll-within-scroll) */
+    .plist { display:grid; gap:6px; overflow-y:auto }
+
+    .prow { display:flex; align-items:center; gap:11px;
+            padding:10px 12px; border-radius:12px; min-height:60px;
+            background:rgba(255,255,255,.04);
+            border:1px solid rgba(148,163,200,.1);
+            cursor:pointer; transition:.15s; -webkit-tap-highlight-color:transparent }
+    .prow:active { background:rgba(6,182,212,.12); transform:scale(.98) }
+    @media(hover:hover){ .prow:hover{border-color:rgba(6,182,212,.35);background:rgba(6,182,212,.07)} }
+
+    .pthumb { width:42px; height:42px; border-radius:10px; flex-shrink:0;
+              display:flex; align-items:center; justify-content:center;
+              background:rgba(139,92,246,.12); overflow:hidden }
+    .pthumb img { width:42px; height:42px; object-fit:cover; border-radius:10px }
+    .pinfo { flex:1; min-width:0 }
+    .pinfo b    { display:block; font-size:13px; color:var(--text);
+                  white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+    .pinfo span { font-size:11px; color:var(--muted) }
+    .pprice { font-size:14px; font-weight:800; color:#7dd3fc; white-space:nowrap }
+
+    /* ══════════════════════════════════════════════════
+       CART
+    ══════════════════════════════════════════════════ */
+    .cart-empty { text-align:center; padding:24px 16px; color:var(--muted); font-size:13px }
+    .citem { display:flex; align-items:center; gap:8px; padding:10px 12px;
+             border-radius:12px; background:rgba(255,255,255,.04);
+             border:1px solid rgba(148,163,200,.1); margin-bottom:6px }
+    .citem-name  { flex:1; font-size:13px; color:var(--text); min-width:0;
+                   white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+    .qty-ctrl    { display:flex; align-items:center; gap:6px; flex-shrink:0 }
+    .qbtn { width:30px; height:30px; border-radius:8px; border:1px solid var(--line);
+            background:rgba(255,255,255,.07); color:var(--text); cursor:pointer;
+            font-size:15px; font-weight:700; display:flex; align-items:center;
+            justify-content:center; -webkit-tap-highlight-color:transparent }
+    .qbtn:active { background:rgba(139,92,246,.2) }
+    .qval        { min-width:26px; text-align:center; font-size:13px;
+                   font-weight:700; color:var(--text) }
+    .citem-price { font-size:13px; font-weight:800; color:#7dd3fc;
+                   min-width:52px; text-align:right; flex-shrink:0 }
+    .rmvbtn { width:30px; height:30px; border-radius:8px; border:none;
+              background:rgba(239,68,68,.14); color:#fca5a5; cursor:pointer;
+              font-size:16px; line-height:1; display:flex; align-items:center;
+              justify-content:center; flex-shrink:0;
+              -webkit-tap-highlight-color:transparent }
+    .rmvbtn:active { background:rgba(239,68,68,.3) }
+
+    /* ══════════════════════════════════════════════════
+       SUMMARY
+    ══════════════════════════════════════════════════ */
+    .sum-box { padding:14px; border-radius:14px;
+               background:rgba(255,255,255,.04);
+               border:1px solid rgba(148,163,200,.1); margin:12px 0 }
+    .srow       { display:flex; justify-content:space-between;
+                  padding:5px 0; font-size:13px; color:var(--muted) }
+    .srow.total { border-top:1px solid var(--line); margin-top:8px;
+                  padding-top:10px; font-size:16px; font-weight:700; color:var(--text) }
+    .srow.total span:last-child { color:#7dd3fc }
+    .srow.riel  { font-size:12px }
+
+    /* ══════════════════════════════════════════════════
+       SUBMIT (desktop cart panel)
+    ══════════════════════════════════════════════════ */
+    .submit-btn { width:100%; padding:14px; border-radius:13px; border:none;
+                  background:linear-gradient(135deg,#8b5cf6,#06b6d4);
+                  color:#fff; font-size:15px; font-weight:700; cursor:pointer;
+                  font-family:inherit; letter-spacing:.02em; margin-top:4px;
+                  transition:.15s }
+    .submit-btn:active  { opacity:.82; transform:scale(.98) }
+    .submit-btn:disabled{ opacity:.5; cursor:not-allowed }
+
+    /* ══════════════════════════════════════════════════
+       TOAST
+    ══════════════════════════════════════════════════ */
+    .toast-container { position:fixed; top:16px; right:16px; z-index:9999;
+                       display:flex; flex-direction:column; gap:8px;
+                       pointer-events:none }
+    .toast { padding:10px 16px; border-radius:10px; font-size:13px;
+             font-weight:600; color:#fff; max-width:300px;
+             opacity:1; transition:opacity .4s,transform .4s }
+    .toast.success { background:rgba(22,163,74,.92) }
+    .toast.error   { background:rgba(220,38,38,.92) }
+    .toast.info    { background:rgba(59,130,246,.92) }
+
+    /* ══════════════════════════════════════════════════
+       MOBILE STICKY BOTTOM BAR
+    ══════════════════════════════════════════════════ */
+    .mob-bar {
+      display:none;
+      position:fixed; bottom:0; left:0; right:0; z-index:500;
+      background:rgba(10,15,30,.94);
+      backdrop-filter:blur(14px);
+      -webkit-backdrop-filter:blur(14px);
+      border-top:1px solid rgba(148,163,200,.15);
+      padding:10px 16px calc(10px + env(safe-area-inset-bottom)) 16px;
+      align-items:center; gap:12px;
+      box-shadow:0 -4px 24px rgba(0,0,0,.3)
+    }
+    [data-theme="light"] .mob-bar { background:rgba(238,243,251,.96) }
+    .mob-bar-left   { flex:1; min-width:0; cursor:default }
+    .mob-bar-count  { font-size:11px; color:var(--muted); margin-bottom:2px }
+    .mob-bar-total  { font-size:20px; font-weight:800; color:#7dd3fc }
+    .mob-bar-riel   { font-size:11px; color:var(--muted) }
+    .mob-save-btn   { flex-shrink:0; padding:12px 24px; border-radius:13px;
+                      border:none; background:linear-gradient(135deg,#8b5cf6,#06b6d4);
+                      color:#fff; font-size:14px; font-weight:700; cursor:pointer;
+                      font-family:inherit; white-space:nowrap;
+                      -webkit-tap-highlight-color:transparent }
+    .mob-save-btn:active   { opacity:.82; transform:scale(.97) }
+    .mob-save-btn:disabled { opacity:.5; cursor:not-allowed }
+
+    /* ══════════════════════════════════════════════════
+       RESPONSIVE BREAKPOINTS
+    ══════════════════════════════════════════════════ */
+
+    /* ── Desktop / large tablet ≥ 980px ── */
+    @media(min-width:980px){
+      .no-grid { grid-template-columns:1.3fr 1fr }
+      #cartPanel { position:sticky; top:20px }
+      .mob-bar { display:none !important }
+    }
+
+    /* ── Tablet / mobile < 980px ── */
+    @media(max-width:979px){
+      .no-grid { grid-template-columns:1fr }
+      /* Cart panel stays in flow — no sticky needed */
+      /* Product list: remove fixed max-height to avoid scroll-within-scroll */
+      .plist { max-height:none }
+      /* Submit button inside cart panel — replaced by sticky bar */
+      #submitBtn { display:none }
+      .mob-bar { display:flex }
+      /* Space for sticky bar */
+      .no-wrap { padding-bottom:84px }
+    }
+
+    /* ── Mobile: remove side padding → edge-to-edge ── */
+    @media(max-width:979px){
+      .main-content { padding-left:0 !important; padding-right:0 !important }
+      .no-wrap      { padding-left:8px; padding-right:8px }
+    }
+
+    /* ── Small phones < 480px ── */
+    @media(max-width:479px){
+      .no-wrap  { padding-left:4px; padding-right:4px }
+      .no-card  { padding:13px }
+      /* cols3: Pages + CloseBy on top row, Status below */
+      .frow.cols3 { grid-template-columns:1fr 1fr }
+      .frow.cols3 > :nth-child(3) { grid-column:1 / -1 }
+    }
   </style>
 </head>
 <body>
@@ -82,7 +229,7 @@
 
       <div class="no-grid">
         <!-- ═══ LEFT COLUMN ═══ -->
-        <div style="display:grid;gap:18px">
+        <div style="display:grid;gap:14px">
 
           <!-- Customer Info -->
           <article class="glass-card no-card">
@@ -93,13 +240,13 @@
 
             <!-- Customer / Phone -->
             <div class="frow">
-              <div class="fg"><label>ឈ្មោះអតិថិជន</label><input id="customer" type="text" placeholder="customer..."></div>
-              <div class="fg"><label>លេខទូរស័ព្ទ</label><input id="phone" type="text" placeholder="0xx xxx xxx"></div>
+              <div class="fg"><label>ឈ្មោះអតិថិជន</label><input id="customer" type="text" placeholder="customer..." autocomplete="off"></div>
+              <div class="fg"><label>លេខទូរស័ព្ទ</label><input id="phone" type="tel" placeholder="0xx xxx xxx"></div>
             </div>
 
-            <!-- Address detail -->
+            <!-- Address -->
             <div class="frow full">
-              <div class="fg"><label>ទីតាំងតំបន</label><input id="addressDetail" type="text" placeholder="ភូមិ / ផ្លូវ / ផ្ទះលេខ..."></div>
+              <div class="fg"><label>ទីតាំងតំបន</label><input id="addressDetail" type="text" placeholder="ភូមិ / ផ្លូវ / ផ្ទះលេខ..." autocomplete="off"></div>
             </div>
 
             <!-- Province -->
@@ -153,7 +300,7 @@
               </div>
               <div class="fg">
                 <label>ថ្លៃដឹក ($)</label>
-                <input id="deliveryFee" type="number" value="2" min="0" step="0.5" placeholder="2">
+                <input id="deliveryFee" type="number" value="2" min="0" step="0.5" placeholder="2" inputmode="decimal">
               </div>
             </div>
 
@@ -175,7 +322,7 @@
               </div>
               <div class="fg">
                 <label>CloseBy</label>
-                <input id="closeBy" type="text" placeholder="...">
+                <input id="closeBy" type="text" placeholder="..." autocomplete="off">
               </div>
               <div class="fg">
                 <label>Status</label>
@@ -209,7 +356,7 @@
             </div>
           </article>
 
-          <!-- Note  (class "note-card" required by order-plust.js) -->
+          <!-- Note (class "note-card" required by order-plust.js) -->
           <article class="glass-card no-card note-card">
             <h3 class="no-title">
               <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -232,14 +379,14 @@
               <button class="ptab" data-cat="Drink">Drink</button>
             </div>
             <div class="psearch">
-              <input id="pSearch" type="text" placeholder="ស្វែងរក..." oninput="filterProds()">
+              <input id="pSearch" type="text" placeholder="ស្វែងរក..." oninput="filterProds()" autocomplete="off">
             </div>
             <div class="plist" id="pList"></div>
           </article>
-        </div>
+        </div><!-- end left column -->
 
-        <!-- ═══ RIGHT COLUMN: Cart ═══ -->
-        <article class="glass-card no-card" style="position:sticky;top:20px">
+        <!-- ═══ RIGHT COLUMN: Cart (desktop sticky) ═══ -->
+        <article class="glass-card no-card" id="cartPanel">
           <h3 class="no-title">
             <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
             Cart Summary
@@ -253,18 +400,29 @@
             <div class="srow total"><span>Total</span><span id="grandTotal">$0</span></div>
             <div class="srow riel"><span>ប្រាក់រៀល</span><span id="rielTotal">0៛</span></div>
           </div>
+          <!-- Hidden on mobile — replaced by sticky bar -->
           <button class="submit-btn" id="submitBtn" onclick="submitOrder()">✓ Save Order</button>
         </article>
-      </div>
+      </div><!-- end no-grid -->
 
-    </div>
+    </div><!-- end no-wrap -->
   </main>
+</div>
+
+<!-- ═══ MOBILE STICKY BOTTOM BAR ═══ -->
+<div class="mob-bar" id="mobBar">
+  <div class="mob-bar-left">
+    <div class="mob-bar-count" id="mobBarCount">0 ផលិតផល</div>
+    <div class="mob-bar-total" id="mobBarTotal">$0</div>
+    <div class="mob-bar-riel" id="mobBarRiel">0៛</div>
+  </div>
+  <button class="mob-save-btn" id="mobSaveBtn" onclick="submitOrder()">✓ Save Order</button>
 </div>
 
 <div id="toastContainer" class="toast-container"></div>
 
 <script>
-// ── Apps Script URL (same as Smart Orderer) ──────────────────────────────────
+// ── Apps Script URL ──────────────────────────────────────────────────────────
 window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCcN0be7HYhGxCAj63XilkVQzVF1ljyLl26MCXbNMv_bd9BCThb-s-ZiUYep7i1Qsl-w/exec";
 
 // ── KHR exchange rate ────────────────────────────────────────────────────────
@@ -272,7 +430,7 @@ var KHR_RATE = (function(){
   try { var r = Number(localStorage.getItem('cambo_khr_rate')); return r > 0 ? r : 4100; } catch { return 4100; }
 })();
 
-// ── Full product catalog (27 products) ───────────────────────────────────────
+// ── Full product catalog ─────────────────────────────────────────────────────
 var products = [
   {id:1, name:"សាប៊ូកក់&ស្បាសក់ JELY",              price:15,   category:"Hair",  detail:"សាប៊ូកក់សក់ និងស្បាសក់ JELY",                         image:"../images/products/hair/សាប៊ូកក់សក់ និងស្បាសក់ JELY.png"},
   {id:2, name:"សាប៊ូកក់&ម៉ាសសក់ CCR",               price:16,   category:"Hair",  detail:"សាប៊ូកក់ និងម៉ាសសក់ CCR",                            image:"../images/products/hair/សាប៊ូកក់សក់ និងម៉ាសសក់ CCR.png"},
@@ -303,12 +461,9 @@ var products = [
   {id:27,name:"ឈុតសម្រកទ្វេដង CCR",                price:42,   category:"Drink", detail:"ឈុតសម្រកទ្វេដង CCR",                                 image:"../images/products/drink/SlimSetX2_CCR.png"}
 ];
 
-// ── State ────────────────────────────────────────────────────────────────────
-var items = [];              // global — order-plust.js reads/writes this
+// ── State ─────────────────────────────────────────────────────────────────────
+var items = [];
 var activeCategory = 'All';
-
-// ── els (global — order-plust.js uses this) ───────────────────────────────────
-// Set after DOMContentLoaded; declared var so order-plust.js can see it.
 var els = null;
 
 function _el(id){ return document.getElementById(id); }
@@ -331,32 +486,37 @@ function toast(msg, type){
   el.className = 'toast ' + (type || 'info');
   el.textContent = msg;
   _el('toastContainer').appendChild(el);
-  setTimeout(function(){ el.style.opacity = '0'; el.style.transform = 'translateY(-8px)'; }, 2200);
+  setTimeout(function(){ el.style.opacity='0'; el.style.transform='translateY(-8px)'; }, 2200);
   setTimeout(function(){ el.remove(); }, 2600);
 }
 
-// ── Totals ───────────────────────────────────────────────────────────────────
+// ── Totals ────────────────────────────────────────────────────────────────────
 function getItemsTotal(){
-  return items.reduce(function(s, it){ return s + Number(it.subtotal || 0); }, 0);
+  return items.reduce(function(s,it){ return s + Number(it.subtotal||0); }, 0);
 }
-
 function getDeliveryFeeValue(){
   return Math.max(0, Number((_el('deliveryFee') && _el('deliveryFee').value) || 0));
 }
-
 function getGrandTotal(){ return getItemsTotal() + getDeliveryFeeValue(); }
 
 function calcTotal(){
   var sub   = getItemsTotal();
   var grand = getGrandTotal();
-  _el('subTotal').textContent       = fmt(sub);
+  var riel  = Math.round(grand * KHR_RATE);
+
+  _el('subTotal').textContent        = fmt(sub);
   _el('deliveryDisplay').textContent = fmt(getDeliveryFeeValue());
-  _el('grandTotal').textContent     = fmt(grand);
-  _el('rielTotal').textContent      = Math.round(grand * KHR_RATE).toLocaleString() + '៛';
+  _el('grandTotal').textContent      = fmt(grand);
+  _el('rielTotal').textContent       = riel.toLocaleString() + '៛';
+
+  // ── Update mobile sticky bar ──
+  var mTotal = _el('mobBarTotal');
+  var mRiel  = _el('mobBarRiel');
+  if(mTotal) mTotal.textContent = fmt(grand);
+  if(mRiel)  mRiel.textContent  = riel.toLocaleString() + '៛';
 }
 
 // ── Cart rendering ────────────────────────────────────────────────────────────
-// renderTable() is the name order-plust.js expects — alias to renderCart()
 function renderTable(){ renderCart(); }
 
 function renderCart(){
@@ -364,6 +524,7 @@ function renderCart(){
   if(!items.length){
     el.innerHTML = '<div class="cart-empty">🛒 មិនទាន់មានផលិតផល<br><small>ចុចលើ product ខាងឆ្វេង</small></div>';
     calcTotal();
+    _updateMobCount();
     return;
   }
 
@@ -380,7 +541,6 @@ function renderCart(){
       + '</div>';
   }).join('');
 
-  // Event delegation — avoids float-ID issues in onclick strings
   el.querySelectorAll('[data-action]').forEach(function(btn){
     btn.addEventListener('click', function(){
       var idx    = Number(btn.dataset.idx);
@@ -392,6 +552,17 @@ function renderCart(){
   });
 
   calcTotal();
+  _updateMobCount();
+}
+
+function _updateMobCount(){
+  var mobC = _el('mobBarCount');
+  if(!mobC) return;
+  var total = items.reduce(function(s,it){ return s + (it.qty||0); }, 0);
+  mobC.textContent = total + ' ផលិតផល';
+  // sync disabled state
+  var mobBtn = _el('mobSaveBtn');
+  if(mobBtn) mobBtn.disabled = !items.length;
 }
 
 function _chQty(idx, dir){
@@ -400,7 +571,6 @@ function _chQty(idx, dir){
   items[idx].subtotal = Math.max(0, items[idx].qty * items[idx].price - items[idx].discount);
   renderCart();
 }
-
 function _rmvItem(idx){
   items.splice(idx, 1);
   renderCart();
@@ -410,22 +580,13 @@ function _rmvItem(idx){
 function addToCart(id){
   var p = products.find(function(x){ return String(x.id) === String(id); });
   if(!p) return;
-
-  // Increment if already in cart
   var ex = items.find(function(x){ return String(x.productId) === String(id); });
   if(ex){
     ex.qty++;
     ex.subtotal = Math.max(0, ex.qty * ex.price - ex.discount);
   } else {
-    items.push({
-      rowId:     Date.now() + Math.random(),
-      productId: String(p.id),
-      name:      p.name,
-      qty:       1,
-      price:     p.price,
-      discount:  0,
-      subtotal:  p.price
-    });
+    items.push({ rowId:Date.now()+Math.random(), productId:String(p.id),
+                 name:p.name, qty:1, price:p.price, discount:0, subtotal:p.price });
   }
   renderCart();
 }
@@ -440,24 +601,19 @@ function getFiltered(){
     return catOk && qOk;
   });
 }
-
 function filterProds(){ renderPList(getFiltered()); }
 
 function renderPList(list){
   _el('pList').innerHTML = list.map(function(p){
     return '<div class="prow" onclick="addToCart(' + p.id + ')">'
       + '<div class="pthumb"><img src="' + escHtml(p.image) + '" alt="" onerror="this.style.display=\'none\'"></div>'
-      + '<div class="pinfo">'
-      + '<b>' + escHtml(p.name) + '</b>'
-      + '<span>' + escHtml(p.category) + '</span>'
-      + '</div>'
+      + '<div class="pinfo"><b>' + escHtml(p.name) + '</b><span>' + escHtml(p.category) + '</span></div>'
       + '<span class="pprice">' + fmt(p.price) + '</span>'
       + '</div>';
   }).join('');
 }
 
 // ── Clear all ─────────────────────────────────────────────────────────────────
-// clearOrderForm() is the name order-plust.js expects
 function clearOrderForm(){ clearAll(); }
 
 function clearAll(){
@@ -479,7 +635,6 @@ function clearAll(){
     b.classList.toggle('active', b.dataset.value === 'Delivery');
   });
 
-  // Set current date + time (datetime-local format: YYYY-MM-DDTHH:MM)
   (function(){
     var n = new Date();
     var pad = function(x){ return String(x).padStart(2,'0'); };
@@ -496,43 +651,37 @@ function buildPayload(){
   var now = new Date();
   var pad = function(x){ return String(x).padStart(2,'0'); };
 
-  // Read datetime-local value (format: "YYYY-MM-DDTHH:MM")
-  // Fallback: use LOCAL date+time (not toISOString which is UTC)
   var rawVal = _el('date') ? _el('date').value : '';
   if(!rawVal){
     rawVal = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())
             +'T'+pad(now.getHours())+':'+pad(now.getMinutes());
   }
 
-  // Convert to "DD/MM/YYYY HH:MM" — timezone-safe, Apps Script won't shift the date
   var dateTime;
   var m = rawVal.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
   if(m){
-    dateTime = m[3]+'/'+m[2]+'/'+m[1]+' '+m[4]+':'+m[5]; // DD/MM/YYYY HH:MM
+    dateTime = m[3]+'/'+m[2]+'/'+m[1]+' '+m[4]+':'+m[5];
   } else if(/^\d{2}\/\d{2}\/\d{4}/.test(rawVal)){
-    dateTime = rawVal; // already DD/MM/YYYY format
+    dateTime = rawVal;
   } else {
-    dateTime = rawVal; // fallback as-is
+    dateTime = rawVal;
   }
-
-  // createdAt stays as UTC ISO for server logging (Apps Script)
-  var createdAt = now.toISOString();
 
   return {
     id:           Date.now(),
-    createdAt:    createdAt,
-    status:       (_el('status')       && _el('status').value)       || 'Pending',
-    page:         (_el('page')         && _el('page').value)         || '',
-    closeBy:      (_el('closeBy')      && _el('closeBy').value)      || '',
-    customer:     (_el('customer')     && _el('customer').value)     || '',
-    phone:        (_el('phone')        && _el('phone').value)        || '',
+    createdAt:    now.toISOString(),
+    status:       (_el('status')       && _el('status').value)        || 'Pending',
+    page:         (_el('page')         && _el('page').value)          || '',
+    closeBy:      (_el('closeBy')      && _el('closeBy').value)       || '',
+    customer:     (_el('customer')     && _el('customer').value)      || '',
+    phone:        (_el('phone')        && _el('phone').value)         || '',
     date:         dateTime,
-    province:     (_el('province')     && _el('province').value)     || '',
-    addressDetail:(_el('addressDetail')&& _el('addressDetail').value)|| '',
-    delivery:     (_el('deliveryName') && _el('deliveryName').value) || '',
+    province:     (_el('province')     && _el('province').value)      || '',
+    addressDetail:(_el('addressDetail')&& _el('addressDetail').value) || '',
+    delivery:     (_el('deliveryName') && _el('deliveryName').value)  || '',
     deliveryFee:  getDeliveryFeeValue(),
-    payment:      (_el('payment')      && _el('payment').value)      || '',
-    note:         (_el('note')         && _el('note').value)         || '',
+    payment:      (_el('payment')      && _el('payment').value)       || '',
+    note:         (_el('note')         && _el('note').value)          || '',
     showQrEnabled: true,
     receiptNo:    '',
     items:        items.map(function(it){ return Object.assign({}, it); }),
@@ -546,12 +695,9 @@ function buildPayload(){
 async function _postToAppsScript(order){
   var url = window.APPS_SCRIPT_URL;
   if(!url) throw new Error('Apps Script URL is missing.');
-
-  var res  = await fetch(url, {
-    method:  'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body:    JSON.stringify(order)
-  });
+  var res  = await fetch(url, { method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(order) });
   var text = await res.text();
   var data;
   try { data = JSON.parse(text); } catch { throw new Error('Invalid server response: ' + text); }
@@ -563,16 +709,17 @@ async function _postToAppsScript(order){
 async function submitOrder(){
   if(!items.length){ toast('សូមជ្រើសរើសផលិតផលជាមុន!', 'error'); return; }
 
-  var btn = _el('submitBtn');
-  var originalText = btn.textContent;
-  btn.disabled    = true;
-  btn.textContent = 'Saving...';
+  var btn     = _el('submitBtn');
+  var mobBtn  = _el('mobSaveBtn');
+  var origTxt = btn ? btn.textContent : '✓ Save Order';
+
+  if(btn)    { btn.disabled    = true; btn.textContent    = 'Saving...'; }
+  if(mobBtn) { mobBtn.disabled = true; mobBtn.textContent = 'Saving...'; }
 
   try {
     var order  = buildPayload();
     var result = await _postToAppsScript(order);
 
-    // Mirror to localStorage (same key as Smart Orderer)
     try {
       var saved = JSON.parse(localStorage.getItem('camboOrders') || '[]');
       saved.push(order);
@@ -590,33 +737,32 @@ async function submitOrder(){
     console.error('Save failed:', err);
     toast(err.message || 'Save failed.', 'error');
   } finally {
-    btn.disabled    = false;
-    btn.textContent = originalText;
+    if(btn)    { btn.disabled    = false; btn.textContent    = origTxt; }
+    if(mobBtn) { mobBtn.disabled = false; mobBtn.textContent = '✓ Save Order'; }
   }
 }
 
-// ── Init ─────────────────────────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
-  // Build els object — global so order-plust.js can access it
   els = {
-    customer:     _el('customer'),
-    phone:        _el('phone'),
-    date:         _el('date'),
-    province:     _el('province'),
-    addressDetail:_el('addressDetail'),
-    deliveryName: _el('deliveryName'),
-    deliveryFee:  _el('deliveryFee'),
-    payment:      _el('payment'),
+    customer:      _el('customer'),
+    phone:         _el('phone'),
+    date:          _el('date'),
+    province:      _el('province'),
+    addressDetail: _el('addressDetail'),
+    deliveryName:  _el('deliveryName'),
+    deliveryFee:   _el('deliveryFee'),
+    payment:       _el('payment'),
     paymentOptions:_el('paymentOptions'),
-    note:         _el('note'),
-    page:         _el('page'),
-    closeBy:      _el('closeBy'),
-    status:       _el('status')
+    note:          _el('note'),
+    page:          _el('page'),
+    closeBy:       _el('closeBy'),
+    status:        _el('status')
   };
 
-  // Set current date + time (datetime-local: YYYY-MM-DDTHH:MM using LOCAL time)
+  // Set current local date+time
   (function(){
-    var n = new Date();
+    var n   = new Date();
     var pad = function(x){ return String(x).padStart(2,'0'); };
     var dtLocal = n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())
                  +'T'+pad(n.getHours())+':'+pad(n.getMinutes());
@@ -642,8 +788,11 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
 
-  // Delivery fee change → update totals
+  // Delivery fee → update totals
   _el('deliveryFee').addEventListener('input', calcTotal);
+
+  // Init mob bar state
+  _updateMobCount();
 
   // Initial render
   renderPList(products);
@@ -651,7 +800,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-<!-- order-plust.js: Receipt Paste feature — requires els, items, products, renderTable, clearOrderForm -->
+<!-- order-plust.js: Receipt Paste — requires els, items, products, renderTable, clearOrderForm -->
 <script src="../assets/js/order-plust.js"></script>
 <script src="../assets/js/layout.js"></script>
 <script src="../assets/js/dashboard-layout.js"></script>
