@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzd1g4M2oIFIl5MYkUnVd-WtxTzaEgXXepuIXYJ-KZboRNJGIOXfPOd8ANWX-dzay-ynQ/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxnUHyjMP-qIRZNS956bCwon32dsnmQsOlEzq2EDeUDFvejJW1_avX5HTtBZyJbydklPQ/exec';
 var LS_KEY = 'cambo_search_edit_orders_v3';
 
 var _orders = [], _sel = new Set();
@@ -148,11 +148,30 @@ function localCamboOrders(){
   try{ return normalizeOrders(JSON.parse(localStorage.getItem('camboOrders')||'[]')); }catch(e){ return []; }
 }
 
-/* Merge two order arrays — Sheet wins on duplicate IDs, local-only appended */
+/* Merge two order arrays — Sheet wins on duplicate IDs, local-only appended.
+   EXCEPTION: if local has a DD/MM/YYYY date (timezone-safe), prefer it over
+   Sheet's date which may be UTC-shifted (e.g. 05:15 AM UTC+7 → previous day UTC). */
 function mergeOrders(sheetOrders, localOrders){
+  // Build map: id → local date, only when local date is DD/MM/YYYY (timezone-correct)
+  var localDateMap = {};
+  localOrders.forEach(function(o){
+    var d = String(o.date||'');
+    if(o.id && d && /^\d{2}\/\d{2}\/\d{4}/.test(d)){
+      localDateMap[String(o.id)] = d;
+    }
+  });
+
   var sheetIds = new Set(sheetOrders.map(function(o){ return String(o.id); }));
   var localOnly = localOrders.filter(function(o){ return !sheetIds.has(String(o.id)); });
-  return sheetOrders.concat(localOnly);
+
+  // For matching orders: override Sheet date with local DD/MM/YYYY date if available
+  var sheetFixed = sheetOrders.map(function(o){
+    var localDate = localDateMap[String(o.id)];
+    if(localDate) return Object.assign({}, o, { date: localDate });
+    return o;
+  });
+
+  return sheetFixed.concat(localOnly);
 }
 
 async function loadOrders(){
