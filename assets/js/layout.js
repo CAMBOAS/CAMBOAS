@@ -2,22 +2,27 @@
 (function () {
   'use strict';
 
-  /* ── Page titles ── */
+  /* ── Language helpers ── */
+  function getLang() { return localStorage.getItem('cambo_lang') || 'kh'; }
+  function setLang(l) { localStorage.setItem('cambo_lang', l); }
+  function t(kh, en) { return getLang() === 'en' ? en : kh; }
+
+  /* ── Page titles (bilingual) ── */
   const PAGE_META = {
-    'index.html':               { title:'Dashboard',           subtitle:'Overview of sales, revenue, and live activity' },
-    'pages/analytics.html':     { title:'Analytics',           subtitle:'Deep dive into your business metrics' },
-    'pages/orders-details.html':{ title:'Smart Orderer',       subtitle:'Create orders quickly and smartly' },
-    'pages/smart-mobile.html':  { title:'Smart Mobile',         subtitle:'Mobile-optimized order entry for smartphones' },
-    'pages/order-list.html':        { title:'Order List',           subtitle:'View and manage all orders in one place' },
-    'pages/new-order.html':     { title:'New Order',           subtitle:'Create a new order' },
-    'pages/customers.html':     { title:'Customers',           subtitle:'Manage your customer base' },
-    'pages/products.html':      { title:'Products',            subtitle:'Browse and manage products' },
-    'pages/stock.html':         { title:'Stock',               subtitle:'Track inventory levels and stock movements' },
-    'pages/delivery.html':      { title:'Delivery',            subtitle:'Manage delivery and shipping' },
-    'pages/commission.html':    { title:'Commission',          subtitle:'Agent commission and leaderboard' },
-    'pages/packaging.html':     { title:'Packaging',           subtitle:'វិចខ្ចប់ និងរៀបចំការដឹកជញ្ជូន' },
-    'pages/settings.html':      { title:'Settings',            subtitle:'Configure your workspace' },
-    'login.html':               { title:'Login',               subtitle:'' },
+    'index.html':               { title: t('ផ្ទាំងគ្រប់គ្រង','Dashboard'),    subtitle: t('ទិដ្ឋភាពរួមនៃការលក់ ចំណូល និងសកម្មភាព','Overview of sales, revenue, and live activity') },
+    'pages/analytics.html':     { title: t('វិភាគទិន្នន័យ','Analytics'),       subtitle: t('វិភាគស៊ីជម្រៅលើអាជីវកម្មរបស់អ្នក','Deep dive into your business metrics') },
+    'pages/orders-details.html':{ title: t('Smart Orders','Smart Orders'),     subtitle: t('បង្កើតបញ្ជាទិញបានលឿន និងឆ្លាតវៃ','Create orders quickly and smartly') },
+    'pages/smart-mobile.html':  { title: t('Smart Mobile','Smart Mobile'),     subtitle: t('បញ្ចូលបញ្ជាទិញផ្តល់ជូនតាម Smartphone','Mobile-optimized order entry for smartphones') },
+    'pages/order-list.html':    { title: t('បញ្ជីបញ្ជាទិញ','Order List'),      subtitle: t('មើល និងគ្រប់គ្រងបញ្ជាទិញទាំងអស់','View and manage all orders in one place') },
+    'pages/new-order.html':     { title: t('បញ្ជាទិញថ្មី','New Order'),        subtitle: t('បង្កើតបញ្ជាទិញថ្មី','Create a new order') },
+    'pages/customers.html':     { title: t('អតិថិជន','Customers'),             subtitle: t('គ្រប់គ្រងបញ្ជីអតិថិជន','Manage your customer base') },
+    'pages/products.html':      { title: t('ផលិតផល','Products'),               subtitle: t('រក្សាទុក និងគ្រប់គ្រងផលិតផល','Browse and manage products') },
+    'pages/stock.html':         { title: t('ស្តុក','Stock'),                    subtitle: t('តាមដានស្តុក និងការផ្លាស់ប្ដូរ','Track inventory levels and stock movements') },
+    'pages/delivery.html':      { title: t('ដឹកជញ្ជូន','Delivery'),            subtitle: t('គ្រប់គ្រងការដឹកជញ្ជូន','Manage delivery and shipping') },
+    'pages/commission.html':    { title: t('កម្រៃជើងសារ','Commission'),         subtitle: t('កម្រៃអ្នកលក់ និងតារាងចំណាត់ថ្នាក់','Agent commission and leaderboard') },
+    'pages/packaging.html':     { title: t('វេចខ្ចប់','Packaging'),             subtitle: t('វេចខ្ចប់ និងរៀបចំការដឹកជញ្ជូន','Packaging and delivery preparation') },
+    'pages/settings.html':      { title: t('ការកំណត់','Settings'),              subtitle: t('រៀបចំ Workspace របស់អ្នក','Configure your workspace') },
+    'login.html':               { title: t('ចូលប្រើ','Login'),                  subtitle: '' },
   };
 
   /* ── Icons ── */
@@ -80,43 +85,43 @@
       </div>
       <div class="sb-divider"></div>
       <nav class="sb-nav">
-        <div class="sb-section-label">Main Menu</div>
+        <div class="sb-section-label">${t('ម៉ឺនុយចំបង','Main Menu')}</div>
         <ul class="sb-list">
-          ${link('index.html',                ic.dashboard,'Dashboard')}
-          ${link('pages/analytics.html',      ic.analytics, 'Analytics')}
-          ${link('pages/new-order.html',      ic.neworder,  'New Order')}
-          ${link('pages/orders-details.html', ic.orders,    'Smart Orders')}
-          ${link('pages/smart-mobile.html',   ic.orders,    'Smart Mobile')}
-          ${link('pages/order-list.html',     ic.orderlist, 'Order List')}
+          ${link('index.html',                ic.dashboard, t('ផ្ទាំងគ្រប់គ្រង','Dashboard'))}
+          ${link('pages/analytics.html',      ic.analytics, t('វិភាគទិន្នន័យ','Analytics'))}
+          ${link('pages/new-order.html',      ic.neworder,  t('បញ្ជាទិញថ្មី','New Order'))}
+          ${link('pages/orders-details.html', ic.orders,    t('Smart Orders','Smart Orders'))}
+          ${link('pages/smart-mobile.html',   ic.orders,    t('Smart Mobile','Smart Mobile'))}
+          ${link('pages/order-list.html',     ic.orderlist, t('បញ្ជីបញ្ជាទិញ','Order List'))}
         </ul>
         <div class="sb-divider sb-divider-sm"></div>
-        <div class="sb-section-label">Management</div>
+        <div class="sb-section-label">${t('ការគ្រប់គ្រង','Management')}</div>
         <ul class="sb-list">
-          ${link('pages/customers.html',  ic.customers, 'Customers')}
-          ${link('pages/products.html',   ic.products,  'Products')}
-          ${link('pages/stock.html',      ic.stock,     'Stock')}
-          ${link('pages/delivery.html',   ic.delivery,  'Delivery')}
-          ${link('pages/packaging.html',  ic.packaging, 'Packaging')}
-          ${link('pages/commission.html', ic.commission,'Commission')}
+          ${link('pages/customers.html',  ic.customers, t('អតិថិជន','Customers'))}
+          ${link('pages/products.html',   ic.products,  t('ផលិតផល','Products'))}
+          ${link('pages/stock.html',      ic.stock,     t('ស្តុក','Stock'))}
+          ${link('pages/delivery.html',   ic.delivery,  t('ដឹកជញ្ជូន','Delivery'))}
+          ${link('pages/packaging.html',  ic.packaging, t('វេចខ្ចប់','Packaging'))}
+          ${link('pages/commission.html', ic.commission,t('កម្រៃជើងសារ','Commission'))}
         </ul>
         <div class="sb-divider sb-divider-sm"></div>
-        <div class="sb-section-label">System</div>
+        <div class="sb-section-label">${t('ប្រព័ន្ធ','System')}</div>
         <ul class="sb-list">
-          ${link('pages/settings.html', ic.settings, 'Settings')}
-          ${link('login.html',          ic.logout,   'Logout', true)}
+          ${link('pages/settings.html', ic.settings, t('ការកំណត់','Settings'))}
+          ${link('login.html',          ic.logout,   t('ចាកចេញ','Logout'), true)}
         </ul>
       </nav>
       <div class="sb-footer">
         <button class="sb-theme-btn" id="sbThemeBtn">
           <span class="sb-theme-icon">${isDark ? ic.moon : ic.sun}</span>
-          <span>${isDark ? 'Dark Mode' : 'Light Mode'}</span>
+          <span>${isDark ? t('របៀបងងឹត','Dark Mode') : t('របៀបភ្លឺ','Light Mode')}</span>
           <div class="sb-theme-toggle ${isDark ? 'on' : ''}"></div>
         </button>
         <div class="sb-user">
           <div class="sb-user-avatar">CM</div>
           <div>
             <div class="sb-user-name">CAMBO MINI</div>
-            <div class="sb-user-role"><span class="sb-online-dot"></span>Administrator</div>
+            <div class="sb-user-role"><span class="sb-online-dot"></span>${t('អ្នកគ្រប់គ្រង','Administrator')}</div>
           </div>
         </div>
       </div>`;
@@ -145,6 +150,11 @@
           </div>
         </div>
         <div class="header-actions">
+          <button class="lang-toggle-btn" id="langToggleBtn" title="Switch Language">
+            <span class="${getLang()==='en'?'lang-active':''}">EN</span>
+            <span class="lang-sep">|</span>
+            <span class="${getLang()==='kh'?'lang-active':''}">KH</span>
+          </button>
           <div class="notify-wrap" style="position:relative">
             <button class="notify-btn" id="notifyBtn" aria-label="Notifications">
               ${ic.bell}
@@ -325,8 +335,33 @@
     applyCollapse(localStorage.getItem('sb_collapsed') === '1');
     bindToggleBtn();
 
+    /* ── Language toggle ── */
+    function bindLangBtn() {
+      const btn = document.getElementById('langToggleBtn');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        setLang(getLang() === 'kh' ? 'en' : 'kh');
+        /* Rebuild full layout with new language */
+        if (sidebar) {
+          sidebar.innerHTML = buildSidebar();
+          bindThemeBtn();
+          bindToggleBtn();
+          applyCollapse(localStorage.getItem('sb_collapsed') === '1');
+        }
+        if (topbar) {
+          topbar.innerHTML = buildTopbar();
+          bindLangBtn();
+          startGreeting();
+        }
+      });
+    }
+    bindLangBtn();
+
     /* ── Topbar greeting: time-based + rotating motivational phrases ── */
-    (function() {
+    var _greetTimer = null;
+    function startGreeting() {
+      if (_greetTimer) { clearInterval(_greetTimer); _greetTimer = null; }
+
       /* Inject keyframes once */
       if (!document.getElementById('greetKF')) {
         var s = document.createElement('style');
@@ -344,13 +379,13 @@
         document.head.appendChild(s);
       }
 
+      var isKH = getLang() === 'kh';
       var h = new Date().getHours();
-      var timeGreet =
-        h >= 5  && h < 12 ? 'អរុណសួស្ដី! ☀️' :
-        h >= 12 && h < 18 ? 'ទិវាសួស្ដី! 🌤' :
-        h >= 18 && h < 21 ? 'សាយណ្ហសួស្ដី! 🌆' :
-                            'រាត្រីសួស្ដី! 🌙';
-      var phrases = [
+      var timeGreet = isKH
+        ? (h>=5&&h<12 ? 'អរុណសួស្ដី! ☀️' : h>=12&&h<18 ? 'ទិវាសួស្ដី! 🌤' : h>=18&&h<21 ? 'សាយណ្ហសួស្ដី! 🌆' : 'រាត្រីសួស្ដី! 🌙')
+        : (h>=5&&h<12 ? 'Good Morning! ☀️' : h>=12&&h<18 ? 'Good Afternoon! 🌤' : h>=18&&h<21 ? 'Good Evening! 🌆' : 'Good Night! 🌙');
+
+      var phrases = isKH ? [
         timeGreet,
         'ជ័យជម្នះជារបស់អ្នក! 🏆',
         'ថ្ងៃដ៏ស្រស់ស្អាត! ✨',
@@ -358,31 +393,38 @@
         'អ្នកអាចធ្វើបាន! 💪',
         'ព្យាយាម ហើយនឹងជោគជ័យ 🌟',
         'ដំណើរការពាណិជ្ជ! 📈',
+      ] : [
+        timeGreet,
+        'Victory belongs to you! 🏆',
+        'What a beautiful day! ✨',
+        'Success starts today 🚀',
+        'You can do it! 💪',
+        'Keep going, stay strong 🌟',
+        'Great business ahead! 📈',
       ];
+
       var el = document.getElementById('headerGreeting');
       if (!el) return;
       el.style.cssText = 'display:block;overflow:hidden;';
       var idx = 0;
 
       function showPhrase(text) {
-        /* Slide out */
         el.style.animation = 'greetOut .38s cubic-bezier(.4,0,.6,1) forwards';
         setTimeout(function() {
           el.textContent = text;
-          /* Slide in */
           el.style.animation = 'greetIn .45s cubic-bezier(.22,.68,0,1.2) forwards';
         }, 380);
       }
 
-      /* First phrase — just slide in, no out */
       el.textContent = phrases[0];
       el.style.animation = 'greetIn .55s cubic-bezier(.22,.68,0,1.2) forwards';
 
-      setInterval(function() {
+      _greetTimer = setInterval(function() {
         idx = (idx + 1) % phrases.length;
         showPhrase(phrases[idx]);
       }, 10000);
-    })();
+    }
+    startGreeting();
 
     /* ── Logo spin: randomly pick 1 of 5 styles each page load ── */
     (function() {

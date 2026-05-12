@@ -419,6 +419,23 @@ body.sb-collapsed .shared-topbar { left: var(--sb-w-col); }
 
 .header-actions { display:flex; align-items:center; gap:10px; position:relative; z-index:1; }
 
+/* ── Language toggle button ── */
+.lang-toggle-btn {
+  display: flex; align-items: center; gap: 3px;
+  height: 32px; padding: 0 10px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(139,92,246,.3);
+  background: rgba(139,92,246,.08);
+  font-size: 11px; font-weight: 800; letter-spacing: .06em;
+  color: var(--muted); cursor: pointer; font-family: inherit;
+  transition: background .18s, border-color .18s, color .18s;
+}
+.lang-toggle-btn:hover { background: rgba(139,92,246,.16); border-color: rgba(139,92,246,.5); color: var(--text); }
+.lang-toggle-btn .lang-active { color: #a78bfa; }
+.lang-toggle-btn .lang-sep { opacity: .4; margin: 0 1px; }
+[data-theme="light"] .lang-toggle-btn { border-color: rgba(99,102,241,.25); background: rgba(99,102,241,.07); }
+[data-theme="light"] .lang-toggle-btn .lang-active { color: #4f46e5; }
+
 .header-badge {
   height:38px; padding:0 14px; border-radius:999px;
   border:1px solid rgba(125,211,252,.18); background:rgba(255,255,255,.04);
