@@ -39,11 +39,16 @@
   .cm-btn-refresh{display:flex;align-items:center;gap:6px;height:34px;padding:0 16px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;white-space:nowrap}
   .cm-btn-refresh:hover{opacity:.85}
 
-  /* ── KPI ── */
+  /* ── KPI redesign ── */
   .cm-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-  .cm-kpi-card{padding:16px 18px;border-radius:16px}
-  .cm-kpi-label{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-  .cm-kpi-val{font-size:22px;font-weight:800;color:var(--text);margin-top:6px;display:block}
+  .cm-kpi-card{padding:16px 18px;border-radius:18px;display:flex;align-items:flex-start;gap:14px}
+  .cm-kpi-icon{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .cm-kpi-body{flex:1;min-width:0}
+  .cm-kpi-label{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+  .cm-kpi-val{font-size:20px;font-weight:800;color:var(--text);display:block;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cm-kpi-sub{font-size:10px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:5px}
+  .cm-kpi-bar{height:4px;border-radius:99px;background:rgba(148,163,200,.12);overflow:hidden;margin-top:6px}
+  .cm-kpi-bar-fill{height:100%;border-radius:99px;transition:width .5s ease}
 
   /* ── Ctrl bar ── */
   .cm-ctrl-bar{padding:14px 18px;border-radius:18px;display:flex;flex-direction:column;gap:10px}
@@ -217,21 +222,53 @@
 
       <!-- 1. KPI cards -->
       <div class="cm-kpi">
+        <!-- Total Commission -->
         <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-label">Total Commission</div>
-          <strong class="cm-kpi-val" id="sTot">0 ៛</strong>
+          <div class="cm-kpi-icon" style="background:rgba(139,92,246,.15)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v2m0 8v2M9 9.5A2.5 2.5 0 0 1 12 7.5h1a2.5 2.5 0 0 1 0 5h-2a2.5 2.5 0 0 0 0 5h1a2.5 2.5 0 0 0 2.5-2.5"/></svg>
+          </div>
+          <div class="cm-kpi-body">
+            <div class="cm-kpi-label">Total Commission</div>
+            <strong class="cm-kpi-val" id="sTot">0 ៛</strong>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" id="sTotBar" style="width:100%;background:linear-gradient(90deg,#8b5cf6,#06b6d4)"></div></div>
+            <div class="cm-kpi-sub" id="sTotSub" style="margin-top:5px">—</div>
+          </div>
         </article>
+        <!-- Paid Out -->
         <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-label">Paid Out</div>
-          <strong class="cm-kpi-val" id="sPaid" style="color:#86efac">0 ៛</strong>
+          <div class="cm-kpi-icon" style="background:rgba(134,239,172,.12)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#86efac" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="cm-kpi-body">
+            <div class="cm-kpi-label">Paid Out</div>
+            <strong class="cm-kpi-val" id="sPaid" style="color:#86efac">0 ៛</strong>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" id="sPaidBar" style="width:0%;background:#86efac"></div></div>
+            <div class="cm-kpi-sub" id="sPaidPct" style="margin-top:5px;color:#86efac">0% of total</div>
+          </div>
         </article>
+        <!-- Pending -->
         <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-label">Pending</div>
-          <strong class="cm-kpi-val" id="sPend" style="color:#fde68a">0 ៛</strong>
+          <div class="cm-kpi-icon" style="background:rgba(253,230,138,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fde68a" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="cm-kpi-body">
+            <div class="cm-kpi-label">Pending</div>
+            <strong class="cm-kpi-val" id="sPend" style="color:#fde68a">0 ៛</strong>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" id="sPendBar" style="width:0%;background:#fde68a"></div></div>
+            <div class="cm-kpi-sub" id="sPendPct" style="margin-top:5px;color:#fde68a">0% of total</div>
+          </div>
         </article>
+        <!-- Active CloseBy -->
         <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-label">Active CloseBy</div>
-          <strong class="cm-kpi-val" id="sAg">0</strong>
+          <div class="cm-kpi-icon" style="background:rgba(125,211,252,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="cm-kpi-body">
+            <div class="cm-kpi-label">Active CloseBy</div>
+            <strong class="cm-kpi-val" id="sAg" style="color:#7dd3fc">0</strong>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" id="sAgBar" style="width:100%;background:#7dd3fc"></div></div>
+            <div class="cm-kpi-sub" id="sAgSub" style="margin-top:5px;color:#7dd3fc">agents active</div>
+          </div>
         </article>
       </div>
 
@@ -289,7 +326,6 @@
         <article class="glass-card cm-table-card">
           <div class="cm-table-head">
             <h3 class="cm-panel-title" id="panelTitle">Commission Records</h3>
-            <span class="cm-range-tag" id="rangeLabel"></span>
           </div>
 
           <!-- Breadcrumb -->
@@ -440,8 +476,8 @@
 
   function updateRangeLabel(){
     var labels={today:'ថ្ងៃនេះ',week:'សប្ដាហ៍នេះ',month:'ខែនេះ',lastmonth:'ខែមុន',custom:'Custom',all:'ទាំងអស់'};
-    var el=document.getElementById('rangeLabel');
-    if(el) el.textContent=_filtered.length+' orders · '+(labels[_mode]||_mode);
+    var el=document.getElementById('sumRangeLabel');
+    if(el) el.textContent='📅 '+(labels[_mode]||_mode)+' · '+_filtered.length+' orders';
   }
 
   /* ══ CALC MODE ══ */
@@ -606,10 +642,24 @@
     var tot =_agents.reduce(function(s,a){return s+calcComm(a);},0);
     var paid=_agents.filter(function(a){return a.status==='Paid';}).reduce(function(s,a){return s+calcComm(a);},0);
     var pend=_agents.filter(function(a){return a.status==='Pending';}).reduce(function(s,a){return s+calcComm(a);},0);
-    document.getElementById('sTot').textContent =tot.toLocaleString()+'៛';
-    document.getElementById('sPaid').textContent=paid.toLocaleString()+'៛';
-    document.getElementById('sPend').textContent=pend.toLocaleString()+'៛';
-    document.getElementById('sAg').textContent  =_agents.length;
+    var agCnt=_agents.length;
+    var paidPct=tot>0?Math.round(paid/tot*100):0;
+    var pendPct=tot>0?Math.round(pend/tot*100):0;
+
+    document.getElementById('sTot').textContent  = tot.toLocaleString()+'៛';
+    document.getElementById('sPaid').textContent = paid.toLocaleString()+'៛';
+    document.getElementById('sPend').textContent = pend.toLocaleString()+'៛';
+    document.getElementById('sAg').textContent   = agCnt;
+
+    // Sub-labels
+    document.getElementById('sTotSub').textContent  = agCnt+' agents · '+_filtered.length+' orders';
+    document.getElementById('sPaidPct').textContent = paidPct+'% of total';
+    document.getElementById('sPendPct').textContent = pendPct+'% of total';
+    document.getElementById('sAgSub').textContent   = agCnt === 1 ? '1 agent active' : agCnt+' agents active';
+
+    // Progress bars
+    document.getElementById('sPaidBar').style.width = paidPct+'%';
+    document.getElementById('sPendBar').style.width = pendPct+'%';
   }
 
   /* ══ TOP CLOSEBY ══ */
