@@ -52,15 +52,18 @@
 
   /* ── Ctrl bar ── */
   .cm-ctrl-bar{padding:14px 18px;border-radius:18px;display:flex;flex-direction:column;gap:10px}
-  .cm-ctrl-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .cm-ctrl-spacer{flex:1}
+  .cm-ctrl-top{display:flex;align-items:center;gap:8px}
+  .cm-ctrl-spacer{flex:1;min-width:0}
   .cm-ctrl-div{height:1px;background:var(--line)}
-  .cm-ctrl-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .cm-ctrl-rate-group{display:flex;align-items:center;gap:7px;padding:3px 10px 3px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+  .cm-ctrl-row2{display:flex;align-items:center;gap:8px}
+  .cm-ctrl-rate-group{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+  .cm-ctrl-rate-full{width:100%;box-sizing:border-box}
   [data-theme="light"] .cm-ctrl-rate-group{background:rgba(0,0,0,.03)}
-  .cm-ctrl-rate-lbl{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
-  .cm-ctrl-rate-inp-wrap{display:flex;align-items:center;gap:3px}
+  .cm-ctrl-rate-lbl{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+  .cm-ctrl-rate-inp-wrap{display:flex;align-items:center;gap:4px}
   .cm-ctrl-rate-unit{font-size:12px;font-weight:700;color:var(--muted)}
+  .cm-range-mobile{display:none;font-size:11px;color:var(--muted);font-weight:600;padding:2px 0}
+  .cm-range-hide-mobile{display:inline-flex}
   /* ── Setup strip ── */
   .cm-setup{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 18px;border-radius:16px}
   .cm-setup-label{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
@@ -202,13 +205,15 @@
   @media(max-width:1000px){.cm-main{grid-template-columns:1fr}}
   @media(max-width:700px){
     .cm-kpi{grid-template-columns:repeat(2,1fr)}
-    .cm-bar{flex-direction:column;align-items:stretch}
-    .cm-bar-right{flex-direction:column}
-    .cm-tabs{flex-wrap:wrap}
-    .cm-setup{flex-direction:column;align-items:stretch}
-    .cm-setup-actions{margin-left:0}
+    .cm-range-hide-mobile{display:none}
+    .cm-range-mobile{display:block}
+    .cm-refresh-label{display:none}
+    .cm-btn-refresh{padding:0 13px;min-width:36px;justify-content:center}
   }
-  @media(max-width:420px){.cm-kpi{grid-template-columns:1fr}}
+  @media(max-width:420px){
+    .cm-kpi{grid-template-columns:1fr}
+    .cm-rate-inp{width:64px}
+  }
   </style>
 </head>
 <body>
@@ -274,20 +279,22 @@
 
       <!-- 2. Combined filter + setup card -->
       <section class="glass-card cm-ctrl-bar">
-        <!-- Row 1: date dropdown + refresh -->
+        <!-- Row 1: date + range + refresh -->
         <div class="cm-ctrl-top">
           <button class="cm-date-btn" id="dateBtnTrigger" onclick="toggleDateDrop(event)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <span id="dateBtnLabel">ខែនេះ</span>
             <svg class="arr" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
+          <span class="cm-range-tag cm-range-hide-mobile" id="sumRangeLabel"></span>
           <span class="cm-ctrl-spacer"></span>
-          <span class="cm-range-tag" id="sumRangeLabel"></span>
           <button class="cm-btn-refresh" onclick="loadData()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Refresh
+            <span class="cm-refresh-label">Refresh</span>
           </button>
         </div>
+        <!-- Range tag mobile only -->
+        <div class="cm-range-mobile" id="sumRangeLabelMobile"></div>
         <!-- Custom date range -->
         <div class="cm-custom-row" id="customDateBar" style="padding:0;border-radius:0;background:none;margin:0">
           <span class="cm-custom-lbl">ពី</span>
@@ -297,25 +304,27 @@
         </div>
         <!-- Divider -->
         <div class="cm-ctrl-div"></div>
-        <!-- Row 2: optimized toolbar -->
-        <div class="cm-ctrl-tools">
+        <!-- Row 2: mode + csv on same line -->
+        <div class="cm-ctrl-row2">
           <div class="cm-mode-group">
             <button class="cm-mode-btn active" id="modeOrders" onclick="setCalcMode('orders')">Orders</button>
             <button class="cm-mode-btn" id="modeItems" onclick="setCalcMode('items')">Items</button>
-          </div>
-          <div class="cm-ctrl-rate-group">
-            <span class="cm-ctrl-rate-lbl" id="rateLabel">Rate / Order</span>
-            <div class="cm-ctrl-rate-inp-wrap">
-              <input type="number" id="defRate" class="cm-rate-inp" value="200" min="0" step="50">
-              <span class="cm-ctrl-rate-unit">៛</span>
-            </div>
-            <button class="cm-apply" onclick="applyDefRate()">Apply</button>
           </div>
           <span class="cm-ctrl-spacer"></span>
           <button class="cm-export" onclick="exportCommCSV()">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             CSV
           </button>
+        </div>
+        <!-- Row 3: rate group full width on mobile -->
+        <div class="cm-ctrl-rate-group cm-ctrl-rate-full">
+          <span class="cm-ctrl-rate-lbl" id="rateLabel">Rate / Order</span>
+          <span class="cm-ctrl-spacer"></span>
+          <div class="cm-ctrl-rate-inp-wrap">
+            <input type="number" id="defRate" class="cm-rate-inp" value="200" min="0" step="50">
+            <span class="cm-ctrl-rate-unit">៛</span>
+          </div>
+          <button class="cm-apply" onclick="applyDefRate()">Apply</button>
         </div>
       </section>
 
@@ -476,8 +485,11 @@
 
   function updateRangeLabel(){
     var labels={today:'ថ្ងៃនេះ',week:'សប្ដាហ៍នេះ',month:'ខែនេះ',lastmonth:'ខែមុន',custom:'Custom',all:'ទាំងអស់'};
+    var txt='📅 '+(labels[_mode]||_mode)+' · '+_filtered.length+' orders';
     var el=document.getElementById('sumRangeLabel');
-    if(el) el.textContent='📅 '+(labels[_mode]||_mode)+' · '+_filtered.length+' orders';
+    if(el) el.textContent=txt;
+    var el2=document.getElementById('sumRangeLabelMobile');
+    if(el2) el2.textContent=txt;
   }
 
   /* ══ CALC MODE ══ */
