@@ -14,6 +14,30 @@
     /* Hide paste-receipt tool (order-plust.js) — not needed on New Order */
     .receipt-paste-tool { display: none !important; }
 
+    /* ── Carrier badge (mobile) ── */
+    #carrierBadgeMobile {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px 4px 7px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1.5px solid;
+      pointer-events: none;
+      margin-top: 6px;
+      width: fit-content;
+      transition: opacity .2s;
+    }
+    #carrierBadgeMobile.show { display: flex; }
+    #carrierBadgeMobile img { height: 16px; width: auto; border-radius: 2px; }
+    #carrierBadgeMobile.c-cellcard { border-color:#d97706; color:#92400e; background:rgba(217,119,6,.1); }
+    #carrierBadgeMobile.c-smart    { border-color:#00a651; color:#065f46; background:rgba(0,166,81,.1); }
+    #carrierBadgeMobile.c-metfone  { border-color:#e30613; color:#991b1b; background:rgba(227,6,19,.1); }
+    [data-theme="dark"] #carrierBadgeMobile.c-cellcard { color:#fcd34d; background:rgba(217,119,6,.15); }
+    [data-theme="dark"] #carrierBadgeMobile.c-smart    { color:#34d399; background:rgba(0,166,81,.15); }
+    [data-theme="dark"] #carrierBadgeMobile.c-metfone  { color:#fca5a5; background:rgba(227,6,19,.15); }
+
     /* ══════════════════════════════════════════════════════
        RESET & BASE  — iOS/Android tap optimizations
     ══════════════════════════════════════════════════════ */
@@ -681,11 +705,17 @@
                   <label>លេខទូរស័ព្ទ</label>
                   <div style="position:relative;">
                     <input id="phone" type="tel" placeholder="0xx xxx xxx" style="padding-right:72px;width:100%;">
+                    <!-- Desktop carrier badge (inside field, hidden on mobile) -->
                     <span id="carrierBadgeDesktop" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;align-items:center;gap:4px;font-size:11px;font-weight:700;">
                       <img id="carrierLogoDesktop" src="" alt="" style="height:16px;width:auto;border-radius:2px;">
                       <span id="carrierNameDesktop"></span>
                     </span>
                   </div>
+                  <!-- Mobile carrier badge (appears below field) -->
+                  <span id="carrierBadgeMobile">
+                    <img id="carrierLogoMobile" src="" alt="">
+                    <span id="carrierNameMobile"></span>
+                  </span>
                 </div>
               </div>
 
