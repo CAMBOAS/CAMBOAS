@@ -970,13 +970,14 @@ body.sb-collapsed .shared-topbar { left: var(--sb-w-col); }
    ================================================================ */
 @media (max-width: 980px) {
 
-  /* Shared-topbar becomes the solid bar — no card inside */
+  /* Shared-topbar becomes the solid bar — always on top, no card inside */
   .shared-topbar {
     top: 0 !important;
     margin-bottom: 0 !important;
     background: rgba(13,17,38,.97) !important;
     backdrop-filter: blur(28px) saturate(1.6) !important;
     box-shadow: 0 2px 20px rgba(0,0,0,.3) !important;
+    z-index: 10000 !important;
   }
   [data-theme="light"] .shared-topbar {
     background: rgba(255,255,255,.97) !important;
@@ -1033,19 +1034,18 @@ body.sb-collapsed .shared-topbar { left: var(--sb-w-col); }
    ================================================================ */
 @media (max-width: 980px) {
 
-  /* Sidebar covers from very top — over header */
+  /* Sidebar slides in below topbar */
   .sidebar {
-    top: 0 !important;
-    height: 100vh !important;
-    height: 100dvh !important;  /* dynamic viewport for mobile browsers */
+    top: var(--topbar-offset, 72px) !important;
+    height: calc(100dvh - var(--topbar-offset, 72px)) !important;
     border-radius: 0 20px 20px 0 !important;
-    z-index: 200 !important;
+    z-index: 9999 !important;
   }
 
-  /* Overlay covers everything including header */
+  /* Overlay also starts below topbar */
   .sidebar-overlay {
-    z-index: 190 !important;
-    top: 0 !important;
+    z-index: 9990 !important;
+    top: var(--topbar-offset, 72px) !important;
   }
 
   /* Tap overlay = close sidebar */
