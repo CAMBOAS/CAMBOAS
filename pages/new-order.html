@@ -328,16 +328,12 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
+      padding: 12px 12px 10px;
+      gap: 6px;
     }
 
-    /* Info section */
-    .prow-info {
-      padding: 12px 14px 8px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
+    /* Info: name + tag */
+    .prow-info { display: flex; flex-direction: column; gap: 6px; }
     .pinfo b {
       display: block;
       font-size: 14px;
@@ -352,77 +348,64 @@
     .pcat-tag {
       display: inline-flex;
       align-items: center;
-      margin-top: 5px;
-      padding: 3px 10px;
-      border-radius: 6px;
+      padding: 3px 12px;
+      border-radius: 20px;
       font-size: 11px;
       font-weight: 600;
-      background: rgba(124,92,255,.1);
+      border: 1.5px solid rgba(124,92,255,.3);
       color: #7c5cff;
+      background: transparent;
       align-self: flex-start;
     }
-    [data-theme="dark"] .pcat-tag { background: rgba(124,92,255,.2); }
+    [data-theme="dark"] .pcat-tag { border-color: rgba(124,92,255,.4); }
 
-    /* Divider before controls */
+    /* Spacer */
+    .prow-spacer { flex: 1; }
     .prow-div { display: none; }
 
-    /* ── Controls bar ── */
+    /* ── Controls: 4 pill boxes ── */
     .prow-ctrl {
       display: flex;
-      align-items: stretch;
-      background: rgba(124,92,255,.045);
-      min-height: 60px;
+      gap: 6px;
+      background: transparent;
+      padding: 0;
     }
-    [data-theme="dark"] .prow-ctrl { background: rgba(124,92,255,.08); }
-    [data-theme="light"] .prow-ctrl { background: rgba(124,92,255,.04); }
 
     .pctrl-box {
       flex: 1;
+      height: 46px;
+      border-radius: 50px;
+      border: 1.5px solid rgba(124,92,255,.25);
+      background: transparent;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
-      padding: 7px 3px;
-      border-right: 1px solid rgba(124,92,255,.1);
+      gap: 1px;
       position: relative;
+      overflow: hidden;
     }
-    [data-theme="dark"] .pctrl-box { border-right-color: rgba(255,255,255,.07); }
-    .pctrl-box:last-child { border-right: none; }
+    [data-theme="dark"] .pctrl-box { border-color: rgba(124,92,255,.3); }
 
     /* Label */
     .pctrl-lbl-top {
-      font-size: 9.5px;
+      font-size: 9px;
       font-weight: 700;
       color: #a0a8c0;
       line-height: 1;
-      letter-spacing: .03em;
-      text-transform: uppercase;
+      letter-spacing: .02em;
     }
 
-    /* Price pill */
-    .pctrl-price {
-      display: flex;
-      align-items: baseline;
-      gap: 1px;
-      background: rgba(124,92,255,.12);
-      border-radius: 7px;
-      padding: 3px 6px 3px 4px;
-    }
-    [data-theme="dark"] .pctrl-price { background: rgba(124,92,255,.2); }
-    .pprice-sym {
-      font-size: 11px;
-      font-weight: 800;
-      color: #7c5cff;
-      line-height: 1;
-    }
+    /* Price */
+    .pctrl-price { display: flex; align-items: baseline; gap: 1px; }
+    .pprice-sym { font-size: 11px; font-weight: 800; color: #7c5cff; line-height: 1; }
     .pprice-inp {
-      width: 40px;
-      height: 24px;
+      width: 38px;
+      height: 22px;
       border: none;
       background: transparent;
       color: #7c5cff;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 800;
       font-family: inherit;
       text-align: center;
@@ -433,15 +416,14 @@
     .pprice-inp::-webkit-outer-spin-button,
     .pprice-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-    /* Qty pill */
+    /* Qty */
     .pqty-inp {
-      width: 44px;
-      height: 28px;
+      width: 42px;
+      height: 24px;
       border: none;
-      background: rgba(0,0,0,.06);
-      border-radius: 7px;
+      background: transparent;
       color: #18213a;
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 700;
       font-family: inherit;
       text-align: center;
@@ -451,19 +433,15 @@
     }
     .pqty-inp::-webkit-outer-spin-button,
     .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    [data-theme="dark"] .pqty-inp { background: rgba(255,255,255,.1); color: #f0eaff; }
+    [data-theme="dark"] .pqty-inp { color: #f0eaff; }
 
     /* Unit toggle */
     .punit-btn {
-      width: 100%;
-      height: 100%;
       position: absolute;
       inset: 0;
       border: none;
       background: transparent;
       color: #7c5cff;
-      font-size: 14px;
-      font-weight: 800;
       font-family: inherit;
       cursor: pointer;
       touch-action: manipulation;
@@ -472,32 +450,26 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
+      gap: 2px;
       transition: background .15s;
     }
-    .punit-icon {
-      font-size: 11px;
-      line-height: 1;
-      opacity: .5;
-    }
-    .punit-lbl {
-      font-size: 14px;
-      font-weight: 800;
-      line-height: 1;
-    }
+    .punit-icon { font-size: 10px; opacity: .45; line-height: 1; }
+    .punit-lbl { font-size: 13px; font-weight: 800; line-height: 1; }
     .punit-btn.is-case { color: #0891b2; }
-    .punit-btn:active { background: rgba(124,92,255,.1); }
+    .punit-btn:active { background: rgba(124,92,255,.08); }
 
-    /* Add button — full gradient */
+    /* Add button — pill gradient */
+    .pctrl-box.padd-box {
+      background: linear-gradient(135deg, #7c5cff, #06b6d4);
+      border-color: transparent;
+    }
     .padd-btn {
-      width: 100%;
-      height: 100%;
       position: absolute;
       inset: 0;
       border: none;
-      background: linear-gradient(145deg, #7c5cff 0%, #06b6d4 100%);
+      background: transparent;
       color: #fff;
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 300;
       font-family: inherit;
       cursor: pointer;
@@ -507,9 +479,9 @@
       align-items: center;
       justify-content: center;
       line-height: 1;
-      transition: opacity .15s, filter .15s;
+      transition: opacity .15s;
     }
-    .padd-btn:active { opacity: .8; filter: brightness(.92); }
+    .padd-btn:active { opacity: .78; }
 
     /* ══════════════════════════════════════════════════════
        CART
@@ -1269,7 +1241,7 @@ function renderPList(list){
           +'<div class="pinfo"><b>'+escHtml(p.name)+'</b></div>'
           +'<span class="pcat-tag">'+escHtml(p.category)+'</span>'
         +'</div>'
-        +'<div class="prow-div"></div>'
+        +'<div class="prow-spacer"></div>'
         +'<div class="prow-ctrl">'
           /* Price */
           +'<div class="pctrl-box">'
@@ -1292,7 +1264,7 @@ function renderPList(list){
             +'</button>'
           +'</div>'
           /* Add */
-          +'<div class="pctrl-box" style="padding:0;">'
+          +'<div class="pctrl-box padd-box">'
             +'<button class="padd-btn" onclick="addFromCard(this,event)" type="button">+</button>'
           +'</div>'
         +'</div>'
