@@ -347,26 +347,53 @@ option { background:#0f172a; color:#e5eefc; }
 }
 
 /* ================================================================
-   HEADER (topbar)
+   HEADER (topbar) — smart sticky scroll
    ================================================================ */
-.shared-topbar { margin-bottom: 20px; }
+.shared-topbar {
+  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  transition: transform 0.32s cubic-bezier(.4,0,.2,1), opacity 0.28s ease;
+}
+.shared-topbar.topbar-hidden {
+  transform: translateY(-115%);
+  opacity: 0;
+  pointer-events: none;
+}
 
 .header-shell {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; padding: 14px 20px;
-  background: linear-gradient(135deg,rgba(15,23,42,.92),rgba(17,24,39,.70));
-  border: 1px solid var(--line); border-radius: 20px;
-  backdrop-filter: blur(20px); box-shadow: var(--shadow);
+  gap: 16px; padding: 14px 22px;
+  background: linear-gradient(135deg,rgba(13,17,38,.96),rgba(17,24,39,.88));
+  border: 1px solid rgba(139,92,246,.2);
+  border-radius: 20px;
+  backdrop-filter: blur(28px) saturate(1.6);
+  box-shadow: 0 4px 28px rgba(0,0,0,.28), 0 1px 0 rgba(139,92,246,.12) inset;
   position: relative; overflow: visible;
 }
+/* Bottom accent gradient line */
+.header-shell::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 18px; right: 18px; height: 2px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg,transparent,#8b5cf6 30%,#06b6d4 70%,transparent);
+  opacity: .55;
+  pointer-events: none;
+}
 [data-theme="light"] .header-shell {
-  background: linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,250,252,.92));
-  border-color: var(--line);
+  background: linear-gradient(135deg,rgba(255,255,255,.98),rgba(248,250,252,.95));
+  border-color: rgba(99,102,241,.15);
+  box-shadow: 0 2px 20px rgba(99,102,241,.08), 0 1px 0 rgba(255,255,255,.9) inset;
+}
+[data-theme="light"] .header-shell::after {
+  opacity: .4;
 }
 .premium-header-shell::before {
-  content:""; position:absolute; inset:0; pointer-events:none;
-  background: radial-gradient(circle at top right,rgba(139,92,246,.12),transparent 36%),
-              radial-gradient(circle at bottom left,rgba(6,182,212,.10),transparent 36%);
+  content:""; position:absolute; inset:0; pointer-events:none; border-radius:20px; overflow:hidden;
+  background: radial-gradient(circle at top right,rgba(139,92,246,.14),transparent 38%),
+              radial-gradient(circle at bottom left,rgba(6,182,212,.10),transparent 38%);
 }
 
 .header-start { display:flex; align-items:center; gap:14px; min-width:0; position:relative; z-index:1; }
@@ -375,10 +402,10 @@ option { background:#0f172a; color:#e5eefc; }
 .header-kicker { font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#a5b4fc;margin-bottom:3px; }
 [data-theme="light"] .header-kicker { color:#6366f1; }
 
-.header-title { margin:0; font-size:26px; line-height:1.1; font-weight:800; letter-spacing:-.01em; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.header-title { margin:0; font-size:24px; line-height:1.1; font-weight:800; letter-spacing:-.02em; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 [data-theme="light"] .header-title { color:#0f172a; }
 
-.header-subtitle { margin-top:3px; font-size:12.5px; color:#8fa3c2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:min(58vw,680px); }
+.header-subtitle { margin-top:2px; font-size:12px; color:rgba(165,180,252,.7); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:min(58vw,680px); }
 [data-theme="light"] .header-subtitle { color:#64748b; }
 
 .header-actions { display:flex; align-items:center; gap:10px; position:relative; z-index:1; }
@@ -960,7 +987,7 @@ option { background:#0f172a; color:#e5eefc; }
   }
 
   /* Shared topbar no bottom margin on mobile */
-  .shared-topbar { margin-bottom: 16px !important; }
+  .shared-topbar { margin-bottom: 16px !important; top: 0 !important; }
 
   /* Sidebar overlay — closes on tap */
   .sidebar-overlay { cursor: pointer; }

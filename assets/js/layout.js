@@ -331,6 +331,25 @@
     if (scrollUp)   scrollUp.addEventListener('click',   () => window.scrollTo({top:0,behavior:'smooth'}));
     if (scrollDown) scrollDown.addEventListener('click', () => window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}));
 
+    /* ── Smart scroll: hide topbar on scroll-down, reveal on scroll-up ── */
+    let _lastScrollY = 0;
+    const _topbar = document.getElementById('sharedHeader');
+    const _mainContent = document.querySelector('.main-content');
+    const _scrollEl = (_mainContent && getComputedStyle(_mainContent).overflowY === 'auto') ? _mainContent : window;
+    _scrollEl.addEventListener('scroll', () => {
+      const scrollY = _scrollEl === window ? window.scrollY : _scrollEl.scrollTop;
+      const delta   = scrollY - _lastScrollY;
+      if (!_topbar) { _lastScrollY = scrollY; return; }
+      if (scrollY < 72) {
+        _topbar.classList.remove('topbar-hidden');
+      } else if (delta > 6) {
+        _topbar.classList.add('topbar-hidden');
+      } else if (delta < -6) {
+        _topbar.classList.remove('topbar-hidden');
+      }
+      _lastScrollY = scrollY;
+    }, { passive: true });
+
     renderNotes();
   }
 
