@@ -70,7 +70,7 @@
         </div>
         <div class="sb-brand-text">
           <div class="sb-brand-name">CAMBO MINI</div>
-          <div class="sb-brand-sub">Premium Workspace</div>
+          <div class="sb-brand-sub" id="sbGreeting"></div>
         </div>
       </div>
       <div class="sb-toggle-row">
@@ -324,6 +324,39 @@
     bindThemeBtn();
     applyCollapse(localStorage.getItem('sb_collapsed') === '1');
     bindToggleBtn();
+
+    /* ── Sidebar greeting: time-based + rotating motivational phrases ── */
+    (function() {
+      var h = new Date().getHours();
+      var timeGreet =
+        h >= 5  && h < 12 ? 'អរុណសួស្ដី! ☀️' :
+        h >= 12 && h < 18 ? 'ទិវាសួស្ដី! 🌤' :
+        h >= 18 && h < 21 ? 'សាយណ្ហសួស្ដី! 🌆' :
+                            'រាត្រីសួស្ដី! 🌙';
+      var phrases = [
+        timeGreet,
+        'ជ័យជម្នះជារបស់អ្នក! 🏆',
+        'ថ្ងៃដ៏ស្រស់ស្អាត! ✨',
+        'ជោគជ័យចាប់ផ្ដើមពីថ្ងៃនេះ 🚀',
+        'អ្នកអាចធ្វើបាន! 💪',
+        'ព្យាយាម ហើយនឹងជោគជ័យ 🌟',
+        'ដំណើរការពាណិជ្ជ! 📈',
+      ];
+      var el = document.getElementById('sbGreeting');
+      if (!el) return;
+      /* fade transition via inline style */
+      el.style.cssText = 'transition:opacity .5s ease;opacity:1;';
+      var idx = 0;
+      el.textContent = phrases[idx];
+      setInterval(function() {
+        el.style.opacity = '0';
+        setTimeout(function() {
+          idx = (idx + 1) % phrases.length;
+          el.textContent = phrases[idx];
+          el.style.opacity = '1';
+        }, 500);
+      }, 4000);
+    })();
 
     /* ── Logo spin: randomly pick 1 of 5 styles each page load ── */
     (function() {
