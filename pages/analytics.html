@@ -46,9 +46,28 @@
   [data-theme="light"] .an-date-opt.active{background:rgba(139,92,246,.1);color:#7c3aed}
   .an-date-opt .opt-chk{opacity:0;font-size:11px;color:#a78bfa}
   .an-date-opt.active .opt-chk{opacity:1}
-  /* Page select & refresh */
-  .an-sel{height:36px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font-size:12px;font-family:inherit;cursor:pointer;outline:none}
-  [data-theme="light"] .an-sel{background:#fff}
+  /* Page dropdown button (same look as date btn) */
+  .an-page-btn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .12s;white-space:nowrap;max-width:160px}
+  .an-page-btn:hover{background:rgba(255,255,255,.08)}
+  [data-theme="light"] .an-page-btn{background:#fff}
+  [data-theme="light"] .an-page-btn:hover{background:#f1f5f9}
+  .an-page-btn svg{opacity:.55;flex-shrink:0}
+  .an-page-btn .chev{transition:transform .2s}
+  .an-page-btn.open .chev{transform:rotate(180deg)}
+  .an-page-btn span.lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:110px}
+  /* Floating page menu */
+  #anPageFloatMenu{display:none;position:fixed;z-index:9999;background:#1e1b2e;border:1px solid rgba(139,92,246,.25);border-radius:14px;padding:6px;box-shadow:0 12px 40px rgba(0,0,0,.45);min-width:180px;max-width:240px;max-height:280px;overflow-y:auto;flex-direction:column;gap:2px}
+  [data-theme="light"] #anPageFloatMenu{background:#ffffff;border-color:rgba(0,0,0,.1);box-shadow:0 8px 32px rgba(0,0,0,.15)}
+  #anPageFloatMenu.show{display:flex}
+  .an-page-opt{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:10px;border:none;background:none;color:#e2e8f0;font-size:13px;font-family:inherit;cursor:pointer;transition:background .12s;text-align:left;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  [data-theme="light"] .an-page-opt{color:#1e293b}
+  .an-page-opt:hover{background:rgba(139,92,246,.15)}
+  .an-page-opt.active{background:rgba(139,92,246,.2);color:#c4b5fd;font-weight:700}
+  [data-theme="light"] .an-page-opt.active{background:rgba(139,92,246,.1);color:#7c3aed}
+  .an-page-opt .opt-chk{opacity:0;font-size:11px;color:#a78bfa;flex-shrink:0;margin-left:6px}
+  .an-page-opt.active .opt-chk{opacity:1}
+  /* hidden native select (still used by analytics-live.js) */
+  #analyticsPage{display:none}
   .an-refresh{display:flex;align-items:center;gap:6px;height:36px;padding:0 16px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;white-space:nowrap}
   .an-refresh:hover{opacity:.88}
   .an-refresh svg{flex-shrink:0}
@@ -210,10 +229,13 @@
             <span class="an-custom-sep">→</span>
             <input id="analyticsEnd" type="date">
           </div>
-          <!-- Page filter -->
-          <select id="analyticsPage" class="an-sel">
-            <option value="">All Pages</option>
-          </select>
+          <!-- Page filter (custom dropdown) -->
+          <select id="analyticsPage"><option value="">All Pages</option></select>
+          <button class="an-page-btn" id="anPageBtn" onclick="anTogglePageDrop(event)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span class="lbl" id="anPageLabel">All Pages</span>
+            <svg class="chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
           <!-- Refresh -->
           <button class="an-refresh" id="analyticsRefresh" type="button">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
@@ -260,6 +282,9 @@
 <script src="../assets/js/orders-data.js"></script>
 <script src="../assets/js/analytics-live.js"></script>
 <script src="../assets/js/sw-register.js"></script>
+
+<!-- Floating page menu -->
+<div id="anPageFloatMenu"></div>
 
 <!-- Floating date menu -->
 <div id="anDateFloatMenu">
@@ -334,21 +359,72 @@
     }
   };
 
-  document.addEventListener('click', function(e){
+  /* ── Page dropdown ── */
+  function rebuildPageMenu(){
+    var menu=document.getElementById('anPageFloatMenu');
+    var sel=document.getElementById('analyticsPage');
+    if(!menu||!sel) return;
+    menu.innerHTML='';
+    Array.from(sel.options).forEach(function(opt){
+      var btn=document.createElement('button');
+      btn.className='an-page-opt'+(opt.value===''?' active':'');
+      btn.dataset.value=opt.value;
+      var txt=document.createTextNode(opt.textContent);
+      var chk=document.createElement('span');
+      chk.className='opt-chk'; chk.textContent='✓';
+      btn.appendChild(txt); btn.appendChild(chk);
+      btn.onclick=function(){ anPickPage(btn,opt.value,opt.textContent.trim()); };
+      menu.appendChild(btn);
+    });
+  }
+
+  window.anTogglePageDrop=function(e){
+    e.stopPropagation();
+    var menu=document.getElementById('anPageFloatMenu');
+    var btn=document.getElementById('anPageBtn');
+    var open=menu.classList.contains('show');
+    if(open){ menu.classList.remove('show'); btn.classList.remove('open'); return; }
+    var r=btn.getBoundingClientRect();
+    menu.style.top=(r.bottom+6)+'px';
+    menu.style.left=r.left+'px';
+    menu.classList.add('show');
+    btn.classList.add('open');
+  };
+
+  window.anPickPage=function(el,value,label){
+    document.getElementById('anPageLabel').textContent=label||'All Pages';
+    document.querySelectorAll('.an-page-opt').forEach(function(b){ b.classList.toggle('active',b===el); });
+    document.getElementById('anPageFloatMenu').classList.remove('show');
+    document.getElementById('anPageBtn').classList.remove('open');
+    var sel=document.getElementById('analyticsPage');
+    sel.value=value;
+    sel.dispatchEvent(new Event('input'));
+  };
+
+  document.addEventListener('click',function(e){
     var menu=document.getElementById('anDateFloatMenu');
     var btn=document.getElementById('anDateBtn');
     if(menu&&!menu.contains(e.target)&&e.target!==btn&&!btn.contains(e.target)){
       menu.classList.remove('show');
       if(btn) btn.classList.remove('open');
     }
+    var pm=document.getElementById('anPageFloatMenu');
+    var pb=document.getElementById('anPageBtn');
+    if(pm&&!pm.contains(e.target)&&e.target!==pb&&!pb.contains(e.target)){
+      pm.classList.remove('show');
+      if(pb) pb.classList.remove('open');
+    }
   });
 
-  /* Set month range on first load (analytics-live.js sets its own defaults,
-     we override once DOM+data are ready) */
-  document.addEventListener('DOMContentLoaded', function(){
-    /* hide custom dates by default */
+  document.addEventListener('DOMContentLoaded',function(){
     var cd=document.getElementById('anCustomDates');
     if(cd) cd.classList.remove('show');
+    /* Watch for analytics-live.js populating the hidden select */
+    var sel=document.getElementById('analyticsPage');
+    if(sel){
+      rebuildPageMenu();
+      new MutationObserver(function(){ rebuildPageMenu(); }).observe(sel,{childList:true});
+    }
   });
 })();
 </script>
