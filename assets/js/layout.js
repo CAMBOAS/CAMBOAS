@@ -327,6 +327,23 @@
 
     /* ── Topbar greeting: time-based + rotating motivational phrases ── */
     (function() {
+      /* Inject keyframes once */
+      if (!document.getElementById('greetKF')) {
+        var s = document.createElement('style');
+        s.id = 'greetKF';
+        s.textContent =
+          '@keyframes greetIn{' +
+            '0%{opacity:0;transform:translateY(10px) scale(.97);}' +
+            '60%{opacity:1;transform:translateY(-2px) scale(1.01);}' +
+            '100%{opacity:1;transform:translateY(0) scale(1);}' +
+          '}' +
+          '@keyframes greetOut{' +
+            '0%{opacity:1;transform:translateY(0) scale(1);}' +
+            '100%{opacity:0;transform:translateY(-10px) scale(.97);}' +
+          '}';
+        document.head.appendChild(s);
+      }
+
       var h = new Date().getHours();
       var timeGreet =
         h >= 5  && h < 12 ? 'អរុណសួស្ដី! ☀️' :
@@ -344,17 +361,27 @@
       ];
       var el = document.getElementById('headerGreeting');
       if (!el) return;
-      el.style.cssText = 'transition:opacity .5s ease;opacity:1;display:block;';
+      el.style.cssText = 'display:block;overflow:hidden;';
       var idx = 0;
-      el.textContent = phrases[idx];
-      setInterval(function() {
-        el.style.opacity = '0';
+
+      function showPhrase(text) {
+        /* Slide out */
+        el.style.animation = 'greetOut .38s cubic-bezier(.4,0,.6,1) forwards';
         setTimeout(function() {
-          idx = (idx + 1) % phrases.length;
-          el.textContent = phrases[idx];
-          el.style.opacity = '1';
-        }, 500);
-      }, 4000);
+          el.textContent = text;
+          /* Slide in */
+          el.style.animation = 'greetIn .45s cubic-bezier(.22,.68,0,1.2) forwards';
+        }, 380);
+      }
+
+      /* First phrase — just slide in, no out */
+      el.textContent = phrases[0];
+      el.style.animation = 'greetIn .55s cubic-bezier(.22,.68,0,1.2) forwards';
+
+      setInterval(function() {
+        idx = (idx + 1) % phrases.length;
+        showPhrase(phrases[idx]);
+      }, 4500);
     })();
 
     /* ── Logo spin: randomly pick 1 of 5 styles each page load ── */
