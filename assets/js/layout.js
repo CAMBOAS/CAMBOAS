@@ -7,23 +7,25 @@
   function setLang(l) { localStorage.setItem('cambo_lang', l); }
   function t(kh, en) { return getLang() === 'en' ? en : kh; }
 
-  /* ── Page titles (bilingual) ── */
-  const PAGE_META = {
-    'index.html':               { title: t('ផ្ទាំងគ្រប់គ្រង','Dashboard'),    subtitle: t('ទិដ្ឋភាពរួមនៃការលក់ ចំណូល និងសកម្មភាព','Overview of sales, revenue, and live activity') },
-    'pages/analytics.html':     { title: t('វិភាគទិន្នន័យ','Analytics'),       subtitle: t('វិភាគស៊ីជម្រៅលើអាជីវកម្មរបស់អ្នក','Deep dive into your business metrics') },
-    'pages/orders-details.html':{ title: t('Smart Orders','Smart Orders'),     subtitle: t('បង្កើតបញ្ជាទិញបានលឿន និងឆ្លាតវៃ','Create orders quickly and smartly') },
-    'pages/smart-mobile.html':  { title: t('Smart Mobile','Smart Mobile'),     subtitle: t('បញ្ចូលបញ្ជាទិញផ្តល់ជូនតាម Smartphone','Mobile-optimized order entry for smartphones') },
-    'pages/order-list.html':    { title: t('បញ្ជីបញ្ជាទិញ','Order List'),      subtitle: t('មើល និងគ្រប់គ្រងបញ្ជាទិញទាំងអស់','View and manage all orders in one place') },
-    'pages/new-order.html':     { title: t('បញ្ជាទិញថ្មី','New Order'),        subtitle: t('បង្កើតបញ្ជាទិញថ្មី','Create a new order') },
-    'pages/customers.html':     { title: t('អតិថិជន','Customers'),             subtitle: t('គ្រប់គ្រងបញ្ជីអតិថិជន','Manage your customer base') },
-    'pages/products.html':      { title: t('ផលិតផល','Products'),               subtitle: t('រក្សាទុក និងគ្រប់គ្រងផលិតផល','Browse and manage products') },
-    'pages/stock.html':         { title: t('ស្តុក','Stock'),                    subtitle: t('តាមដានស្តុក និងការផ្លាស់ប្ដូរ','Track inventory levels and stock movements') },
-    'pages/delivery.html':      { title: t('ដឹកជញ្ជូន','Delivery'),            subtitle: t('គ្រប់គ្រងការដឹកជញ្ជូន','Manage delivery and shipping') },
-    'pages/commission.html':    { title: t('កម្រៃជើងសារ','Commission'),         subtitle: t('កម្រៃអ្នកលក់ និងតារាងចំណាត់ថ្នាក់','Agent commission and leaderboard') },
-    'pages/packaging.html':     { title: t('វេចខ្ចប់','Packaging'),             subtitle: t('វេចខ្ចប់ និងរៀបចំការដឹកជញ្ជូន','Packaging and delivery preparation') },
-    'pages/settings.html':      { title: t('ការកំណត់','Settings'),              subtitle: t('រៀបចំ Workspace របស់អ្នក','Configure your workspace') },
-    'login.html':               { title: t('ចូលប្រើ','Login'),                  subtitle: '' },
-  };
+  /* ── Page titles (bilingual) — function so t() re-evaluates on each call ── */
+  function getPageMeta() {
+    return {
+      'index.html':               { title: t('ផ្ទាំងគ្រប់គ្រង','Dashboard'),    subtitle: t('ទិដ្ឋភាពរួមនៃការលក់ ចំណូល និងសកម្មភាព','Overview of sales, revenue, and live activity') },
+      'pages/analytics.html':     { title: t('វិភាគទិន្នន័យ','Analytics'),       subtitle: t('វិភាគស៊ីជម្រៅលើអាជីវកម្មរបស់អ្នក','Deep dive into your business metrics') },
+      'pages/orders-details.html':{ title: t('Smart Orders','Smart Orders'),     subtitle: t('បង្កើតបញ្ជាទិញបានលឿន និងឆ្លាតវៃ','Create orders quickly and smartly') },
+      'pages/smart-mobile.html':  { title: t('Smart Mobile','Smart Mobile'),     subtitle: t('បញ្ចូលបញ្ជាទិញផ្តល់ជូនតាម Smartphone','Mobile-optimized order entry for smartphones') },
+      'pages/order-list.html':    { title: t('បញ្ជីបញ្ជាទិញ','Order List'),      subtitle: t('មើល និងគ្រប់គ្រងបញ្ជាទិញទាំងអស់','View and manage all orders in one place') },
+      'pages/new-order.html':     { title: t('បញ្ជាទិញថ្មី','New Order'),        subtitle: t('បង្កើតបញ្ជាទិញថ្មី','Create a new order') },
+      'pages/customers.html':     { title: t('អតិថិជន','Customers'),             subtitle: t('គ្រប់គ្រងបញ្ជីអតិថិជន','Manage your customer base') },
+      'pages/products.html':      { title: t('ផលិតផល','Products'),               subtitle: t('រក្សាទុក និងគ្រប់គ្រងផលិតផល','Browse and manage products') },
+      'pages/stock.html':         { title: t('ស្តុក','Stock'),                    subtitle: t('តាមដានស្តុក និងការផ្លាស់ប្ដូរ','Track inventory levels and stock movements') },
+      'pages/delivery.html':      { title: t('ដឹកជញ្ជូន','Delivery'),            subtitle: t('គ្រប់គ្រងការដឹកជញ្ជូន','Manage delivery and shipping') },
+      'pages/commission.html':    { title: t('កម្រៃជើងសារ','Commission'),         subtitle: t('កម្រៃអ្នកលក់ និងតារាងចំណាត់ថ្នាក់','Agent commission and leaderboard') },
+      'pages/packaging.html':     { title: t('វេចខ្ចប់','Packaging'),             subtitle: t('វេចខ្ចប់ និងរៀបចំការដឹកជញ្ជូន','Packaging and delivery preparation') },
+      'pages/settings.html':      { title: t('ការកំណត់','Settings'),              subtitle: t('រៀបចំ Workspace របស់អ្នក','Configure your workspace') },
+      'login.html':               { title: t('ចូលប្រើ','Login'),                  subtitle: '' },
+    };
+  }
 
   /* ── Icons ── */
   const ic = {
@@ -136,7 +138,7 @@
   /* ── Build topbar HTML ── */
   function buildTopbar() {
     const cur  = getCurrentPage();
-    const meta = PAGE_META[cur] || { title:'CAMBO MINI', subtitle:'' };
+    const meta = getPageMeta()[cur] || { title:'CAMBO MINI', subtitle:'' };
     return `
       <div class="header-shell premium-header-shell">
         <div class="header-start">
@@ -240,46 +242,57 @@
       if (a.dataset.page === cur) a.classList.add('sb-active');
     });
 
-    /* Mobile sidebar */
-    const menuBtn = document.getElementById('mobileMenuBtn');
+    /* Sidebar overlay close */
     const overlay = document.querySelector('.sidebar-overlay');
     function openSidebar()  { document.body.classList.add('sidebar-open'); }
     function closeSidebar() { document.body.classList.remove('sidebar-open'); }
-    if (menuBtn) menuBtn.addEventListener('click', openSidebar);
     if (overlay) overlay.addEventListener('click', closeSidebar);
 
-    /* Notification panel */
-    const notifyBtn   = document.getElementById('notifyBtn');
-    const notifyPanel = document.getElementById('notifyPanel');
-    const clearBtn    = document.getElementById('clearAllBtn');
-    const markAllBtn  = document.getElementById('markAllReadBtn');
-
+    /* ── bindTopbar: rebind all topbar events after any rebuild ── */
     let _notifyOpen = false;
-    function openNotify()  { if (!notifyPanel) return; notifyPanel.hidden=false; _notifyOpen=true; renderNotes(); }
-    function closeNotify() { if (!notifyPanel) return; notifyPanel.hidden=true;  _notifyOpen=false; }
+    function bindTopbar() {
+      /* Mobile menu button */
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      if (menuBtn) { menuBtn.replaceWith(menuBtn.cloneNode(true)); }
+      const menuBtn2 = document.getElementById('mobileMenuBtn');
+      if (menuBtn2) menuBtn2.addEventListener('click', openSidebar);
 
-    if (notifyBtn) notifyBtn.addEventListener('click', e => { e.stopPropagation(); _notifyOpen ? closeNotify() : openNotify(); });
-    if (clearBtn)  clearBtn.addEventListener('click',  () => { saveNotes([]); renderNotes(); });
-    if (markAllBtn) markAllBtn.addEventListener('click', () => {
-      const arr = loadNotes().map(n => ({...n, read:true}));
-      saveNotes(arr); renderNotes();
-    });
+      /* Notification panel */
+      const notifyBtn   = document.getElementById('notifyBtn');
+      const notifyPanel = document.getElementById('notifyPanel');
+      const clearBtn    = document.getElementById('clearAllBtn');
+      const markAllBtn  = document.getElementById('markAllReadBtn');
 
-    document.querySelectorAll('.notify-tab').forEach(tab => {
-      tab.addEventListener('click', e => {
-        document.querySelectorAll('.notify-tab').forEach(t => t.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        _activeTab = e.currentTarget.dataset.tab;
-        renderNotes();
+      function openNotify()  { if (!notifyPanel) return; notifyPanel.hidden=false; _notifyOpen=true; renderNotes(); }
+      function closeNotify() { if (!notifyPanel) return; notifyPanel.hidden=true;  _notifyOpen=false; }
+
+      if (notifyBtn) notifyBtn.addEventListener('click', e => { e.stopPropagation(); _notifyOpen ? closeNotify() : openNotify(); });
+      if (clearBtn)  clearBtn.addEventListener('click',  () => { saveNotes([]); renderNotes(); });
+      if (markAllBtn) markAllBtn.addEventListener('click', () => {
+        const arr = loadNotes().map(n => ({...n, read:true}));
+        saveNotes(arr); renderNotes();
       });
-    });
+      document.querySelectorAll('.notify-tab').forEach(tab => {
+        tab.addEventListener('click', e => {
+          document.querySelectorAll('.notify-tab').forEach(t => t.classList.remove('active'));
+          e.currentTarget.classList.add('active');
+          _activeTab = e.currentTarget.dataset.tab;
+          renderNotes();
+        });
+      });
+    }
+    bindTopbar();
 
     document.addEventListener('click', e => {
-      if (_notifyOpen && notifyPanel && !notifyPanel.contains(e.target) && e.target !== notifyBtn)
-        closeNotify();
+      const notifyPanel = document.getElementById('notifyPanel');
+      const notifyBtn   = document.getElementById('notifyBtn');
+      if (_notifyOpen && notifyPanel && !notifyPanel.contains(e.target) && e.target !== notifyBtn) {
+        notifyPanel.hidden = true; _notifyOpen = false;
+      }
     });
-
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNotify(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { const p = document.getElementById('notifyPanel'); if(p) p.hidden=true; _notifyOpen=false; }
+    });
 
     /* ── Sidebar collapse ── */
     const _chevL = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
@@ -339,15 +352,17 @@
       if (!btn) return;
       btn.addEventListener('click', function() {
         setLang(getLang() === 'kh' ? 'en' : 'kh');
-        /* Rebuild full layout with new language */
+        /* Rebuild sidebar */
         if (sidebar) {
           sidebar.innerHTML = buildSidebar();
           bindThemeBtn();
           bindToggleBtn();
           applyCollapse(localStorage.getItem('sb_collapsed') === '1');
         }
-        if (topbar) {
-          topbar.innerHTML = buildTopbar();
+        /* Rebuild topbar + rebind all topbar events */
+        if (header) {
+          header.innerHTML = buildTopbar();
+          bindTopbar();
           bindLangBtn();
           startGreeting();
         }
