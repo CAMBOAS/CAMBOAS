@@ -226,6 +226,30 @@
 
       <!-- 1. KPI cards -->
       <div class="cm-kpi">
+        <!-- Total Sale -->
+        <article class="glass-card cm-kpi-card">
+          <div class="cm-kpi-icon" style="background:rgba(134,239,172,.12)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#86efac" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="cm-kpi-body">
+            <div class="cm-kpi-label">Total Sale</div>
+            <strong class="cm-kpi-val" id="sTotalSale" style="color:#86efac">$0</strong>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" style="width:100%;background:#86efac"></div></div>
+            <div class="cm-kpi-sub" id="sTotalSaleSub" style="margin-top:5px;color:#86efac">revenue this period</div>
+          </div>
+        </article>
+        <!-- Total Orders -->
+        <article class="glass-card cm-kpi-card">
+          <div class="cm-kpi-icon" style="background:rgba(125,211,252,.12)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div class="cm-kpi-body">
+            <div class="cm-kpi-label">Total Orders</div>
+            <strong class="cm-kpi-val" id="sTotalOrders" style="color:#7dd3fc">0</strong>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" style="width:100%;background:#7dd3fc"></div></div>
+            <div class="cm-kpi-sub" id="sTotalOrdersSub" style="margin-top:5px;color:#7dd3fc">orders this period</div>
+          </div>
+        </article>
         <!-- Total Commission -->
         <article class="glass-card cm-kpi-card">
           <div class="cm-kpi-icon" style="background:rgba(139,92,246,.15)">
@@ -234,44 +258,20 @@
           <div class="cm-kpi-body">
             <div class="cm-kpi-label">Total Commission</div>
             <strong class="cm-kpi-val" id="sTot">0 ៛</strong>
-            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" id="sTotBar" style="width:100%;background:linear-gradient(90deg,#8b5cf6,#06b6d4)"></div></div>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" style="width:100%;background:linear-gradient(90deg,#8b5cf6,#06b6d4)"></div></div>
             <div class="cm-kpi-sub" id="sTotSub" style="margin-top:5px">—</div>
-          </div>
-        </article>
-        <!-- Total Orders -->
-        <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-icon" style="background:rgba(134,239,172,.12)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#86efac" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          </div>
-          <div class="cm-kpi-body">
-            <div class="cm-kpi-label">Total Orders</div>
-            <strong class="cm-kpi-val" id="sTotalOrders" style="color:#86efac">0</strong>
-            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" id="sTotalOrdersBar" style="width:100%;background:#86efac"></div></div>
-            <div class="cm-kpi-sub" id="sTotalOrdersSub" style="margin-top:5px;color:#86efac">orders this period</div>
-          </div>
-        </article>
-        <!-- Total Items -->
-        <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-icon" style="background:rgba(253,230,138,.1)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fde68a" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          </div>
-          <div class="cm-kpi-body">
-            <div class="cm-kpi-label">Total Items</div>
-            <strong class="cm-kpi-val" id="sTotalItems" style="color:#fde68a">0</strong>
-            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" id="sTotalItemsBar" style="width:100%;background:#fde68a"></div></div>
-            <div class="cm-kpi-sub" id="sTotalItemsSub" style="margin-top:5px;color:#fde68a">items sold</div>
           </div>
         </article>
         <!-- Active CloseBy -->
         <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-icon" style="background:rgba(125,211,252,.1)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <div class="cm-kpi-icon" style="background:rgba(253,230,138,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fde68a" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
           <div class="cm-kpi-body">
             <div class="cm-kpi-label">Active CloseBy</div>
-            <strong class="cm-kpi-val" id="sAg" style="color:#7dd3fc">0</strong>
-            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" id="sAgBar" style="width:100%;background:#7dd3fc"></div></div>
-            <div class="cm-kpi-sub" id="sAgSub" style="margin-top:5px;color:#7dd3fc">agents active</div>
+            <strong class="cm-kpi-val" id="sAg" style="color:#fde68a">0</strong>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" style="width:100%;background:#fde68a"></div></div>
+            <div class="cm-kpi-sub" id="sAgSub" style="margin-top:5px;color:#fde68a">agents active</div>
           </div>
         </article>
       </div>
@@ -649,16 +649,16 @@
     var tot    = _agents.reduce(function(s,a){return s+calcComm(a);},0);
     var agCnt  = _agents.length;
     var ordCnt = _filtered.length;
-    var itmCnt = _agents.reduce(function(s,a){return s+agentItems(a);},0);
+    var sales  = _filtered.reduce(function(s,o){return s+total(o);},0);
 
+    document.getElementById('sTotalSale').textContent    = '$'+$m(sales);
+    document.getElementById('sTotalSaleSub').textContent = ordCnt+' orders · '+agCnt+' agents';
+    document.getElementById('sTotalOrders').textContent  = ordCnt.toLocaleString();
+    document.getElementById('sTotalOrdersSub').textContent = ordCnt.toLocaleString()+' orders this period';
     document.getElementById('sTot').textContent          = tot.toLocaleString()+'៛';
     document.getElementById('sTotSub').textContent       = agCnt+' agents · '+ordCnt+' orders';
-    document.getElementById('sTotalOrders').textContent  = ordCnt.toLocaleString();
-    document.getElementById('sTotalOrdersSub').textContent = ordCnt === 1 ? '1 order this period' : ordCnt.toLocaleString()+' orders this period';
-    document.getElementById('sTotalItems').textContent   = itmCnt.toLocaleString();
-    document.getElementById('sTotalItemsSub').textContent= itmCnt.toLocaleString()+' items sold';
-    document.getElementById('sAg').textContent          = agCnt;
-    document.getElementById('sAgSub').textContent       = agCnt === 1 ? '1 agent active' : agCnt+' agents active';
+    document.getElementById('sAg').textContent           = agCnt;
+    document.getElementById('sAgSub').textContent        = agCnt === 1 ? '1 agent active' : agCnt+' agents active';
   }
 
   /* ══ TOP CLOSEBY ══ */
