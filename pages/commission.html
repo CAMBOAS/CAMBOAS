@@ -737,40 +737,54 @@
     if(el) el.textContent='📅 '+(labels[_mode]||_mode)+' · '+totalOrders+' orders';
   }
 
-  /* ══ EXPORT PDF (browser print — full Khmer support) ══ */
-  var _pdfStyle='@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;600;700;800&display=swap");'
-    +'*{margin:0;padding:0;box-sizing:border-box}'
-    +'body{font-family:"Noto Sans Khmer",sans-serif;padding:28px 32px;color:#1e293b;font-size:13px;line-height:1.6}'
-    +'.pdf-header{margin-bottom:18px;border-bottom:2px solid #7c3aed;padding-bottom:12px}'
-    +'.pdf-header h1{font-size:20px;font-weight:800;color:#1e293b;margin-bottom:3px}'
-    +'.pdf-header p{font-size:11px;color:#64748b}'
-    +'.pdf-info{display:flex;gap:16px;flex-wrap:wrap;background:#f8f6ff;border:1px solid #e9d5ff;border-radius:8px;padding:10px 14px;margin-bottom:16px}'
-    +'.pdf-info span{font-size:11px;color:#64748b} .pdf-info b{color:#1e293b}'
-    +'table{width:100%;border-collapse:collapse;font-size:12px}'
-    +'thead th{background:#7c3aed;color:#fff;padding:9px 12px;text-align:left;font-weight:700;font-size:11px}'
-    +'tbody td{padding:8px 12px;border-bottom:1px solid #e2e8f0;vertical-align:middle}'
+  /* ══ EXPORT PDF (html2pdf.js — direct download, full Khmer support) ══ */
+  var _pdfCSS='*{box-sizing:border-box;margin:0;padding:0}'
+    +'body{font-family:"Noto Sans Khmer",sans-serif;color:#1e293b;font-size:12px;line-height:1.7;padding:20px}'
+    +'.pdf-header{border-bottom:3px solid #7c3aed;padding-bottom:10px;margin-bottom:14px}'
+    +'.pdf-header h1{font-size:18px;font-weight:800;color:#1e293b;margin-bottom:2px}'
+    +'.pdf-header p{font-size:10px;color:#64748b}'
+    +'.pdf-info{display:flex;gap:20px;flex-wrap:wrap;background:#f8f6ff;border:1px solid #e9d5ff;border-radius:6px;padding:8px 12px;margin-bottom:14px}'
+    +'.pdf-info span{font-size:10px;color:#64748b}'
+    +'.pdf-info b{color:#1e293b;font-weight:700}'
+    +'table{width:100%;border-collapse:collapse}'
+    +'thead th{background:#7c3aed;color:#fff;padding:7px 10px;text-align:left;font-size:10px;font-weight:700}'
+    +'tbody td{padding:7px 10px;border-bottom:1px solid #e2e8f0;font-size:11px}'
     +'tbody tr:nth-child(even) td{background:#f8f6ff}'
     +'.num{text-align:right} .comm{color:#7c3aed;font-weight:700} .sale{color:#16a34a;font-weight:700}'
-    +'.footer{margin-top:20px;font-size:10px;color:#94a3b8;text-align:right}'
-    +'@media print{body{padding:16px}@page{margin:14mm}}';
+    +'.footer{margin-top:16px;font-size:9px;color:#94a3b8;text-align:right;border-top:1px solid #e2e8f0;padding-top:8px}';
 
-  function _openPrint(title,bodyHtml){
-    var win=window.open('','_blank','width=900,height=700');
-    if(!win){macUI&&macUI.toast('ប្រព័ន្ធ block popup — សូម allow popup','warning');return;}
-    var period=document.getElementById('dateBtnLabel').textContent;
+  function _buildPdfEl(bodyHtml){
+    var wrap=document.createElement('div');
+    wrap.style.cssText='position:fixed;left:-9999px;top:0;width:794px;background:#fff;padding:0';
     var stamp=new Date().toLocaleDateString('km-KH',{year:'numeric',month:'long',day:'numeric'});
-    win.document.write('<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8"><title>'+title+'</title>'
-      +'<style>'+_pdfStyle+'</style></head><body>'
-      +bodyHtml
-      +'<div class="footer">CAMBO MINI · Commission Report · '+stamp+'</div>'
-      +'</body></html>');
-    win.document.close();
-    win.onload=function(){setTimeout(function(){win.print();},400);};
-    macUI&&macUI.toast('PDF រួចរាល់ — ជ្រើស "Save as PDF" ✓','success');
+    wrap.innerHTML='<style>'+_pdfCSS+'</style><body style="padding:20px">'+bodyHtml
+      +'<div class="footer">CAMBO MINI · Commission Report · '+stamp+'</div></body>';
+    document.body.appendChild(wrap);
+    return wrap;
+  }
+
+  function _doDownload(el,filename){
+    var btn=document.getElementById('pdfBtn');
+    if(btn){btn.disabled=true;btn.style.opacity='.6';}
+    macUI&&macUI.toast('កំពុង generate PDF...','info');
+    var opt={margin:8,filename:filename+'.pdf',image:{type:'jpeg',quality:0.98},
+      html2canvas:{scale:2,useCORS:true,allowTaint:true,logging:false},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}};
+    html2pdf().set(opt).from(el.querySelector('body')||el).save().then(function(){
+      document.body.removeChild(el);
+      if(btn){btn.disabled=false;btn.style.opacity='';}
+      macUI&&macUI.toast('ទាញយក PDF រួចរាល់! ✓','success');
+    }).catch(function(){
+      document.body.removeChild(el);
+      if(btn){btn.disabled=false;btn.style.opacity='';}
+      macUI&&macUI.toast('មានបញ្ហា — សូមព្យាយាមម្ដងទៀត','error');
+    });
   }
 
   window.exportPDF=function(){
+    if(!window.html2pdf){macUI&&macUI.toast('Library loading... ព្យាយាមម្ដងទៀត','warning');return;}
     var period=document.getElementById('dateBtnLabel').textContent;
+    var today=new Date().toISOString().slice(0,10);
 
     if(_view==='agents'){
       if(!_agents.length){macUI&&macUI.toast('គ្មានទិន្នន័យ','warning');return;}
@@ -778,55 +792,45 @@
       var totalComm=_agents.reduce(function(s,a){return s+calcComm(a);},0);
       var rows=_agents.map(function(a,i){
         var sales=a.orders.reduce(function(s,o){return s+total(o);},0);
-        return '<tr>'
-          +'<td>'+(i+1)+'</td>'
-          +'<td><b>'+a.name+'</b></td>'
-          +'<td class="num">'+a.orders.length+'</td>'
-          +'<td class="num">'+agentItems(a)+'</td>'
+        return'<tr><td>'+(i+1)+'</td><td><b>'+a.name+'</b></td>'
+          +'<td class="num">'+a.orders.length+'</td><td class="num">'+agentItems(a)+'</td>'
           +'<td class="num sale">$'+$m(sales)+'</td>'
           +'<td class="num">'+(a.rate||0)+'៛</td>'
-          +'<td class="num comm">'+calcComm(a).toLocaleString()+'៛</td>'
-          +'</tr>';
+          +'<td class="num comm">'+calcComm(a).toLocaleString()+'៛</td></tr>';
       }).join('');
-      _openPrint('Commission Report — '+period,
-        '<div class="pdf-header"><h1>របាយការណ៍ Commission</h1><p>ช่วงเวลา: '+period+'</p></div>'
-        +'<div class="pdf-info">'
-        +'<span>Agents: <b>'+_agents.length+'</b></span>'
+      var el=_buildPdfEl(
+        '<div class="pdf-header"><h1>របាយការណ៍ Commission</h1><p>'+period+'</p></div>'
+        +'<div class="pdf-info"><span>Agents: <b>'+_agents.length+'</b></span>'
         +'<span>Orders: <b>'+_filtered.length+'</b></span>'
         +'<span>Total Sale: <b>$'+$m(totalSales)+'</b></span>'
-        +'<span>Total Commission: <b>'+totalComm.toLocaleString()+'៛</b></span>'
-        +'</div>'
+        +'<span>Commission: <b>'+totalComm.toLocaleString()+'៛</b></span></div>'
         +'<table><thead><tr><th>#</th><th>CloseBy</th><th>Orders</th><th>Items</th><th>Sales</th><th>Rate</th><th>Commission</th></tr></thead>'
         +'<tbody>'+rows+'</tbody></table>');
+      _doDownload(el,'commission_'+period+'_'+today);
 
-    } else if(_view==='orders'){
+    }else if(_view==='orders'){
       var name=decodeURIComponent(_selAgent||'');
       var ag=_agents.find(function(a){return a.name===name;});
       if(!ag){macUI&&macUI.toast('រកមិនឃើញ','warning');return;}
       var rows=ag.orders.map(function(o,i){
         var prods=Array.isArray(o.products)?o.products:[];
         var qty=prods.reduce(function(s,p){return s+(+p.qty||1);},0);
-        return '<tr>'
-          +'<td>'+(i+1)+'</td>'
-          +'<td><b>'+(o.customer||'Unknown')+'</b></td>'
-          +'<td>'+fmtD(o)+'</td>'
-          +'<td class="num">'+qty+'</td>'
+        return'<tr><td>'+(i+1)+'</td><td><b>'+(o.customer||'Unknown')+'</b></td>'
+          +'<td>'+fmtD(o)+'</td><td class="num">'+qty+'</td>'
           +'<td class="num sale">$'+$m(total(o))+'</td>'
           +'<td>'+(o.payment||'—')+'</td>'
-          +'<td>'+(o.receiptNo?'#'+o.receiptNo:'—')+'</td>'
-          +'</tr>';
+          +'<td>'+(o.receiptNo?'#'+o.receiptNo:'—')+'</td></tr>';
       }).join('');
-      _openPrint('Orders — '+name,
-        '<div class="pdf-header"><h1>Orders — '+name+'</h1><p>ช่วงเวลา: '+period+'</p></div>'
-        +'<div class="pdf-info">'
-        +'<span>Orders: <b>'+ag.orders.length+'</b></span>'
+      var el=_buildPdfEl(
+        '<div class="pdf-header"><h1>Orders — '+name+'</h1><p>'+period+'</p></div>'
+        +'<div class="pdf-info"><span>Orders: <b>'+ag.orders.length+'</b></span>'
         +'<span>Items: <b>'+agentItems(ag)+'</b></span>'
-        +'<span>Commission: <b class="comm">'+calcComm(ag).toLocaleString()+'៛</b></span>'
-        +'</div>'
+        +'<span>Commission: <b class="comm">'+calcComm(ag).toLocaleString()+'៛</b></span></div>'
         +'<table><thead><tr><th>#</th><th>អតិថិជន</th><th>កាលបរិច្ឆេទ</th><th>Items</th><th>សរុប</th><th>Payment</th><th>Receipt</th></tr></thead>'
         +'<tbody>'+rows+'</tbody></table>');
+      _doDownload(el,'orders_'+name+'_'+today);
 
-    } else if(_view==='products'){
+    }else if(_view==='products'){
       var name=decodeURIComponent(_selAgent||'');
       var ag=_agents.find(function(a){return a.name===name;});
       var ord=ag&&ag.orders[_selOrder];
@@ -834,18 +838,13 @@
       var prods=Array.isArray(ord.products)?ord.products:[];
       var rows=prods.map(function(p,i){
         var sub=((+p.qty||1)*(+p.price||0))-(+p.discount||0);
-        return '<tr>'
-          +'<td>'+(i+1)+'</td>'
-          +'<td><b>'+(p.name||p.product||'—')+'</b></td>'
-          +'<td class="num">'+(+p.qty||1)+'</td>'
-          +'<td class="num">$'+(+p.price||0)+'</td>'
-          +'<td class="num sale">$'+$m(sub)+'</td>'
-          +'</tr>';
+        return'<tr><td>'+(i+1)+'</td><td><b>'+(p.name||p.product||'—')+'</b></td>'
+          +'<td class="num">'+(+p.qty||1)+'</td><td class="num">$'+(+p.price||0)+'</td>'
+          +'<td class="num sale">$'+$m(sub)+'</td></tr>';
       }).join('');
-      _openPrint('Order — '+(ord.customer||'Order'),
+      var el=_buildPdfEl(
         '<div class="pdf-header"><h1>Order Detail</h1><p>CloseBy: '+name+'</p></div>'
-        +'<div class="pdf-info">'
-        +'<span>អតិថិជន: <b>'+(ord.customer||'—')+'</b></span>'
+        +'<div class="pdf-info"><span>អតិថិជន: <b>'+(ord.customer||'—')+'</b></span>'
         +'<span>កាលបរិច្ឆេទ: <b>'+fmtD(ord)+'</b></span>'
         +'<span>សរុប: <b class="sale">$'+$m(total(ord))+'</b></span>'
         +(ord.payment?'<span>Payment: <b>'+ord.payment+'</b></span>':'')
@@ -853,6 +852,7 @@
         +'</div>'
         +'<table><thead><tr><th>#</th><th>ផលិតផល</th><th>Qty</th><th>តម្លៃ</th><th>សរុប</th></tr></thead>'
         +'<tbody>'+rows+'</tbody></table>');
+      _doDownload(el,'order_'+(ord.customer||'order')+'_'+today);
     }
   };
 
@@ -886,6 +886,7 @@
   });
 })();
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="../assets/js/sw-register.js"></script>
 
 <!-- Floating date filter menu (attached to body to avoid clipping) -->
