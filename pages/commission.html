@@ -46,9 +46,34 @@
   .cm-kpi-body{flex:1;min-width:0}
   .cm-kpi-label{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
   .cm-kpi-val{font-size:20px;font-weight:800;color:var(--text);display:block;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .cm-kpi-sub{font-size:10px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:5px}
+  .cm-kpi-sub{font-size:10px;font-weight:600;display:flex;align-items:center;gap:5px}
   .cm-kpi-bar{height:4px;border-radius:99px;background:rgba(148,163,200,.12);overflow:hidden;margin-top:6px}
   .cm-kpi-bar-fill{height:100%;border-radius:99px;transition:width .5s ease}
+  /* KPI color tokens — dark mode uses lighter, light mode uses darker */
+  .kpi-green .cm-kpi-val{color:#16a34a}
+  .kpi-green .cm-kpi-sub{color:#15803d}
+  .kpi-green .cm-kpi-bar-fill{background:#16a34a}
+  [data-theme="dark"] .kpi-green .cm-kpi-val{color:#4ade80}
+  [data-theme="dark"] .kpi-green .cm-kpi-sub{color:#86efac}
+  [data-theme="dark"] .kpi-green .cm-kpi-bar-fill{background:#4ade80}
+  .kpi-blue .cm-kpi-val{color:#2563eb}
+  .kpi-blue .cm-kpi-sub{color:#1d4ed8}
+  .kpi-blue .cm-kpi-bar-fill{background:#2563eb}
+  [data-theme="dark"] .kpi-blue .cm-kpi-val{color:#60a5fa}
+  [data-theme="dark"] .kpi-blue .cm-kpi-sub{color:#93c5fd}
+  [data-theme="dark"] .kpi-blue .cm-kpi-bar-fill{background:#60a5fa}
+  .kpi-purple .cm-kpi-val{color:#7c3aed}
+  .kpi-purple .cm-kpi-sub{color:#6d28d9}
+  .kpi-purple .cm-kpi-bar-fill{background:linear-gradient(90deg,#7c3aed,#0891b2)}
+  [data-theme="dark"] .kpi-purple .cm-kpi-val{color:#c4b5fd}
+  [data-theme="dark"] .kpi-purple .cm-kpi-sub{color:#a78bfa}
+  [data-theme="dark"] .kpi-purple .cm-kpi-bar-fill{background:linear-gradient(90deg,#8b5cf6,#06b6d4)}
+  .kpi-amber .cm-kpi-val{color:#b45309}
+  .kpi-amber .cm-kpi-sub{color:#92400e}
+  .kpi-amber .cm-kpi-bar-fill{background:#b45309}
+  [data-theme="dark"] .kpi-amber .cm-kpi-val{color:#fcd34d}
+  [data-theme="dark"] .kpi-amber .cm-kpi-sub{color:#fde68a}
+  [data-theme="dark"] .kpi-amber .cm-kpi-bar-fill{background:#fcd34d}
 
   /* ── Ctrl bar ── */
   .cm-ctrl-bar{padding:14px 18px;border-radius:18px;display:flex;flex-direction:column;gap:10px}
@@ -227,51 +252,51 @@
       <!-- 1. KPI cards -->
       <div class="cm-kpi">
         <!-- Total Sale -->
-        <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-icon" style="background:rgba(134,239,172,.12)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#86efac" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <article class="glass-card cm-kpi-card kpi-green">
+          <div class="cm-kpi-icon" style="background:rgba(22,163,74,.12)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           </div>
           <div class="cm-kpi-body">
             <div class="cm-kpi-label">Total Sale</div>
-            <strong class="cm-kpi-val" id="sTotalSale" style="color:#86efac">$0</strong>
-            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" style="width:100%;background:#86efac"></div></div>
-            <div class="cm-kpi-sub" id="sTotalSaleSub" style="margin-top:5px;color:#86efac">revenue this period</div>
+            <strong class="cm-kpi-val" id="sTotalSale">$0</strong>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill"></div></div>
+            <div class="cm-kpi-sub" id="sTotalSaleSub" style="margin-top:5px">revenue this period</div>
           </div>
         </article>
         <!-- Total Orders -->
-        <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-icon" style="background:rgba(125,211,252,.12)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <article class="glass-card cm-kpi-card kpi-blue">
+          <div class="cm-kpi-icon" style="background:rgba(37,99,235,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           </div>
           <div class="cm-kpi-body">
             <div class="cm-kpi-label">Total Orders</div>
-            <strong class="cm-kpi-val" id="sTotalOrders" style="color:#7dd3fc">0</strong>
-            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" style="width:100%;background:#7dd3fc"></div></div>
-            <div class="cm-kpi-sub" id="sTotalOrdersSub" style="margin-top:5px;color:#7dd3fc">orders this period</div>
+            <strong class="cm-kpi-val" id="sTotalOrders">0</strong>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill"></div></div>
+            <div class="cm-kpi-sub" id="sTotalOrdersSub" style="margin-top:5px">orders this period</div>
           </div>
         </article>
         <!-- Total Commission -->
-        <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-icon" style="background:rgba(139,92,246,.15)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v2m0 8v2M9 9.5A2.5 2.5 0 0 1 12 7.5h1a2.5 2.5 0 0 1 0 5h-2a2.5 2.5 0 0 0 0 5h1a2.5 2.5 0 0 0 2.5-2.5"/></svg>
+        <article class="glass-card cm-kpi-card kpi-purple">
+          <div class="cm-kpi-icon" style="background:rgba(124,58,237,.12)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v2m0 8v2M9 9.5A2.5 2.5 0 0 1 12 7.5h1a2.5 2.5 0 0 1 0 5h-2a2.5 2.5 0 0 0 0 5h1a2.5 2.5 0 0 0 2.5-2.5"/></svg>
           </div>
           <div class="cm-kpi-body">
             <div class="cm-kpi-label">Total Commission</div>
             <strong class="cm-kpi-val" id="sTot">0 ៛</strong>
-            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" style="width:100%;background:linear-gradient(90deg,#8b5cf6,#06b6d4)"></div></div>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill"></div></div>
             <div class="cm-kpi-sub" id="sTotSub" style="margin-top:5px">—</div>
           </div>
         </article>
         <!-- Active CloseBy -->
-        <article class="glass-card cm-kpi-card">
-          <div class="cm-kpi-icon" style="background:rgba(253,230,138,.1)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fde68a" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <article class="glass-card cm-kpi-card kpi-amber">
+          <div class="cm-kpi-icon" style="background:rgba(180,83,9,.1)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </div>
           <div class="cm-kpi-body">
             <div class="cm-kpi-label">Active CloseBy</div>
-            <strong class="cm-kpi-val" id="sAg" style="color:#fde68a">0</strong>
-            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill" style="width:100%;background:#fde68a"></div></div>
-            <div class="cm-kpi-sub" id="sAgSub" style="margin-top:5px;color:#fde68a">agents active</div>
+            <strong class="cm-kpi-val" id="sAg">0</strong>
+            <div class="cm-kpi-bar"><div class="cm-kpi-bar-fill"></div></div>
+            <div class="cm-kpi-sub" id="sAgSub" style="margin-top:5px">agents active</div>
           </div>
         </article>
       </div>
