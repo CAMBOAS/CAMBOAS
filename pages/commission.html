@@ -55,9 +55,8 @@
   .cm-ctrl-top{display:flex;align-items:center;gap:8px}
   .cm-ctrl-spacer{flex:1;min-width:0}
   .cm-ctrl-div{height:1px;background:var(--line)}
-  .cm-ctrl-row2{display:flex;align-items:center;gap:8px}
-  .cm-ctrl-rate-group{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
-  .cm-ctrl-rate-full{width:100%;box-sizing:border-box}
+  .cm-ctrl-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .cm-ctrl-rate-group{display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
   [data-theme="light"] .cm-ctrl-rate-group{background:rgba(0,0,0,.03)}
   .cm-ctrl-rate-lbl{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
   .cm-ctrl-rate-inp-wrap{display:flex;align-items:center;gap:4px}
@@ -304,27 +303,23 @@
         </div>
         <!-- Divider -->
         <div class="cm-ctrl-div"></div>
-        <!-- Row 2: mode + csv on same line -->
-        <div class="cm-ctrl-row2">
+        <!-- Row 2: mode + rate + apply + csv — all in one row -->
+        <div class="cm-ctrl-tools">
           <div class="cm-mode-group">
             <button class="cm-mode-btn active" id="modeOrders" onclick="setCalcMode('orders')">Orders</button>
             <button class="cm-mode-btn" id="modeItems" onclick="setCalcMode('items')">Items</button>
+          </div>
+          <div class="cm-ctrl-rate-group">
+            <span class="cm-ctrl-rate-lbl" id="rateLabel">Rate / Order</span>
+            <input type="number" id="defRate" class="cm-rate-inp" value="200" min="0" step="50">
+            <span class="cm-ctrl-rate-unit">៛</span>
+            <button class="cm-apply" onclick="applyDefRate()">Apply</button>
           </div>
           <span class="cm-ctrl-spacer"></span>
           <button class="cm-export" onclick="exportCommCSV()">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             CSV
           </button>
-        </div>
-        <!-- Row 3: rate group full width on mobile -->
-        <div class="cm-ctrl-rate-group cm-ctrl-rate-full">
-          <span class="cm-ctrl-rate-lbl" id="rateLabel">Rate / Order</span>
-          <span class="cm-ctrl-spacer"></span>
-          <div class="cm-ctrl-rate-inp-wrap">
-            <input type="number" id="defRate" class="cm-rate-inp" value="200" min="0" step="50">
-            <span class="cm-ctrl-rate-unit">៛</span>
-          </div>
-          <button class="cm-apply" onclick="applyDefRate()">Apply</button>
         </div>
       </section>
 
