@@ -325,6 +325,24 @@
     applyCollapse(localStorage.getItem('sb_collapsed') === '1');
     bindToggleBtn();
 
+    /* ── Logo spin: randomly pick 1 of 5 styles each page load ── */
+    (function() {
+      var styles = [
+        { name: 'logo-spin-steady',    dur: '9s',  timing: 'linear' },
+        { name: 'logo-spin-pulse',     dur: '7s',  timing: 'ease-in-out' },
+        { name: 'logo-spin-wobble',    dur: '6s',  timing: 'ease-in-out' },
+        { name: 'logo-spin-bounce',    dur: '5s',  timing: 'ease-in-out' },
+        { name: 'logo-spin-heartbeat', dur: '4s',  timing: 'ease-in-out' },
+      ];
+      var s = styles[Math.floor(Math.random() * styles.length)];
+      var img = document.querySelector('.sb-logo img');
+      if (img) {
+        img.style.animationName           = s.name;
+        img.style.animationDuration       = s.dur;
+        img.style.animationTimingFunction = s.timing;
+      }
+    })();
+
     /* Scroll FABs */
     const scrollUp   = document.getElementById('scrollFabUp');
     const scrollDown = document.getElementById('scrollFabDown');
