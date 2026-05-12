@@ -381,7 +381,7 @@
       setInterval(function() {
         idx = (idx + 1) % phrases.length;
         showPhrase(phrases[idx]);
-      }, 4500);
+      }, 10000);
     })();
 
     /* ── Logo spin: randomly pick 1 of 5 styles each page load ── */
