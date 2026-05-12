@@ -151,9 +151,7 @@
         </div>
         <div class="header-actions">
           <button class="lang-toggle-btn" id="langToggleBtn" title="Switch Language">
-            <span class="${getLang()==='en'?'lang-active':''}">EN</span>
-            <span class="lang-sep">|</span>
-            <span class="${getLang()==='kh'?'lang-active':''}">KH</span>
+            ${getLang() === 'en' ? 'EN' : 'KH'}
           </button>
           <div class="notify-wrap" style="position:relative">
             <button class="notify-btn" id="notifyBtn" aria-label="Notifications">
