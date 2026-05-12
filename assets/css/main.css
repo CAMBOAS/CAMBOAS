@@ -486,20 +486,20 @@ body.sb-collapsed .shared-topbar { left: var(--sb-w-col); }
 @media (max-width: 980px) {
   .sidebar {
     transform: translateX(-100%);
-    width: 100%;
+    width: min(280px, 82vw);
     box-shadow: none;
     transition: transform .28s cubic-bezier(.4,0,.2,1);
+    z-index: 9999 !important;
   }
+  .sidebar-overlay { z-index: 9990 !important; }
   body.sidebar-open .sidebar {
     transform: translateX(0);
-    box-shadow: none;
+    box-shadow: 8px 0 32px rgba(0,0,0,.28);
   }
-  /* Hide overlay (sidebar is already full-width) */
-  body.sidebar-open .sidebar-overlay { display: none !important; }
-  /* Hide topbar when sidebar is open */
+  /* Topbar stays — sidebar z-index 9999 covers it */
   body.sidebar-open .shared-topbar {
-    transform: translateY(-115%);
-    opacity: 0;
+    transform: none;
+    opacity: 1;
     pointer-events: none;
   }
   .main-content { margin-left:0; width:100%; padding:16px 14px 28px; padding-top: var(--topbar-offset, 72px); }
