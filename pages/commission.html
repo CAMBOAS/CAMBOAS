@@ -738,47 +738,61 @@
   }
 
   /* ══ EXPORT PDF (html2pdf.js — direct download, full Khmer support) ══ */
-  var _pdfCSS='*{box-sizing:border-box;margin:0;padding:0}'
-    +'body{font-family:"Noto Sans Khmer",sans-serif;color:#1e293b;font-size:12px;line-height:1.7;padding:20px}'
-    +'.pdf-header{border-bottom:3px solid #7c3aed;padding-bottom:10px;margin-bottom:14px}'
-    +'.pdf-header h1{font-size:18px;font-weight:800;color:#1e293b;margin-bottom:2px}'
-    +'.pdf-header p{font-size:10px;color:#64748b}'
-    +'.pdf-info{display:flex;gap:20px;flex-wrap:wrap;background:#f8f6ff;border:1px solid #e9d5ff;border-radius:6px;padding:8px 12px;margin-bottom:14px}'
-    +'.pdf-info span{font-size:10px;color:#64748b}'
-    +'.pdf-info b{color:#1e293b;font-weight:700}'
-    +'table{width:100%;border-collapse:collapse}'
-    +'thead th{background:#7c3aed;color:#fff;padding:7px 10px;text-align:left;font-size:10px;font-weight:700}'
-    +'tbody td{padding:7px 10px;border-bottom:1px solid #e2e8f0;font-size:11px}'
-    +'tbody tr:nth-child(even) td{background:#f8f6ff}'
-    +'.num{text-align:right} .comm{color:#7c3aed;font-weight:700} .sale{color:#16a34a;font-weight:700}'
-    +'.footer{margin-top:16px;font-size:9px;color:#94a3b8;text-align:right;border-top:1px solid #e2e8f0;padding-top:8px}';
-
-  function _buildPdfEl(bodyHtml){
-    var wrap=document.createElement('div');
-    wrap.style.cssText='position:fixed;left:-9999px;top:0;width:794px;background:#fff;padding:0';
-    var stamp=new Date().toLocaleDateString('km-KH',{year:'numeric',month:'long',day:'numeric'});
-    wrap.innerHTML='<style>'+_pdfCSS+'</style><body style="padding:20px">'+bodyHtml
-      +'<div class="footer">CAMBO MINI · Commission Report · '+stamp+'</div></body>';
-    document.body.appendChild(wrap);
-    return wrap;
-  }
-
-  function _doDownload(el,filename){
+  /* PDF helper */
+  function _doDownload(contentHtml, filename){
     var btn=document.getElementById('pdfBtn');
+    var stamp=new Date().toLocaleDateString('km-KH',{year:'numeric',month:'long',day:'numeric'});
+
+    /* ── overlay visible ── */
+    var overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99998;display:flex;align-items:center;justify-content:center';
+
+    var box=document.createElement('div');
+    box.style.cssText='background:#fff;border-radius:12px;padding:28px 32px;width:794px;max-width:95vw;max-height:90vh;overflow:auto;font-family:"Noto Sans Khmer",sans-serif;font-size:12px;color:#1e293b;line-height:1.7';
+    box.innerHTML=
+      '<style>'
+      +'*{box-sizing:border-box} table{width:100%;border-collapse:collapse}'
+      +'.pdf-header{border-bottom:3px solid #7c3aed;padding-bottom:10px;margin-bottom:14px}'
+      +'.pdf-header h1{font-size:18px;font-weight:800;margin-bottom:2px}'
+      +'.pdf-header p{font-size:10px;color:#64748b}'
+      +'.pdf-info{display:flex;gap:16px;flex-wrap:wrap;background:#f8f6ff;border:1px solid #e9d5ff;border-radius:6px;padding:8px 12px;margin-bottom:14px}'
+      +'.pdf-info span{font-size:10px;color:#64748b} .pdf-info b{color:#1e293b;font-weight:700}'
+      +'thead th{background:#7c3aed;color:#fff;padding:7px 10px;text-align:left;font-size:10px;font-weight:700}'
+      +'tbody td{padding:7px 10px;border-bottom:1px solid #e2e8f0;font-size:11px;vertical-align:middle}'
+      +'tbody tr:nth-child(even) td{background:#f8f6ff}'
+      +'.num{text-align:right} .comm{color:#7c3aed;font-weight:700} .sale{color:#16a34a;font-weight:700}'
+      +'.footer{margin-top:16px;font-size:9px;color:#94a3b8;text-align:right;border-top:1px solid #e2e8f0;padding-top:8px}'
+      +'</style>'
+      +contentHtml
+      +'<div class="footer">CAMBO MINI · Commission Report · '+stamp+'</div>';
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
     if(btn){btn.disabled=true;btn.style.opacity='.6';}
     macUI&&macUI.toast('កំពុង generate PDF...','info');
-    var opt={margin:8,filename:filename+'.pdf',image:{type:'jpeg',quality:0.98},
-      html2canvas:{scale:2,useCORS:true,allowTaint:true,logging:false},
-      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}};
-    html2pdf().set(opt).from(el.querySelector('body')||el).save().then(function(){
-      document.body.removeChild(el);
-      if(btn){btn.disabled=false;btn.style.opacity='';}
-      macUI&&macUI.toast('ទាញយក PDF រួចរាល់! ✓','success');
-    }).catch(function(){
-      document.body.removeChild(el);
-      if(btn){btn.disabled=false;btn.style.opacity='';}
-      macUI&&macUI.toast('មានបញ្ហា — សូមព្យាយាមម្ដងទៀត','error');
-    });
+
+    var opt={
+      margin:[8,8,8,8],
+      filename:filename+'.pdf',
+      image:{type:'jpeg',quality:0.98},
+      html2canvas:{scale:2,useCORS:true,allowTaint:true,logging:false,backgroundColor:'#ffffff'},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+    };
+
+    /* short delay to let fonts/DOM paint before capture */
+    setTimeout(function(){
+      html2pdf().set(opt).from(box).save().then(function(){
+        document.body.removeChild(overlay);
+        if(btn){btn.disabled=false;btn.style.opacity='';}
+        macUI&&macUI.toast('ទាញយក PDF រួចរាល់! ✓','success');
+      }).catch(function(e){
+        console.error(e);
+        document.body.removeChild(overlay);
+        if(btn){btn.disabled=false;btn.style.opacity='';}
+        macUI&&macUI.toast('មានបញ្ហា — សូមព្យាយាមម្ដងទៀត','error');
+      });
+    },300);
   }
 
   window.exportPDF=function(){
@@ -798,15 +812,15 @@
           +'<td class="num">'+(a.rate||0)+'៛</td>'
           +'<td class="num comm">'+calcComm(a).toLocaleString()+'៛</td></tr>';
       }).join('');
-      var el=_buildPdfEl(
+      _doDownload(
         '<div class="pdf-header"><h1>របាយការណ៍ Commission</h1><p>'+period+'</p></div>'
         +'<div class="pdf-info"><span>Agents: <b>'+_agents.length+'</b></span>'
         +'<span>Orders: <b>'+_filtered.length+'</b></span>'
         +'<span>Total Sale: <b>$'+$m(totalSales)+'</b></span>'
         +'<span>Commission: <b>'+totalComm.toLocaleString()+'៛</b></span></div>'
         +'<table><thead><tr><th>#</th><th>CloseBy</th><th>Orders</th><th>Items</th><th>Sales</th><th>Rate</th><th>Commission</th></tr></thead>'
-        +'<tbody>'+rows+'</tbody></table>');
-      _doDownload(el,'commission_'+period+'_'+today);
+        +'<tbody>'+rows+'</tbody></table>',
+        'commission_'+period+'_'+today);
 
     }else if(_view==='orders'){
       var name=decodeURIComponent(_selAgent||'');
@@ -821,14 +835,14 @@
           +'<td>'+(o.payment||'—')+'</td>'
           +'<td>'+(o.receiptNo?'#'+o.receiptNo:'—')+'</td></tr>';
       }).join('');
-      var el=_buildPdfEl(
+      _doDownload(
         '<div class="pdf-header"><h1>Orders — '+name+'</h1><p>'+period+'</p></div>'
         +'<div class="pdf-info"><span>Orders: <b>'+ag.orders.length+'</b></span>'
         +'<span>Items: <b>'+agentItems(ag)+'</b></span>'
         +'<span>Commission: <b class="comm">'+calcComm(ag).toLocaleString()+'៛</b></span></div>'
         +'<table><thead><tr><th>#</th><th>អតិថិជន</th><th>កាលបរិច្ឆេទ</th><th>Items</th><th>សរុប</th><th>Payment</th><th>Receipt</th></tr></thead>'
-        +'<tbody>'+rows+'</tbody></table>');
-      _doDownload(el,'orders_'+name+'_'+today);
+        +'<tbody>'+rows+'</tbody></table>',
+        'orders_'+name+'_'+today);
 
     }else if(_view==='products'){
       var name=decodeURIComponent(_selAgent||'');
@@ -842,7 +856,7 @@
           +'<td class="num">'+(+p.qty||1)+'</td><td class="num">$'+(+p.price||0)+'</td>'
           +'<td class="num sale">$'+$m(sub)+'</td></tr>';
       }).join('');
-      var el=_buildPdfEl(
+      _doDownload(
         '<div class="pdf-header"><h1>Order Detail</h1><p>CloseBy: '+name+'</p></div>'
         +'<div class="pdf-info"><span>អតិថិជន: <b>'+(ord.customer||'—')+'</b></span>'
         +'<span>កាលបរិច្ឆេទ: <b>'+fmtD(ord)+'</b></span>'
@@ -851,8 +865,8 @@
         +(ord.receiptNo?'<span>Receipt: <b>#'+ord.receiptNo+'</b></span>':'')
         +'</div>'
         +'<table><thead><tr><th>#</th><th>ផលិតផល</th><th>Qty</th><th>តម្លៃ</th><th>សរុប</th></tr></thead>'
-        +'<tbody>'+rows+'</tbody></table>');
-      _doDownload(el,'order_'+(ord.customer||'order')+'_'+today);
+        +'<tbody>'+rows+'</tbody></table>',
+        'order_'+(ord.customer||'order')+'_'+today);
     }
   };
 
