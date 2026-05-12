@@ -70,7 +70,7 @@
         </div>
         <div class="sb-brand-text">
           <div class="sb-brand-name">CAMBO MINI</div>
-          <div class="sb-brand-sub" id="sbGreeting"></div>
+          <div class="sb-brand-sub">Premium Workspace</div>
         </div>
       </div>
       <div class="sb-toggle-row">
@@ -141,7 +141,7 @@
           <div class="header-text">
             <div class="header-kicker">CAMBO MINI</div>
             <h1 class="header-title">${meta.title}</h1>
-            ${meta.subtitle ? `<p class="header-subtitle">${meta.subtitle}</p>` : ''}
+            <p class="header-subtitle" id="headerGreeting">${meta.subtitle || ''}</p>
           </div>
         </div>
         <div class="header-actions">
@@ -325,7 +325,7 @@
     applyCollapse(localStorage.getItem('sb_collapsed') === '1');
     bindToggleBtn();
 
-    /* ── Sidebar greeting: time-based + rotating motivational phrases ── */
+    /* ── Topbar greeting: time-based + rotating motivational phrases ── */
     (function() {
       var h = new Date().getHours();
       var timeGreet =
@@ -342,10 +342,9 @@
         'ព្យាយាម ហើយនឹងជោគជ័យ 🌟',
         'ដំណើរការពាណិជ្ជ! 📈',
       ];
-      var el = document.getElementById('sbGreeting');
+      var el = document.getElementById('headerGreeting');
       if (!el) return;
-      /* fade transition via inline style */
-      el.style.cssText = 'transition:opacity .5s ease;opacity:1;';
+      el.style.cssText = 'transition:opacity .5s ease;opacity:1;display:block;';
       var idx = 0;
       el.textContent = phrases[idx];
       setInterval(function() {
