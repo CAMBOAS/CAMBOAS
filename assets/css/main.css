@@ -1034,18 +1034,19 @@ body.sb-collapsed .shared-topbar { left: var(--sb-w-col); }
    ================================================================ */
 @media (max-width: 980px) {
 
-  /* Sidebar slides in below topbar */
+  /* Sidebar covers full screen including topbar */
   .sidebar {
-    top: var(--topbar-offset, 72px) !important;
-    height: calc(100dvh - var(--topbar-offset, 72px)) !important;
+    top: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     border-radius: 0 20px 20px 0 !important;
-    z-index: 9999 !important;
+    z-index: 10001 !important;
   }
 
-  /* Overlay also starts below topbar */
+  /* Overlay covers full screen */
   .sidebar-overlay {
-    z-index: 9990 !important;
-    top: var(--topbar-offset, 72px) !important;
+    z-index: 10000 !important;
+    top: 0 !important;
   }
 
   /* Tap overlay = close sidebar */
