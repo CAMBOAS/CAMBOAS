@@ -283,23 +283,21 @@
     .prow {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
+      gap: 10px;
+      padding: 10px 12px;
       border-radius: 14px;
-      min-height: 68px;
+      min-height: 72px;
       background: rgba(255,255,255,.04);
       border: 1px solid rgba(148,163,200,.1);
-      cursor: pointer;
-      transition: background .15s, transform .1s;
+      transition: border-color .2s, background .2s;
     }
-    .prow:active { background: rgba(124,92,255,.12); transform: scale(.98); }
-    @media (hover:hover) { .prow:hover { border-color: rgba(124,92,255,.35); background: rgba(124,92,255,.07); } }
     [data-theme="dark"] .prow { border-color: rgba(255,255,255,.08); }
+    .prow.padd-flash { border-color: rgba(34,197,94,.55) !important; background: rgba(34,197,94,.07) !important; }
 
     .pthumb {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
+      width: 48px;
+      height: 48px;
+      border-radius: 11px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -307,21 +305,114 @@
       background: rgba(124,92,255,.12);
       overflow: hidden;
     }
-    .pthumb img { width: 52px; height: 52px; object-fit: cover; border-radius: 12px; }
+    .pthumb img { width: 48px; height: 48px; object-fit: cover; border-radius: 11px; }
     .pinfo { flex: 1; min-width: 0; }
     .pinfo b {
       display: block;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text, #18213a);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      line-height: 1.35;
+      line-height: 1.3;
     }
-    .pinfo span { font-size: 11px; color: var(--muted, #6b7898); }
+    .pinfo small { font-size: 10px; color: var(--muted, #6b7898); display: block; }
     [data-theme="dark"] .pinfo b { color: #e8e0ff; }
-    .pprice { font-size: 15px; font-weight: 800; color: #7c5cff; white-space: nowrap; }
+    .pprice-row { display: flex; align-items: center; gap: 2px; margin-top: 4px; }
+    .pprice-sym { font-size: 12px; font-weight: 800; color: #7c5cff; line-height: 1; }
+    .pprice-inp {
+      width: 62px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(124,92,255,.3);
+      background: rgba(124,92,255,.08);
+      color: #7c5cff;
+      font-size: 16px;
+      font-weight: 800;
+      font-family: inherit;
+      text-align: center;
+      outline: none;
+      padding: 0 4px;
+      box-sizing: border-box;
+      -moz-appearance: textfield;
+      transition: border-color .15s, background .15s;
+    }
+    .pprice-inp:focus { border-color: #7c5cff; background: rgba(124,92,255,.14); }
+    .pprice-inp::-webkit-outer-spin-button,
+    .pprice-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    [data-theme="dark"] .pprice-inp { background: rgba(124,92,255,.13); border-color: rgba(124,92,255,.35); }
+
+    /* Product controls */
+    .pctrl { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+    .punit-btn {
+      height: 44px;
+      padding: 0 9px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(124,92,255,.45);
+      background: rgba(124,92,255,.1);
+      color: #7c5cff;
+      font-size: 12px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .punit-btn.is-case {
+      border-color: rgba(6,182,212,.45);
+      background: rgba(6,182,212,.1);
+      color: #0891b2;
+    }
+    .pqty-col { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .pqty-lbl {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--muted, #6b7898);
+      line-height: 1;
+      letter-spacing: .02em;
+    }
+    .pqty-inp {
+      width: 48px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1.5px solid rgba(148,163,200,.2);
+      background: var(--input, rgba(255,255,255,.9));
+      color: var(--text, #18213a);
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      text-align: center;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    .pqty-inp::-webkit-outer-spin-button,
+    .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .pqty-inp:focus { border-color: #7c5cff; }
+    [data-theme="dark"] .pqty-inp { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.12); color: #e8e0ff; }
+    .padd-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #7c5cff, #06b6d4);
+      color: #fff;
+      font-size: 24px;
+      font-weight: 400;
+      font-family: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      line-height: 1;
+      transition: opacity .15s, transform .1s;
+    }
+    .padd-btn:active { opacity: .82; transform: scale(.91); }
 
     /* ══════════════════════════════════════════════════════
        CART
@@ -1073,12 +1164,53 @@ function getFiltered(){
 function filterProds(){ renderPList(getFiltered()); }
 function renderPList(list){
   _el('pList').innerHTML = list.map(function(p){
-    return '<div class="prow" onclick="addToCart('+p.id+')">'
+    return '<div class="prow" id="pc_'+p.id+'" data-pid="'+p.id+'">'
       +'<div class="pthumb"><img src="'+escHtml(p.image)+'" alt="" onerror="this.style.display=\'none\'"></div>'
-      +'<div class="pinfo"><b>'+escHtml(p.name)+'</b><span>'+escHtml(p.category)+'</span></div>'
-      +'<span class="pprice">'+fmt(p.price)+'</span>'
-      +'</div>';
+      +'<div class="pinfo"><b>'+escHtml(p.name)+'</b><small>'+escHtml(p.category)+'</small>'
+      +'<div class="pprice-row"><span class="pprice-sym">$</span><input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()"></div></div>'
+      +'<div class="pctrl">'
+        +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button">ឈុត</button>'
+        +'<div class="pqty-col">'
+          +'<span class="pqty-lbl">ឈុត</span>'
+          +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
+        +'</div>'
+        +'<button class="padd-btn" onclick="addFromCard(this,event)" type="button">+</button>'
+      +'</div>'
+    +'</div>';
   }).join('');
+}
+
+function toggleUnit(btn, e){
+  e.stopPropagation();
+  var isCase = btn.textContent.trim() === 'កេស';
+  var newUnit = isCase ? 'ឈុត' : 'កេស';
+  btn.textContent = newUnit;
+  btn.classList.toggle('is-case', !isCase);
+  var lbl = btn.closest('.prow').querySelector('.pqty-lbl');
+  if(lbl) lbl.textContent = newUnit;
+}
+
+function addFromCard(btn, e){
+  e.stopPropagation();
+  var row = btn.closest('.prow');
+  var pid = row.getAttribute('data-pid');
+  var qty = Math.max(1, parseInt(row.querySelector('.pqty-inp').value) || 1);
+  var unit = row.querySelector('.punit-btn').textContent.trim();
+  var customPrice = Math.max(0, parseFloat(row.querySelector('.pprice-inp').value) || 0);
+  var p = products.find(function(x){ return String(x.id)===String(pid); });
+  if(!p) return;
+  var dispName = unit === 'កេស' ? p.name+' (កេស)' : p.name;
+  var ex = items.find(function(x){ return x.productId===String(pid) && x.unit===unit && x.price===customPrice; });
+  if(ex){ ex.qty += qty; ex.subtotal = Math.max(0, ex.qty*ex.price - ex.discount); }
+  else { items.push({rowId:Date.now()+Math.random(), productId:String(pid), name:dispName, qty:qty, price:customPrice, discount:0, subtotal:customPrice*qty, unit:unit}); }
+  row.querySelector('.pqty-inp').value = 1;
+  var cHead = _el('cartHead'), cBody = _el('cartBody');
+  if(cHead && cBody && !cHead.classList.contains('is-open')){
+    cHead.classList.add('is-open'); cBody.classList.remove('is-hidden');
+  }
+  renderCart();
+  row.classList.add('padd-flash');
+  setTimeout(function(){ row.classList.remove('padd-flash'); }, 500);
 }
 
 /* ── Clear form ── */
