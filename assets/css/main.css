@@ -494,6 +494,12 @@ body.sb-collapsed .shared-topbar { left: var(--sb-w-col); }
     transform: translateX(0);
     box-shadow: 12px 0 40px rgba(0,0,0,.22);
   }
+  /* Hide topbar when sidebar drawer is open */
+  body.sidebar-open .shared-topbar {
+    transform: translateY(-110%);
+    opacity: 0;
+    pointer-events: none;
+  }
   .main-content { margin-left:0; width:100%; padding:16px 14px 28px; padding-top: var(--topbar-offset, 72px); }
   .shared-topbar { left: 0 !important; padding: 0 !important; }
   .mobile-menu-btn { display:flex; }
