@@ -629,6 +629,7 @@
         +'<div class="cm-order-meta">'
         +'<span class="cm-chip">📅 '+fmtD(o)+'</span>'
         +'<span class="cm-chip">📦 '+qty+' ឈុត</span>'
+        +(o.phone?'<span class="cm-chip">📞 '+o.phone+'</span>':'')
         +(o.payment?'<span class="cm-chip">'+o.payment+'</span>':'')
         +(o.receiptNo?'<span class="cm-chip">#'+o.receiptNo+'</span>':'')
         +'</div></div>';
