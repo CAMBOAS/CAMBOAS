@@ -348,18 +348,26 @@
     }
     [data-theme="dark"] .pcat-tag { background: rgba(124,92,255,.2); }
 
-    /* Divider */
-    .prow-div {
-      height: 1px;
-      background: rgba(148,163,200,.13);
-    }
-    [data-theme="dark"] .prow-div { background: rgba(255,255,255,.07); }
+    /* Divider before controls */
+    .prow-div { display: none; }
 
-    /* ── Controls: 4 equal columns ── */
+    /* ── Controls bar ── */
     .prow-ctrl {
       display: flex;
       align-items: stretch;
+      background: rgba(124,92,255,.045);
+      border-top: 1px solid rgba(124,92,255,.1);
+      min-height: 60px;
     }
+    [data-theme="dark"] .prow-ctrl {
+      background: rgba(124,92,255,.08);
+      border-top-color: rgba(124,92,255,.15);
+    }
+    [data-theme="light"] .prow-ctrl {
+      background: rgba(124,92,255,.04);
+      border-top-color: rgba(124,92,255,.1);
+    }
+
     .pctrl-box {
       flex: 1;
       display: flex;
@@ -367,40 +375,46 @@
       align-items: center;
       justify-content: center;
       gap: 3px;
-      min-height: 54px;
-      padding: 6px 2px;
-      border-right: 1px solid rgba(148,163,200,.12);
+      padding: 7px 3px;
+      border-right: 1px solid rgba(124,92,255,.1);
       position: relative;
     }
     [data-theme="dark"] .pctrl-box { border-right-color: rgba(255,255,255,.07); }
     .pctrl-box:last-child { border-right: none; }
 
-    /* Price */
+    /* Label */
     .pctrl-lbl-top {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
-      color: #9aa3bf;
+      color: #a0a8c0;
       line-height: 1;
-      letter-spacing: .02em;
+      letter-spacing: .03em;
+      text-transform: uppercase;
     }
+
+    /* Price pill */
     .pctrl-price {
       display: flex;
       align-items: baseline;
       gap: 1px;
+      background: rgba(124,92,255,.12);
+      border-radius: 7px;
+      padding: 3px 6px 3px 4px;
     }
+    [data-theme="dark"] .pctrl-price { background: rgba(124,92,255,.2); }
     .pprice-sym {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
       color: #7c5cff;
       line-height: 1;
     }
     .pprice-inp {
-      width: 52px;
-      height: 30px;
+      width: 40px;
+      height: 24px;
       border: none;
       background: transparent;
       color: #7c5cff;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 800;
       font-family: inherit;
       text-align: center;
@@ -411,23 +425,25 @@
     .pprice-inp::-webkit-outer-spin-button,
     .pprice-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-    /* Qty */
+    /* Qty pill */
     .pqty-inp {
-      width: 52px;
-      height: 30px;
+      width: 44px;
+      height: 28px;
       border: none;
-      background: transparent;
+      background: rgba(0,0,0,.06);
+      border-radius: 7px;
       color: #18213a;
       font-size: 20px;
       font-weight: 700;
       font-family: inherit;
       text-align: center;
       outline: none;
+      padding: 0;
       -moz-appearance: textfield;
     }
     .pqty-inp::-webkit-outer-spin-button,
     .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    [data-theme="dark"] .pqty-inp { color: #f0eaff; }
+    [data-theme="dark"] .pqty-inp { background: rgba(255,255,255,.1); color: #f0eaff; }
 
     /* Unit toggle */
     .punit-btn {
@@ -448,29 +464,32 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 2px;
+      gap: 3px;
       transition: background .15s;
     }
-    .punit-btn::before {
-      content: '↕';
-      font-size: 10px;
-      opacity: .45;
+    .punit-icon {
+      font-size: 11px;
+      line-height: 1;
+      opacity: .5;
+    }
+    .punit-lbl {
+      font-size: 14px;
+      font-weight: 800;
       line-height: 1;
     }
-    .punit-btn:active { background: rgba(124,92,255,.1); }
     .punit-btn.is-case { color: #0891b2; }
-    .punit-btn.is-case::before { opacity: .45; }
+    .punit-btn:active { background: rgba(124,92,255,.1); }
 
-    /* Add button */
+    /* Add button — full gradient */
     .padd-btn {
       width: 100%;
       height: 100%;
       position: absolute;
       inset: 0;
       border: none;
-      background: linear-gradient(160deg, #8b5cf6, #06b6d4);
+      background: linear-gradient(145deg, #7c5cff 0%, #06b6d4 100%);
       color: #fff;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 300;
       font-family: inherit;
       cursor: pointer;
@@ -480,9 +499,9 @@
       align-items: center;
       justify-content: center;
       line-height: 1;
-      transition: opacity .15s;
+      transition: opacity .15s, filter .15s;
     }
-    .padd-btn:active { opacity: .78; }
+    .padd-btn:active { opacity: .8; filter: brightness(.92); }
 
     /* ══════════════════════════════════════════════════════
        CART
@@ -1258,7 +1277,10 @@ function renderPList(list){
           +'</div>'
           /* Unit toggle */
           +'<div class="pctrl-box">'
-            +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button">ឈុត</button>'
+            +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button">'
+              +'<span class="punit-icon">⇄</span>'
+              +'<span class="punit-lbl">ឈុត</span>'
+            +'</button>'
           +'</div>'
           /* Add */
           +'<div class="pctrl-box" style="padding:0;">'
@@ -1272,12 +1294,13 @@ function renderPList(list){
 
 function toggleUnit(btn, e){
   e.stopPropagation();
-  var isCase = btn.textContent.trim() === 'កេស';
+  var lblEl = btn.querySelector('.punit-lbl');
+  var isCase = (lblEl ? lblEl.textContent.trim() : btn.textContent.trim()) === 'កេស';
   var newUnit = isCase ? 'ឈុត' : 'កេស';
-  btn.textContent = newUnit;
+  if(lblEl) lblEl.textContent = newUnit; else btn.textContent = newUnit;
   btn.classList.toggle('is-case', !isCase);
-  var lbl = btn.closest('.prow').querySelector('.pctrl-lbl');
-  if(lbl) lbl.textContent = newUnit;
+  var qtyLbl = btn.closest('.prow').querySelector('.pctrl-lbl');
+  if(qtyLbl) qtyLbl.textContent = newUnit;
 }
 
 function addFromCard(btn, e){
@@ -1285,7 +1308,8 @@ function addFromCard(btn, e){
   var row = btn.closest('.prow');
   var pid = row.getAttribute('data-pid');
   var qty = Math.max(1, parseInt(row.querySelector('.pqty-inp').value) || 1);
-  var unit = row.querySelector('.punit-btn').textContent.trim();
+  var unitLblEl = row.querySelector('.punit-lbl');
+  var unit = unitLblEl ? unitLblEl.textContent.trim() : (row.querySelector('.punit-btn').textContent.trim());
   var customPrice = Math.max(0, parseFloat(row.querySelector('.pprice-inp').value) || 0);
   var p = products.find(function(x){ return String(x.id)===String(pid); });
   if(!p) return;
