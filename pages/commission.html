@@ -18,11 +18,24 @@
   .cm-bar-left h2{margin:0 0 2px;font-size:18px;font-weight:800;color:var(--text)}
   .cm-bar-left p{margin:0;font-size:12px;color:var(--muted)}
   .cm-bar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .cm-tabs{display:flex;gap:4px;background:rgba(0,0,0,.06);border-radius:10px;padding:3px}
-  [data-theme="light"] .cm-tabs{background:rgba(0,0,0,.06)}
-  .cm-tab{padding:5px 12px;border-radius:7px;border:none;background:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .14s;white-space:nowrap}
-  .cm-tab.active{background:#fff;color:#1e293b;box-shadow:0 1px 4px rgba(0,0,0,.12)}
-  [data-theme="dark"] .cm-tab.active{background:rgba(139,92,246,.25);color:#c4b5fd;box-shadow:none}
+  /* ── Date dropdown ── */
+  .cm-date-btn{display:flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .14s;white-space:nowrap}
+  .cm-date-btn:hover,.cm-date-btn.open{border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.1);color:#c4b5fd}
+  [data-theme="light"] .cm-date-btn{background:#fff}
+  [data-theme="light"] .cm-date-btn:hover,[data-theme="light"] .cm-date-btn.open{color:#4f46e5}
+  .cm-date-btn .arr{transition:transform .2s;opacity:.7}
+  .cm-date-btn.open .arr{transform:rotate(180deg)}
+  #cmDateFloatMenu{display:none;position:fixed;min-width:150px;border-radius:14px;border:1px solid var(--line);box-shadow:0 10px 32px rgba(0,0,0,.28);z-index:9999;padding:5px;overflow:hidden}
+  [data-theme="dark"] #cmDateFloatMenu{background:#1e293b}
+  [data-theme="light"] #cmDateFloatMenu{background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.13)}
+  #cmDateFloatMenu.show{display:block}
+  .cm-date-opt{display:flex;align-items:center;gap:8px;width:100%;padding:9px 13px;border:none;background:none;color:var(--text);font-size:13px;font-weight:600;text-align:left;cursor:pointer;border-radius:9px;font-family:inherit;transition:background .12s;white-space:nowrap}
+  .cm-date-opt:hover{background:rgba(139,92,246,.13);color:#c4b5fd}
+  [data-theme="light"] .cm-date-opt:hover{background:rgba(99,102,241,.09);color:#4f46e5}
+  .cm-date-opt.active{background:rgba(139,92,246,.2);color:#c4b5fd;font-weight:700}
+  [data-theme="light"] .cm-date-opt.active{background:rgba(99,102,241,.12);color:#4f46e5}
+  .cm-date-opt .opt-check{opacity:0;font-size:11px;margin-left:auto}
+  .cm-date-opt.active .opt-check{opacity:1}
   .cm-btn-refresh{display:flex;align-items:center;gap:6px;height:34px;padding:0 16px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s;white-space:nowrap}
   .cm-btn-refresh:hover{opacity:.85}
 
@@ -32,6 +45,17 @@
   .cm-kpi-label{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
   .cm-kpi-val{font-size:22px;font-weight:800;color:var(--text);margin-top:6px;display:block}
 
+  /* ── Ctrl bar ── */
+  .cm-ctrl-bar{padding:14px 18px;border-radius:18px;display:flex;flex-direction:column;gap:10px}
+  .cm-ctrl-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .cm-ctrl-spacer{flex:1}
+  .cm-ctrl-div{height:1px;background:var(--line)}
+  .cm-ctrl-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .cm-ctrl-rate-group{display:flex;align-items:center;gap:7px;padding:3px 10px 3px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+  [data-theme="light"] .cm-ctrl-rate-group{background:rgba(0,0,0,.03)}
+  .cm-ctrl-rate-lbl{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
+  .cm-ctrl-rate-inp-wrap{display:flex;align-items:center;gap:3px}
+  .cm-ctrl-rate-unit{font-size:12px;font-weight:700;color:var(--muted)}
   /* ── Setup strip ── */
   .cm-setup{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 18px;border-radius:16px}
   .cm-setup-label{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
@@ -191,37 +215,7 @@
     <div class="shared-topbar" id="sharedHeader"></div>
     <div class="cw">
 
-      <!-- 1. Filter bar -->
-      <section class="glass-card cm-bar">
-        <div class="cm-bar-left">
-          <h2>Commission</h2>
-          <p>Commission report CloseBy និង payout</p>
-        </div>
-        <div class="cm-bar-right">
-          <div class="cm-tabs">
-            <button class="cm-tab" data-mode="today"     onclick="setMode('today')">ថ្ងៃនេះ</button>
-            <button class="cm-tab" data-mode="week"      onclick="setMode('week')">សប្ដាហ៍</button>
-            <button class="cm-tab active" data-mode="month" onclick="setMode('month')">ខែនេះ</button>
-            <button class="cm-tab" data-mode="lastmonth" onclick="setMode('lastmonth')">ខែមុន</button>
-            <button class="cm-tab" data-mode="all"       onclick="setMode('all')">ទាំងអស់</button>
-            <button class="cm-tab" data-mode="custom"    onclick="setMode('custom')">Custom</button>
-          </div>
-          <button class="cm-btn-refresh" onclick="loadData()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Refresh
-          </button>
-        </div>
-      </section>
-
-      <!-- Custom date range (inline, shows only when Custom tab active) -->
-      <div class="glass-card cm-custom-row" id="customDateBar">
-        <span class="cm-custom-lbl">ពី</span>
-        <input type="date" id="dateFrom" class="cm-custom-inp" onchange="applyFilter()">
-        <span class="cm-custom-lbl">ដល់</span>
-        <input type="date" id="dateTo" class="cm-custom-inp" onchange="applyFilter()">
-      </div>
-
-      <!-- 2. KPI cards -->
+      <!-- 1. KPI cards -->
       <div class="cm-kpi">
         <article class="glass-card cm-kpi-card">
           <div class="cm-kpi-label">Total Commission</div>
@@ -241,21 +235,51 @@
         </article>
       </div>
 
-      <!-- 3. Setup strip — minimal -->
-      <section class="glass-card cm-setup">
-        <div class="cm-mode-group">
-          <button class="cm-mode-btn active" id="modeOrders" onclick="setCalcMode('orders')">Orders</button>
-          <button class="cm-mode-btn" id="modeItems" onclick="setCalcMode('items')">Items</button>
+      <!-- 2. Combined filter + setup card -->
+      <section class="glass-card cm-ctrl-bar">
+        <!-- Row 1: date dropdown + refresh -->
+        <div class="cm-ctrl-top">
+          <button class="cm-date-btn" id="dateBtnTrigger" onclick="toggleDateDrop(event)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="dateBtnLabel">ខែនេះ</span>
+            <svg class="arr" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <span class="cm-ctrl-spacer"></span>
+          <span class="cm-range-tag" id="sumRangeLabel"></span>
+          <button class="cm-btn-refresh" onclick="loadData()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
         </div>
-        <span class="cm-setup-label" id="rateLabel">Rate</span>
-        <input type="number" id="defRate" class="cm-rate-inp" value="200" min="0" step="50">
-        <span class="cm-rate-unit">៛</span>
-        <button class="cm-apply" onclick="applyDefRate()">Apply</button>
-        <button class="cm-export" onclick="exportCommCSV()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          CSV
-        </button>
-        <span class="cm-range-tag" id="sumRangeLabel" style="margin-left:auto"></span>
+        <!-- Custom date range -->
+        <div class="cm-custom-row" id="customDateBar" style="padding:0;border-radius:0;background:none;margin:0">
+          <span class="cm-custom-lbl">ពី</span>
+          <input type="date" id="dateFrom" class="cm-custom-inp" onchange="applyFilter()">
+          <span class="cm-custom-lbl">ដល់</span>
+          <input type="date" id="dateTo" class="cm-custom-inp" onchange="applyFilter()">
+        </div>
+        <!-- Divider -->
+        <div class="cm-ctrl-div"></div>
+        <!-- Row 2: optimized toolbar -->
+        <div class="cm-ctrl-tools">
+          <div class="cm-mode-group">
+            <button class="cm-mode-btn active" id="modeOrders" onclick="setCalcMode('orders')">Orders</button>
+            <button class="cm-mode-btn" id="modeItems" onclick="setCalcMode('items')">Items</button>
+          </div>
+          <div class="cm-ctrl-rate-group">
+            <span class="cm-ctrl-rate-lbl" id="rateLabel">Rate / Order</span>
+            <div class="cm-ctrl-rate-inp-wrap">
+              <input type="number" id="defRate" class="cm-rate-inp" value="200" min="0" step="50">
+              <span class="cm-ctrl-rate-unit">៛</span>
+            </div>
+            <button class="cm-apply" onclick="applyDefRate()">Apply</button>
+          </div>
+          <span class="cm-ctrl-spacer"></span>
+          <button class="cm-export" onclick="exportCommCSV()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            CSV
+          </button>
+        </div>
       </section>
 
       <!-- 4. Main content -->
@@ -276,12 +300,6 @@
           <!-- Search row (agents view) -->
           <div class="cm-search-row" id="srchBar">
             <input type="text" id="srch" placeholder="ស្វែងរក CloseBy..." oninput="renderAgents()">
-            <select id="fst" onchange="renderAgents()">
-              <option value="">All Status</option>
-              <option value="Paid">Paid</option>
-              <option value="Pending">Pending</option>
-              <option value="Processing">Processing</option>
-            </select>
           </div>
 
           <!-- Panel content -->
@@ -342,12 +360,51 @@
   }
   function $m(n){ return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2}); }
 
+  /* ══ DATE DROPDOWN ══ */
+  window.toggleDateDrop=function(e){
+    e.stopPropagation();
+    var menu=document.getElementById('cmDateFloatMenu');
+    var btn=document.getElementById('dateBtnTrigger');
+    if(menu.classList.contains('show')){
+      menu.classList.remove('show');
+      btn.classList.remove('open');
+      return;
+    }
+    var r=btn.getBoundingClientRect();
+    menu.style.top=(r.bottom+6)+'px';
+    var left=r.right-menu.offsetWidth;
+    if(left<8) left=8;
+    menu.style.left=left+'px';
+    menu.classList.add('show');
+    btn.classList.add('open');
+    // Reposition after it's visible (width known)
+    requestAnimationFrame(function(){
+      var ml=r.right-menu.offsetWidth;
+      if(ml<8) ml=8;
+      menu.style.left=ml+'px';
+    });
+  };
+  window.pickMode=function(m,label){
+    document.getElementById('dateBtnLabel').textContent=label;
+    document.querySelectorAll('.cm-date-opt').forEach(function(b){
+      b.classList.toggle('active',b.dataset.mode===m);
+    });
+    document.getElementById('cmDateFloatMenu').classList.remove('show');
+    document.getElementById('dateBtnTrigger').classList.remove('open');
+    setMode(m);
+  };
+  document.addEventListener('click',function(e){
+    var menu=document.getElementById('cmDateFloatMenu');
+    var btn=document.getElementById('dateBtnTrigger');
+    if(menu&&!menu.contains(e.target)&&e.target!==btn&&!btn.contains(e.target)){
+      menu.classList.remove('show');
+      btn.classList.remove('open');
+    }
+  });
+
   /* ══ DATE FILTER ══ */
   window.setMode=function(m){
     _mode=m;
-    document.querySelectorAll('.cm-tab').forEach(function(b){
-      b.classList.toggle('active',b.dataset.mode===m);
-    });
     var customBar=document.getElementById('customDateBar');
     if(customBar) customBar.classList.toggle('show',m==='custom');
     applyFilter();
@@ -460,8 +517,7 @@
   /* ══ VIEW 1: AGENTS TABLE ══ */
   window.renderAgents=function(){
     var q=(document.getElementById('srch').value||'').toLowerCase();
-    var f=document.getElementById('fst').value;
-    var list=_agents.filter(function(a){return (!q||a.name.toLowerCase().includes(q))&&(!f||a.status===f);});
+    var list=_agents.filter(function(a){return (!q||a.name.toLowerCase().includes(q));});
     if(!list.length){
       document.getElementById('panelContent').innerHTML='<div class="no-data">គ្មានទិន្នន័យ CloseBy<br><small>Orders ត្រូវបំពេញ CloseBy field</small></div>';
       return;
@@ -483,13 +539,12 @@
         +'<td class="cm-sales">$'+$m(sales)+'</td>'
         +'<td onclick="event.stopPropagation()"><input type="number" class="cm-rate-cell" value="'+a.rate+'" min="0" step="50" onchange="_ur(\''+enc+'\',this.value)"></td>'
         +'<td class="cm-comm">'+comm.toLocaleString()+'៛</td>'
-        +'<td onclick="event.stopPropagation()"><select class="cm-status-sel" onchange="_us(\''+enc+'\',this.value)">'+['Paid','Pending','Processing'].map(function(s){return'<option'+(s===a.status?' selected':'')+'>'+s+'</option>';}).join('')+'</select></td>'
         +'</tr>';
     }).join('');
 
     document.getElementById('panelContent').innerHTML=
       '<div class="cm-tbl-wrap"><table class="cm-tbl">'
-      +'<thead><tr><th>CloseBy</th><th>Orders</th><th>Items</th><th>Sales</th><th>Rate ៛</th><th>Commission</th><th>Status</th></tr></thead>'
+      +'<thead><tr><th>CloseBy</th><th>Orders</th><th>Items</th><th>Sales</th><th>Rate ៛</th><th>Commission</th></tr></thead>'
       +'<tbody>'+rows+'</tbody></table></div>';
     renderKPI();
   };
@@ -654,6 +709,16 @@
 })();
 </script>
 <script src="../assets/js/sw-register.js"></script>
+
+<!-- Floating date filter menu (attached to body to avoid clipping) -->
+<div id="cmDateFloatMenu">
+  <button class="cm-date-opt active" data-mode="month"     onclick="pickMode('month','ខែនេះ')">📅 ខែនេះ<span class="opt-check">✓</span></button>
+  <button class="cm-date-opt"        data-mode="today"     onclick="pickMode('today','ថ្ងៃនេះ')">🌅 ថ្ងៃនេះ<span class="opt-check">✓</span></button>
+  <button class="cm-date-opt"        data-mode="week"      onclick="pickMode('week','សប្ដាហ៍')">📆 សប្ដាហ៍<span class="opt-check">✓</span></button>
+  <button class="cm-date-opt"        data-mode="lastmonth" onclick="pickMode('lastmonth','ខែមុន')">🗓 ខែមុន<span class="opt-check">✓</span></button>
+  <button class="cm-date-opt"        data-mode="all"       onclick="pickMode('all','ទាំងអស់')">📊 ទាំងអស់<span class="opt-check">✓</span></button>
+  <button class="cm-date-opt"        data-mode="custom"    onclick="pickMode('custom','Custom')">✏️ Custom<span class="opt-check">✓</span></button>
+</div>
 
 </body>
 </html>
