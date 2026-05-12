@@ -285,10 +285,11 @@
     @media (max-width: 480px) { .plist { margin: 10px -14px -16px; } }
     @media (min-width: 768px) { .plist { margin: 10px -20px -20px; } }
 
-    /* ── Product Row (full-bleed, no card frame) ── */
+    /* ── Product Row — sketch layout ── */
     .prow {
       display: flex;
       align-items: stretch;
+      min-height: 100px;
       background: transparent;
       border-bottom: 1px solid rgba(148,163,200,.13);
       transition: background .15s;
@@ -296,22 +297,22 @@
     [data-theme="dark"] .prow { border-bottom-color: rgba(255,255,255,.07); }
     [data-theme="light"] .prow { border-bottom-color: rgba(0,0,0,.07); }
     .prow:last-child { border-bottom: none; }
-    .prow.padd-flash { background: rgba(34,197,94,.08) !important; }
+    .prow.padd-flash { background: rgba(34,197,94,.07) !important; }
 
-    /* Left: thumbnail flush to edge */
+    /* Left: large image ~38% */
     .pthumb {
-      width: 76px;
-      min-height: 80px;
+      width: 38%;
+      max-width: 140px;
       flex-shrink: 0;
-      background: rgba(124,92,255,.08);
+      background: rgba(124,92,255,.07);
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
     }
-    .pthumb img { width: 76px; height: 76px; object-fit: cover; display: block; }
+    .pthumb img { width: 100%; height: 100%; object-fit: cover; display: block; min-height: 100px; }
 
-    /* Right: all content */
+    /* Right column */
     .prow-body {
       flex: 1;
       min-width: 0;
@@ -319,15 +320,11 @@
       flex-direction: column;
     }
 
-    /* Info row */
+    /* Top: name + category */
     .prow-info {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 10px 12px 8px;
+      padding: 10px 12px 6px;
+      flex: 1;
     }
-    .pinfo { flex: 1; min-width: 0; }
     .pinfo b {
       display: block;
       font-size: 14px;
@@ -339,30 +336,58 @@
       text-overflow: ellipsis;
     }
     [data-theme="dark"] .pinfo b { color: #f0eaff; }
-    .pinfo small {
+    .pcat-tag {
+      display: inline-block;
+      margin-top: 5px;
+      padding: 2px 9px;
+      border-radius: 5px;
       font-size: 11px;
-      color: #8896b3;
-      display: block;
-      margin-top: 2px;
+      font-weight: 600;
+      background: rgba(124,92,255,.1);
+      color: #7c5cff;
+      border: 1px solid rgba(124,92,255,.2);
     }
+    [data-theme="dark"] .pcat-tag { background: rgba(124,92,255,.18); }
 
-    /* Price chip */
-    .pprice-chip {
+    /* Divider */
+    .prow-div {
+      height: 1px;
+      background: rgba(148,163,200,.13);
+      margin: 0;
+    }
+    [data-theme="dark"] .prow-div { background: rgba(255,255,255,.07); }
+
+    /* Controls: 4 equal boxes */
+    .prow-ctrl {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+    }
+    .pctrl-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 4px;
+      border-right: 1px solid rgba(148,163,200,.12);
+      min-height: 52px;
+      gap: 2px;
+    }
+    [data-theme="dark"] .pctrl-box { border-right-color: rgba(255,255,255,.06); }
+    .pctrl-box:last-child { border-right: none; }
+
+    /* Price box */
+    .pctrl-price {
       display: flex;
       align-items: center;
-      gap: 1px;
-      flex-shrink: 0;
-      background: rgba(124,92,255,.1);
-      border: 1.5px solid rgba(124,92,255,.28);
-      border-radius: 10px;
-      padding: 0 7px;
-      height: 36px;
+      gap: 0;
     }
-    [data-theme="dark"] .pprice-chip { background: rgba(124,92,255,.17); border-color: rgba(124,92,255,.4); }
-    .pprice-sym { font-size: 13px; font-weight: 800; color: #7c5cff; line-height: 1; }
+    .pprice-sym { font-size: 12px; font-weight: 800; color: #7c5cff; }
     .pprice-inp {
-      width: 50px;
-      height: 100%;
+      width: 100%;
+      max-width: 54px;
+      height: 32px;
       border: none;
       background: transparent;
       color: #7c5cff;
@@ -377,63 +402,19 @@
     .pprice-inp::-webkit-outer-spin-button,
     .pprice-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-    /* Divider */
-    .prow-div {
-      height: 1px;
-      background: rgba(148,163,200,.12);
-      margin: 0 12px;
-    }
-    [data-theme="dark"] .prow-div { background: rgba(255,255,255,.07); }
-
-    /* Controls row */
-    .prow-ctrl {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px 10px;
-    }
-    .punit-btn {
-      height: 38px;
-      padding: 0 14px;
-      border-radius: 10px;
-      border: 1.5px solid rgba(124,92,255,.38);
-      background: rgba(124,92,255,.1);
-      color: #7c5cff;
-      font-size: 13px;
-      font-weight: 800;
-      font-family: inherit;
-      cursor: pointer;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-      white-space: nowrap;
-      flex-shrink: 0;
-      transition: background .15s, border-color .15s, color .15s;
-    }
-    .punit-btn.is-case {
-      border-color: rgba(6,182,212,.38);
-      background: rgba(6,182,212,.1);
-      color: #0891b2;
-    }
-    .prow-ctrl-gap { flex: 1; }
-    .pqty-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      flex-shrink: 0;
-    }
-    .pqty-lbl {
+    /* Qty box */
+    .pctrl-lbl {
       font-size: 10px;
       font-weight: 700;
       color: #8896b3;
       line-height: 1;
     }
     .pqty-inp {
-      width: 58px;
-      height: 34px;
-      border-radius: 9px;
-      border: 1.5px solid rgba(148,163,200,.2);
-      background: rgba(255,255,255,.9);
+      width: 100%;
+      max-width: 54px;
+      height: 28px;
+      border: none;
+      background: transparent;
       color: #18213a;
       font-size: 16px;
       font-weight: 700;
@@ -441,16 +422,36 @@
       text-align: center;
       outline: none;
       -moz-appearance: textfield;
-      transition: border-color .15s;
     }
     .pqty-inp::-webkit-outer-spin-button,
     .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    .pqty-inp:focus { border-color: #7c5cff; }
-    [data-theme="dark"] .pqty-inp { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.15); color: #f0eaff; }
+    [data-theme="dark"] .pqty-inp { color: #f0eaff; }
+
+    /* Unit toggle box */
+    .punit-btn {
+      width: 100%;
+      height: 100%;
+      padding: 4px;
+      border: none;
+      background: transparent;
+      color: #7c5cff;
+      font-size: 13px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .15s, color .15s;
+      line-height: 1.3;
+      text-align: center;
+    }
+    .punit-btn:active { background: rgba(124,92,255,.1); }
+    .punit-btn.is-case { color: #0891b2; }
+
+    /* Add button box */
     .padd-btn {
-      width: 46px;
-      height: 46px;
-      border-radius: 13px;
+      width: 100%;
+      height: 100%;
       border: none;
       background: linear-gradient(135deg, #7c5cff, #06b6d4);
       color: #fff;
@@ -463,12 +464,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
       line-height: 1;
-      box-shadow: 0 3px 12px rgba(124,92,255,.4);
-      transition: opacity .15s, transform .1s;
+      transition: opacity .15s;
     }
-    .padd-btn:active { opacity: .82; transform: scale(.91); }
+    .padd-btn:active { opacity: .78; }
 
     /* ══════════════════════════════════════════════════════
        CART
@@ -1224,18 +1223,31 @@ function renderPList(list){
       +'<div class="pthumb"><img src="'+escHtml(p.image)+'" alt="" onerror="this.style.display=\'none\'"></div>'
       +'<div class="prow-body">'
         +'<div class="prow-info">'
-          +'<div class="pinfo"><b>'+escHtml(p.name)+'</b><small>'+escHtml(p.category)+'</small></div>'
-          +'<div class="pprice-chip"><span class="pprice-sym">$</span><input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()"></div>'
+          +'<div class="pinfo"><b>'+escHtml(p.name)+'</b></div>'
+          +'<span class="pcat-tag">'+escHtml(p.category)+'</span>'
         +'</div>'
         +'<div class="prow-div"></div>'
         +'<div class="prow-ctrl">'
-          +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button">ឈុត</button>'
-          +'<div class="prow-ctrl-gap"></div>'
-          +'<div class="pqty-wrap">'
-            +'<span class="pqty-lbl">ឈុត</span>'
+          /* Price */
+          +'<div class="pctrl-box">'
+            +'<div class="pctrl-price">'
+              +'<span class="pprice-sym">$</span>'
+              +'<input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()">'
+            +'</div>'
+          +'</div>'
+          /* Qty */
+          +'<div class="pctrl-box">'
+            +'<span class="pctrl-lbl">ចំនួន</span>'
             +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
           +'</div>'
-          +'<button class="padd-btn" onclick="addFromCard(this,event)" type="button">+</button>'
+          /* Unit toggle */
+          +'<div class="pctrl-box">'
+            +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button">ឈុត</button>'
+          +'</div>'
+          /* Add */
+          +'<div class="pctrl-box" style="padding:0;">'
+            +'<button class="padd-btn" onclick="addFromCard(this,event)" type="button">+</button>'
+          +'</div>'
         +'</div>'
       +'</div>'
     +'</div>';
@@ -1248,7 +1260,7 @@ function toggleUnit(btn, e){
   var newUnit = isCase ? 'ឈុត' : 'កេស';
   btn.textContent = newUnit;
   btn.classList.toggle('is-case', !isCase);
-  var lbl = btn.closest('.prow').querySelector('.pqty-lbl');
+  var lbl = btn.closest('.prow').querySelector('.pctrl-lbl');
   if(lbl) lbl.textContent = newUnit;
 }
 
