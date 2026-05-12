@@ -331,23 +331,29 @@
     if (scrollUp)   scrollUp.addEventListener('click',   () => window.scrollTo({top:0,behavior:'smooth'}));
     if (scrollDown) scrollDown.addEventListener('click', () => window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}));
 
-    /* ── Smart scroll: hide topbar on scroll-down, reveal on scroll-up ── */
-    let _lastScrollY = 0;
-    const _topbar = document.getElementById('sharedHeader');
-    const _mainContent = document.querySelector('.main-content');
-    const _scrollEl = (_mainContent && getComputedStyle(_mainContent).overflowY === 'auto') ? _mainContent : window;
-    _scrollEl.addEventListener('scroll', () => {
-      const scrollY = _scrollEl === window ? window.scrollY : _scrollEl.scrollTop;
-      const delta   = scrollY - _lastScrollY;
-      if (!_topbar) { _lastScrollY = scrollY; return; }
-      if (scrollY < 72) {
-        _topbar.classList.remove('topbar-hidden');
-      } else if (delta > 6) {
-        _topbar.classList.add('topbar-hidden');
-      } else if (delta < -6) {
-        _topbar.classList.remove('topbar-hidden');
+    /* ── Smart scroll: hide on scroll-down, show on scroll-up ── */
+    const _topbarEl = document.getElementById('sharedHeader');
+    /* Measure topbar height and set --topbar-offset so content isn't hidden behind fixed header */
+    function _setTopOffset() {
+      if (!_topbarEl) return;
+      const h = _topbarEl.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--topbar-offset', (h + 8) + 'px');
+    }
+    setTimeout(_setTopOffset, 80);
+    window.addEventListener('resize', _setTopOffset, { passive: true });
+
+    let _prevY = window.pageYOffset;
+    window.addEventListener('scroll', function () {
+      const y = window.pageYOffset;
+      if (!_topbarEl) { _prevY = y; return; }
+      if (y < 60) {
+        _topbarEl.classList.remove('topbar-hidden');
+      } else if (y > _prevY + 6) {
+        _topbarEl.classList.add('topbar-hidden');    /* scrolling down */
+      } else if (y < _prevY - 6) {
+        _topbarEl.classList.remove('topbar-hidden'); /* scrolling up */
       }
-      _lastScrollY = scrollY;
+      _prevY = y;
     }, { passive: true });
 
     renderNotes();

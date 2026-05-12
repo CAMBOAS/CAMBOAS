@@ -64,6 +64,7 @@ body.sidebar-open .sidebar-overlay { display:block; opacity:1; }
   margin-left: var(--sb-w);
   width: calc(100% - var(--sb-w));
   padding: 24px 24px 40px;
+  padding-top: var(--topbar-offset, 110px);
   min-height: 100vh;
 }
 
@@ -347,20 +348,28 @@ option { background:#0f172a; color:#e5eefc; }
 }
 
 /* ================================================================
-   HEADER (topbar) — smart sticky scroll
+   HEADER (topbar) — smart fixed scroll
    ================================================================ */
 .shared-topbar {
-  margin-bottom: 20px;
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 200;
-  transition: transform 0.32s cubic-bezier(.4,0,.2,1), opacity 0.28s ease;
+  left: var(--sb-w);
+  right: 0;
+  z-index: 150;
+  padding: 16px 24px 0;
+  margin-bottom: 0;
+  transition: transform 0.32s cubic-bezier(.4,0,.2,1),
+              opacity 0.28s ease,
+              left 0.25s cubic-bezier(.4,0,.2,1);
 }
+body.sb-collapsed .shared-topbar { left: var(--sb-w-col); }
 .shared-topbar.topbar-hidden {
   transform: translateY(-115%);
   opacity: 0;
   pointer-events: none;
 }
+/* Ensure notify-panel always renders above everything */
+.shared-topbar .notify-wrap { position: relative; }
 
 .header-shell {
   display: flex; align-items: center; justify-content: space-between;
@@ -485,7 +494,8 @@ option { background:#0f172a; color:#e5eefc; }
     transform: translateX(0);
     box-shadow: 12px 0 40px rgba(0,0,0,.22);
   }
-  .main-content { margin-left:0; width:100%; padding:16px 14px 28px; }
+  .main-content { margin-left:0; width:100%; padding:16px 14px 28px; padding-top: var(--topbar-offset, 86px); }
+  .shared-topbar { left: 0 !important; padding: 10px 14px 0; }
   .mobile-menu-btn { display:flex; }
   .header-badge, .theme-pill { display:none; }
   .header-title  { font-size:22px; }
@@ -774,12 +784,8 @@ option { background:#0f172a; color:#e5eefc; }
 }
 /* Panel must NEVER appear unless explicitly opened by user */
 .notify-panel[hidden] { display: none !important; visibility: hidden !important; pointer-events: none !important; }
-/* Ensure shared-topbar doesn't clip */
-.shared-topbar {
-  position: relative;
-  z-index: 50;
-  overflow: visible !important;
-}
+/* Ensure notify-panel inside topbar is not clipped */
+.shared-topbar { overflow: visible !important; }
 
 /* ================================================================
    FLOATING SCROLL BUTTONS
@@ -986,8 +992,8 @@ option { background:#0f172a; color:#e5eefc; }
     right: -3px !important;
   }
 
-  /* Shared topbar no bottom margin on mobile */
-  .shared-topbar { margin-bottom: 16px !important; top: 0 !important; }
+  /* Shared topbar on mobile: ensure top:0 */
+  .shared-topbar { top: 0 !important; margin-bottom: 0 !important; }
 
   /* Sidebar overlay — closes on tap */
   .sidebar-overlay { cursor: pointer; }
@@ -1820,16 +1826,14 @@ body {
   box-shadow: 0 2px 12px rgba(15,23,42,.06) !important;
 }
 
-/* ── Dark: topbar ── */
-.shared-topbar, .premium-header-shell {
-  background: rgba(6,12,26,.85) !important;
-  backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(148,163,200,.1) !important;
+/* ── Dark: topbar card ── */
+.header-shell, .premium-header-shell {
+  background: rgba(13,17,38,.96) !important;
+  backdrop-filter: blur(28px) !important;
 }
-[data-theme="light"] .shared-topbar,
+[data-theme="light"] .header-shell,
 [data-theme="light"] .premium-header-shell {
-  background: rgba(255,255,255,.88) !important;
-  border-bottom-color: rgba(148,163,184,.15) !important;
+  background: rgba(255,255,255,.98) !important;
 }
 
 /* ── Dark: inputs / selects ── */
