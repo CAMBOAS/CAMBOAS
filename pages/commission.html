@@ -737,71 +737,125 @@
     if(el) el.textContent='📅 '+(labels[_mode]||_mode)+' · '+totalOrders+' orders';
   }
 
-  /* ══ EXPORT PDF ══ */
-  window.exportPDF=function(){
-    if(!window.jspdf){ macUI&&macUI.toast('PDF library loading...','warning'); return; }
-    var doc=new window.jspdf.jsPDF();
+  /* ══ EXPORT PDF (browser print — full Khmer support) ══ */
+  var _pdfStyle='@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;600;700;800&display=swap");'
+    +'*{margin:0;padding:0;box-sizing:border-box}'
+    +'body{font-family:"Noto Sans Khmer",sans-serif;padding:28px 32px;color:#1e293b;font-size:13px;line-height:1.6}'
+    +'.pdf-header{margin-bottom:18px;border-bottom:2px solid #7c3aed;padding-bottom:12px}'
+    +'.pdf-header h1{font-size:20px;font-weight:800;color:#1e293b;margin-bottom:3px}'
+    +'.pdf-header p{font-size:11px;color:#64748b}'
+    +'.pdf-info{display:flex;gap:16px;flex-wrap:wrap;background:#f8f6ff;border:1px solid #e9d5ff;border-radius:8px;padding:10px 14px;margin-bottom:16px}'
+    +'.pdf-info span{font-size:11px;color:#64748b} .pdf-info b{color:#1e293b}'
+    +'table{width:100%;border-collapse:collapse;font-size:12px}'
+    +'thead th{background:#7c3aed;color:#fff;padding:9px 12px;text-align:left;font-weight:700;font-size:11px}'
+    +'tbody td{padding:8px 12px;border-bottom:1px solid #e2e8f0;vertical-align:middle}'
+    +'tbody tr:nth-child(even) td{background:#f8f6ff}'
+    +'.num{text-align:right} .comm{color:#7c3aed;font-weight:700} .sale{color:#16a34a;font-weight:700}'
+    +'.footer{margin-top:20px;font-size:10px;color:#94a3b8;text-align:right}'
+    +'@media print{body{padding:16px}@page{margin:14mm}}';
+
+  function _openPrint(title,bodyHtml){
+    var win=window.open('','_blank','width=900,height=700');
+    if(!win){macUI&&macUI.toast('ប្រព័ន្ធ block popup — សូម allow popup','warning');return;}
     var period=document.getElementById('dateBtnLabel').textContent;
-    var today=new Date().toISOString().slice(0,10);
-    var purple=[124,58,237];
+    var stamp=new Date().toLocaleDateString('km-KH',{year:'numeric',month:'long',day:'numeric'});
+    win.document.write('<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8"><title>'+title+'</title>'
+      +'<style>'+_pdfStyle+'</style></head><body>'
+      +bodyHtml
+      +'<div class="footer">CAMBO MINI · Commission Report · '+stamp+'</div>'
+      +'</body></html>');
+    win.document.close();
+    win.onload=function(){setTimeout(function(){win.print();},400);};
+    macUI&&macUI.toast('PDF រួចរាល់ — ជ្រើស "Save as PDF" ✓','success');
+  }
+
+  window.exportPDF=function(){
+    var period=document.getElementById('dateBtnLabel').textContent;
 
     if(_view==='agents'){
-      /* ── All agents summary ── */
-      if(!_agents.length){ macUI&&macUI.toast('គ្មានទិន្នន័យ','warning'); return; }
-      doc.setFontSize(18); doc.setTextColor(40,40,40);
-      doc.text('Commission Report',14,18);
-      doc.setFontSize(10); doc.setTextColor(120,120,120);
-      doc.text('Period: '+period+'   Agents: '+_agents.length+'   Orders: '+_filtered.length,14,26);
-      var rows=_agents.map(function(a){
+      if(!_agents.length){macUI&&macUI.toast('គ្មានទិន្នន័យ','warning');return;}
+      var totalSales=_filtered.reduce(function(s,o){return s+total(o);},0);
+      var totalComm=_agents.reduce(function(s,a){return s+calcComm(a);},0);
+      var rows=_agents.map(function(a,i){
         var sales=a.orders.reduce(function(s,o){return s+total(o);},0);
-        return[a.name,a.orders.length,agentItems(a),'$'+$m(sales),(a.rate||0)+'៛',calcComm(a).toLocaleString()+'៛'];
-      });
-      doc.autoTable({startY:32,head:[['CloseBy','Orders','Items','Sales','Rate','Commission']],body:rows,
-        styles:{fontSize:9,cellPadding:4},headStyles:{fillColor:purple},alternateRowStyles:{fillColor:[248,246,255]}});
-      doc.save('commission_'+period+'_'+today+'.pdf');
+        return '<tr>'
+          +'<td>'+(i+1)+'</td>'
+          +'<td><b>'+a.name+'</b></td>'
+          +'<td class="num">'+a.orders.length+'</td>'
+          +'<td class="num">'+agentItems(a)+'</td>'
+          +'<td class="num sale">$'+$m(sales)+'</td>'
+          +'<td class="num">'+(a.rate||0)+'៛</td>'
+          +'<td class="num comm">'+calcComm(a).toLocaleString()+'៛</td>'
+          +'</tr>';
+      }).join('');
+      _openPrint('Commission Report — '+period,
+        '<div class="pdf-header"><h1>របាយការណ៍ Commission</h1><p>ช่วงเวลา: '+period+'</p></div>'
+        +'<div class="pdf-info">'
+        +'<span>Agents: <b>'+_agents.length+'</b></span>'
+        +'<span>Orders: <b>'+_filtered.length+'</b></span>'
+        +'<span>Total Sale: <b>$'+$m(totalSales)+'</b></span>'
+        +'<span>Total Commission: <b>'+totalComm.toLocaleString()+'៛</b></span>'
+        +'</div>'
+        +'<table><thead><tr><th>#</th><th>CloseBy</th><th>Orders</th><th>Items</th><th>Sales</th><th>Rate</th><th>Commission</th></tr></thead>'
+        +'<tbody>'+rows+'</tbody></table>');
 
     } else if(_view==='orders'){
-      /* ── Single agent orders ── */
       var name=decodeURIComponent(_selAgent||'');
       var ag=_agents.find(function(a){return a.name===name;});
-      if(!ag){ macUI&&macUI.toast('រកមិនឃើញ','warning'); return; }
-      doc.setFontSize(18); doc.setTextColor(40,40,40);
-      doc.text('Orders — '+name,14,18);
-      doc.setFontSize(10); doc.setTextColor(120,120,120);
-      doc.text('Period: '+period+'   Orders: '+ag.orders.length+'   Commission: '+calcComm(ag).toLocaleString()+'៛',14,26);
-      var rows=ag.orders.map(function(o){
+      if(!ag){macUI&&macUI.toast('រកមិនឃើញ','warning');return;}
+      var rows=ag.orders.map(function(o,i){
         var prods=Array.isArray(o.products)?o.products:[];
         var qty=prods.reduce(function(s,p){return s+(+p.qty||1);},0);
-        return[o.customer||'Unknown',fmtD(o),qty,'$'+$m(total(o)),o.payment||'—',o.receiptNo||'—'];
-      });
-      doc.autoTable({startY:32,head:[['Customer','Date','Items','Total','Payment','Receipt#']],body:rows,
-        styles:{fontSize:9,cellPadding:4},headStyles:{fillColor:purple},alternateRowStyles:{fillColor:[248,246,255]}});
-      doc.save('orders_'+name+'_'+period+'.pdf');
+        return '<tr>'
+          +'<td>'+(i+1)+'</td>'
+          +'<td><b>'+(o.customer||'Unknown')+'</b></td>'
+          +'<td>'+fmtD(o)+'</td>'
+          +'<td class="num">'+qty+'</td>'
+          +'<td class="num sale">$'+$m(total(o))+'</td>'
+          +'<td>'+(o.payment||'—')+'</td>'
+          +'<td>'+(o.receiptNo?'#'+o.receiptNo:'—')+'</td>'
+          +'</tr>';
+      }).join('');
+      _openPrint('Orders — '+name,
+        '<div class="pdf-header"><h1>Orders — '+name+'</h1><p>ช่วงเวลา: '+period+'</p></div>'
+        +'<div class="pdf-info">'
+        +'<span>Orders: <b>'+ag.orders.length+'</b></span>'
+        +'<span>Items: <b>'+agentItems(ag)+'</b></span>'
+        +'<span>Commission: <b class="comm">'+calcComm(ag).toLocaleString()+'៛</b></span>'
+        +'</div>'
+        +'<table><thead><tr><th>#</th><th>អតិថិជន</th><th>កាលបរិច្ឆេទ</th><th>Items</th><th>សរុប</th><th>Payment</th><th>Receipt</th></tr></thead>'
+        +'<tbody>'+rows+'</tbody></table>');
 
     } else if(_view==='products'){
-      /* ── Single order products ── */
       var name=decodeURIComponent(_selAgent||'');
       var ag=_agents.find(function(a){return a.name===name;});
       var ord=ag&&ag.orders[_selOrder];
-      if(!ord){ macUI&&macUI.toast('រកមិនឃើញ','warning'); return; }
-      doc.setFontSize(18); doc.setTextColor(40,40,40);
-      doc.text('Order Detail',14,18);
-      doc.setFontSize(10); doc.setTextColor(120,120,120);
-      doc.text('Customer: '+(ord.customer||'—')+'   Date: '+fmtD(ord)+'   Total: $'+$m(total(ord)),14,26);
-      doc.text('CloseBy: '+name+'   Payment: '+(ord.payment||'—')+(ord.receiptNo?'   #'+ord.receiptNo:''),14,33);
+      if(!ord){macUI&&macUI.toast('រកមិនឃើញ','warning');return;}
       var prods=Array.isArray(ord.products)?ord.products:[];
-      var rows=prods.map(function(p){
+      var rows=prods.map(function(p,i){
         var sub=((+p.qty||1)*(+p.price||0))-(+p.discount||0);
-        return[p.name||p.product||'—',+p.qty||1,'$'+(+p.price||0),'$'+$m(sub)];
-      });
-      doc.autoTable({startY:40,head:[['Product','Qty','Price','Subtotal']],body:rows,
-        styles:{fontSize:9,cellPadding:4},headStyles:{fillColor:purple},alternateRowStyles:{fillColor:[248,246,255]}});
-      doc.save('order_'+(ord.customer||'order')+'_'+fmtD(ord)+'.pdf');
+        return '<tr>'
+          +'<td>'+(i+1)+'</td>'
+          +'<td><b>'+(p.name||p.product||'—')+'</b></td>'
+          +'<td class="num">'+(+p.qty||1)+'</td>'
+          +'<td class="num">$'+(+p.price||0)+'</td>'
+          +'<td class="num sale">$'+$m(sub)+'</td>'
+          +'</tr>';
+      }).join('');
+      _openPrint('Order — '+(ord.customer||'Order'),
+        '<div class="pdf-header"><h1>Order Detail</h1><p>CloseBy: '+name+'</p></div>'
+        +'<div class="pdf-info">'
+        +'<span>អតិថិជន: <b>'+(ord.customer||'—')+'</b></span>'
+        +'<span>កាលបរិច្ឆេទ: <b>'+fmtD(ord)+'</b></span>'
+        +'<span>សរុប: <b class="sale">$'+$m(total(ord))+'</b></span>'
+        +(ord.payment?'<span>Payment: <b>'+ord.payment+'</b></span>':'')
+        +(ord.receiptNo?'<span>Receipt: <b>#'+ord.receiptNo+'</b></span>':'')
+        +'</div>'
+        +'<table><thead><tr><th>#</th><th>ផលិតផល</th><th>Qty</th><th>តម្លៃ</th><th>សរុប</th></tr></thead>'
+        +'<tbody>'+rows+'</tbody></table>');
     }
-    macUI&&macUI.toast('Export PDF រួចរាល់! ✓','success');
   };
 
-  /* update PDF button label based on view */
   function updatePdfBtn(){
     var el=document.getElementById('pdfBtnLabel');
     if(!el) return;
@@ -832,8 +886,6 @@
   });
 })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="../assets/js/sw-register.js"></script>
 
 <!-- Floating date filter menu (attached to body to avoid clipping) -->
