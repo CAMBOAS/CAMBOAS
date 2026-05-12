@@ -326,12 +326,22 @@
     return {s:'',e:''};
   }
 
+  function anCloseAll(){
+    ['anDateFloatMenu','anPageFloatMenu'].forEach(function(id){
+      var m=document.getElementById(id); if(m) m.classList.remove('show');
+    });
+    ['anDateBtn','anPageBtn'].forEach(function(id){
+      var b=document.getElementById(id); if(b) b.classList.remove('open');
+    });
+  }
+
   window.anToggleDateDrop = function(e){
     e.stopPropagation();
     var menu=document.getElementById('anDateFloatMenu');
     var btn=document.getElementById('anDateBtn');
     var open=menu.classList.contains('show');
-    if(open){ menu.classList.remove('show'); btn.classList.remove('open'); return; }
+    anCloseAll();
+    if(open) return;
     var r=btn.getBoundingClientRect();
     menu.style.top=(r.bottom+6)+'px';
     menu.style.left=r.left+'px';
@@ -383,7 +393,8 @@
     var menu=document.getElementById('anPageFloatMenu');
     var btn=document.getElementById('anPageBtn');
     var open=menu.classList.contains('show');
-    if(open){ menu.classList.remove('show'); btn.classList.remove('open'); return; }
+    anCloseAll();
+    if(open) return;
     var r=btn.getBoundingClientRect();
     menu.style.top=(r.bottom+6)+'px';
     menu.style.left=r.left+'px';
