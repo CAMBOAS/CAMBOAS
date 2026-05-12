@@ -36,6 +36,13 @@
                    font-size:14px; width:100%; box-sizing:border-box }
     .fg textarea { min-height:80px; padding:11px 13px; resize:vertical }
 
+    /* Searchable combo inside fg */
+    .fg .searchable-select { width:100%; }
+    .fg .searchable-select .combo-input {
+      min-height:46px; border-radius:11px; padding:0 13px;
+      font-size:14px; width:100%; box-sizing:border-box;
+    }
+
     /* ══════════════════════════════════════════════════
        PAYMENT BUTTONS
     ══════════════════════════════════════════════════ */
@@ -51,7 +58,6 @@
     /* ══════════════════════════════════════════════════
        PRODUCT PICKER
     ══════════════════════════════════════════════════ */
-    /* Horizontal-scroll tabs — no scroll-within-scroll on mobile */
     .ptabs { display:flex; gap:7px; margin-bottom:10px;
              overflow-x:auto; padding-bottom:2px;
              -webkit-overflow-scrolling:touch; scrollbar-width:none }
@@ -67,7 +73,6 @@
     .psearch input { width:100%; min-height:46px; border-radius:11px;
                      padding:0 13px; font-size:14px; box-sizing:border-box }
 
-    /* Product list — no max-height on mobile (avoid scroll-within-scroll) */
     .plist { display:grid; gap:6px; overflow-y:auto }
 
     .prow { display:flex; align-items:center; gap:11px;
@@ -119,24 +124,33 @@
     ══════════════════════════════════════════════════ */
     .sum-box { padding:14px; border-radius:14px;
                background:rgba(255,255,255,.04);
-               border:1px solid rgba(148,163,200,.1); margin:12px 0 }
+               border:1px solid rgba(148,163,200,.1); margin:12px 0 8px }
     .srow       { display:flex; justify-content:space-between;
                   padding:5px 0; font-size:13px; color:var(--muted) }
     .srow.total { border-top:1px solid var(--line); margin-top:8px;
                   padding-top:10px; font-size:16px; font-weight:700; color:var(--text) }
     .srow.total span:last-child { color:#7dd3fc }
-    .srow.riel  { font-size:12px }
 
-    /* ══════════════════════════════════════════════════
-       SUBMIT (desktop cart panel)
-    ══════════════════════════════════════════════════ */
-    .submit-btn { width:100%; padding:14px; border-radius:13px; border:none;
-                  background:linear-gradient(135deg,#8b5cf6,#06b6d4);
-                  color:#fff; font-size:15px; font-weight:700; cursor:pointer;
-                  font-family:inherit; letter-spacing:.02em; margin-top:4px;
-                  transition:.15s }
-    .submit-btn:active  { opacity:.82; transform:scale(.98) }
-    .submit-btn:disabled{ opacity:.5; cursor:not-allowed }
+    /* KHR rate box */
+    .khr-row { display:flex; align-items:center; justify-content:space-between;
+               background:rgba(124,92,255,.07); border-radius:10px;
+               padding:8px 12px; gap:8px; margin-bottom:10px }
+    .khr-row .khr-lbl { font-size:11px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em }
+    .khr-row .khr-val { font-size:15px; font-weight:800; color:#a78bfa }
+    .khr-edit-btn { display:flex; align-items:center; gap:4px; padding:4px 10px;
+                    border-radius:8px; border:1px solid rgba(124,92,255,.3);
+                    background:transparent; font-size:11px; color:#a78bfa;
+                    font-family:inherit; cursor:pointer; flex-shrink:0; font-weight:700 }
+    .khr-edit-btn:active { background:rgba(124,92,255,.15) }
+    #khrInputRow { display:flex; gap:5px; align-items:center; margin-bottom:10px }
+    #khrRateInput { flex:1; min-height:40px; border-radius:9px; padding:0 10px;
+                    font-size:14px; font-family:inherit; border:1.5px solid #a78bfa;
+                    background:var(--input,rgba(255,255,255,.08)); color:var(--text) }
+    .khr-apply-btn { width:40px; height:40px; border-radius:9px; border:none;
+                     background:#7c5cff; color:#fff; font-size:16px; cursor:pointer; flex-shrink:0 }
+    .khr-cancel-btn { width:40px; height:40px; border-radius:9px; border:none;
+                      background:rgba(0,0,0,.1); color:var(--text); font-size:14px;
+                      cursor:pointer; flex-shrink:0 }
 
     /* ══════════════════════════════════════════════════
        TOAST
@@ -152,70 +166,102 @@
     .toast.info    { background:rgba(59,130,246,.92) }
 
     /* ══════════════════════════════════════════════════
-       MOBILE STICKY BOTTOM BAR
+       BOTTOM ACTION BAR  (all breakpoints, like smart-mobile)
     ══════════════════════════════════════════════════ */
-    .mob-bar {
-      display:none;
-      position:fixed; bottom:0; left:0; right:0; z-index:500;
-      background:rgba(10,15,30,.94);
-      backdrop-filter:blur(14px);
-      -webkit-backdrop-filter:blur(14px);
+    .mob-bottom-bar {
+      position:fixed; bottom:0; left:0; right:0;
+      height:68px;
+      padding-bottom:env(safe-area-inset-bottom);
+      background:rgba(238,243,251,.96);
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
       border-top:1px solid rgba(148,163,200,.15);
-      padding:10px 16px calc(10px + env(safe-area-inset-bottom)) 16px;
-      align-items:center; gap:12px;
-      box-shadow:0 -4px 24px rgba(0,0,0,.3)
+      display:flex; align-items:center; gap:6px;
+      padding-left:10px; padding-right:10px;
+      z-index:500;
+      box-shadow:0 -4px 24px rgba(0,0,0,.12);
+      transform:translateY(0); opacity:1;
+      transition:transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease;
     }
-    [data-theme="light"] .mob-bar { background:rgba(238,243,251,.96) }
-    .mob-bar-left   { flex:1; min-width:0; cursor:default }
-    .mob-bar-count  { font-size:11px; color:var(--muted); margin-bottom:2px }
-    .mob-bar-total  { font-size:20px; font-weight:800; color:#7dd3fc }
-    .mob-bar-riel   { font-size:11px; color:var(--muted) }
-    .mob-save-btn   { flex-shrink:0; padding:12px 24px; border-radius:13px;
-                      border:none; background:linear-gradient(135deg,#8b5cf6,#06b6d4);
-                      color:#fff; font-size:14px; font-weight:700; cursor:pointer;
-                      font-family:inherit; white-space:nowrap;
-                      -webkit-tap-highlight-color:transparent }
-    .mob-save-btn:active   { opacity:.82; transform:scale(.97) }
-    .mob-save-btn:disabled { opacity:.5; cursor:not-allowed }
+    [data-theme="dark"] .mob-bottom-bar { background:rgba(10,15,30,.94) }
+    .mob-bottom-bar.bar-hidden { transform:translateY(110%); opacity:0; pointer-events:none }
+
+    /* Offset on desktop so sidebar doesn't cover it */
+    @media(min-width:980px) { .mob-bottom-bar { left:var(--sb-w,272px) } }
+
+    /* Receipt number field */
+    .mob-receipt-field { flex:1; min-width:0 }
+    #receiptNo {
+      width:100%; height:38px; border-radius:9px; padding:0 10px;
+      font-size:14px; font-family:inherit;
+      border:1.5px solid var(--line,rgba(0,0,0,.12));
+      background:var(--input,rgba(255,255,255,.9)); color:var(--text,#18213a);
+      box-sizing:border-box;
+    }
+    @media(max-width:479px){
+      #receiptNo { font-size:16px; height:40px }
+    }
+
+    /* Action buttons */
+    .mob-action-btns { display:flex; gap:6px; flex-shrink:0; align-items:center }
+    .mob-action-btns .btn {
+      width:44px; height:44px; padding:0; border-radius:12px; border:none;
+      font-family:inherit; cursor:pointer;
+      transition:opacity .15s, transform .1s;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .mob-action-btns .btn:active { opacity:.72; transform:scale(.92) }
+    .mob-action-btns .btn-print  { background:rgba(92,124,250,.12); color:#5c7cfa }
+    .mob-action-btns .btn-copy   { background:rgba(16,185,129,.12); color:#059669 }
+    .mob-action-btns .btn-share  { background:rgba(251,146,60,.12); color:#ea7a0e }
+    .mob-action-btns .btn-save   { background:#7c5cff; color:#fff }
+
+    /* QR toggle */
+    .toggle-qr-btn { border:1.5px solid rgba(34,197,94,.4) !important; background:rgba(34,197,94,.12) !important; color:#16a34a !important }
+    .toggle-qr-btn.is-off { border-color:rgba(239,68,68,.35) !important; background:rgba(239,68,68,.10) !important; color:#ef4444 !important }
+
+    /* Scroll buttons */
+    #scrollBtns {
+      position:fixed; right:12px;
+      bottom:calc(68px + env(safe-area-inset-bottom) + 10px);
+      display:flex; flex-direction:column; gap:6px;
+      z-index:400; opacity:0; pointer-events:none; transition:opacity .35s
+    }
+    #scrollBtns.visible { opacity:1; pointer-events:all }
+    #scrollTopBtn, #scrollBotBtn {
+      width:38px; height:38px; border-radius:50%; border:none;
+      background:rgba(124,92,255,.72); color:#fff; font-size:13px;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 2px 10px rgba(0,0,0,.18);
+      backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+      transition:background .15s, transform .1s; line-height:1;
+    }
+    #scrollTopBtn:active, #scrollBotBtn:active { background:rgba(124,92,255,1); transform:scale(.92) }
 
     /* ══════════════════════════════════════════════════
        RESPONSIVE BREAKPOINTS
     ══════════════════════════════════════════════════ */
-
-    /* ── Desktop / large tablet ≥ 980px ── */
     @media(min-width:980px){
       .no-grid { grid-template-columns:1.3fr 1fr }
       #cartPanel { position:sticky; top:20px }
-      .mob-bar { display:none !important }
     }
-
-    /* ── Tablet / mobile < 980px ── */
     @media(max-width:979px){
       .no-grid { grid-template-columns:1fr }
-      /* Cart panel stays in flow — no sticky needed */
-      /* Product list: remove fixed max-height to avoid scroll-within-scroll */
       .plist { max-height:none }
-      /* Submit button inside cart panel — replaced by sticky bar */
-      #submitBtn { display:none }
-      .mob-bar { display:flex }
-      /* Space for sticky bar */
-      .no-wrap { padding-bottom:84px }
     }
-
-    /* ── Mobile: remove side padding → edge-to-edge ── */
     @media(max-width:979px){
       .main-content { padding-left:0 !important; padding-right:0 !important }
-      .no-wrap      { padding-left:8px; padding-right:8px }
+      .no-wrap { padding-left:8px; padding-right:8px }
     }
-
-    /* ── Small phones < 480px ── */
     @media(max-width:479px){
       .no-wrap  { padding-left:4px; padding-right:4px }
       .no-card  { padding:13px }
-      /* cols3: Pages + CloseBy on top row, Status below */
       .frow.cols3 { grid-template-columns:1fr 1fr }
       .frow.cols3 > :nth-child(3) { grid-column:1 / -1 }
     }
+
+    /* ── Extra space at bottom for the action bar ── */
+    .no-wrap { padding-bottom:calc(68px + env(safe-area-inset-bottom) + 16px) }
   </style>
 </head>
 <body>
@@ -241,7 +287,16 @@
             <!-- Customer / Phone -->
             <div class="frow">
               <div class="fg"><label>ឈ្មោះអតិថិជន</label><input id="customer" type="text" placeholder="customer..." autocomplete="off"></div>
-              <div class="fg"><label>លេខទូរស័ព្ទ</label><input id="phone" type="tel" placeholder="0xx xxx xxx"></div>
+              <div class="fg">
+                <label>លេខទូរស័ព្ទ</label>
+                <div style="position:relative;">
+                  <input id="phone" type="tel" placeholder="0xx xxx xxx" style="width:100%;padding-right:80px;box-sizing:border-box;">
+                  <span id="carrierBadgeDesktop" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;">
+                    <img id="carrierLogoDesktop" src="" alt="" style="height:16px;width:auto;border-radius:2px;">
+                    <span id="carrierNameDesktop"></span>
+                  </span>
+                </div>
+              </div>
             </div>
 
             <!-- Address -->
@@ -253,34 +308,10 @@
             <div class="frow full">
               <div class="fg">
                 <label>ខេត្ត / ក្រុង</label>
-                <select id="province">
-                  <option value="">ជ្រើស...</option>
-                  <option>រាជធានីភ្នំពេញ</option>
-                  <option>ខេត្តបន្ទាយមានជ័យ</option>
-                  <option>ខេត្តបាត់ដំបង</option>
-                  <option>ខេត្តកំពង់ចាម</option>
-                  <option>ខេត្តកំពង់ឆ្នាំង</option>
-                  <option>ខេត្តកំពង់ស្ពឺ</option>
-                  <option>ខេត្តកំពង់ធំ</option>
-                  <option>ខេត្តកំពត</option>
-                  <option>ខេត្តកណ្ដាល</option>
-                  <option>ខេត្តកោះកុង</option>
-                  <option>ខេត្តក្រចេះ</option>
-                  <option>ខេត្តមណ្ឌលគីរី</option>
-                  <option>ខេត្តពោធិ៍សាត់</option>
-                  <option>ខេត្តព្រះវិហារ</option>
-                  <option>ខេត្តព្រៃវែង</option>
-                  <option>ខេត្តរតនគីរី</option>
-                  <option>ខេត្តសៀមរាប</option>
-                  <option>ខេត្តស្ទឹងត្រែង</option>
-                  <option>ខេត្តស្វាយរៀង</option>
-                  <option>ខេត្តតាកែវ</option>
-                  <option>ខេត្តឧត្ដរមានជ័យ</option>
-                  <option>ខេត្តកែប</option>
-                  <option>ខេត្តប៉ៃលិន</option>
-                  <option>ខេត្តព្រះសីហនុ</option>
-                  <option>ខេត្តត្បូងឃ្មុំ</option>
-                </select>
+                <div class="searchable-select" id="provinceCombo">
+                  <input type="text" class="combo-input" id="provinceInput" placeholder="ខេត្ត..." autocomplete="off" />
+                  <input type="hidden" id="province" />
+                </div>
               </div>
             </div>
 
@@ -288,15 +319,10 @@
             <div class="frow">
               <div class="fg">
                 <label>ដឹកជញ្ជូន</label>
-                <select id="deliveryName">
-                  <option value="">ជ្រើស...</option>
-                  <option>វីរៈ ប៊ុនថាំ</option>
-                  <option>J&amp;T</option>
-                  <option>DRSB</option>
-                  <option>ភ្នំពេញ តាធំ</option>
-                  <option>ភ្នំពេញ តាតូច</option>
-                  <option>ដឹកខ្លួនឯង</option>
-                </select>
+                <div class="searchable-select" id="deliveryCombo">
+                  <input type="text" class="combo-input" id="deliveryInput" placeholder="ដឹកជញ្ជូន..." autocomplete="off" />
+                  <input type="hidden" id="deliveryName" />
+                </div>
               </div>
               <div class="fg">
                 <label>ថ្លៃដឹក ($)</label>
@@ -308,21 +334,17 @@
             <div class="frow cols3">
               <div class="fg">
                 <label>Pages</label>
-                <select id="page">
-                  <option value="">ជ្រើស...</option>
-                  <option>Helen CCR</option>
-                  <option>Brand1 CCR</option>
-                  <option>JELY BRAND BY HELEN</option>
-                  <option>JELY CCR BRAND</option>
-                  <option>ចែម៉ៅ CCR BRAND</option>
-                  <option>ហេឡេន CCR</option>
-                  <option>ស្រីម៉ៅ JELY</option>
-                  <option>ស្រីម៉ៅ JELY BRAND</option>
-                </select>
+                <div class="searchable-select" id="pagesCombo">
+                  <input type="text" class="combo-input" id="pagesInput" placeholder="Pages..." autocomplete="off" />
+                  <input type="hidden" id="page" />
+                </div>
               </div>
               <div class="fg">
                 <label>CloseBy</label>
-                <input id="closeBy" type="text" placeholder="..." autocomplete="off">
+                <div class="searchable-select" id="closeByCombo">
+                  <input type="text" class="combo-input" id="closeByInput" placeholder="CloseBy..." autocomplete="off" />
+                  <input type="hidden" id="closeBy" />
+                </div>
               </div>
               <div class="fg">
                 <label>Status</label>
@@ -356,7 +378,7 @@
             </div>
           </article>
 
-          <!-- Note (class "note-card" required by order-plust.js) -->
+          <!-- Note -->
           <article class="glass-card no-card note-card">
             <h3 class="no-title">
               <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -398,10 +420,23 @@
             <div class="srow"><span>Subtotal</span><span id="subTotal">$0</span></div>
             <div class="srow"><span>Delivery</span><span id="deliveryDisplay">$2</span></div>
             <div class="srow total"><span>Total</span><span id="grandTotal">$0</span></div>
-            <div class="srow riel"><span>ប្រាក់រៀល</span><span id="rielTotal">0៛</span></div>
           </div>
-          <!-- Hidden on mobile — replaced by sticky bar -->
-          <button class="submit-btn" id="submitBtn" onclick="submitOrder()">✓ Save Order</button>
+          <!-- KHR rate box -->
+          <div class="khr-row" id="khrRow">
+            <div>
+              <div class="khr-lbl">ប្រាក់រៀល</div>
+              <strong class="khr-val" id="rielTotal">0៛</strong>
+            </div>
+            <button type="button" class="khr-edit-btn" id="khrEditBtn">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span id="khrRateLabel">4,100</span>
+            </button>
+          </div>
+          <div id="khrInputRow" style="display:none;">
+            <input type="number" id="khrRateInput" placeholder="Rate..." min="1" step="1" value="4100" inputmode="numeric" />
+            <button type="button" class="khr-apply-btn" id="khrApplyBtn">✓</button>
+            <button type="button" class="khr-cancel-btn" id="khrCancelBtn">✕</button>
+          </div>
         </article>
       </div><!-- end no-grid -->
 
@@ -409,17 +444,57 @@
   </main>
 </div>
 
-<!-- ═══ MOBILE STICKY BOTTOM BAR ═══ -->
-<div class="mob-bar" id="mobBar">
-  <div class="mob-bar-left">
-    <div class="mob-bar-count" id="mobBarCount">0 ផលិតផល</div>
-    <div class="mob-bar-total" id="mobBarTotal">$0</div>
-    <div class="mob-bar-riel" id="mobBarRiel">0៛</div>
+<!-- ═══ FIXED BOTTOM ACTION BAR ═══ -->
+<div class="mob-bottom-bar" id="mobBottomBar">
+  <!-- Receipt Number -->
+  <div class="mob-receipt-field">
+    <input type="number" id="receiptNo" placeholder="លេខប៉ុង..." min="0" step="1" inputmode="numeric" />
   </div>
-  <button class="mob-save-btn" id="mobSaveBtn" onclick="submitOrder()">✓ Save Order</button>
+  <!-- Action Buttons -->
+  <div class="mob-action-btns">
+    <!-- QR Toggle -->
+    <button id="toggleQrBtn" class="btn toggle-qr-btn" type="button" aria-pressed="true" title="QR ON/OFF">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
+        <rect x="5" y="5" width="3" height="3" fill="currentColor" stroke="none"/><rect x="16" y="5" width="3" height="3" fill="currentColor" stroke="none"/><rect x="16" y="16" width="3" height="3" fill="currentColor" stroke="none"/><rect x="5" y="16" width="3" height="3" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+    <!-- Print -->
+    <button id="printBtn" class="btn btn-print" type="button" title="Print">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+      </svg>
+    </button>
+    <!-- Copy -->
+    <button id="copyBtn" class="btn btn-copy" type="button" title="Copy">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+      </svg>
+    </button>
+    <!-- Share -->
+    <button id="shareBtn" class="btn btn-share" type="button" title="Share">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+    </button>
+    <!-- Save -->
+    <button id="saveBtn" class="btn btn-save" type="button" title="Save Order">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Scroll buttons -->
+<div id="scrollBtns">
+  <button id="scrollTopBtn" title="ឡើងលើ">▲</button>
+  <button id="scrollBotBtn" title="ចុះក្រោម">▼</button>
 </div>
 
 <div id="toastContainer" class="toast-container"></div>
+<!-- Print area (hidden, used by share-receipt) -->
+<div id="printArea" style="display:none;"></div>
 
 <script>
 // ── Apps Script URL ──────────────────────────────────────────────────────────
@@ -427,8 +502,11 @@ window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCcN0be7HYhGx
 
 // ── KHR exchange rate ────────────────────────────────────────────────────────
 var KHR_RATE = (function(){
-  try { var r = Number(localStorage.getItem('cambo_khr_rate')); return r > 0 ? r : 4100; } catch { return 4100; }
+  try { var r = Number(localStorage.getItem('cambo_khr_rate')); return r > 0 ? r : 4100; } catch(e) { return 4100; }
 })();
+
+// ── QR show state ────────────────────────────────────────────────────────────
+var _showQR = true;
 
 // ── Full product catalog ─────────────────────────────────────────────────────
 var products = [
@@ -504,16 +582,10 @@ function calcTotal(){
   var grand = getGrandTotal();
   var riel  = Math.round(grand * KHR_RATE);
 
-  _el('subTotal').textContent        = fmt(sub);
-  _el('deliveryDisplay').textContent = fmt(getDeliveryFeeValue());
-  _el('grandTotal').textContent      = fmt(grand);
-  _el('rielTotal').textContent       = riel.toLocaleString() + '៛';
-
-  // ── Update mobile sticky bar ──
-  var mTotal = _el('mobBarTotal');
-  var mRiel  = _el('mobBarRiel');
-  if(mTotal) mTotal.textContent = fmt(grand);
-  if(mRiel)  mRiel.textContent  = riel.toLocaleString() + '៛';
+  if(_el('subTotal'))       _el('subTotal').textContent        = fmt(sub);
+  if(_el('deliveryDisplay'))_el('deliveryDisplay').textContent = fmt(getDeliveryFeeValue());
+  if(_el('grandTotal'))     _el('grandTotal').textContent      = fmt(grand);
+  if(_el('rielTotal'))      _el('rielTotal').textContent       = riel.toLocaleString() + '៛';
 }
 
 // ── Cart rendering ────────────────────────────────────────────────────────────
@@ -524,7 +596,6 @@ function renderCart(){
   if(!items.length){
     el.innerHTML = '<div class="cart-empty">🛒 មិនទាន់មានផលិតផល<br><small>ចុចលើ product ខាងឆ្វេង</small></div>';
     calcTotal();
-    _updateMobCount();
     return;
   }
 
@@ -552,17 +623,6 @@ function renderCart(){
   });
 
   calcTotal();
-  _updateMobCount();
-}
-
-function _updateMobCount(){
-  var mobC = _el('mobBarCount');
-  if(!mobC) return;
-  var total = items.reduce(function(s,it){ return s + (it.qty||0); }, 0);
-  mobC.textContent = total + ' ផលិតផល';
-  // sync disabled state
-  var mobBtn = _el('mobSaveBtn');
-  if(mobBtn) mobBtn.disabled = !items.length;
 }
 
 function _chQty(idx, dir){
@@ -620,13 +680,19 @@ function clearAll(){
   items = [];
   renderCart();
 
-  ['customer','phone','addressDetail','note','closeBy'].forEach(function(id){
+  ['customer','phone','addressDetail','note'].forEach(function(id){
     if(_el(id)) _el(id).value = '';
   });
 
-  if(_el('page'))         _el('page').value         = '';
-  if(_el('province'))     _el('province').value     = '';
-  if(_el('deliveryName')) _el('deliveryName').value = '';
+  // Clear hidden inputs
+  ['page','province','deliveryName','closeBy'].forEach(function(id){
+    if(_el(id)) _el(id).value = '';
+  });
+  // Clear combo display inputs
+  ['pagesInput','provinceInput','deliveryInput','closeByInput'].forEach(function(id){
+    if(_el(id)) _el(id).value = '';
+  });
+
   if(_el('deliveryFee'))  _el('deliveryFee').value  = '2';
   if(_el('status'))       _el('status').value       = 'Pending';
   if(_el('payment'))      _el('payment').value      = 'Delivery';
@@ -661,12 +727,11 @@ function buildPayload(){
   var m = rawVal.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
   if(m){
     dateTime = m[3]+'/'+m[2]+'/'+m[1]+' '+m[4]+':'+m[5];
-  } else if(/^\d{2}\/\d{2}\/\d{4}/.test(rawVal)){
-    dateTime = rawVal;
   } else {
     dateTime = rawVal;
   }
 
+  var receiptNoEl = _el('receiptNo');
   return {
     id:           Date.now(),
     createdAt:    now.toISOString(),
@@ -682,12 +747,39 @@ function buildPayload(){
     deliveryFee:  getDeliveryFeeValue(),
     payment:      (_el('payment')      && _el('payment').value)       || '',
     note:         (_el('note')         && _el('note').value)          || '',
-    showQrEnabled: true,
-    receiptNo:    '',
+    showQrEnabled: _showQR,
+    receiptNo:    receiptNoEl ? receiptNoEl.value : '',
     items:        items.map(function(it){ return Object.assign({}, it); }),
     itemsTotal:   getItemsTotal(),
     total:        getGrandTotal(),
     totalRiel:    getGrandTotal() * KHR_RATE
+  };
+}
+
+// ── Build receipt data for print/copy/share ──────────────────────────────────
+function buildReceiptData(){
+  var payload = buildPayload();
+  var sub     = getItemsTotal();
+  var grand   = getGrandTotal();
+  return {
+    title:        'CAMBO MINI',
+    date:         payload.date,
+    customer:     payload.customer,
+    phone:        payload.phone,
+    address:      payload.addressDetail,
+    province:     payload.province,
+    deliveryName: payload.delivery,
+    note:         payload.note || '-',
+    page:         payload.page,
+    closeBy:      payload.closeBy,
+    payment:      payload.payment,
+    receiptNo:    payload.receiptNo,
+    showQR:       _showQR,
+    items:        payload.items,
+    subtotal:     sub,
+    deliveryFee:  payload.deliveryFee,
+    grandTotal:   grand,
+    grandRiel:    Math.round(grand * KHR_RATE)
   };
 }
 
@@ -700,7 +792,7 @@ async function _postToAppsScript(order){
     body:JSON.stringify(order) });
   var text = await res.text();
   var data;
-  try { data = JSON.parse(text); } catch { throw new Error('Invalid server response: ' + text); }
+  try { data = JSON.parse(text); } catch(e) { throw new Error('Invalid server response: ' + text); }
   if(!res.ok || !data.ok) throw new Error(data.message || 'Save failed.');
   return data;
 }
@@ -709,12 +801,10 @@ async function _postToAppsScript(order){
 async function submitOrder(){
   if(!items.length){ toast('សូមជ្រើសរើសផលិតផលជាមុន!', 'error'); return; }
 
-  var btn     = _el('submitBtn');
-  var mobBtn  = _el('mobSaveBtn');
-  var origTxt = btn ? btn.textContent : '✓ Save Order';
+  var saveBtn = _el('saveBtn');
+  var origHTML = saveBtn ? saveBtn.innerHTML : '';
 
-  if(btn)    { btn.disabled    = true; btn.textContent    = 'Saving...'; }
-  if(mobBtn) { mobBtn.disabled = true; mobBtn.textContent = 'Saving...'; }
+  if(saveBtn){ saveBtn.disabled = true; }
 
   try {
     var order  = buildPayload();
@@ -724,7 +814,7 @@ async function submitOrder(){
       var saved = JSON.parse(localStorage.getItem('camboOrders') || '[]');
       saved.push(order);
       localStorage.setItem('camboOrders', JSON.stringify(saved));
-    } catch {}
+    } catch(e) {}
 
     toast(
       result.telegram && result.telegram.ok === false
@@ -737,9 +827,48 @@ async function submitOrder(){
     console.error('Save failed:', err);
     toast(err.message || 'Save failed.', 'error');
   } finally {
-    if(btn)    { btn.disabled    = false; btn.textContent    = origTxt; }
-    if(mobBtn) { mobBtn.disabled = false; mobBtn.textContent = '✓ Save Order'; }
+    if(saveBtn){ saveBtn.disabled = false; saveBtn.innerHTML = origHTML; }
   }
+}
+
+// ── KHR rate controller ───────────────────────────────────────────────────────
+function _initKHR(){
+  var lbl      = _el('khrRateLabel');
+  var editBtn  = _el('khrEditBtn');
+  var inputRow = _el('khrInputRow');
+  var inp      = _el('khrRateInput');
+  var applyBtn = _el('khrApplyBtn');
+  var cancelBtn= _el('khrCancelBtn');
+
+  function updateLabel(){
+    if(lbl) lbl.textContent = KHR_RATE.toLocaleString();
+  }
+  updateLabel();
+  if(inp) inp.value = KHR_RATE;
+
+  if(editBtn) editBtn.addEventListener('click', function(){
+    if(inp) inp.value = KHR_RATE;
+    if(inputRow) inputRow.style.display = 'flex';
+    if(inp) setTimeout(function(){ inp.focus(); inp.select(); }, 50);
+  });
+
+  function applyRate(){
+    var v = Number(inp ? inp.value : 0);
+    if(v > 0){
+      KHR_RATE = v;
+      try{ localStorage.setItem('cambo_khr_rate', String(v)); }catch(e){}
+      updateLabel();
+      calcTotal();
+    }
+    if(inputRow) inputRow.style.display = 'none';
+  }
+
+  if(applyBtn)  applyBtn.addEventListener('click', applyRate);
+  if(cancelBtn) cancelBtn.addEventListener('click', function(){ if(inputRow) inputRow.style.display='none'; });
+  if(inp) inp.addEventListener('keydown', function(e){
+    if(e.key==='Enter') applyRate();
+    if(e.key==='Escape' && inputRow) inputRow.style.display='none';
+  });
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -791,8 +920,51 @@ document.addEventListener('DOMContentLoaded', function(){
   // Delivery fee → update totals
   _el('deliveryFee').addEventListener('input', calcTotal);
 
-  // Init mob bar state
-  _updateMobCount();
+  // KHR controller
+  _initKHR();
+
+  // QR toggle
+  var qrBtn = _el('toggleQrBtn');
+  if(qrBtn){
+    qrBtn.addEventListener('click', function(){
+      _showQR = !_showQR;
+      qrBtn.classList.toggle('is-off', !_showQR);
+      qrBtn.setAttribute('aria-pressed', String(_showQR));
+    });
+  }
+
+  // Save button
+  var saveBtn = _el('saveBtn');
+  if(saveBtn) saveBtn.addEventListener('click', function(){ submitOrder(); });
+
+  // Print button
+  var printBtn = _el('printBtn');
+  if(printBtn) printBtn.addEventListener('click', function(){
+    if(!items.length){ toast('សូមជ្រើសរើសផលិតផលជាមុន!', 'error'); return; }
+    if(typeof ReceiptPrinter === 'undefined'){ toast('Printer not ready', 'error'); return; }
+    try {
+      ReceiptPrinter.print(buildReceiptData(), { rielRate: KHR_RATE });
+    } catch(e){ toast(e.message||'Print failed', 'error'); }
+  });
+
+  // Copy button
+  var copyBtn = _el('copyBtn');
+  if(copyBtn) copyBtn.addEventListener('click', function(){
+    if(!items.length){ toast('សូមជ្រើសរើសផលិតផលជាមុន!', 'error'); return; }
+    if(typeof CopyReceipt === 'undefined'){ toast('Copy not ready', 'error'); return; }
+    CopyReceipt.copy(buildReceiptData())
+      .then(function(){ toast('ចម្លងរួចរាល់!', 'success'); })
+      .catch(function(e){ toast(e.message||'Copy failed', 'error'); });
+  });
+
+  // Share button
+  var shareBtn = _el('shareBtn');
+  if(shareBtn) shareBtn.addEventListener('click', function(){
+    if(!items.length){ toast('សូមជ្រើសរើសផលិតផលជាមុន!', 'error'); return; }
+    if(typeof ShareReceipt === 'undefined'){ toast('Share not ready', 'error'); return; }
+    ShareReceipt.share(buildReceiptData(), { target: _el('printArea') })
+      .catch(function(e){ toast(e.message||'Share failed', 'error'); });
+  });
 
   // Initial render
   renderPList(products);
@@ -800,10 +972,65 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
+<!-- ── Scroll-aware: header + bottom bar hide/show ── -->
+<script>
+(function(){
+  var header  = document.getElementById('sharedHeader');
+  var bar     = document.getElementById('mobBottomBar');
+  var lastY   = window.scrollY;
+  var ticking = false;
+  var DELTA   = 8;
+
+  function show(){
+    if(header) header.classList.remove('header-hidden');
+    if(bar)    bar.classList.remove('bar-hidden');
+  }
+  function hide(){
+    if(header) header.classList.add('header-hidden');
+    if(bar)    bar.classList.add('bar-hidden');
+  }
+
+  function onScroll(){
+    var y     = window.scrollY;
+    var delta = y - lastY;
+    if(y <= 40)           show();
+    else if(delta >= DELTA)  hide();
+    else if(delta <= -DELTA) show();
+    lastY   = y;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function(){
+    if(!ticking){ requestAnimationFrame(onScroll); ticking = true; }
+  }, { passive:true });
+
+  if(bar) bar.addEventListener('pointerdown', function(){ show(); }, { passive:true });
+})();
+</script>
+
+<!-- ── Scroll buttons ── -->
+<script>
+(function(){
+  var wrap = document.getElementById('scrollBtns');
+  if(!wrap) return;
+  var timer;
+  function show(){ wrap.classList.add('visible'); clearTimeout(timer); timer = setTimeout(function(){ wrap.classList.remove('visible'); }, 2200); }
+  window.addEventListener('scroll', show, { passive:true });
+  document.getElementById('scrollTopBtn').onclick = function(){ window.scrollTo({ top:0, behavior:'smooth' }); };
+  document.getElementById('scrollBotBtn').onclick = function(){ window.scrollTo({ top:document.body.scrollHeight, behavior:'smooth' }); };
+})();
+</script>
+
 <!-- order-plust.js: Receipt Paste — requires els, items, products, renderTable, clearOrderForm -->
+<script src="../assets/js/printer-receipt.js"></script>
+<script src="../assets/js/copy-receipt.js"></script>
+<script src="../assets/js/phone-carrier.js"></script>
 <script src="../assets/js/order-plust.js"></script>
 <script src="../assets/js/layout.js"></script>
 <script src="../assets/js/dashboard-layout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="../assets/js/share-receipt.js"></script>
+<script src="../assets/js/searchable-combo.js"></script>
 <script src="../assets/js/sw-register.js"></script>
 </body>
 </html>

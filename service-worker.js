@@ -4,7 +4,7 @@
    Network-first strategy for data (localStorage)
    ═══════════════════════════════════════════════ */
 
-const CACHE_NAME = 'cambo-mini-v96';
+const CACHE_NAME = 'cambo-mini-v97';
 
 const STATIC_ASSETS = [
   /* Pages */
