@@ -539,31 +539,45 @@
     .padd-btn:active { opacity: .78; transform: scale(.88); }
 
     /* ══════════════════════════════════════════════════════
-       CART
+       CART — full-width edge-to-edge
     ══════════════════════════════════════════════════════ */
+    #cartBody { padding: 0 0 14px; }
+
     .cart-empty {
       text-align: center;
-      padding: 28px 16px;
+      padding: 32px 20px;
       color: var(--muted, #6b7898);
       font-size: 14px;
       line-height: 1.6;
     }
+
+    /* Each cart item: 2-row full-width */
     .citem {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-      border-radius: 13px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(148,163,200,.1);
-      margin-bottom: 7px;
-      min-height: 58px;
+      flex-direction: column;
+      padding: 11px 16px 10px;
+      border-bottom: 1px solid var(--line, rgba(0,0,0,.06));
+      background: transparent;
+      border-radius: 0;
+      margin: 0;
     }
-    [data-theme="dark"] .citem { border-color: rgba(255,255,255,.08); }
+    [data-theme="dark"] .citem { border-color: rgba(255,255,255,.07); }
+    .citem-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+    }
+    .citem-bot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
     .citem-name {
       flex: 1;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text, #18213a);
       min-width: 0;
       white-space: nowrap;
@@ -571,51 +585,134 @@
       text-overflow: ellipsis;
     }
     [data-theme="dark"] .citem-name { color: #e8e0ff; }
-    .qty-ctrl { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+    .citem-price {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ef4444;
+      flex-shrink: 0;
+    }
+
+    /* ── Inline edit mode ── */
+    .citem-name {
+      cursor: pointer;
+    }
+    .citem-name:hover { opacity: .75; }
+    .citem.is-editing .citem-top {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 7px;
+      margin-bottom: 0;
+    }
+    .citem.is-editing .citem-bot { display: none; }
+    .cedit-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .cedit-name {
+      flex: 1;
+      height: 38px;
+      border-radius: 9px;
+      border: 1.5px solid #7c5cff;
+      padding: 0 10px;
+      font-size: 14px;
+      font-weight: 600;
+      background: var(--input, rgba(255,255,255,.95));
+      color: var(--text, #18213a);
+      outline: none;
+      min-width: 0;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    [data-theme="dark"] .cedit-name { background: rgba(255,255,255,.09); color: #e8e0ff; }
+    .cedit-psym { font-size: 13px; font-weight: 700; color: #ef4444; flex-shrink: 0; }
+    .cedit-price {
+      width: 72px;
+      height: 38px;
+      border-radius: 9px;
+      border: 1.5px solid #ef4444;
+      padding: 0 8px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #ef4444;
+      background: var(--input, rgba(255,255,255,.95));
+      outline: none;
+      text-align: center;
+      -moz-appearance: textfield;
+    }
+    .cedit-price::-webkit-outer-spin-button,
+    .cedit-price::-webkit-inner-spin-button { -webkit-appearance: none; }
+    [data-theme="dark"] .cedit-price { background: rgba(255,255,255,.09); }
+    .cedit-ok {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 9px;
+      border: none;
+      background: #7c5cff;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .cedit-ok:active { background: #5b3fe0; }
+    .cedit-cancel {
+      height: 38px;
+      width: 38px;
+      border-radius: 9px;
+      border: none;
+      background: rgba(0,0,0,.08);
+      color: var(--muted, #6b7898);
+      font-size: 16px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .cedit-cancel { background: rgba(255,255,255,.1); }
+    .qty-ctrl { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
     .qbtn {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      border: 1.5px solid var(--line, rgba(0,0,0,.12));
-      background: rgba(255,255,255,.07);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(124,92,255,.22);
+      background: rgba(124,92,255,.06);
       color: #7c5cff;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
-    .qbtn:active { background: rgba(124,92,255,.2); }
-    .qval { min-width: 26px; text-align: center; font-size: 15px; font-weight: 800; color: var(--text, #18213a); }
+    .qbtn:active { background: rgba(124,92,255,.22); }
+    .qval { min-width: 24px; text-align: center; font-size: 15px; font-weight: 800; color: var(--text, #18213a); }
     [data-theme="dark"] .qval { color: #e8e0ff; }
-    .citem-price { font-size: 14px; font-weight: 800; color: #7c5cff; min-width: 54px; text-align: right; flex-shrink: 0; }
     .rmvbtn {
-      width: 34px;
-      height: 34px;
-      border-radius: 9px;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
       border: none;
-      background: rgba(239,68,68,.12);
+      background: rgba(239,68,68,.1);
       color: #ef4444;
       cursor: pointer;
-      font-size: 17px;
+      font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
-    .rmvbtn:active { background: rgba(239,68,68,.28); }
+    .rmvbtn:active { background: rgba(239,68,68,.24); }
 
     /* ══════════════════════════════════════════════════════
        SUMMARY / TOTAL
     ══════════════════════════════════════════════════════ */
     .sum-box {
-      padding: 14px;
-      border-radius: 14px;
-      background: rgba(124,92,255,.06);
-      border: 1px solid rgba(124,92,255,.15);
-      margin: 12px 0 8px;
+      padding: 14px 16px;
+      border-radius: 0;
+      background: rgba(124,92,255,.05);
+      border-top: 1px solid rgba(124,92,255,.12);
+      border-bottom: 1px solid rgba(124,92,255,.12);
+      margin: 0 0 0;
     }
     .srow {
       display: flex;
@@ -640,11 +737,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(124,92,255,.07);
-      border-radius: 12px;
-      padding: 10px 14px;
+      background: rgba(124,92,255,.06);
+      border-radius: 0;
+      padding: 12px 16px;
       gap: 8px;
-      margin-bottom: 10px;
+      margin: 0;
+      border-bottom: 1px solid rgba(124,92,255,.1);
     }
     .khr-lbl { font-size: 11px; color: var(--muted, #6b7898); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
     .khr-val { font-size: 18px; font-weight: 800; color: #7c5cff; margin-top: 2px; }
@@ -668,11 +766,12 @@
       display: flex;
       gap: 7px;
       align-items: center;
-      margin-bottom: 10px;
+      padding: 10px 16px;
+      margin: 0;
     }
     #khrRateInput {
       flex: 1;
-      height: 48px;
+      height: 46px;
       border-radius: 11px;
       padding: 0 12px;
       font-size: 16px;
@@ -682,8 +781,8 @@
     }
     [data-theme="dark"] #khrRateInput { background: rgba(255,255,255,.08); color: #e8e0ff; }
     .khr-apply-btn, .khr-cancel-btn {
-      width: 48px;
-      height: 48px;
+      width: 46px;
+      height: 46px;
       border-radius: 11px;
       border: none;
       font-size: 18px;
@@ -1234,14 +1333,18 @@ function renderCart(){
   }
   el.innerHTML = items.map(function(c, idx){
     return '<div class="citem">'
-      + '<span class="citem-name">' + escHtml(c.name) + '</span>'
-      + '<div class="qty-ctrl">'
-      + '<button class="qbtn" data-action="dec" data-idx="'+idx+'">−</button>'
-      + '<span class="qval">'+c.qty+'</span>'
-      + '<button class="qbtn" data-action="inc" data-idx="'+idx+'">+</button>'
+      + '<div class="citem-top">'
+        + '<span class="citem-name" onclick="editCartItem(this,'+idx+')" title="ចុចដើម្បីកែ">' + escHtml(c.name) + '</span>'
+        + '<span class="citem-price">'+fmt(c.subtotal)+'</span>'
       + '</div>'
-      + '<span class="citem-price">'+fmt(c.subtotal)+'</span>'
-      + '<button class="rmvbtn" data-action="rmv" data-idx="'+idx+'">×</button>'
+      + '<div class="citem-bot">'
+        + '<div class="qty-ctrl">'
+          + '<button class="qbtn" data-action="dec" data-idx="'+idx+'">−</button>'
+          + '<span class="qval">'+c.qty+'</span>'
+          + '<button class="qbtn" data-action="inc" data-idx="'+idx+'">+</button>'
+        + '</div>'
+        + '<button class="rmvbtn" data-action="rmv" data-idx="'+idx+'">×</button>'
+      + '</div>'
       + '</div>';
   }).join('');
   el.querySelectorAll('[data-action]').forEach(function(btn){
@@ -1261,6 +1364,40 @@ function _chQty(idx,dir){
   renderCart();
 }
 function _rmvItem(idx){ items.splice(idx,1); renderCart(); }
+
+/* ── Inline cart edit ── */
+function editCartItem(nameEl, idx) {
+  var citem = nameEl.closest('.citem');
+  if (citem.classList.contains('is-editing')) return;
+  citem.classList.add('is-editing');
+  var item = items[idx];
+  var top = citem.querySelector('.citem-top');
+  top.innerHTML =
+    '<input class="cedit-name" type="text" value="' + escHtml(item.name) + '" placeholder="ឈ្មោះផលិតផល">'
+    + '<div class="cedit-row">'
+      + '<span class="cedit-psym">$</span>'
+      + '<input class="cedit-price" type="number" value="' + item.price + '" min="0" step="0.5" placeholder="0">'
+      + '<button class="cedit-ok" onclick="saveCartEdit(this,' + idx + ')" type="button">✓</button>'
+      + '<button class="cedit-cancel" onclick="cancelCartEdit(this)" type="button">✕</button>'
+    + '</div>';
+  var nameInput = top.querySelector('.cedit-name');
+  nameInput.focus();
+  nameInput.select();
+  nameInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') top.querySelector('.cedit-ok').click();
+    if (e.key === 'Escape') top.querySelector('.cedit-cancel').click();
+  });
+}
+function saveCartEdit(btn, idx) {
+  var citem = btn.closest('.citem');
+  var nameVal = (citem.querySelector('.cedit-name').value || '').trim();
+  var priceVal = Math.max(0, parseFloat(citem.querySelector('.cedit-price').value) || 0);
+  if (nameVal) items[idx].name = nameVal;
+  items[idx].price = priceVal;
+  items[idx].subtotal = Math.max(0, items[idx].qty * priceVal - (items[idx].discount || 0));
+  renderCart();
+}
+function cancelCartEdit() { renderCart(); }
 
 /* ── Add to cart ── */
 function addToCart(id){
@@ -1298,13 +1435,6 @@ function renderPList(list){
         +'</div>'
         +'<div class="prow-spacer"></div>'
         +'<div class="prow-ctrl">'
-          /* Qty — label above, bordered box */
-          +'<div class="pctrl-col">'
-            +'<span class="pctrl-above pctrl-lbl">ចំនួន</span>'
-            +'<div class="pctrl-box">'
-              +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
-            +'</div>'
-          +'</div>'
           /* Price — label above, bordered box */
           +'<div class="pctrl-col">'
             +'<span class="pctrl-above">Price</span>'
@@ -1313,6 +1443,13 @@ function renderPList(list){
                 +'<span class="pprice-sym">$</span>'
                 +'<input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()">'
               +'</div>'
+            +'</div>'
+          +'</div>'
+          /* Qty — label above, bordered box */
+          +'<div class="pctrl-col">'
+            +'<span class="pctrl-above pctrl-lbl">ចំនួន</span>'
+            +'<div class="pctrl-box">'
+              +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
             +'</div>'
           +'</div>'
           /* Unit toggle — gradient purple */
