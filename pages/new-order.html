@@ -1483,35 +1483,25 @@ function mobCollapse(headEl, bodyId) {
 
 /* ── Format money ── */
 /* ── Click sound — iPhone keyboard style (Web Audio API) ── */
+/* ── iPhone Tweet — ascending chirp sweep ── */
 function playClick(){
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
     function _play(){
-      var sr  = ctx.sampleRate;
-      var len = Math.floor(sr * 0.03); // 30ms burst
-      var buf = ctx.createBuffer(1, len, sr);
-      var d   = buf.getChannelData(0);
-      for(var i = 0; i < len; i++){
-        d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (len * 0.18));
-      }
-      var src    = ctx.createBufferSource();
-      src.buffer = buf;
-      var hp = ctx.createBiquadFilter();
-      hp.type = 'highpass'; hp.frequency.value = 1200;
-      var pk = ctx.createBiquadFilter();
-      pk.type = 'peaking'; pk.frequency.value = 3000; pk.gain.value = 8;
+      var t    = ctx.currentTime;
+      var osc  = ctx.createOscillator();
       var gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.65, ctx.currentTime);
-      src.connect(hp); hp.connect(pk); pk.connect(gain); gain.connect(ctx.destination);
-      src.onended = function(){ ctx.close(); };
-      src.start();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(420, t);
+      osc.frequency.exponentialRampToValueAtTime(2100, t + 0.042);
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.55, t + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.072);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(t); osc.stop(t + 0.075);
+      osc.onended = function(){ ctx.close(); };
     }
-    /* Mobile browsers start AudioContext suspended — must resume first */
-    if(ctx.state === 'suspended'){
-      ctx.resume().then(_play);
-    } else {
-      _play();
-    }
+    if(ctx.state === 'suspended'){ ctx.resume().then(_play); } else { _play(); }
   } catch(e) {}
 }
 
