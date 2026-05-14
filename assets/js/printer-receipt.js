@@ -157,7 +157,7 @@
     return data.items.map((item, index) => `
       <tr>
         <td class="product">${index + 1}. ${escapeHtml(item.product)}</td>
-        <td class="qty">${escapeHtml(item.qty)} ឈុត</td>
+        <td class="qty">${escapeHtml(item.qty)} ${escapeHtml(item.unit || 'ឈុត')}</td>
         <td class="price">$${money(item.price)}</td>
         <td class="total">$${money(item.subtotal)}</td>
       </tr>

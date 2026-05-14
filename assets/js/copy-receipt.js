@@ -72,7 +72,7 @@ function buildCopyText(data) {
 
   data.items.forEach((item, index) => {
     lines.push(`${index + 1}. ${item.product}`);
-    lines.push(`   ចំនួន ${item.qty} ឈុត x ${formatDisplayMoney(item.price)}      = ${formatDisplayMoney(item.subtotal)}`);
+    lines.push(`   ចំនួន ${item.qty} ${item.unit || 'ឈុត'} x ${formatDisplayMoney(item.price)}      = ${formatDisplayMoney(item.subtotal)}`);
   });
 
   // Summary
