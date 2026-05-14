@@ -720,24 +720,7 @@
       }
     }
 
-    /* QR toggle — inherits .mob-action-btns .btn size, color = green ON / red OFF */
-    #toggleQrBtn.toggle-qr-btn {
-      border: 1.5px solid rgba(239,68,68,0.35);
-      background: rgba(239,68,68,0.10);
-      color: #ef4444;
-    }
-
-    #toggleQrBtn.is-on {
-      border-color: rgba(34,197,94,0.4);
-      background: rgba(34,197,94,0.12);
-      color: #16a34a;
-    }
-
-    #toggleQrBtn.is-off {
-      border-color: rgba(239,68,68,0.35);
-      background: rgba(239,68,68,0.10);
-      color: #ef4444;
-    }
+    /* QR toggle — color handled by shared main.css */
 
     /* Receipt no input */
     .mob-receipt-field {
@@ -767,38 +750,7 @@
       width: 100%;
     }
 
-    /* Action buttons */
-    .mob-action-btns {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-      align-items: center;
-    }
-
-    .mob-action-btns .btn {
-      width: 44px;
-      height: 44px;
-      padding: 0;
-      border-radius: 12px;
-      border: none;
-      font-family: inherit;
-      cursor: pointer;
-      transition: opacity .15s, transform .1s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .mob-action-btns .btn:active {
-      opacity: .72;
-      transform: scale(0.92);
-    }
-
-    .mob-action-btns .btn-print  { background: rgba(92,124,250,0.12); color: var(--mob-accent2); }
-    .mob-action-btns .btn-copy   { background: rgba(16,185,129,0.12); color: #059669; }
-    .mob-action-btns .btn-share  { background: rgba(251,146,60,0.12); color: #ea7a0e; }
-    .mob-action-btns .btn-save   { background: var(--mob-accent); color: #fff; }
+    /* Action buttons — styles from shared main.css (iPhone app-icon) */
 
     /* ══ Section head with product manager button ══ */
     .mob-prod-head {

@@ -2286,3 +2286,69 @@ body.sb-collapsed .main-content {
   .sidebar.sb-collapsed { width: min(272px, 80vw) !important; }
   .sb-toggle-row { display: none !important; }
 }
+
+/* ════════════════════════════════════════════════
+   SHARED — iPhone App-Icon Style Action Buttons
+   Used by: new-order, smart-mobile, orders-details
+   ════════════════════════════════════════════════ */
+.mob-action-btns { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+.mob-action-btns .btn {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 14px;
+  border: none !important;
+  cursor: pointer;
+  transition: opacity .15s, transform .12s cubic-bezier(.34,1.56,.64,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff !important;
+}
+.mob-action-btns .btn:active { opacity: .78 !important; transform: scale(.88) !important; }
+
+/* QR — green (Find My) */
+.mob-action-btns .toggle-qr-btn,
+.toggle-qr-btn {
+  background: linear-gradient(145deg, #30d158, #25a244) !important;
+  box-shadow: 0 3px 10px rgba(48,209,88,.40) !important;
+  border: none !important;
+  color: #fff !important;
+}
+.mob-action-btns .toggle-qr-btn.is-off,
+.toggle-qr-btn.is-off {
+  background: linear-gradient(145deg, #ff453a, #d32f2f) !important;
+  box-shadow: 0 3px 10px rgba(255,69,58,.38) !important;
+  color: #fff !important;
+}
+
+/* Print — blue (Safari) */
+.mob-action-btns .btn-print {
+  background: linear-gradient(145deg, #64a8ff, #0a7eff) !important;
+  box-shadow: 0 3px 10px rgba(10,126,255,.38) !important;
+  color: #fff !important;
+}
+
+/* Copy — teal (Wallet) */
+.mob-action-btns .btn-copy {
+  background: linear-gradient(145deg, #00d2a8, #00916e) !important;
+  box-shadow: 0 3px 10px rgba(0,210,168,.38) !important;
+  color: #fff !important;
+}
+
+/* Share — orange (Podcast) */
+.mob-action-btns .btn-share {
+  background: linear-gradient(145deg, #ffa040, #e0620a) !important;
+  box-shadow: 0 3px 10px rgba(255,160,64,.38) !important;
+  color: #fff !important;
+}
+
+/* Save — purple (Reminders) */
+.mob-action-btns .btn-save {
+  background: linear-gradient(145deg, #bf5af2, #8944cf) !important;
+  box-shadow: 0 3px 14px rgba(191,90,242,.45) !important;
+  color: #fff !important;
+}
+
+/* Dark mode — keep gradients (no change needed, they look great on dark) */
