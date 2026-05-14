@@ -1610,7 +1610,7 @@ function cancelCartEdit() { renderCart(); }
 
 /* ── Add to cart ── */
 function addToCart(id){
-  if(navigator.vibrate) navigator.vibrate(35);
+  if(navigator.vibrate) navigator.vibrate(80);
   var p = _allProducts().find(function(x){ return String(x.id)===String(id); });
   if(!p) return;
   var ex = items.find(function(x){ return String(x.productId)===String(id); });
@@ -1696,7 +1696,7 @@ function toggleUnit(btn, e){
 
 function addFromCard(btn, e){
   e.stopPropagation();
-  if(navigator.vibrate) navigator.vibrate(35);
+  if(navigator.vibrate) navigator.vibrate(80);
   var row = btn.closest('.prow');
   var pid = row.getAttribute('data-pid');
   var qty = Math.max(1, parseInt(row.querySelector('.pqty-inp').value) || 1);
