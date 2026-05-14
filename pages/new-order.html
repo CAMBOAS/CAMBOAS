@@ -106,6 +106,23 @@
       min-width: 0;
     }
     [data-theme="dark"] .mob-sect-head h3 { color: #e8e0ff; }
+    .cart-count-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 10px;
+      background: #7c5cff;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: transform .2s cubic-bezier(.34,1.56,.64,1);
+    }
+    .cart-count-badge.bump { transform: scale(1.35); }
     .mob-sect-chevron {
       font-size: 18px;
       color: var(--muted, #6b7898);
@@ -505,7 +522,8 @@
       letter-spacing: .02em;
       transition: opacity .12s, transform .1s;
     }
-    .punit-btn.is-case { color: #bfdbfe; }
+    .punit-btn.is-case { background: linear-gradient(135deg,#0ea5e9,#38bdf8); box-shadow: 0 3px 10px rgba(14,165,233,.38); }
+    .punit-btn.is-lay  { background: linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow: 0 3px 10px rgba(245,158,11,.38); }
     .punit-btn:active { opacity: .78; transform: scale(.9); }
     .punit-icon { display: none; }
 
@@ -687,6 +705,17 @@
     .qbtn:active { background: rgba(124,92,255,.22); }
     .qval { min-width: 24px; text-align: center; font-size: 15px; font-weight: 800; color: var(--text, #18213a); }
     [data-theme="dark"] .qval { color: #e8e0ff; }
+    .citem-unit {
+      font-size: 11px;
+      font-weight: 800;
+      color: #7c5cff;
+      background: rgba(124,92,255,.1);
+      padding: 3px 9px;
+      border-radius: 7px;
+      flex-shrink: 0;
+      letter-spacing: .01em;
+    }
+    [data-theme="dark"] .citem-unit { background: rgba(124,92,255,.2); color: #c4b5fd; }
     .rmvbtn {
       width: 30px;
       height: 30px;
@@ -961,8 +990,11 @@
         gap: 16px;
         align-items: start;
       }
+      #leftCol { gap: 16px !important; }
       #cartPanel { position: sticky; top: 20px; }
       .fgrid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+      .no-wrap { padding: 14px 24px 60px; }
+      .fg textarea { min-height: 72px; }
     }
 
     /* ══════════════════════════════════════════════════════
@@ -1066,7 +1098,7 @@
                 </div>
                 <div class="fg">
                   <label>ថ្លៃដឹក ($)</label>
-                  <input id="deliveryFee" type="number" value="2" min="0" step="0.5" placeholder="2" inputmode="decimal">
+                  <input id="deliveryFee" type="number" value="0" min="0" step="0.5" placeholder="0" inputmode="decimal">
                 </div>
               </div>
 
@@ -1154,7 +1186,7 @@
         <!-- ═══ RIGHT COLUMN: Cart Summary ═══ -->
         <div class="mob-section" id="cartPanel">
           <div class="mob-sect-head is-open" id="cartHead" onclick="mobCollapse(this,'cartBody')">
-            <h3>🛒 Cart Summary</h3>
+            <h3>🛒 Cart Summary <span class="cart-count-badge" id="cartCountBadge" style="display:none">0</span></h3>
             <span class="mob-sect-chevron">▾</span>
           </div>
           <div class="mob-sect-body" id="cartBody">
@@ -1320,6 +1352,21 @@ function calcTotal(){
   if(_el('deliveryDisplay')) _el('deliveryDisplay').textContent = fmt(getDeliveryFeeValue());
   if(_el('grandTotal'))      _el('grandTotal').textContent      = fmt(grand);
   if(_el('rielTotal'))       _el('rielTotal').textContent       = riel.toLocaleString() + '៛';
+  /* Cart count badge */
+  var badge = _el('cartCountBadge');
+  if(badge){
+    var count = items.reduce(function(s,c){ return s + (c.qty||1); }, 0);
+    if(count > 0){
+      badge.textContent = count;
+      badge.style.display = 'inline-flex';
+      badge.classList.remove('bump');
+      void badge.offsetWidth; /* reflow to restart animation */
+      badge.classList.add('bump');
+      setTimeout(function(){ badge.classList.remove('bump'); }, 300);
+    } else {
+      badge.style.display = 'none';
+    }
+  }
 }
 
 /* ── Cart ── */
@@ -1343,6 +1390,7 @@ function renderCart(){
           + '<span class="qval">'+c.qty+'</span>'
           + '<button class="qbtn" data-action="inc" data-idx="'+idx+'">+</button>'
         + '</div>'
+        + '<span class="citem-unit">'+(c.unit||'ឈុត')+'</span>'
         + '<button class="rmvbtn" data-action="rmv" data-idx="'+idx+'">×</button>'
       + '</div>'
       + '</div>';
@@ -1404,8 +1452,8 @@ function addToCart(id){
   var p = products.find(function(x){ return String(x.id)===String(id); });
   if(!p) return;
   var ex = items.find(function(x){ return String(x.productId)===String(id); });
-  if(ex){ ex.qty++; ex.subtotal = Math.max(0, ex.qty*ex.price - ex.discount); }
-  else { items.push({rowId:Date.now()+Math.random(), productId:String(p.id), name:p.name, qty:1, price:p.price, discount:0, subtotal:p.price}); }
+  if(ex){ ex.qty++; ex.subtotal = Math.max(0, ex.qty*ex.price - ex.discount); toast('🛒 '+p.name+' ×'+ex.qty+' ឈុត','success'); }
+  else { items.push({rowId:Date.now()+Math.random(), productId:String(p.id), name:p.name, qty:1, price:p.price, discount:0, subtotal:p.price, unit:'ឈុត'}); toast('✅ បានបន្ថែម '+p.name,'success'); }
   /* Auto-open cart on first add */
   var cHead = _el('cartHead'), cBody = _el('cartBody');
   if(cHead && cBody && !cHead.classList.contains('is-open')){
@@ -1447,7 +1495,7 @@ function renderPList(list){
           +'</div>'
           /* Qty — label above, bordered box */
           +'<div class="pctrl-col">'
-            +'<span class="pctrl-above pctrl-lbl">ចំនួន</span>'
+            +'<span class="pctrl-above pctrl-lbl">ឈុត</span>'
             +'<div class="pctrl-box">'
               +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
             +'</div>'
@@ -1471,10 +1519,13 @@ function renderPList(list){
 function toggleUnit(btn, e){
   e.stopPropagation();
   var lblEl = btn.querySelector('.punit-lbl');
-  var isCase = (lblEl ? lblEl.textContent.trim() : btn.textContent.trim()) === 'កេស';
-  var newUnit = isCase ? 'ឈុត' : 'កេស';
+  var cur = (lblEl ? lblEl.textContent.trim() : btn.textContent.trim());
+  var units = ['ឈុត','កេស','លាយ'];
+  var idx = units.indexOf(cur);
+  var newUnit = units[(idx + 1) % units.length];
   if(lblEl) lblEl.textContent = newUnit; else btn.textContent = newUnit;
-  btn.classList.toggle('is-case', !isCase);
+  btn.classList.toggle('is-case', newUnit === 'កេស');
+  btn.classList.toggle('is-lay',  newUnit === 'លាយ');
   var qtyLbl = btn.closest('.prow').querySelector('.pctrl-lbl');
   if(qtyLbl) qtyLbl.textContent = newUnit;
 }
@@ -1489,10 +1540,10 @@ function addFromCard(btn, e){
   var customPrice = Math.max(0, parseFloat(row.querySelector('.pprice-inp').value) || 0);
   var p = products.find(function(x){ return String(x.id)===String(pid); });
   if(!p) return;
-  var dispName = unit === 'កេស' ? p.name+' (កេស)' : p.name;
+  var dispName = unit === 'ឈុត' ? p.name : p.name + ' (' + unit + ')';
   var ex = items.find(function(x){ return x.productId===String(pid) && x.unit===unit && x.price===customPrice; });
-  if(ex){ ex.qty += qty; ex.subtotal = Math.max(0, ex.qty*ex.price - ex.discount); }
-  else { items.push({rowId:Date.now()+Math.random(), productId:String(pid), name:dispName, qty:qty, price:customPrice, discount:0, subtotal:customPrice*qty, unit:unit}); }
+  if(ex){ ex.qty += qty; ex.subtotal = Math.max(0, ex.qty*ex.price - ex.discount); toast('🛒 '+dispName+' ×'+ex.qty+' '+unit,'success'); }
+  else { items.push({rowId:Date.now()+Math.random(), productId:String(pid), name:dispName, qty:qty, price:customPrice, discount:0, subtotal:customPrice*qty, unit:unit}); toast('✅ បានបន្ថែម '+dispName+' ×'+qty+' '+unit,'success'); }
   row.querySelector('.pqty-inp').value = 1;
   var cHead = _el('cartHead'), cBody = _el('cartBody');
   if(cHead && cBody && !cHead.classList.contains('is-open')){
@@ -1511,7 +1562,7 @@ function clearAll(){
   ['customer','phone','addressDetail','note'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
   ['page','province','deliveryName','closeBy'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
   ['pagesInput','provinceInput','deliveryInput','closeByInput'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
-  if(_el('deliveryFee'))  _el('deliveryFee').value  = '2';
+  if(_el('deliveryFee'))  _el('deliveryFee').value  = '0';
   if(_el('status'))       _el('status').value       = 'Pending';
   if(_el('payment'))      _el('payment').value      = 'Delivery';
   _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.value==='Delivery'); });
@@ -1669,25 +1720,37 @@ document.addEventListener('DOMContentLoaded', function(){
 <!-- Scroll-aware hide/show -->
 <script>
 (function(){
-  var header=document.getElementById('sharedHeader'), bar=document.getElementById('mobBottomBar');
-  var lastY=window.scrollY, ticking=false, DELTA=8;
-  function show(){ if(header) header.classList.remove('header-hidden'); if(bar) bar.classList.remove('bar-hidden'); }
-  function hide(){ if(header) header.classList.add('header-hidden'); if(bar) bar.classList.add('bar-hidden'); }
-  function onScroll(){ var y=window.scrollY,d=y-lastY; if(y<=40)show(); else if(d>=DELTA)hide(); else if(d<=-DELTA)show(); lastY=y;ticking=false; }
-  window.addEventListener('scroll',function(){if(!ticking){requestAnimationFrame(onScroll);ticking=true;}},{passive:true});
-  if(bar) bar.addEventListener('pointerdown',function(){show();},{passive:true});
-})();
-</script>
+  var header   = document.getElementById('sharedHeader');
+  var bar      = document.getElementById('mobBottomBar');
+  var scrollBtns = document.getElementById('scrollBtns');
+  var lastY = window.scrollY, ticking = false, DELTA = 8;
 
-<!-- Scroll buttons -->
-<script>
-(function(){
-  var wrap=document.getElementById('scrollBtns'); if(!wrap) return;
-  var timer;
-  function show(){wrap.classList.add('visible');clearTimeout(timer);timer=setTimeout(function(){wrap.classList.remove('visible');},2200);}
-  window.addEventListener('scroll',show,{passive:true});
-  document.getElementById('scrollTopBtn').onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};
-  document.getElementById('scrollBotBtn').onclick=function(){window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});};
+  function showAll(){
+    if(header)     header.classList.remove('header-hidden');
+    if(bar)        bar.classList.remove('bar-hidden');
+    if(scrollBtns) scrollBtns.classList.add('visible');
+  }
+  function hideAll(){
+    if(header)     header.classList.add('header-hidden');
+    if(bar)        bar.classList.add('bar-hidden');
+    if(scrollBtns) scrollBtns.classList.remove('visible');
+  }
+  function onScroll(){
+    var y = window.scrollY, d = y - lastY;
+    if(y <= 40)        showAll();
+    else if(d >= DELTA)  hideAll();
+    else if(d <= -DELTA) showAll();
+    lastY = y; ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if(!ticking){ requestAnimationFrame(onScroll); ticking = true; }
+  }, {passive:true});
+  if(bar) bar.addEventListener('pointerdown', showAll, {passive:true});
+
+  var btnTop = document.getElementById('scrollTopBtn');
+  var btnBot = document.getElementById('scrollBotBtn');
+  if(btnTop) btnTop.onclick = function(){ window.scrollTo({top:0, behavior:'smooth'}); };
+  if(btnBot) btnBot.onclick = function(){ window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'}); };
 })();
 </script>
 
