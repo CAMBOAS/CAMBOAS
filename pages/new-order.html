@@ -966,6 +966,90 @@
     #scrollTopBtn:active, #scrollBotBtn:active { background: rgba(124,92,255,1); transform: scale(.9); }
 
     /* ══════════════════════════════════════════════════════
+       PRODUCT MANAGER BUTTON (pm-open-btn)
+    ══════════════════════════════════════════════════════ */
+    .pm-open-btn {
+      display: flex; align-items: center; gap: 4px;
+      padding: 4px 10px; height: 30px; flex-shrink: 0;
+      border-radius: 8px; border: 1.5px solid var(--line, rgba(0,0,0,.12));
+      background: transparent; font-size: 11px; font-weight: 700;
+      font-family: inherit; color: var(--muted, #6b7898); cursor: pointer;
+      white-space: nowrap; transition: opacity .15s;
+    }
+    .pm-open-btn:active { opacity: .7; }
+
+    /* ══════════════════════════════════════════════════════
+       PRODUCT MANAGER MODAL (pm5)
+    ══════════════════════════════════════════════════════ */
+    #pmModal {
+      position: fixed; inset: 0; z-index: 19000;
+      display: flex !important; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.6); padding: 10px;
+    }
+    #pmModal[hidden] { display: none !important; }
+    .pm5-panel {
+      width: min(600px,96vw); max-height: 90vh;
+      border-radius: 22px; display: flex; flex-direction: column;
+      overflow: hidden; background: #fff;
+      border: 1px solid rgba(148,163,184,.2);
+      box-shadow: 0 24px 64px rgba(15,23,42,.2);
+      animation: pm5In .22s cubic-bezier(.4,0,.2,1);
+    }
+    [data-theme="dark"] .pm5-panel { background: #0d1526; border-color: rgba(148,163,200,.14); box-shadow: 0 32px 80px rgba(0,0,0,.7); }
+    @keyframes pm5In { from{opacity:0;transform:scale(.94) translateY(-12px);} to{opacity:1;transform:scale(1) translateY(0);} }
+    .pm5-head { display:flex; align-items:center; justify-content:space-between; padding:18px 22px 14px; border-bottom:1px solid rgba(0,0,0,.08); flex-shrink:0; }
+    [data-theme="dark"] .pm5-head { border-bottom-color:rgba(148,163,200,.1); }
+    .pm5-head h2 { margin:0; font-size:17px; font-weight:800; color:var(--text,#18213a); }
+    .pm5-close { width:32px; height:32px; border-radius:9px; border:none; background:rgba(239,68,68,.12); color:#ef4444; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .12s; }
+    [data-theme="dark"] .pm5-close { color:#fca5a5; }
+    .pm5-close:hover { background:rgba(239,68,68,.28); }
+    .pm5-tabs { display:flex; gap:4px; padding:10px 18px 0; border-bottom:1px solid rgba(0,0,0,.07); flex-shrink:0; }
+    [data-theme="dark"] .pm5-tabs { border-bottom-color:rgba(148,163,200,.08); }
+    .pmT { padding:7px 18px; border-radius:8px 8px 0 0; border:none; background:transparent; color:var(--muted,#6b7898); font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; position:relative; transition:color .12s; }
+    .pmT:hover { color:var(--text,#18213a); }
+    .pmT.pmT-on { color:#8b5cf6; }
+    .pmT.pmT-on::after { content:''; position:absolute; bottom:-1px; left:6px; right:6px; height:2px; border-radius:2px 2px 0 0; background:linear-gradient(90deg,#8b5cf6,#06b6d4); }
+    .pm5-body { flex:1; overflow-y:auto; padding:16px 20px; scrollbar-width:thin; scrollbar-color:rgba(148,163,200,.2) transparent; }
+    .pm5-body::-webkit-scrollbar { width:4px; }
+    .pm5-body::-webkit-scrollbar-thumb { background:rgba(148,163,200,.2); border-radius:4px; }
+    .pm5-toolbar { display:flex; gap:8px; margin-bottom:12px; }
+    .pm5-toolbar input { flex:1; height:40px; padding:0 12px; border-radius:10px; border:1px solid var(--line,rgba(0,0,0,.12)); background:var(--input,rgba(255,255,255,.9)); color:var(--text,#18213a); font-size:14px; font-family:inherit; outline:none; }
+    .pm5-toolbar input:focus { border-color:#8b5cf6; }
+    [data-theme="dark"] .pm5-toolbar input { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.12); color:#e8e0ff; }
+    .pm5-add-btn { height:40px; padding:0 14px; border-radius:10px; border:none; background:linear-gradient(135deg,#8b5cf6,#06b6d4); color:#fff; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; white-space:nowrap; flex-shrink:0; }
+    .pm5-list { display:grid; gap:7px; }
+    .pmi { display:flex; align-items:center; gap:11px; padding:10px 13px; border-radius:13px; background:#f8fafc; border:1px solid rgba(148,163,184,.13); transition:background .12s; }
+    [data-theme="dark"] .pmi { background:rgba(255,255,255,.04); border-color:rgba(148,163,200,.09); }
+    .pmi-img { width:46px; height:46px; border-radius:10px; object-fit:cover; flex-shrink:0; }
+    .pmi-noimg { width:46px; height:46px; border-radius:10px; background:rgba(124,92,255,.08); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; }
+    .pmi-info { flex:1; min-width:0; }
+    .pmi-name { display:block; font-size:13px; font-weight:700; color:var(--text,#18213a); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pmi-meta { font-size:11px; color:var(--muted,#6b7898); }
+    .pmi-acts { display:flex; gap:5px; flex-shrink:0; }
+    .pmi-btn { width:32px; height:32px; border-radius:8px; border:none; cursor:pointer; font-size:15px; display:flex; align-items:center; justify-content:center; transition:background .12s; }
+    .pmi-edit { background:rgba(251,191,36,.12); } .pmi-edit:hover { background:rgba(251,191,36,.28); }
+    .pmi-eye  { background:rgba(34,197,94,.12);  } .pmi-eye:hover  { background:rgba(34,197,94,.28);  }
+    .pmi-eye-off { background:rgba(148,163,200,.1); opacity:.7; }
+    .pmi-del  { background:rgba(239,68,68,.1);   } .pmi-del:hover  { background:rgba(239,68,68,.28);   }
+    .pm-empty { text-align:center; padding:30px; color:var(--muted,#6b7898); font-size:13px; }
+    .pm5-form { display:grid; gap:16px; }
+    .pm5-form-title { margin:0 0 4px; font-size:15px; font-weight:700; color:var(--text,#18213a); }
+    .pm5-img-zone { width:100%; height:150px; border:2px dashed rgba(148,163,200,.3); border-radius:14px; cursor:pointer; overflow:hidden; transition:border-color .15s, background .15s; }
+    .pm5-img-zone:hover, .pm5-img-zone.pm-drag { border-color:rgba(139,92,246,.55); background:rgba(139,92,246,.05); }
+    .pm5-img-prev { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; color:var(--muted,#6b7898); font-size:13px; }
+    .pm5-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .pm5-fg { display:flex; flex-direction:column; gap:5px; }
+    .pm5-span2 { grid-column:1 / -1; }
+    .pm5-fg label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--muted,#6b7898); }
+    .pm5-fg input, .pm5-fg select { height:42px; padding:0 12px; border-radius:10px; border:1px solid var(--line,rgba(0,0,0,.12)); background:var(--input,rgba(255,255,255,.9)); color:var(--text,#18213a); font-size:14px; font-family:inherit; outline:none; transition:border-color .15s; }
+    .pm5-fg input:focus, .pm5-fg select:focus { border-color:#8b5cf6; }
+    [data-theme="dark"] .pm5-fg input, [data-theme="dark"] .pm5-fg select { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.12); color:#e8e0ff; }
+    .pm5-form-actions { display:flex; gap:10px; justify-content:flex-end; padding-top:4px; }
+    .pm5-cancel-btn { padding:0 18px; height:40px; border-radius:10px; border:1px solid var(--line,rgba(0,0,0,.12)); background:transparent; color:var(--muted,#6b7898); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+    .pm5-save-btn { padding:0 24px; height:42px; border-radius:11px; border:none; background:linear-gradient(135deg,#8b5cf6,#06b6d4); color:#fff; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:opacity .15s; }
+    .pm5-save-btn:hover { opacity:.88; }
+
+    /* ══════════════════════════════════════════════════════
        TABLET (≥600px): glass cards with radius
     ══════════════════════════════════════════════════════ */
     @media (min-width: 600px) {
@@ -1171,7 +1255,10 @@
           <div class="mob-section" id="prodSection">
             <div class="mob-sect-head is-open" id="prodHead" onclick="mobCollapse(this,'prodBody')">
               <h3>📦 ជ្រើសរើសផលិតផល</h3>
-              <span class="mob-sect-chevron">▾</span>
+              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <button type="button" class="pm-open-btn" id="pmOpenBtn">⚙️ គ្រប់គ្រង</button>
+                <span class="mob-sect-chevron">▾</span>
+              </div>
             </div>
             <div class="mob-sect-body" id="prodBody">
               <div class="ptabs" id="categoryTabs">
@@ -1271,6 +1358,66 @@
   <button id="scrollBotBtn" title="ចុះក្រោម">▼</button>
 </div>
 
+<!-- Product Manager Modal -->
+<div id="pmModal" hidden>
+  <div class="pm5-panel">
+    <div class="pm5-head">
+      <h2>⚙️ គ្រប់គ្រងផលិតផល</h2>
+      <button id="pmCloseBtn" class="pm5-close" type="button">✕</button>
+    </div>
+    <div class="pm5-tabs">
+      <button class="pmT pmT-on" data-tab="list">📋 បញ្ជីផលិតផល</button>
+      <button class="pmT" data-tab="form">➕ បន្ថែម / កែ</button>
+    </div>
+    <div id="pmTabList" class="pm5-body">
+      <div class="pm5-toolbar">
+        <input type="text" id="pmSearch" placeholder="🔍 ស្វែងរកផលិតផល...">
+        <button id="pmAddBtn" class="pm5-add-btn" type="button">➕ ផលិតផលថ្មី</button>
+      </div>
+      <div id="pmItems" class="pm5-list"></div>
+    </div>
+    <div id="pmTabForm" class="pm5-body" hidden>
+      <div class="pm5-form">
+        <h3 id="pmFormTitle" class="pm5-form-title">➕ បន្ថែមផលិតផលថ្មី</h3>
+        <div id="pmImgZone" class="pm5-img-zone">
+          <input type="file" id="pmImgFile" accept="image/*" hidden>
+          <div id="pmImgPrev" class="pm5-img-prev">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>ចុច ឬ Drag រូបភាព</span>
+          </div>
+        </div>
+        <div class="pm5-fields">
+          <div class="pm5-fg pm5-span2">
+            <label>ឈ្មោះផលិតផល *</label>
+            <input type="text" id="pmFName" placeholder="ឈ្មោះ...">
+          </div>
+          <div class="pm5-fg pm5-span2">
+            <label>ឈ្មោះ Sub</label>
+            <input type="text" id="pmFSub" placeholder="Sub name / description...">
+          </div>
+          <div class="pm5-fg">
+            <label>Category</label>
+            <select id="pmFCat">
+              <option value="Hair">Hair</option>
+              <option value="Body">Body</option>
+              <option value="Face">Face</option>
+              <option value="Drink">Drink</option>
+            </select>
+          </div>
+          <div class="pm5-fg">
+            <label>តម្លៃ ($)</label>
+            <input type="number" id="pmFPrice" placeholder="0.00" min="0" step="0.5">
+          </div>
+        </div>
+        <div class="pm5-form-actions">
+          <button type="button" class="pm5-cancel-btn pmT" data-tab="list">← ត្រឡប់</button>
+          <button type="button" id="pmSaveBtn" class="pm5-save-btn">✓ រក្សាទុក</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toastContainer" class="toast-container"></div>
 <div id="printArea" style="display:none;"></div>
 
@@ -1312,6 +1459,12 @@ var products = [
   {id:26, name:"កាហ្វេសម្រក CCR",                  price:18,  category:"Drink", detail:"កាហ្វេសម្រក Coffee CCR",                             image:"../images/products/drink/CoffeeCCR.png"},
   {id:27, name:"ឈុតសម្រកទ្វេដង CCR",              price:42,  category:"Drink", detail:"ឈុតសម្រកទ្វេដង CCR",                                image:"../images/products/drink/SlimSetX2_CCR.png"}
 ];
+
+/* ── Product list helpers ── */
+function _allProducts(){ return (window.__camboProducts && window.__camboProducts.length) ? window.__camboProducts : products; }
+
+/* Called by product-manager.js after IndexedDB loads */
+window.renderProductGrid = function(){ renderPList(getFiltered()); };
 
 var items = [];
 var activeCategory = 'All';
@@ -1457,7 +1610,7 @@ function cancelCartEdit() { renderCart(); }
 
 /* ── Add to cart ── */
 function addToCart(id){
-  var p = products.find(function(x){ return String(x.id)===String(id); });
+  var p = _allProducts().find(function(x){ return String(x.id)===String(id); });
   if(!p) return;
   var ex = items.find(function(x){ return String(x.productId)===String(id); });
   if(ex){ ex.qty++; ex.subtotal = Math.max(0, ex.qty*ex.price - ex.discount); toast('🛒 '+p.name+' ×'+ex.qty+' ឈុត','success'); }
@@ -1473,9 +1626,11 @@ function addToCart(id){
 /* ── Product list ── */
 function getFiltered(){
   var q = ((_el('pSearch')&&_el('pSearch').value)||'').toLowerCase();
-  return products.filter(function(p){
+  return _allProducts().filter(function(p){
+    if(p.enabled === false) return false;
     var catOk = activeCategory==='All'||p.category===activeCategory;
-    var qOk   = !q||p.name.toLowerCase().indexOf(q)>=0||p.detail.toLowerCase().indexOf(q)>=0;
+    var detail = p.detail||p.subName||'';
+    var qOk   = !q||p.name.toLowerCase().indexOf(q)>=0||detail.toLowerCase().indexOf(q)>=0;
     return catOk&&qOk;
   });
 }
@@ -1483,7 +1638,7 @@ function filterProds(){ renderPList(getFiltered()); }
 function renderPList(list){
   _el('pList').innerHTML = list.map(function(p){
     return '<div class="prow" id="pc_'+p.id+'" data-pid="'+p.id+'">'
-      +'<div class="pthumb"><img src="'+escHtml(p.image)+'" alt="" onerror="this.style.display=\'none\'"></div>'
+      +'<div class="pthumb"><img src="'+escHtml(p.img||p.image||'')+'" alt="" onerror="this.style.display=\'none\'"></div>'
       +'<div class="prow-body">'
         +'<div class="prow-info">'
           +'<div class="pinfo"><b>'+escHtml(p.name)+'</b></div>'
@@ -1546,7 +1701,7 @@ function addFromCard(btn, e){
   var unitLblEl = row.querySelector('.punit-lbl');
   var unit = unitLblEl ? unitLblEl.textContent.trim() : (row.querySelector('.punit-btn').textContent.trim());
   var customPrice = Math.max(0, parseFloat(row.querySelector('.pprice-inp').value) || 0);
-  var p = products.find(function(x){ return String(x.id)===String(pid); });
+  var p = _allProducts().find(function(x){ return String(x.id)===String(pid); });
   if(!p) return;
   var dispName = unit === 'ឈុត' ? p.name : p.name + ' (' + unit + ')';
   var ex = items.find(function(x){ return x.productId===String(pid) && x.unit===unit && x.price===customPrice; });
@@ -1723,6 +1878,15 @@ document.addEventListener('DOMContentLoaded', function(){
     ShareReceipt.share(buildReceiptData(),{target:_el('printArea')}).catch(function(e){toast(e.message||'Share failed','error');});
   });
 
+  /* Seed IndexedDB with default products, then render grid */
+  if (typeof window.pmInitProducts === 'function') {
+    window.pmInitProducts(products.map(function(p){
+      return { id:String(p.id), name:p.name, subName:p.detail||'', category:p.category, price:p.price, img:p.image||'', enabled:true };
+    }));
+  } else {
+    renderPList(products);
+  }
+
   renderPList(products);
   calcTotal();
 });
@@ -1781,6 +1945,7 @@ document.addEventListener('DOMContentLoaded', function(){
 })();
 </script>
 
+<script src="../assets/js/product-manager.js"></script>
 <script src="../assets/js/printer-receipt.js"></script>
 <script src="../assets/js/copy-receipt.js"></script>
 <script src="../assets/js/phone-carrier.js"></script>
