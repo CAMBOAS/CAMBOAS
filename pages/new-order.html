@@ -1878,6 +1878,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Payment buttons */
   _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(btn){
     btn.addEventListener('click',function(){
+      playPop();
       _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){b.classList.remove('active');});
       btn.classList.add('active'); _el('payment').value=btn.dataset.value||'';
     });
@@ -1886,6 +1887,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Category tabs */
   _el('categoryTabs').querySelectorAll('.ptab').forEach(function(btn){
     btn.addEventListener('click',function(){
+      playPop();
       _el('categoryTabs').querySelectorAll('.ptab').forEach(function(b){b.classList.remove('active');});
       btn.classList.add('active'); activeCategory=btn.dataset.cat||'All'; renderPList(getFiltered());
     });
