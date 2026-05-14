@@ -1716,6 +1716,7 @@ function renderPList(list){
 
 function toggleUnit(btn, e){
   e.stopPropagation();
+  playClick();
   var lblEl = btn.querySelector('.punit-lbl');
   var cur = (lblEl ? lblEl.textContent.trim() : btn.textContent.trim());
   var units = ['ឈុត','កេស','លាយ'];
