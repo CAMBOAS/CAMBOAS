@@ -1482,6 +1482,24 @@ function mobCollapse(headEl, bodyId) {
 }
 
 /* ── Format money ── */
+/* ── Click sound (Web Audio API — works on iOS + Android) ── */
+function playClick(){
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(900, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.045);
+    gain.gain.setValueAtTime(0.28, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.045);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.045);
+    osc.onended = function(){ ctx.close(); };
+  } catch(e) {}
+}
+
 function fmt(n){
   n = Number(n || 0);
   return '$' + (Number.isInteger(n) ? n : n.toFixed(2));
@@ -1610,6 +1628,7 @@ function cancelCartEdit() { renderCart(); }
 
 /* ── Add to cart ── */
 function addToCart(id){
+  playClick();
   if(navigator.vibrate) navigator.vibrate(80);
   var p = _allProducts().find(function(x){ return String(x.id)===String(id); });
   if(!p) return;
@@ -1696,6 +1715,7 @@ function toggleUnit(btn, e){
 
 function addFromCard(btn, e){
   e.stopPropagation();
+  playClick();
   if(navigator.vibrate) navigator.vibrate(80);
   var row = btn.closest('.prow');
   var pid = row.getAttribute('data-pid');
