@@ -1482,21 +1482,33 @@ function mobCollapse(headEl, bodyId) {
 }
 
 /* ── Format money ── */
-/* ── Click sound (Web Audio API — works on iOS + Android) ── */
+/* ── Click sound — iPhone keyboard style (Web Audio API) ── */
 function playClick(){
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
-    var osc = ctx.createOscillator();
+    var sr  = ctx.sampleRate;
+    var len = Math.floor(sr * 0.022); // 22ms burst
+    var buf = ctx.createBuffer(1, len, sr);
+    var d   = buf.getChannelData(0);
+    for(var i = 0; i < len; i++){
+      d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (len * 0.18));
+    }
+    var src    = ctx.createBufferSource();
+    src.buffer = buf;
+    /* High-pass → crisp tick, cuts low rumble */
+    var hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 1200;
+    /* Slight peak at ~3kHz — iPhone click character */
+    var pk = ctx.createBiquadFilter();
+    pk.type = 'peaking';
+    pk.frequency.value = 3000;
+    pk.gain.value = 7;
     var gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.setValueAtTime(900, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.045);
-    gain.gain.setValueAtTime(0.28, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.045);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.045);
-    osc.onended = function(){ ctx.close(); };
+    gain.gain.setValueAtTime(0.32, ctx.currentTime);
+    src.connect(hp); hp.connect(pk); pk.connect(gain); gain.connect(ctx.destination);
+    src.start();
+    src.onended = function(){ ctx.close(); };
   } catch(e) {}
 }
 
