@@ -937,11 +937,7 @@
       flex-direction: column;
       gap: 6px;
       z-index: 400;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .35s;
     }
-    #scrollBtns.visible { opacity: 1; pointer-events: all; }
     #scrollTopBtn, #scrollBotBtn {
       width: 40px;
       height: 40px;
@@ -957,7 +953,15 @@
       box-shadow: 0 3px 12px rgba(0,0,0,.2);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
-      transition: background .15s, transform .1s;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(.65);
+      transition: opacity .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1), background .15s;
+    }
+    #scrollTopBtn.sb-show, #scrollBotBtn.sb-show {
+      opacity: 1;
+      pointer-events: all;
+      transform: scale(1);
     }
     #scrollTopBtn:active, #scrollBotBtn:active { background: rgba(124,92,255,1); transform: scale(.9); }
 
@@ -1144,10 +1148,10 @@
                   <button type="button" class="pay-btn" data-value="AC">AC</button>
                   <button type="button" class="pay-btn" data-value="ABA">ABA</button>
                   <button type="button" class="pay-btn" data-value="Wing">Wing</button>
-                  <button type="button" class="pay-btn active" data-value="Delivery">Delivery</button>
+                  <button type="button" class="pay-btn" data-value="Delivery">Delivery</button>
                   <button type="button" class="pay-btn" data-value="Other">Other</button>
                 </div>
-                <input type="hidden" id="payment" value="Delivery">
+                <input type="hidden" id="payment" value="">
               </div>
 
               <!-- Note — merged into customer section -->
@@ -1564,8 +1568,8 @@ function clearAll(){
   ['pagesInput','provinceInput','deliveryInput','closeByInput'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
   if(_el('deliveryFee'))  _el('deliveryFee').value  = '0';
   if(_el('status'))       _el('status').value       = 'Pending';
-  if(_el('payment'))      _el('payment').value      = 'Delivery';
-  _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.value==='Delivery'); });
+  if(_el('payment'))      _el('payment').value      = '';
+  _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){ b.classList.remove('active'); });
   (function(){
     var n=new Date(), pad=function(x){return String(x).padStart(2,'0');};
     if(_el('date')) _el('date').value = n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+'T'+pad(n.getHours())+':'+pad(n.getMinutes());
@@ -1720,35 +1724,51 @@ document.addEventListener('DOMContentLoaded', function(){
 <!-- Scroll-aware hide/show -->
 <script>
 (function(){
-  var header   = document.getElementById('sharedHeader');
-  var bar      = document.getElementById('mobBottomBar');
+  var header = document.getElementById('sharedHeader');
+  var bar    = document.getElementById('mobBottomBar');
   var scrollBtns = document.getElementById('scrollBtns');
   var lastY = window.scrollY, ticking = false, DELTA = 8;
 
-  function showAll(){
-    if(header)     header.classList.remove('header-hidden');
-    if(bar)        bar.classList.remove('bar-hidden');
-    if(scrollBtns) scrollBtns.classList.add('visible');
-  }
-  function hideAll(){
-    if(header)     header.classList.add('header-hidden');
-    if(bar)        bar.classList.add('bar-hidden');
-    if(scrollBtns) scrollBtns.classList.remove('visible');
-  }
+  /* Header + bottom bar: hide on scroll down, show on scroll up */
+  function showBars(){ if(header) header.classList.remove('header-hidden'); if(bar) bar.classList.remove('bar-hidden'); }
+  function hideBars(){ if(header) header.classList.add('header-hidden');    if(bar) bar.classList.add('bar-hidden'); }
   function onScroll(){
     var y = window.scrollY, d = y - lastY;
-    if(y <= 40)        showAll();
-    else if(d >= DELTA)  hideAll();
-    else if(d <= -DELTA) showAll();
+    if(y <= 40)        showBars();
+    else if(d >= DELTA)  hideBars();
+    else if(d <= -DELTA) showBars();
     lastY = y; ticking = false;
   }
   window.addEventListener('scroll', function(){
     if(!ticking){ requestAnimationFrame(onScroll); ticking = true; }
   }, {passive:true});
-  if(bar) bar.addEventListener('pointerdown', showAll, {passive:true});
+  if(bar) bar.addEventListener('pointerdown', showBars, {passive:true});
 
+  /* Scroll buttons: smart show/hide per button */
   var btnTop = document.getElementById('scrollTopBtn');
   var btnBot = document.getElementById('scrollBotBtn');
+  var sbTimer;
+
+  function updateScrollBtns() {
+    var y   = window.scrollY;
+    var max = document.body.scrollHeight - window.innerHeight;
+    /* ▲ show only when scrolled > 200px from top */
+    if(y > 200) btnTop && btnTop.classList.add('sb-show');
+    else         btnTop && btnTop.classList.remove('sb-show');
+    /* ▼ show only when more than 80px of content remains below */
+    if(y < max - 80) btnBot && btnBot.classList.add('sb-show');
+    else              btnBot && btnBot.classList.remove('sb-show');
+    /* auto-hide both after 2.5s of no scrolling */
+    clearTimeout(sbTimer);
+    sbTimer = setTimeout(function(){
+      btnTop && btnTop.classList.remove('sb-show');
+      btnBot && btnBot.classList.remove('sb-show');
+    }, 2500);
+  }
+
+  window.addEventListener('scroll', updateScrollBtns, {passive:true});
+  updateScrollBtns();
+
   if(btnTop) btnTop.onclick = function(){ window.scrollTo({top:0, behavior:'smooth'}); };
   if(btnBot) btnBot.onclick = function(){ window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'}); };
 })();
