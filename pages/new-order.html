@@ -1525,6 +1525,31 @@ function playPop(){
   } catch(e) {}
 }
 
+/* ── Action Chime — two-note ding for bottom bar icons ── */
+function playAction(){
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    function _play(){
+      var t = ctx.currentTime;
+      var g1 = ctx.createGain(), g2 = ctx.createGain();
+      var o1 = ctx.createOscillator(), o2 = ctx.createOscillator();
+      o1.type = 'sine'; o1.frequency.value = 520;
+      g1.gain.setValueAtTime(0.46, t);
+      g1.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+      o1.connect(g1); g1.connect(ctx.destination);
+      o1.start(t); o1.stop(t + 0.10);
+      o2.type = 'sine'; o2.frequency.value = 840;
+      g2.gain.setValueAtTime(0.001, t + 0.06);
+      g2.gain.linearRampToValueAtTime(0.50, t + 0.072);
+      g2.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      o2.connect(g2); g2.connect(ctx.destination);
+      o2.start(t + 0.06); o2.stop(t + 0.19);
+      o2.onended = function(){ ctx.close(); };
+    }
+    if(ctx.state === 'suspended'){ ctx.resume().then(_play); } else { _play(); }
+  } catch(e) {}
+}
+
 function fmt(n){
   n = Number(n || 0);
   return '$' + (Number.isInteger(n) ? n : n.toFixed(2));
@@ -1898,16 +1923,16 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* QR toggle */
   var qrBtn=_el('toggleQrBtn');
-  if(qrBtn) qrBtn.addEventListener('click',function(){ playPop(); _showQR=!_showQR; qrBtn.classList.toggle('is-off',!_showQR); });
+  if(qrBtn) qrBtn.addEventListener('click',function(){ playAction(); _showQR=!_showQR; qrBtn.classList.toggle('is-off',!_showQR); });
 
   /* Save */
   var saveBtn=_el('saveBtn');
-  if(saveBtn) saveBtn.addEventListener('click',function(){ playPop(); submitOrder(); });
+  if(saveBtn) saveBtn.addEventListener('click',function(){ playAction(); submitOrder(); });
 
   /* Print */
   var printBtn=_el('printBtn');
   if(printBtn) printBtn.addEventListener('click',function(){
-    playPop();
+    playAction();
     if(!items.length){toast('សូមជ្រើសរើសផលិតផលជាមុន!','error');return;}
     if(typeof ReceiptPrinter==='undefined'){toast('Printer not ready','error');return;}
     try{ReceiptPrinter.print(buildReceiptData());}catch(e){toast(e.message||'Print failed','error');}
@@ -1916,7 +1941,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Copy */
   var copyBtn=_el('copyBtn');
   if(copyBtn) copyBtn.addEventListener('click',function(){
-    playPop();
+    playAction();
     if(!items.length){toast('សូមជ្រើសរើសផលិតផលជាមុន!','error');return;}
     if(typeof CopyReceipt==='undefined'){toast('Copy not ready','error');return;}
     CopyReceipt.copy(buildReceiptData()).then(function(){toast('ចម្លងរួចរាល់!','success');}).catch(function(e){toast(e.message||'Copy failed','error');});
@@ -1925,7 +1950,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Share */
   var shareBtn=_el('shareBtn');
   if(shareBtn) shareBtn.addEventListener('click',function(){
-    playPop();
+    playAction();
     if(!items.length){toast('សូមជ្រើសរើសផលិតផលជាមុន!','error');return;}
     if(typeof ShareReceipt==='undefined'){toast('Share not ready','error');return;}
     ShareReceipt.share(buildReceiptData(),{target:_el('printArea')}).catch(function(e){toast(e.message||'Share failed','error');});
