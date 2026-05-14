@@ -1515,6 +1515,26 @@ function playClick(){
   } catch(e) {}
 }
 
+/* ── UI Pop — e-commerce action button sound (Telegram/WhatsApp style) ── */
+function playPop(){
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    function _play(){
+      var osc  = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(820, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(520, ctx.currentTime + 0.065);
+      gain.gain.setValueAtTime(0.52, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.075);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + 0.08);
+      osc.onended = function(){ ctx.close(); };
+    }
+    if(ctx.state === 'suspended'){ ctx.resume().then(_play); } else { _play(); }
+  } catch(e) {}
+}
+
 function fmt(n){
   n = Number(n || 0);
   return '$' + (Number.isInteger(n) ? n : n.toFixed(2));
@@ -1886,15 +1906,16 @@ document.addEventListener('DOMContentLoaded', function(){
 
   /* QR toggle */
   var qrBtn=_el('toggleQrBtn');
-  if(qrBtn) qrBtn.addEventListener('click',function(){ _showQR=!_showQR; qrBtn.classList.toggle('is-off',!_showQR); });
+  if(qrBtn) qrBtn.addEventListener('click',function(){ playPop(); _showQR=!_showQR; qrBtn.classList.toggle('is-off',!_showQR); });
 
   /* Save */
   var saveBtn=_el('saveBtn');
-  if(saveBtn) saveBtn.addEventListener('click',submitOrder);
+  if(saveBtn) saveBtn.addEventListener('click',function(){ playPop(); submitOrder(); });
 
   /* Print */
   var printBtn=_el('printBtn');
   if(printBtn) printBtn.addEventListener('click',function(){
+    playPop();
     if(!items.length){toast('សូមជ្រើសរើសផលិតផលជាមុន!','error');return;}
     if(typeof ReceiptPrinter==='undefined'){toast('Printer not ready','error');return;}
     try{ReceiptPrinter.print(buildReceiptData());}catch(e){toast(e.message||'Print failed','error');}
@@ -1903,6 +1924,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Copy */
   var copyBtn=_el('copyBtn');
   if(copyBtn) copyBtn.addEventListener('click',function(){
+    playPop();
     if(!items.length){toast('សូមជ្រើសរើសផលិតផលជាមុន!','error');return;}
     if(typeof CopyReceipt==='undefined'){toast('Copy not ready','error');return;}
     CopyReceipt.copy(buildReceiptData()).then(function(){toast('ចម្លងរួចរាល់!','success');}).catch(function(e){toast(e.message||'Copy failed','error');});
@@ -1911,6 +1933,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Share */
   var shareBtn=_el('shareBtn');
   if(shareBtn) shareBtn.addEventListener('click',function(){
+    playPop();
     if(!items.length){toast('សូមជ្រើសរើសផលិតផលជាមុន!','error');return;}
     if(typeof ShareReceipt==='undefined'){toast('Share not ready','error');return;}
     ShareReceipt.share(buildReceiptData(),{target:_el('printArea')}).catch(function(e){toast(e.message||'Share failed','error');});
