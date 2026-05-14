@@ -1134,10 +1134,14 @@
               </div>
 
               <!-- Date -->
-              <div class="fgrid full" style="margin-bottom:10px;">
+              <div class="fgrid" style="margin-bottom:10px;grid-template-columns:1fr auto;">
                 <div class="fg">
-                  <label>ថ្ងៃខែឆ្នាំ</label>
-                  <input id="date" type="datetime-local">
+                  <label>📅 ថ្ងៃខែឆ្នាំ</label>
+                  <input id="datePart" type="date">
+                </div>
+                <div class="fg" style="min-width:118px;">
+                  <label>⏰ ម៉ោង</label>
+                  <input id="timePart" type="time">
                 </div>
               </div>
 
@@ -1572,7 +1576,8 @@ function clearAll(){
   _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){ b.classList.remove('active'); });
   (function(){
     var n=new Date(), pad=function(x){return String(x).padStart(2,'0');};
-    if(_el('date')) _el('date').value = n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+'T'+pad(n.getHours())+':'+pad(n.getMinutes());
+    if(_el('datePart')) _el('datePart').value = n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate());
+    if(_el('timePart')) _el('timePart').value = pad(n.getHours())+':'+pad(n.getMinutes());
   })();
   calcTotal();
 }
@@ -1580,7 +1585,9 @@ function clearAll(){
 /* ── Build payload ── */
 function buildPayload(){
   var now=new Date(), pad=function(x){return String(x).padStart(2,'0');};
-  var rawVal = _el('date')?_el('date').value:'';
+  var dp = _el('datePart')?_el('datePart').value:'';
+  var tp = _el('timePart')?_el('timePart').value:'';
+  var rawVal = (dp && tp) ? dp+'T'+tp : (dp ? dp+'T00:00' : '');
   if(!rawVal) rawVal=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes());
   var dateTime, m=rawVal.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
   dateTime = m ? m[3]+'/'+m[2]+'/'+m[1]+' '+m[4]+':'+m[5] : rawVal;
@@ -1660,10 +1667,10 @@ function _initKHR(){
 
 /* ── DOM ready ── */
 document.addEventListener('DOMContentLoaded', function(){
-  els={customer:_el('customer'),phone:_el('phone'),date:_el('date'),province:_el('province'),addressDetail:_el('addressDetail'),deliveryName:_el('deliveryName'),deliveryFee:_el('deliveryFee'),payment:_el('payment'),paymentOptions:_el('paymentOptions'),note:_el('note'),page:_el('page'),closeBy:_el('closeBy'),status:_el('status')};
+  els={customer:_el('customer'),phone:_el('phone'),datePart:_el('datePart'),timePart:_el('timePart'),province:_el('province'),addressDetail:_el('addressDetail'),deliveryName:_el('deliveryName'),deliveryFee:_el('deliveryFee'),payment:_el('payment'),paymentOptions:_el('paymentOptions'),note:_el('note'),page:_el('page'),closeBy:_el('closeBy'),status:_el('status')};
 
-  /* Set current date */
-  (function(){ var n=new Date(),pad=function(x){return String(x).padStart(2,'0');}; if(_el('date')) _el('date').value=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+'T'+pad(n.getHours())+':'+pad(n.getMinutes()); })();
+  /* Set current date & time */
+  (function(){ var n=new Date(),pad=function(x){return String(x).padStart(2,'0');}; if(_el('datePart')) _el('datePart').value=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate()); if(_el('timePart')) _el('timePart').value=pad(n.getHours())+':'+pad(n.getMinutes()); })();
 
   /* Payment buttons */
   _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(btn){
