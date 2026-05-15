@@ -882,7 +882,7 @@
     [data-theme="dark"] .mob-bottom-bar { background: rgba(10,8,22,.95); border-top-color: rgba(255,255,255,.09); }
     .mob-bottom-bar.bar-hidden { transform: translateY(110%); opacity: 0; pointer-events: none; }
 
-    @media (min-width: 980px) { .mob-bottom-bar { left: var(--sb-w, 272px); } }
+    @media (min-width: 980px) { .mob-bottom-bar { left: auto; } }
 
     /* Receipt No field */
     .mob-receipt-field { flex: 1; min-width: 0; }
@@ -1054,9 +1054,41 @@
         align-items: start;
       }
       #leftCol { gap: 16px !important; }
-      #cartPanel { position: sticky; top: 20px; }
+      #rightCol {
+        align-self: start;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: calc(100vh - var(--topbar-offset, 110px) - 28px);
+        overflow-y: auto;
+        scrollbar-width: none;
+      }
+      #rightCol::-webkit-scrollbar { display: none; }
+      #cartPanel { position: static; }
+      .mob-bottom-bar {
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+        height: auto !important;
+        min-height: 60px;
+        border-radius: 18px !important;
+        border: 1px solid var(--line, rgba(0,0,0,.08)) !important;
+        box-shadow: 0 4px 24px rgba(0,0,0,.07) !important;
+        padding: 12px 16px !important;
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        background: var(--card, rgba(255,255,255,.92)) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+      .mob-bottom-bar.bar-hidden {
+        display: none !important;
+        transform: none !important;
+      }
       .fgrid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
-      .no-wrap { padding: 14px 24px 60px; }
+      .no-wrap { padding: 14px 24px 20px; }
       .fg textarea { min-height: 72px; }
     }
 
@@ -1253,47 +1285,45 @@
 
         </div><!-- /leftCol -->
 
-        <!-- ═══ RIGHT COLUMN: Cart Summary ═══ -->
-        <div class="mob-section" id="cartPanel">
-          <div class="mob-sect-head is-open" id="cartHead" onclick="mobCollapse(this,'cartBody')">
-            <h3>🛒 Cart Summary <span class="cart-count-badge" id="cartCountBadge" style="display:none">0</span></h3>
-            <span class="mob-sect-chevron">▾</span>
-          </div>
-          <div class="mob-sect-body" id="cartBody">
-            <div id="cartItems">
-              <div class="cart-empty">🛒 មិនទាន់មានផលិតផល<br><small>ចុចលើ product ខាងលើ</small></div>
+        <!-- ═══ RIGHT COLUMN ═══ -->
+        <div id="rightCol">
+
+          <!-- Cart Summary -->
+          <div class="mob-section" id="cartPanel">
+            <div class="mob-sect-head is-open" id="cartHead" onclick="mobCollapse(this,'cartBody')">
+              <h3>🛒 Cart Summary <span class="cart-count-badge" id="cartCountBadge" style="display:none">0</span></h3>
+              <span class="mob-sect-chevron">▾</span>
             </div>
-            <div class="sum-box">
-              <div class="srow"><span>Subtotal</span><span id="subTotal">$0</span></div>
-              <div class="srow"><span>Delivery</span><span id="deliveryDisplay">$2</span></div>
-              <div class="srow total"><span>Total</span><span id="grandTotal">$0</span></div>
-            </div>
-            <!-- KHR rate -->
-            <div class="khr-row" id="khrRow">
-              <div>
-                <div class="khr-lbl">ប្រាក់រៀល</div>
-                <div class="khr-val" id="rielTotal">0៛</div>
+            <div class="mob-sect-body" id="cartBody">
+              <div id="cartItems">
+                <div class="cart-empty">🛒 មិនទាន់មានផលិតផល<br><small>ចុចលើ product ខាងលើ</small></div>
               </div>
-              <button type="button" class="khr-edit-btn" id="khrEditBtn">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                <span id="khrRateLabel">4,100</span>
-              </button>
+              <div class="sum-box">
+                <div class="srow"><span>Subtotal</span><span id="subTotal">$0</span></div>
+                <div class="srow"><span>Delivery</span><span id="deliveryDisplay">$2</span></div>
+                <div class="srow total"><span>Total</span><span id="grandTotal">$0</span></div>
+              </div>
+              <!-- KHR rate -->
+              <div class="khr-row" id="khrRow">
+                <div>
+                  <div class="khr-lbl">ប្រាក់រៀល</div>
+                  <div class="khr-val" id="rielTotal">0៛</div>
+                </div>
+                <button type="button" class="khr-edit-btn" id="khrEditBtn">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  <span id="khrRateLabel">4,100</span>
+                </button>
+              </div>
+              <div id="khrInputRow" style="display:none;">
+                <input type="number" id="khrRateInput" placeholder="Rate..." min="1" step="1" value="4100" inputmode="numeric">
+                <button type="button" class="khr-apply-btn" id="khrApplyBtn">✓</button>
+                <button type="button" class="khr-cancel-btn" id="khrCancelBtn">✕</button>
+              </div>
             </div>
-            <div id="khrInputRow" style="display:none;">
-              <input type="number" id="khrRateInput" placeholder="Rate..." min="1" step="1" value="4100" inputmode="numeric">
-              <button type="button" class="khr-apply-btn" id="khrApplyBtn">✓</button>
-              <button type="button" class="khr-cancel-btn" id="khrCancelBtn">✕</button>
-            </div>
-          </div>
-        </div><!-- /cartPanel -->
+          </div><!-- /cartPanel -->
 
-      </div><!-- /no-grid -->
-    </div><!-- /no-wrap -->
-  </main>
-</div>
-
-<!-- ═══ BOTTOM ACTION BAR ═══ -->
-<div class="mob-bottom-bar" id="mobBottomBar">
+          <!-- Action Bar (desktop: inside right column) -->
+          <div class="mob-bottom-bar" id="mobBottomBar">
   <div class="mob-receipt-field">
     <input type="number" id="receiptNo" placeholder="លេខប៉ុង..." min="0" step="1" inputmode="numeric">
   </div>
@@ -1325,6 +1355,12 @@
       </svg>
     </button>
   </div>
+        </div><!-- /mobBottomBar -->
+
+        </div><!-- /rightCol -->
+      </div><!-- /no-grid -->
+    </div><!-- /no-wrap -->
+  </main>
 </div>
 
 <!-- Scroll nav -->
@@ -1995,6 +2031,42 @@ document.addEventListener('DOMContentLoaded', function(){
 
   if(btnTop) btnTop.onclick = function(){ window.scrollTo({top:0, behavior:'smooth'}); };
   if(btnBot) btnBot.onclick = function(){ window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'}); };
+
+  /* ── Fix right column (Cart + Action bar) on desktop/tablet ── */
+  function fixRightCol() {
+    var rc = document.getElementById('rightCol');
+    var lc = document.getElementById('leftCol');
+    if (!rc) return;
+    if (window.innerWidth < 980) {
+      rc.style.cssText = '';
+      return;
+    }
+    var lcRect = lc ? lc.getBoundingClientRect() : null;
+    var gap = 16;
+    var rightLeft = lcRect ? lcRect.right + gap : 0;
+    var rightWidth = window.innerWidth - rightLeft - 24;
+    var topbarOffset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-offset')) || 110;
+    rc.style.position = 'fixed';
+    rc.style.top    = (topbarOffset + 14) + 'px';
+    rc.style.left   = rightLeft + 'px';
+    rc.style.width  = rightWidth + 'px';
+    rc.style.zIndex = '10';
+  }
+  fixRightCol();
+  window.addEventListener('resize', fixRightCol);
+  document.addEventListener('sidebar-toggled', fixRightCol);
+
+  /* Watch sidebar width changes (collapse/expand) */
+  var _sidebar = document.getElementById('sharedSidebar');
+  if (_sidebar) {
+    new MutationObserver(function() {
+      requestAnimationFrame(fixRightCol);
+    }).observe(_sidebar, { attributes: true, attributeFilter: ['class', 'style'] });
+  }
+  /* Also watch --sb-w CSS variable via body class changes */
+  new MutationObserver(function() {
+    requestAnimationFrame(fixRightCol);
+  }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 })();
 </script>
 
