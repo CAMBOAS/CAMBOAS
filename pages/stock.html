@@ -133,7 +133,10 @@
 <!-- Edit Product Modal -->
 <div class="edit-overlay" id="editOverlay" onclick="closeEdit(event)">
   <div class="edit-modal">
-    <h3>✏️ កែប្រែផលិតផល</h3>
+    <h3 style="display:flex;align-items:center;gap:12px">
+      <img id="eModalImg" src="" style="width:48px;height:48px;border-radius:11px;object-fit:cover;border:1px solid rgba(255,255,255,.12);display:none;flex-shrink:0">
+      <span>✏️ កែប្រែផលិតផល</span>
+    </h3>
     <div class="stock-indicator" id="editStockIndicator"></div>
     <div class="edit-grid">
       <div class="edit-field full">
@@ -145,27 +148,27 @@
         <input type="text" id="eCat" placeholder="Face Care / Body Care ...">
       </div>
       <div class="edit-field">
-        <label>Box</label>
+        <label>កេស (Box)</label>
         <input type="number" id="eBox" min="0" placeholder="0">
       </div>
       <div class="edit-field">
-        <label>Pack</label>
+        <label>ឈុត (Pack)</label>
         <input type="number" id="ePack" min="0" placeholder="0">
       </div>
       <div class="edit-field">
-        <label>Bottles</label>
+        <label>ដប | កញ្ចប់</label>
         <input type="number" id="eBott" min="0" placeholder="0">
       </div>
       <div class="edit-field">
-        <label>QTY លក់</label>
+        <label>ស្តុក​បច្ចុប្បន្ន (QTY)</label>
         <input type="number" id="eQty" min="0" placeholder="0">
       </div>
       <div class="edit-field full">
-        <label>Max QTY (គោលដៅ/reference bar)</label>
+        <label>ស្តុក​គោលដៅ — Reference Bar <span style="font-weight:400;color:#64748b;text-transform:none">(Max QTY)</span></label>
         <input type="number" id="eStock" min="0" placeholder="0">
       </div>
       <div class="edit-field full">
-        <label>រូបភាព (Image URL)</label>
+        <label>រូបភាព — Custom URL <span style="font-weight:400;color:#64748b;text-transform:none">(optional, auto-detect ពី folder)</span></label>
         <div style="display:flex;gap:8px;align-items:center">
           <input type="url" id="eImg" placeholder="https://..." style="flex:1">
           <img id="eImgPreview" src="" style="width:44px;height:44px;border-radius:10px;object-fit:cover;border:1px solid rgba(255,255,255,.1);display:none">
@@ -466,9 +469,22 @@ function openEdit(id){
   document.getElementById('eStock').value=p.max||0;
   var eImg=document.getElementById('eImg');
   var eImgPrev=document.getElementById('eImgPreview');
+  var eModalImg=document.getElementById('eModalImg');
+  // URL field: only user-set custom URL (not auto-detected)
   eImg.value=p.img||'';
   if(p.img){ eImgPrev.src=p.img; eImgPrev.style.display='block'; } else { eImgPrev.style.display='none'; }
-  eImg.oninput=function(){ if(eImg.value){ eImgPrev.src=eImg.value; eImgPrev.style.display='block'; } else { eImgPrev.style.display='none'; } };
+  eImg.oninput=function(){
+    if(eImg.value){ eImgPrev.src=eImg.value; eImgPrev.style.display='block'; } else { eImgPrev.style.display='none'; }
+    eModalImg.src=eImg.value||autoSrc; eModalImg.style.display='block';
+  };
+  // Modal header image: auto-detected path (fallback chain same as table)
+  var cf=getCatFolder(p.cat);
+  var autoSrc=cf?('../images/products/'+cf+'/'+p.name+'.png'):'';
+  var manualSrc=p.img||'';
+  eModalImg.onerror=function(){ eModalImg.style.display='none'; };
+  eModalImg.onload=function(){ eModalImg.style.display='block'; };
+  eModalImg.src=manualSrc||autoSrc||getLocalImg(p.name)||'';
+  if(!eModalImg.src){ eModalImg.style.display='none'; }
   var s=gs(p);
   var stBg   =s==='ok'?'rgba(16,185,129,.12)':s==='low'?'rgba(245,158,11,.12)':'rgba(239,68,68,.12)';
   var stColor=s==='ok'?'#86efac':s==='low'?'#fde68a':'#fca5a5';
