@@ -121,7 +121,7 @@
             <button class="add-btn" onclick="openAddModal()">+ បន្ថែមផលិតផល</button>
             <button class="reload-btn" onclick="loadStroke()" title="Reload from Google Sheets">↻ Reload</button>
           </div>
-          <table><thead><tr><th>ផលិតផល</th><th>ប្រភេទ</th><th>Box</th><th>Pack</th><th>Bottles</th><th>QTY លក់</th><th>Stock Level</th><th>Status</th></tr></thead>
+          <table><thead><tr><th style="width:36px;text-align:center">#</th><th style="width:50px;text-align:center">IMG</th><th>ផលិតផល</th><th>ប្រភេទ</th><th style="text-align:center">កេស</th><th style="text-align:center">ឈុត</th><th style="text-align:center">ដប | កញ្ចប់</th><th>Stock Level</th><th>Status</th></tr></thead>
           <tbody id="tbody"></tbody></table>
         </article>
 
@@ -164,6 +164,13 @@
         <label>Max QTY (គោលដៅ/reference bar)</label>
         <input type="number" id="eStock" min="0" placeholder="0">
       </div>
+      <div class="edit-field full">
+        <label>រូបភាព (Image URL)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="url" id="eImg" placeholder="https://..." style="flex:1">
+          <img id="eImgPreview" src="" style="width:44px;height:44px;border-radius:10px;object-fit:cover;border:1px solid rgba(255,255,255,.1);display:none">
+        </div>
+      </div>
       <div class="edit-field full" id="eDelWrap" style="margin-top:4px">
         <button class="ebtn" onclick="deleteProduct()" style="background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25);width:100%">🗑 លុបផលិតផលនេះ</button>
       </div>
@@ -204,6 +211,10 @@
         <label>QTY លក់ (ស្តុក)</label>
         <input type="number" id="aQty" min="0" placeholder="0" value="0">
       </div>
+      <div class="edit-field full">
+        <label>រូបភាព (Image URL)</label>
+        <input type="url" id="aImg" placeholder="https://...">
+      </div>
     </div>
     <div class="edit-actions">
       <button class="ebtn ebtn-cancel" onclick="closeAdd()">បោះបង់</button>
@@ -218,11 +229,16 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzW7fNFKrIoE2hB1afSuQfKGr4laKna4Ife0K82x_viFwM9uUBMsyfYjeNz0RpEG5F2xA/exec';
 let S = [];
 let _maxCache = {};
+let _imgCache = {};
 
 /* ── Max cache (localStorage) ── */
 function loadMaxCache(){ try{ _maxCache=JSON.parse(localStorage.getItem('cambo_stroke_max')||'{}'); }catch(e){ _maxCache={}; } }
 function saveMaxCache(){ try{ localStorage.setItem('cambo_stroke_max',JSON.stringify(_maxCache)); }catch(e){} }
 function getMax(name,qty){ if(_maxCache[name]>0) return _maxCache[name]; _maxCache[name]=Math.max(qty,1); return _maxCache[name]; }
+
+/* ── Img cache (localStorage) ── */
+function loadImgCache(){ try{ _imgCache=JSON.parse(localStorage.getItem('cambo_stock_imgs')||'{}'); }catch(e){ _imgCache={}; } }
+function saveImgCache(){ try{ localStorage.setItem('cambo_stock_imgs',JSON.stringify(_imgCache)); }catch(e){} }
 
 /* ── Status helpers ── */
 function gs(p){ return p.qty===0?'out':p.qty/p.max<0.15?'low':'ok'; }
@@ -255,7 +271,8 @@ async function loadStroke(){
       var max = getMax(item.product, qty);
       return { id:i+1, name:item.product||'', cat:item.type||'-',
                box:parseInt(item.box)||0, pack:parseInt(item.pack)||0,
-               bottles:parseInt(item.bottles)||0, qty:qty, max:max };
+               bottles:parseInt(item.bottles)||0, qty:qty, max:max,
+               img:_imgCache[item.product]||'' };
     });
     saveMaxCache();
     saveStock();
@@ -280,16 +297,21 @@ function rt(){
     document.getElementById('tbody').innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">គ្មានទិន្នន័យ</td></tr>';
     us(); return;
   }
-  document.getElementById('tbody').innerHTML=list.map(function(p){
-    var s=gs(p), pct=p.max>0?Math.round(p.qty/p.max*100):0;
+  document.getElementById('tbody').innerHTML=list.map(function(p,i){
+    var s=gs(p);
+    var imgHtml=p.img
+      ?'<img src="'+p.img+'" style="width:38px;height:38px;border-radius:9px;object-fit:cover;display:block" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">'
+       +'<div style="display:none;width:38px;height:38px;border-radius:9px;background:rgba(139,92,246,.12);align-items:center;justify-content:center;font-size:18px">🧴</div>'
+      :'<div style="width:38px;height:38px;border-radius:9px;background:rgba(139,92,246,.12);display:flex;align-items:center;justify-content:center;font-size:18px">🧴</div>';
     return '<tr class="st-'+s+'" onclick="openEdit('+p.id+')" title="ចុចដើម្បីកែប្រែ">'
+      +'<td style="text-align:center;color:var(--muted);font-size:12px;font-weight:600">'+(i+1)+'</td>'
+      +'<td style="padding:6px 10px">'+imgHtml+'</td>'
       +'<td style="font-weight:600">'+p.name+' <span style="font-size:10px;color:var(--muted);font-weight:400">✏️</span></td>'
       +'<td><span class="pill p-b" style="font-size:10px">'+p.cat+'</span></td>'
       +'<td style="text-align:center">'+(p.box||'-')+'</td>'
       +'<td style="text-align:center">'+(p.pack||'-')+'</td>'
       +'<td style="text-align:center">'+(p.bottles||'-')+'</td>'
-      +'<td style="text-align:center;font-weight:700;color:var(--emerald)">'+p.qty+'</td>'
-      +'<td><div class="bw"><div class="btrack"><div class="bfill '+bc(s)+'" style="width:'+pct+'%"></div></div><span style="min-width:26px;font-weight:700">'+p.qty+'</span></div></td>'
+      +'<td><div class="bw"><div class="btrack"><div class="bfill '+bc(s)+'" style="width:'+Math.round(p.max>0?p.qty/p.max*100:0)+'%"></div></div><span style="min-width:26px;font-weight:700;font-size:12px">'+p.qty+'</span></div></td>'
       +'<td><span class="pill '+pc(s)+'">'+pl(s)+'</span></td></tr>';
   }).join('');
   us();
@@ -317,6 +339,11 @@ function openEdit(id){
   document.getElementById('eBott').value =p.bottles||0;
   document.getElementById('eQty').value  =p.qty||0;
   document.getElementById('eStock').value=p.max||0;
+  var eImg=document.getElementById('eImg');
+  var eImgPrev=document.getElementById('eImgPreview');
+  eImg.value=p.img||'';
+  if(p.img){ eImgPrev.src=p.img; eImgPrev.style.display='block'; } else { eImgPrev.style.display='none'; }
+  eImg.oninput=function(){ if(eImg.value){ eImgPrev.src=eImg.value; eImgPrev.style.display='block'; } else { eImgPrev.style.display='none'; } };
   var s=gs(p);
   var stBg   =s==='ok'?'rgba(16,185,129,.12)':s==='low'?'rgba(245,158,11,.12)':'rgba(239,68,68,.12)';
   var stColor=s==='ok'?'#86efac':s==='low'?'#fde68a':'#fca5a5';
@@ -348,6 +375,8 @@ async function saveEdit(){
   var newMax=Math.max(0,parseInt(document.getElementById('eStock').value)||0);
   if(newMax>0){ p.max=newMax; } else if(p.qty>p.max){ p.max=p.qty; }
   _maxCache[p.name]=p.max; saveMaxCache();
+  p.img=document.getElementById('eImg').value.trim();
+  _imgCache[p.name]=p.img; saveImgCache();
   document.getElementById('editOverlay').classList.remove('open'); _editId=null;
   rt(); saveStock();
   try {
@@ -378,7 +407,7 @@ async function deleteProduct(){
 
 /* ── Add Modal ── */
 function openAddModal(){
-  ['aN','aCat'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['aN','aCat','aImg'].forEach(function(id){ document.getElementById(id).value=''; });
   ['aBox','aPack','aBott','aQty'].forEach(function(id){ document.getElementById(id).value=0; });
   document.getElementById('addOverlay').classList.add('open');
 }
@@ -394,11 +423,13 @@ async function saveAdd(){
     box:parseInt(document.getElementById('aBox').value)||0,
     pack:parseInt(document.getElementById('aPack').value)||0,
     bottles:parseInt(document.getElementById('aBott').value)||0,
-    qty:Math.max(0,parseInt(document.getElementById('aQty').value)||0)
+    qty:Math.max(0,parseInt(document.getElementById('aQty').value)||0),
+    img:document.getElementById('aImg').value.trim()
   };
   var newId=(S.length?Math.max.apply(null,S.map(function(x){return x.id;}))+1:1);
-  S.push({id:newId,name:d.product,cat:d.type,box:d.box,pack:d.pack,bottles:d.bottles,qty:d.qty,max:Math.max(d.qty,1)});
+  S.push({id:newId,name:d.product,cat:d.type,box:d.box,pack:d.pack,bottles:d.bottles,qty:d.qty,max:Math.max(d.qty,1),img:d.img});
   _maxCache[d.product]=Math.max(d.qty,1); saveMaxCache();
+  if(d.img){ _imgCache[d.product]=d.img; saveImgCache(); }
   document.getElementById('addOverlay').classList.remove('open');
   rt(); saveStock();
   try {
@@ -411,6 +442,7 @@ async function saveAdd(){
 
 document.addEventListener('DOMContentLoaded',function(){
   loadMaxCache();
+  loadImgCache();
   loadStroke();
 });
 </script>

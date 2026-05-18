@@ -41,22 +41,63 @@ function getProductImg(product){
 }
 
 /* ── Data ── */
-async function loadOrders(){
-  try{
-    const r=await fetch(`${SCRIPT_URL}?action=list&limit=500&_=${Date.now()}`);
-    const d=await r.json();
-    var arr=Array.isArray(d?.orders)?d.orders
-            :Array.isArray(d?.data?.orders)?d.data.orders
-            :Array.isArray(d?.rows)?d.rows
-            :Array.isArray(d?.data)?d.data:null;
-    if(arr) return normalizeOrders(arr);
-    return localOrders();
-  }catch{return localOrders();}
-}
+
 function todayYMD(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1<10?'0':'')+(d.getMonth()+1)+'-'+(d.getDate()<10?'0':'')+d.getDate(); }
 function fixPhone(v){ var ph=String(v||'').trim(); if(ph && /^[1-9]\d{7,9}$/.test(ph)) ph='0'+ph; return ph; }
-function normalizeOrders(arr){ return (Array.isArray(arr)?arr:[]).map(function(o){ if(o.phone!==undefined) o.phone=fixPhone(o.phone); return o; }); }
-function localOrders(){ try{ return normalizeOrders(JSON.parse(localStorage.getItem(LS_KEY)||'[]')); }catch{ return []; } }
+
+function normalizeOrders(arr){
+  return (Array.isArray(arr)?arr:[]).map(function(o){
+    // Normalize field name variations (Sheet may return different casing)
+    function pick(keys){ for(var i=0;i<keys.length;i++){ if(o[keys[i]]!==undefined&&o[keys[i]]!==null&&o[keys[i]]!=='') return o[keys[i]]; } return ''; }
+    if(o.phone!==undefined) o.phone = fixPhone(pick(['phone','Phone','PHONE','tel','Tel'])||o.phone||'');
+    o.customer     = pick(['customer','Customer','name','Name'])     || o.customer     || '';
+    o.province     = pick(['province','Province'])                   || o.province     || '';
+    o.addressDetail= pick(['addressDetail','address','Address'])     || o.addressDetail|| '';
+    o.deliveryName = pick(['deliveryName','delivery','DeliveryName','Delivery']) || o.deliveryName || '';
+    o.deliveryFee  = Number(pick(['deliveryFee','DeliveryFee','delivery_fee','Delivery Fee'])||o.deliveryFee||0);
+    o.status       = pick(['status','Status'])                       || o.status       || 'Pending';
+    o.note         = pick(['note','Note'])                           || o.note         || '';
+    o.page         = pick(['page','Page','pages','Pages'])           || o.page         || '';
+    o.closeBy      = pick(['closeBy','CloseBy','closeby'])           || o.closeBy      || '';
+    o.payment      = pick(['payment','Payment'])                     || o.payment      || '';
+    // Map items → products (new-order.html saves as 'items')
+    o.products = o.products || o.Products || o.items || [];
+    if(!Array.isArray(o.products)) o.products = [];
+    return o;
+  });
+}
+
+/* Orders saved by new-order.html → key: 'camboOrders' */
+function localCamboOrders(){
+  try{ return normalizeOrders(JSON.parse(localStorage.getItem('camboOrders')||'[]')); }catch(e){ return []; }
+}
+
+/* Orders saved/edited via order-list → key: LS_KEY */
+function localV3Orders(){
+  try{ return normalizeOrders(JSON.parse(localStorage.getItem(LS_KEY)||'[]')); }catch(e){ return []; }
+}
+
+/* Merge: Sheet/primary wins on duplicate IDs; camboOrders appended for local-only entries */
+function mergeOrders(primary, cambo){
+  var ids = new Set(primary.map(function(o){ return String(o.id); }));
+  var extra = cambo.filter(function(o){ return !ids.has(String(o.id)); });
+  return primary.concat(extra);
+}
+
+async function loadOrders(){
+  var camboLocal = localCamboOrders(); // always read new-order.html orders first
+  try{
+    var r = await fetch(SCRIPT_URL+'?action=list&limit=500&_='+Date.now());
+    var d = await r.json();
+    var arr = Array.isArray(d?.orders)      ? d.orders
+            : Array.isArray(d?.data?.orders)? d.data.orders
+            : Array.isArray(d?.rows)        ? d.rows
+            : Array.isArray(d?.data)        ? d.data
+            : null;
+    if(arr) return mergeOrders(normalizeOrders(arr), camboLocal);
+    return mergeOrders(localV3Orders(), camboLocal);
+  }catch(e){ return mergeOrders(localV3Orders(), camboLocal); }
+}
 
 function savedPkg(){try{return JSON.parse(localStorage.getItem(PKG_KEY)||'{}');}catch{return{};}}
 function savePkg(m){localStorage.setItem(PKG_KEY,JSON.stringify(m));}
@@ -97,18 +138,23 @@ function updateStats(){
 
 /* ── Filter ── */
 function toYMD(v){
-  // Convert any date format to YYYY-MM-DD for comparison
   if(!v) return '';
   var s=String(v).trim();
-  // Already YYYY-MM-DD
-  if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
-  // DD/MM/YYYY → YYYY-MM-DD
-  if(/^\d{2}\/\d{2}\/\d{4}/.test(s)){
-    var p=s.split('/'); return p[2]+'-'+p[1]+'-'+p[0];
+  var pad2=function(x){return String(x).padStart(2,'0');};
+  // ISO with time/timezone (e.g. "2026-05-17T17:00:00Z") → parse to LOCAL date
+  if(/^\d{4}-\d{2}-\d{2}T/.test(s)||/Z$/.test(s)){
+    var d=new Date(s);
+    if(!isNaN(d)) return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
   }
-  // Try parse
+  // YYYY-MM-DD date only → use as-is (no timezone shift)
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // DD/MM/YYYY (with optional time "18/05/2026 10:30") → YYYY-MM-DD
+  if(/^\d{2}\/\d{2}\/\d{4}/.test(s)){
+    var p=s.split('/'); return p[2].slice(0,4)+'-'+pad2(Number(p[1]))+'-'+pad2(Number(p[0]));
+  }
+  // Fallback: parse any other format to local date
   var d=new Date(s);
-  if(!isNaN(d)) return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  if(!isNaN(d)) return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
   return '';
 }
 function filtered(){
@@ -546,17 +592,15 @@ async function init(){
   const el=document.getElementById('pkgList');
   if(el) el.innerHTML='<div class="pkg-empty">⏳ Loading...</div>';
   _orders=await loadOrders();
-  // Default filter = Today
-  // Default: Today + Pending
-  var _t = todayYMD();
-  _dateStart = _t; _dateEnd = _t;
+  // Default: All Time + Pending (show all pending orders regardless of date)
+  _dateStart = ''; _dateEnd = '';
   _filter = 'pending';
   // Update button label
   var lbl = document.getElementById('pkgDateLabel');
-  if(lbl) lbl.textContent = 'Today';
-  // Activate Today preset button
+  if(lbl) lbl.textContent = 'All Time';
+  // No preset button active by default
   document.querySelectorAll('.ol-date-preset').forEach(function(b){
-    b.classList.toggle('active', b.dataset.p==='today');
+    b.classList.toggle('active', b.dataset.p==='all');
   });
   render();
 

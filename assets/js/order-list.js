@@ -309,6 +309,29 @@ function getProds(o){
       || [];
 }
 
+/* ── Unit helpers ── */
+function getProdUnit(p){
+  // Name suffix is most reliable — "(unit)" is always appended for non-default units
+  var m=(p.name||'').match(/\(([^)]+)\)\s*$/);
+  if(m) return m[1].trim();
+  // Fall back to explicit unit field
+  if(p.unit && p.unit.trim()) return String(p.unit).trim();
+  return 'ឈុត';
+}
+function cleanProdName(p){
+  // Always strip trailing "(unit)" suffix so name input stays clean
+  return (p.name||'').replace(/\s*\([^)]+\)\s*$/,'').trim();
+}
+function unitBadgeStyle(unit){
+  if(unit==='កេស') return 'background:rgba(14,165,233,.18);color:#38bdf8;border:1px solid rgba(14,165,233,.35)';
+  if(unit==='លាយ') return 'background:rgba(245,158,11,.18);color:#fbbf24;border:1px solid rgba(245,158,11,.35)';
+  return 'background:rgba(124,92,255,.18);color:#a78bfa;border:1px solid rgba(124,92,255,.35)';
+}
+function unitBadgeHtml(p){
+  var u=getProdUnit(p);
+  return '<span style="display:inline-block;margin-top:3px;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:800;letter-spacing:.02em;'+unitBadgeStyle(u)+'">'+esc(u)+'</span>';
+}
+
 /* ── filter ── */
 function orderTotal(o){ return getProds(o).reduce(function(s,p){return s+Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0);},0)+Number(o.deliveryFee||0); }
 
@@ -828,14 +851,16 @@ function olSaveEdit(){
       Array.from(prodList.children).forEach(function(row){
         var nameEl2 = row.querySelector('.dr-prod-name');
         if(!nameEl2) return;
-        var nm  = nameEl2.value.trim();
-        var qEl = row.querySelector('.dr-prod-qty');
-        var pEl = row.querySelector('.dr-prod-price');
-        var dEl = row.querySelector('.dr-prod-disc');
-        var qty  = Number(qEl  ? qEl.value  : 1);
-        var pr   = Number(pEl  ? pEl.value  : 0);
-        var disc = Number(dEl  ? dEl.value  : 0);
-        if(nm) newProds.push({name:nm, qty:qty, price:pr, discount:disc});
+        var nm   = nameEl2.value.trim();
+        var uEl  = row.querySelector('.dr-prod-unit');
+        var qEl  = row.querySelector('.dr-prod-qty');
+        var pEl  = row.querySelector('.dr-prod-price');
+        var unit = uEl ? uEl.value : 'ឈុត';
+        var qty  = Number(qEl ? qEl.value : 1);
+        var pr   = Number(pEl ? pEl.value : 0);
+        // Rebuild display name: append "(unit)" for non-default units (matches new-order.html convention)
+        var dispName = (unit && unit !== 'ឈុត') ? nm+' ('+unit+')' : nm;
+        if(nm) newProds.push({name:dispName, qty:qty, price:pr, discount:0, unit:unit, subtotal:qty*pr});
       });
       if(newProds.length){ o.products = newProds; o.items = newProds; }
     }
@@ -908,24 +933,49 @@ function renderDrawerView(o){
 
     // Products card
     +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:12px;padding:14px">'
-    +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">🛍️ ផលិតផល</div>'
-    +'<div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px 12px;font-size:12px">'
-    +'<span style="color:#64748b;font-weight:700;padding-bottom:6px;border-bottom:1px solid rgba(148,163,200,.1)">ឈ្មោះ</span>'
-    +'<span style="color:#64748b;font-weight:700;text-align:center;padding-bottom:6px;border-bottom:1px solid rgba(148,163,200,.1)">ចំ</span>'
-    +'<span style="color:#64748b;font-weight:700;text-align:right;padding-bottom:6px;border-bottom:1px solid rgba(148,163,200,.1)">តម្លៃ</span>'
-    +'<span style="color:#64748b;font-weight:700;text-align:right;padding-bottom:6px;border-bottom:1px solid rgba(148,163,200,.1)">សរុប</span>'
+    +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">🛍️ ផលិតផល ('+prods.length+')</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 46px 58px 65px 58px;gap:0 8px;font-size:12px">'
+    // Header row: ឈ្មោះ | ចំ | ប្រភេទ | តម្លៃ | សរុប
+    +'<span style="color:#64748b;font-weight:700;padding-bottom:8px;border-bottom:2px solid rgba(148,163,200,.15)">ឈ្មោះ</span>'
+    +'<span style="color:#64748b;font-weight:700;text-align:center;padding-bottom:8px;border-bottom:2px solid rgba(148,163,200,.15)">ចំ</span>'
+    +'<span style="color:#64748b;font-weight:700;text-align:center;padding-bottom:8px;border-bottom:2px solid rgba(148,163,200,.15)">ប្រភេទ</span>'
+    +'<span style="color:#64748b;font-weight:700;text-align:right;padding-bottom:8px;border-bottom:2px solid rgba(148,163,200,.15)">តម្លៃ</span>'
+    +'<span style="color:#64748b;font-weight:700;text-align:right;padding-bottom:8px;border-bottom:2px solid rgba(148,163,200,.15)">សរុប</span>'
+    // Data rows: ឈ្មោះ | ចំ | [badge] | តម្លៃ | សរុប
     +prods.map(function(p){
       var sub=Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0);
-      return '<span style="color:#e2e8f0;padding:5px 0;border-bottom:1px solid rgba(148,163,200,.06)">'+esc(p.name||'')+'</span>'
-        +'<span style="text-align:center;color:#94a3b8;border-bottom:1px solid rgba(148,163,200,.06)">'+p.qty+'</span>'
-        +'<span style="text-align:right;color:#94a3b8;border-bottom:1px solid rgba(148,163,200,.06)">$'+Number(p.price||0).toFixed(2)+'</span>'
-        +'<span style="text-align:right;color:#7dd3fc;font-weight:700;border-bottom:1px solid rgba(148,163,200,.06)">$'+sub.toFixed(2)+'</span>';
+      var discount=Number(p.discount||0);
+      var txtClr=themeVal('#e2e8f0','#0f172a');
+      var br='border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)');
+      var u=getProdUnit(p);
+      var ubs=unitBadgeStyle(u);
+      return '<div style="padding:7px 0;'+br+'">'
+          +'<span style="color:'+txtClr+';font-weight:600;font-size:12px">'+esc(cleanProdName(p))+'</span>'
+          +(discount>0?'<div style="font-size:10px;color:#f87171;margin-top:1px">ចុះ -$'+discount.toFixed(2)+'</div>':'')
+        +'</div>'
+        +'<div style="padding:7px 0;'+br+';text-align:center;font-size:13px;font-weight:800;color:'+txtClr+'">'+p.qty+'</div>'
+        +'<div style="padding:7px 0;'+br+';display:flex;align-items:center;justify-content:center">'
+          +'<span style="padding:2px 7px;border-radius:10px;font-size:10px;font-weight:800;white-space:nowrap;'+ubs+'">'+esc(u)+'</span>'
+        +'</div>'
+        +'<div style="padding:7px 0;'+br+';text-align:right;color:#94a3b8">$'+Number(p.price||0).toFixed(2)+'</div>'
+        +'<div style="padding:7px 0;'+br+';text-align:right;color:'+themeVal('#7dd3fc','#4f46e5')+';font-weight:800">$'+sub.toFixed(2)+'</div>';
     }).join('')
     +'</div>'
-    +'<div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:2px solid rgba(148,163,200,.12);font-size:15px;font-weight:800">'
-    +'<span style="color:#94a3b8">Grand Total</span>'
-    +'<span style="color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+total.toFixed(2)+'</span>'
-    +'</div>'
+    +(function(){
+      var khrRate = (function(){ try{ var r=Number(localStorage.getItem('cambo_khr_rate')); return r>0?r:4100; }catch(e){ return 4100; } })();
+      var fee = Number(o.deliveryFee||0);
+      var riel = Math.round(total * khrRate);
+      return '<div style="margin-top:14px;padding:12px 14px;border-radius:10px;background:'+themeVal('rgba(124,92,255,.08)','rgba(99,102,241,.06)')+';border:1px solid '+themeVal('rgba(124,92,255,.2)','rgba(99,102,241,.15)')+'">'
+        +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px"><span>🚚 ថ្លៃដឹក</span><span>'+(fee>0?'$'+fee.toFixed(2):'ហ្វ្រីដឹក')+'</span></div>'
+        +'<div style="display:flex;justify-content:space-between;align-items:baseline">'
+          +'<span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Grand Total</span>'
+          +'<div style="text-align:right">'
+            +'<div style="font-size:18px;font-weight:900;color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+total.toFixed(2)+'</div>'
+            +'<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-top:1px">'+riel.toLocaleString()+'៛</div>'
+          +'</div>'
+        +'</div>'
+      +'</div>';
+    })()
     +'</div>'
     +'</div>';
 }
@@ -939,25 +989,25 @@ function drRow(label, value){
 
 /* ── Edit mode (same layout as view, just inputs instead of text) ── */
 function renderDrawerEdit(o){
-  var inputStyle = 'width:100%;height:30px;padding:0 8px;border-radius:6px;border:1px solid rgba(148,163,200,.25);background:rgba(255,255,255,.06);color:'+themeVal('#e2e8f0','#0f172a')+';font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:600';
+  var inputStyle = 'width:100%;height:26px;padding:0 6px;border-radius:5px;border:1px solid rgba(148,163,200,.25);background:rgba(255,255,255,.06);color:'+themeVal('#e2e8f0','#0f172a')+';font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:600';
   function rowInp(id, val, label, type){
     type = type||'text';
-    return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
+    return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
       +'<span style="color:#64748b">'+label+'</span>'
       +'<input id="'+id+'" type="'+type+'" value="'+esc(val||'')+'" style="'+inputStyle+'">'
       +'</div>';
   }
   function rowSel(id, val, label, opts){
-    return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
+    return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
       +'<span style="color:#64748b">'+label+'</span>'
       +'<select id="'+id+'" style="'+inputStyle+'">'
       +opts.map(function(op){ return '<option value="'+op+'" '+(op===val?'selected':'')+'>'+op+'</option>'; }).join('')
       +'</select></div>';
   }
   function rowTx(id, val, label){
-    return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
-      +'<span style="color:#64748b;padding-top:5px">'+label+'</span>'
-      +'<textarea id="'+id+'" rows="2" style="'+inputStyle+';height:auto;padding:6px 8px;resize:vertical">'+esc(val||'')+'</textarea>'
+    return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start;padding:7px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
+      +'<span style="color:#64748b;padding-top:3px">'+label+'</span>'
+      +'<textarea id="'+id+'" rows="1" style="'+inputStyle+';height:auto;padding:4px 6px;resize:vertical">'+esc(val||'')+'</textarea>'
       +'</div>';
   }
 
@@ -983,15 +1033,34 @@ function renderDrawerEdit(o){
     +'<span style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase">🛍️ ផលិតផល</span>'
     +'<button onclick="olAddProdRow()" type="button" style="height:28px;padding:0 12px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>'
     +'</div>'
-    // Header
-    +'<div style="display:grid;grid-template-columns:1fr 60px 70px 60px 32px;gap:6px;margin-bottom:6px;font-size:10px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase">'
-    +'<span>ឈ្មោះ</span><span style="text-align:center">ចំនួន</span><span style="text-align:center">តម្លៃ</span><span style="text-align:center">បញ្ចុះ</span><span></span>'
+    // Header: ឈ្មោះ | ចំ | ប្រភេទ | តម្លៃ | សរុប | ×
+    +'<div style="display:grid;grid-template-columns:1fr 46px 58px 65px 58px 30px;gap:6px;margin-bottom:6px;font-size:10px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase">'
+    +'<span>ឈ្មោះ</span><span style="text-align:center">ចំ</span><span style="text-align:center">ប្រភេទ</span><span style="text-align:right">តម្លៃ</span><span style="text-align:right">សរុប</span><span></span>'
     +'</div>'
     +'<div id="drProdList">'
     +getProds(o).map(function(p,i){
-      return drProdRow(p.name||'', p.qty||1, p.price||0, p.discount||0);
+      return drProdRow(cleanProdName(p), getProdUnit(p), p.qty||1, p.price||0);
     }).join('')
     +'</div>'
+    // Grand Total box
+    +(function(){
+      var khrRate = (function(){ try{ var r=Number(localStorage.getItem('cambo_khr_rate')); return r>0?r:4100; }catch(e){ return 4100; } })();
+      var sub = getProds(o).reduce(function(s,p){ return s+Number(p.qty||0)*Number(p.price||0); },0);
+      var fee = Number(o.deliveryFee||0);
+      var grand = sub + fee;
+      var riel = Math.round(grand * khrRate);
+      var txtClr = themeVal('#e2e8f0','#0f172a');
+      return '<div style="margin-top:14px;padding:12px 14px;border-radius:10px;background:'+themeVal('rgba(124,92,255,.08)','rgba(99,102,241,.06)')+';border:1px solid '+themeVal('rgba(124,92,255,.2)','rgba(99,102,241,.15)')+'">'
+        +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px"><span>🚚 ថ្លៃដឹក</span><span>'+(fee>0?'$'+fee.toFixed(2):'ហ្វ្រីដឹក')+'</span></div>'
+        +'<div style="display:flex;justify-content:space-between;align-items:baseline">'
+          +'<span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Grand Total</span>'
+          +'<div style="text-align:right">'
+            +'<div style="font-size:18px;font-weight:900;color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+grand.toFixed(2)+'</div>'
+            +'<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-top:1px">'+riel.toLocaleString()+'៛</div>'
+          +'</div>'
+        +'</div>'
+      +'</div>';
+    })()
     +'</div>';
 
   // Re-bind remove buttons after render
@@ -1119,19 +1188,29 @@ window.olAddProdRow  = function(){
   var list = $id('drProdList'); if(!list) return;
   var div = document.createElement('div');
   div.className = 'dr-prod-row';
-  div.innerHTML = drProdRow('',1,0,0);
+  div.innerHTML = drProdRow('','ឈុត',1,0);
   list.appendChild(div);
   div.querySelector('.dr-prod-remove')?.addEventListener('click', function(){ div.remove(); });
 };
 
-function drProdRow(name, qty, price, disc){
+function drProdRow(name, unit, qty, price){
+  unit = unit || 'ឈុត';
+  var sub = Number(qty||0) * Number(price||0);
   var s = 'height:32px;padding:0 8px;border-radius:7px;border:1px solid rgba(148,163,200,.2);background:rgba(255,255,255,.08);color:#e2e8f0;font-size:12px;font-family:inherit;outline:none;width:100%;box-sizing:border-box';
-  return '<div class="dr-prod-row" style="display:grid;grid-template-columns:1fr 60px 70px 60px 32px;gap:6px;margin-bottom:6px;align-items:center">'
+  var ubs = unitBadgeStyle(unit);
+  var selS = 'height:32px;padding:0 4px;border-radius:7px;border:1px solid rgba(148,163,200,.25);font-size:11px;font-weight:800;font-family:inherit;outline:none;width:100%;box-sizing:border-box;text-align:center;cursor:pointer;'+ubs;
+  // oninput: recalculate subtotal live when qty or price changes
+  var onchg = "var r=this.closest('.dr-prod-row');var q=Number(r.querySelector('.dr-prod-qty').value||0);var p=Number(r.querySelector('.dr-prod-price').value||0);var sp=r.querySelector('.dr-prod-sub');if(sp)sp.textContent='$'+(q*p).toFixed(2);";
+  // Column order: ឈ្មោះ | ចំ | ប្រភេទ | តម្លៃ | សរុប | ×
+  return '<div class="dr-prod-row" style="display:grid;grid-template-columns:1fr 46px 58px 65px 58px 30px;gap:6px;margin-bottom:6px;align-items:center">'
     +'<input class="dr-prod-name"  type="text"   value="'+esc(name)+'"  placeholder="ឈ្មោះផលិតផល" style="'+s+'">'
-    +'<input class="dr-prod-qty"   type="number" value="'+qty+'"         min="1"  style="'+s+';text-align:center">'
-    +'<input class="dr-prod-price" type="number" value="'+price+'"       min="0" step="0.01" style="'+s+';text-align:center">'
-    +'<input class="dr-prod-disc"  type="number" value="'+disc+'"        min="0" step="0.01" style="'+s+';text-align:center">'
-    +'<button class="dr-prod-remove" type="button" style="width:28px;height:28px;border-radius:7px;border:none;background:rgba(239,68,68,.15);color:#f87171;font-size:14px;cursor:pointer;flex-shrink:0">✕</button>'
+    +'<input class="dr-prod-qty"   type="number" value="'+qty+'"   min="1"            style="'+s+';text-align:center" oninput="'+onchg+'">'
+    +'<select class="dr-prod-unit" style="'+selS+'">'
+    +['ឈុត','កេស','លាយ'].map(function(u){ return '<option value="'+u+'"'+(u===unit?' selected':'')+'>'+u+'</option>'; }).join('')
+    +'</select>'
+    +'<input class="dr-prod-price" type="number" value="'+price+'" min="0" step="0.01" style="'+s+';text-align:right" oninput="'+onchg+'">'
+    +'<span class="dr-prod-sub" style="text-align:right;font-size:12px;font-weight:800;color:#7dd3fc;padding-right:2px">$'+sub.toFixed(2)+'</span>'
+    +'<button class="dr-prod-remove" type="button" style="width:28px;height:28px;border-radius:7px;border:none;background:rgba(239,68,68,.15);color:#f87171;font-size:16px;cursor:pointer;flex-shrink:0;line-height:1">✕</button>'
     +'</div>';
 }
 window.olToggleEdit  = olToggleEdit;
