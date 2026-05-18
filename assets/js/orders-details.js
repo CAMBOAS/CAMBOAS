@@ -202,7 +202,7 @@ const products = [
     name: "ហ្វៃប័រផាសសិន CCR",
     price: 18,
     category: "Drink",
-    image: "../images/products/drink/Fibery Passion Fruit.png",
+    image: "../images/products/drink/ហ្វៃប័រផាសសិន CCR.png",
     detail: "ហ្វៃប័រផាសសិន Fiber CCR"
   },
   {
@@ -210,7 +210,7 @@ const products = [
     name: "កាហ្វេសម្រក CCR",
     price: 18,
     category: "Drink",
-    image: "../images/products/drink/CoffeeCCR.png",
+    image: "../images/products/drink/កាហ្វេសម្រក CCR.png",
     detail: "កាហ្វេសម្រក Coffee CCR"
   },
   {

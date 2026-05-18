@@ -231,6 +231,134 @@ let S = [];
 let _maxCache = {};
 let _imgCache = {};
 
+/* ── Local product image map ── */
+var _localImgs = {
+  // Face Care
+  'សាប៊ូដុសមុខ យិនសិន CCR'        : '../images/products/face/សាប៊ូដុសមុខ យិនសិន CCR.png',
+  'សំឡីវីតាមីន JELY'               : '../images/products/face/សំឡីវីតាមីន​ JELY.png',
+  'ស័ម្ភីវីតាមីន JELY Mask Pad'    : '../images/products/face/សំឡីវីតាមីន​ JELY.png',
+  'ស័ម្ភីវីតាមីន JELY'             : '../images/products/face/សំឡីវីតាមីន​ JELY.png',
+  'BB Cream CCR'                    : '../images/products/face/BB Cream.png',
+  'SUNSCREEN CCR'                   : '../images/products/face/SUNSCREEN CCR.png',
+  'CC SERUM PINK TONE JELY'         : '../images/products/face/CC SERUM JELY.png',
+  'CC SERUM JELY'                   : '../images/products/face/CC SERUM JELY.png',
+  'ម៉ាស់បិទមុខ 6D CCR'             : '../images/products/face/ម៉ាស់បិទមុខ 6D CCR.png',
+  'ម៉ាស់បិទមុខ 24k'                : '../images/products/face/ម៉ាស់បិទមុខ 6D CCR.png',
+  'ម៉ាស់មុខ 24k'                   : '../images/products/face/ម៉ាស់បិទមុខ 6D CCR.png',
+  'ថ្នាំដុសធ្មេញ CCR'              : '../images/products/face/ថ្នាំដុសធ្មេញ CCR.png',
+  'ក្រដាស់សើម Remove MakeUp CCR'   : '../images/products/face/ក្រដាស់សើម Remove MakeUp CCR.png',
+  'ឈុតមុខស្អាត JELY'               : '../images/products/face/ឈុតមុខស្អាត JELY.png',
+  'សាប៊ូដុសមុខ JELY Gluta'         : '../images/products/face/សាប៊ូដុសមុខ JELY Gluta.png',
+  'លុបមុខស្អាត JELY'               : '../images/products/face/ឈុតមុខស្អាត JELY.png',
+  // Body Care
+  'សាប៊ូដុសខ្លួន មាសក្លិន'        : '../images/products/body/សាប៊ូដុសខ្លួនមាសក្លិនទឹកអប់អូតែលផ្កាយ 5.png',
+  'សាប៊ូដុសខ្លួនមាស'              : '../images/products/body/សាប៊ូដុសខ្លួនមាសក្លិនទឹកអប់អូតែលផ្កាយ 5.png',
+  'ទឹកអនាម័យស្រ្ដី JELY'          : '../images/products/body/ទឹកអនាម័យស្រ្ដី JELY.png',
+  'ទឹកអនាម័យ JELY'                : '../images/products/body/ទឹកអនាម័យស្រ្ដី JELY.png',
+  'សាប៊ូកក់សក់និងដុសខ្លួនក្មេង CCR' : '../images/products/body/សាប៊ូកក់សក់និងដុសខ្លួនក្មេង CCR.png',
+  'សាប៊ូដុសខ្លួនកុលាប'            : '../images/products/body/សាប៊ូដុសខ្លួនកុលាប.png',
+  'សាប៊ូដុសខ្លួន កុលាប'           : '../images/products/body/សាប៊ូដុសខ្លួនកុលាប.png',
+  'សេរ៉ូមលាបខ្លួន JELY'           : '../images/products/body/សេរ៉ូមលាបខ្លួន JELY BODY ESSENCE VC WHITENGING.png',
+  'JELY Body Serum'                 : '../images/products/body/សេរ៉ូមលាបខ្លួន JELY BODY ESSENCE VC WHITENGING.png',
+  'ស្រ្ពៃក្លៀក និងឡេកលៀត'         : '../images/products/body/ស្រ្ពៃក្លៀក និងឡេកលៀត.png',
+  'ស្រ្ពៃក្លៀក'                    : '../images/products/body/ស្រ្ពៃក្លៀក និងឡេកលៀត.png',
+  'ឡេលាបខ្លួន Gluta SUDO'          : '../images/products/body/ឡេលាបខ្លួន Gluta SUDO.png',
+  'ឡេ Gluta SUDO'                  : '../images/products/body/ឡេលាបខ្លួន Gluta SUDO.png',
+  'ឡេលាបខ្លួន JELY'               : '../images/products/body/ឡេលាបខ្លួន JELY BODY LOTION.png',
+  'Body Lotion JELY'               : '../images/products/body/ឡេលាបខ្លួន JELY BODY LOTION.png',
+  'ឡេ SUDO'                        : '../images/products/body/ឡេលាបខ្លួន Gluta SUDO.png',
+  // Drinks
+  'ឈុតសម្រកទ្វេដង CCR'            : '../images/products/drink/ឈុតសម្រកទ្វេដង CCR.png',
+  'ប្រ CCR'                        : '../images/products/drink/កាហ្វេសម្រក CCR.png',
+  'ការ CCR'                        : '../images/products/drink/កាហ្វេសម្រក CCR.png',
+  'Coffee CCR'                     : '../images/products/drink/កាហ្វេសម្រក CCR.png',
+  'Fibery'                         : '../images/products/drink/ហ្វៃប័រផាសសិន CCR.png',
+  'SlimSet'                        : '../images/products/drink/SlimSetX2_CCR.png',
+  // Hair
+  'ប្រេងលាបសក់ CCR'                : '../images/products/hair/ប្រេងលាបសក់ CCR.png',
+  'ស្រ្ពៃបាញ់សក់'                  : '../images/products/hair/ស្រ្ពៃបាញ់សក់.png',
+  'Hair Spray CCR'                  : '../images/products/hair/ស្រ្ពៃបាញ់សក់.png',
+  'VIP 5in1 CCR'                   : '../images/products/hair/សក់និងម៉ាស 5in1.png',
+  '5in1 CCR'                       : '../images/products/hair/សក់និងម៉ាស 5in1.png',
+  'Premium CCR'                    : '../images/products/hair/សក់និងម៉ាស Premium CCR.png',
+  'JELY ក'                         : '../images/products/hair/សាប៊ូកក់សក់ និងស្បាសក់ JELY.png',
+  'JELY ហ'                         : '../images/products/hair/សាប៊ូកក់សក់ និងស្បាសក់ JELY.png',
+  'CCR ក'                          : '../images/products/hair/សាប៊ូកក់សក់ និងម៉ាសសក់ CCR.png',
+  'CCR ហ'                          : '../images/products/hair/សាប៊ូកក់សក់ និងម៉ាសសក់ CCR.png',
+  'សាប៊ូកក់សក់ និងម៉ាសសក់ CCR'    : '../images/products/hair/សាប៊ូកក់សក់ និងម៉ាសសក់ CCR.png',
+  'សាប៊ូកក់សក់ និងស្បាសក់ JELY'   : '../images/products/hair/សាប៊ូកក់សក់ និងស្បាសក់ JELY.png',
+};
+
+/* 3-pass fuzzy match: exact → normalized → keyword overlap */
+function getLocalImg(name){
+  if(!name) return '';
+  // Pass 1: exact
+  if(_localImgs[name]) return _localImgs[name];
+  // Normalize helper: lowercase, remove spaces & punctuation
+  var norm=function(s){ return s.toLowerCase().replace(/[\s\(\)\[\]\-\.\,\|\/]+/g,''); };
+  var nn=norm(name);
+  var keys=Object.keys(_localImgs);
+  // Pass 2: normalized exact or one contains the other
+  for(var i=0;i<keys.length;i++){
+    var k=norm(keys[i]);
+    if(nn===k||nn.includes(k)||k.includes(nn)) return _localImgs[keys[i]];
+  }
+  // Pass 3: keyword overlap — score by how many words match (≥2 required)
+  var words=name.toLowerCase().split(/[\s\(\)\[\]\-\.\,\|\/]+/).filter(function(w){return w.length>1;});
+  var best=null,bestScore=0;
+  for(var i=0;i<keys.length;i++){
+    var kwords=keys[i].toLowerCase().split(/[\s\(\)\[\]\-\.\,\|\/]+/).filter(function(w){return w.length>1;});
+    var score=words.filter(function(w){ return kwords.some(function(kw){ return kw.includes(w)||w.includes(kw); }); }).length;
+    if(score>=2&&score>bestScore){ bestScore=score; best=_localImgs[keys[i]]; }
+  }
+  return best||'';
+}
+
+/* ── Map category type → subfolder name ── */
+function getCatFolder(cat){
+  var c=(cat||'').toLowerCase();
+  if(c.includes('face')) return 'face';
+  if(c.includes('body')) return 'body';
+  if(c.includes('hair')) return 'hair';
+  if(c.includes('drink')) return 'drink';
+  return '';
+}
+
+/*
+ * Image fallback chain for product table:
+ *   1. manualImg (user-set URL)
+ *   2. images/products/[cat]/[name].png  ← NEW: just drop file here!
+ *   3. images/products/[name].png         ← flat folder fallback
+ *   4. getLocalImg() mapping              ← legacy existing files
+ *   5. 🧴 placeholder
+ */
+window._imgFallback = function(el, paths){
+  if(!paths || !paths.length){ el.style.display='none'; el.nextSibling.style.display='flex'; return; }
+  el.onerror = function(){ window._imgFallback(el, paths.slice(1)); };
+  el.src = paths[0];
+};
+
+function buildImgHtml(p){
+  var manual    = p.img || '';
+  var cf        = getCatFolder(p.cat);
+  var catPath   = cf ? '../images/products/'+cf+'/'+p.name+'.png' : '';
+  var flatPath  = '../images/products/'+p.name+'.png';
+  var legacyPath= getLocalImg(p.name);
+
+  // Build ordered fallback list (skip duplicates / blanks)
+  var chain=[];
+  if(manual)     chain.push(manual);
+  if(catPath)    chain.push(catPath);
+  chain.push(flatPath);
+  if(legacyPath && chain.indexOf(legacyPath)<0) chain.push(legacyPath);
+
+  var first=chain.shift();
+  var rest=JSON.stringify(chain);
+  return '<img src="'+first+'" style="width:38px;height:38px;border-radius:9px;object-fit:cover;display:block" '
+        +'onerror="window._imgFallback(this,'+rest.replace(/"/g,"'")+')">'
+        +'<div style="display:none;width:38px;height:38px;border-radius:9px;background:rgba(139,92,246,.12);align-items:center;justify-content:center;font-size:18px">🧴</div>';
+}
+
 /* ── Max cache (localStorage) ── */
 function loadMaxCache(){ try{ _maxCache=JSON.parse(localStorage.getItem('cambo_stroke_max')||'{}'); }catch(e){ _maxCache={}; } }
 function saveMaxCache(){ try{ localStorage.setItem('cambo_stroke_max',JSON.stringify(_maxCache)); }catch(e){} }
@@ -280,7 +408,7 @@ async function loadStroke(){
   } catch(err){
     var cached=null;
     try{ cached=JSON.parse(localStorage.getItem('cambo_stock_v2')||'null'); }catch(_){}
-    if(cached && cached.length){ S=cached; rt(); notify('⚠️ Offline — showing cached data',false); }
+    if(cached && cached.length){ S=cached.map(function(p){ return Object.assign({},p,{img:p.img||getLocalImg(p.name)||''}); }); rt(); notify('⚠️ Offline — showing cached data',false); }
     else { document.getElementById('tbody').innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:#fca5a5">❌ ទាញទិន្នន័យបរាជ័យ — '+err.message+'<br><small style="color:var(--muted)">សូម Enter ទិន្នន័យនៅ Google Sheets Stroke sheet ជាមុន</small></td></tr>';
       ['sTot','sIn','sLo','sOut'].forEach(function(id){ document.getElementById(id).textContent='0'; }); }
   }
@@ -299,10 +427,7 @@ function rt(){
   }
   document.getElementById('tbody').innerHTML=list.map(function(p,i){
     var s=gs(p);
-    var imgHtml=p.img
-      ?'<img src="'+p.img+'" style="width:38px;height:38px;border-radius:9px;object-fit:cover;display:block" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">'
-       +'<div style="display:none;width:38px;height:38px;border-radius:9px;background:rgba(139,92,246,.12);align-items:center;justify-content:center;font-size:18px">🧴</div>'
-      :'<div style="width:38px;height:38px;border-radius:9px;background:rgba(139,92,246,.12);display:flex;align-items:center;justify-content:center;font-size:18px">🧴</div>';
+    var imgHtml=buildImgHtml(p);
     return '<tr class="st-'+s+'" onclick="openEdit('+p.id+')" title="ចុចដើម្បីកែប្រែ">'
       +'<td style="text-align:center;color:var(--muted);font-size:12px;font-weight:600">'+(i+1)+'</td>'
       +'<td style="padding:6px 10px">'+imgHtml+'</td>'
