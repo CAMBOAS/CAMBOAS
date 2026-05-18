@@ -78,9 +78,26 @@ function _doInit(defaults){
     }
 
     if(saved && saved.length > 0 && missing.length === 0){
-      // Already initialized & no new products to add
-      window.__camboProducts = saved;
-      doRenderGrid();
+      // Already initialized — but sync img/price from defaults in case they changed
+      var defaultMap = {};
+      (defaults||[]).forEach(function(d){ defaultMap[String(d.id)] = d; });
+      var syncDone = 0, syncNeeded = 0;
+      saved.forEach(function(p){
+        var def = defaultMap[String(p.id)];
+        var newImg = def ? (def.image || def.img || '') : p.img;
+        if(def && newImg && newImg !== p.img){
+          syncNeeded++;
+          dbPut(Object.assign({}, p, { img: newImg }), function(){
+            if(++syncDone === syncNeeded){
+              dbGetAll(function(list){ window.__camboProducts = list; doRenderGrid(); });
+            }
+          });
+        }
+      });
+      if(syncNeeded === 0){
+        window.__camboProducts = saved;
+        doRenderGrid();
+      }
       return;
     }
 
