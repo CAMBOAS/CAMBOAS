@@ -444,10 +444,20 @@ async function loadStroke(){
     var data = await res.json();
     if(!data.ok || !Array.isArray(data.stroke)) throw new Error(data.message||'Load failed');
     S = data.stroke.map(function(item,i){
-      var qty = parseInt(item.qty)||0;
+      var qty  = parseInt(item.qty)||0;
+      var box  = parseInt(item.box)||0;
+      var pack = parseInt(item.pack)||0;
+      var bott = parseInt(item.bottles)||0;
+      // Parse bottPerPack from ratio text e.g. "1 ឈុត = 3 ដបប្រអប់"
+      var bpp=0, ratioText=String(item.ratio||item.pack2||'');
+      if(ratioText){ var m=ratioText.match(/=\s*(\d+)/); if(m) bpp=parseInt(m[1]); }
+      if(!bpp && pack>0 && bott>0) bpp=Math.round(bott/pack);
+      // packPerBox from col F (box2) or derive
+      var ppb=parseInt(item.packPerBox||item.box2)||0;
+      if(!ppb && box>0 && pack>0) ppb=Math.round(pack/box);
       return { id:i+1, name:item.product||'', cat:item.type||'-',
-               box:parseInt(item.box)||0, pack:parseInt(item.pack)||0,
-               bottles:parseInt(item.bottles)||0, qty:qty,
+               box:box, pack:pack, bottles:bott, qty:qty,
+               packPerBox:ppb, bottPerPack:bpp,
                img:_imgCache[item.product]||'' };
     });
     saveStock();
@@ -511,9 +521,9 @@ function openEdit(id){
   document.getElementById('ePack').value =p.pack||0;
   document.getElementById('eBott').value =p.bottles||0;
   document.getElementById('eQty').value  =p.box||0;
-  // Derive ratios from existing data
-  var _ppb=p.box>0&&p.pack>0   ? Math.round(p.pack/p.box)     : 0;
-  var _bpp=p.pack>0&&p.bottles>0? Math.round(p.bottles/p.pack) : 0;
+  // Use stored ratios from Sheets (fallback: derive from data)
+  var _ppb=p.packPerBox||(p.box>0&&p.pack>0    ? Math.round(p.pack/p.box)     : 0);
+  var _bpp=p.bottPerPack||(p.pack>0&&p.bottles>0? Math.round(p.bottles/p.pack) : 0);
   document.getElementById('ePackPerBox').value  =_ppb||'';
   document.getElementById('eBottPerPack').value =_bpp||'';
   // Auto-calc when BOX changes
@@ -585,21 +595,25 @@ async function saveEdit(){
   var ok=await macUI.confirm('រក្សាទុកការផ្លាស់ប្ដូរសម្រាប់ "'+p.name+'" ?','💾 បញ្ជាក់ការរក្សាទុក');
   if(!ok) return;
   var origName=p.name;
-  p.name    =document.getElementById('eN').value.trim()||p.name;
-  p.cat     =document.getElementById('eCat').value.trim()||p.cat;
-  p.box     =parseInt(document.getElementById('eBox').value)||0;
-  p.pack    =parseInt(document.getElementById('ePack').value)||0;
-  p.bottles =parseInt(document.getElementById('eBott').value)||0;
-  p.qty     =p.box;
+  p.name       =document.getElementById('eN').value.trim()||p.name;
+  p.cat        =document.getElementById('eCat').value.trim()||p.cat;
+  p.box        =parseInt(document.getElementById('eBox').value)||0;
+  p.pack       =parseInt(document.getElementById('ePack').value)||0;
+  p.bottles    =parseInt(document.getElementById('eBott').value)||0;
+  p.qty        =p.box;
+  p.packPerBox =parseInt(document.getElementById('ePackPerBox').value)||0;
+  p.bottPerPack=parseInt(document.getElementById('eBottPerPack').value)||0;
   p.img=document.getElementById('eImg').value.trim();
   _imgCache[p.name]=p.img; saveImgCache();
   document.getElementById('editOverlay').classList.remove('open');
   _editId=null; _editDirty=false;
   rt(); saveStock();
+  var ratioText=p.bottPerPack?'1 ឈុត = '+p.bottPerPack+' ដបប្រអប់':'';
   try {
     var res=await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify({action:'stroke_update',originalName:origName,
-        data:{product:p.name,type:p.cat,box:p.box,pack:p.pack,bottles:p.bottles,qty:p.qty}})});
+        data:{product:p.name,type:p.cat,box:p.box,pack:p.pack,bottles:p.bottles,qty:p.qty,
+              packPerBox:p.packPerBox,ratio:ratioText}})});
     var r=await res.json();
     notify(r.ok?'✅ រក្សាទុករួចរាល់!':'⚠️ '+(r.message||'Save failed'), r.ok);
   } catch(e){ notify('⚠️ Offline — saved locally only',false); }
@@ -658,17 +672,21 @@ function closeAdd(e){
 async function saveAdd(){
   var name=document.getElementById('aN').value.trim();
   if(!name){ notify('⚠️ សូមបញ្ចូលឈ្មោះផលិតផល',false); return; }
-  var aBox=parseInt(document.getElementById('aBox').value)||0;
+  var aBox    =parseInt(document.getElementById('aBox').value)||0;
+  var aPpb    =parseInt(document.getElementById('aPackPerBox').value)||0;
+  var aBpp    =parseInt(document.getElementById('aBottPerPack').value)||0;
+  var aRatio  =aBpp?'1 ឈុត = '+aBpp+' ដបប្រអប់':'';
   var d={
     product:name, type:document.getElementById('aCat').value.trim()||'-',
     box:aBox,
     pack:parseInt(document.getElementById('aPack').value)||0,
     bottles:parseInt(document.getElementById('aBott').value)||0,
-    qty:aBox,
+    qty:aBox, packPerBox:aPpb, ratio:aRatio,
     img:document.getElementById('aImg').value.trim()
   };
   var newId=(S.length?Math.max.apply(null,S.map(function(x){return x.id;}))+1:1);
-  S.push({id:newId,name:d.product,cat:d.type,box:d.box,pack:d.pack,bottles:d.bottles,qty:d.qty,img:d.img});
+  S.push({id:newId,name:d.product,cat:d.type,box:d.box,pack:d.pack,bottles:d.bottles,qty:d.qty,
+          packPerBox:aPpb,bottPerPack:aBpp,img:d.img});
   if(d.img){ _imgCache[d.product]=d.img; saveImgCache(); }
   document.getElementById('addOverlay').classList.remove('open');
   rt(); saveStock();
