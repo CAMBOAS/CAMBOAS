@@ -913,7 +913,7 @@ function renderDrawerView(o){
     '<div style="display:flex;flex-direction:column;gap:16px">'
 
     // Customer info card
-    +'<div style="background:rgba(255,255,255,.04);border:1px solid rgba(148,163,200,.1);border-radius:12px;padding:14px">'
+    +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:12px;padding:14px">'
     +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">👤 ព័ត៌មានអតិថិជន</div>'
     +drRow('ឈ្មោះ', o.customer||'—')
     +drRow('ទូរស័ព្ទ', '<span style="color:#60a5fa">'+esc(o.phone||'—')+'</span>')
@@ -927,7 +927,13 @@ function renderDrawerView(o){
     +drRow('Pages', o.page||o.pages||'—')
     +drRow('CloseBy', o.closeBy||o.closeby||'—')
     +drRow('Priority', o.priority||'Medium')
-    +drRow('Status', '<span style="background:rgba(245,158,11,.15);color:#fbbf24;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">'+esc(o.status||o.orderStatus||'Pending')+'</span>')
+    +drRow('Status', (function(st){
+      var s=String(st||'Pending');
+      var isDel=s==='Delivered', isCan=s==='Cancelled';
+      var bg=isDel?'rgba(34,197,94,.15)':isCan?'rgba(239,68,68,.15)':'rgba(245,158,11,.15)';
+      var clr=isDel?themeVal('#4ade80','#16a34a'):isCan?themeVal('#f87171','#dc2626'):themeVal('#fbbf24','#d97706');
+      return '<span style="background:'+bg+';color:'+clr+';padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">'+esc(s)+'</span>';
+    })(o.status||o.orderStatus||'Pending'))
     +(o.note ? drRow('Note', '<span style="color:#f87171">'+esc(o.note)+'</span>') : '')
     +'</div>'
 

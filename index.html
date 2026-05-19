@@ -17,11 +17,11 @@
 .tx-stroke-item:active{transform:scale(.99)}
 .tx-s-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;color:#fff}
 .tx-s-info{flex:1;min-width:0}
-.tx-s-name{font-size:13px;font-weight:600;color:var(--text-primary,#f1f5f9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tx-s-product{font-size:11px;color:var(--text-muted,#94a3b8);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tx-s-date{font-size:11px;color:var(--text-muted,#94a3b8);min-width:70px;text-align:center}
+.tx-s-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-s-product{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-s-date{font-size:11px;color:var(--muted);min-width:70px;text-align:center}
 .tx-s-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
-.tx-s-amt{font-size:14px;font-weight:600;color:#f1f5f9}
+.tx-s-amt{font-size:14px;font-weight:600;color:var(--text)}
 .tx-s-status{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
 .tx-s-status.pending{background:rgba(234,179,8,.15);color:#fbbf24}
 .tx-s-status.delivered{background:rgba(34,197,94,.15);color:#4ade80}
@@ -370,9 +370,9 @@
   }
 
   function getStatus(p){
-    var s = p.stock !== undefined ? p.stock : (p.qty||0);
-    if(s===0) return 'out';
-    if(s/p.max < 0.15) return 'low';
+    var box = p.box !== undefined ? p.box : (p.qty||0);
+    if(box===0) return 'out';
+    if(box<=2)  return 'low';
     return 'ok';
   }
 
@@ -381,7 +381,8 @@
     'Face Care':  {bg:'rgba(139,92,246,.15)', color:'#8b5cf6'},
     'Body Care':  {bg:'rgba(6,182,212,.15)',  color:'#06b6d4'},
     'Hair Care':  {bg:'rgba(16,185,129,.15)', color:'#10b981'},
-    'Drinks':     {bg:'rgba(245,158,11,.15)', color:'#f59e0b'}
+    'Drinks':     {bg:'rgba(245,158,11,.15)', color:'#f59e0b'},
+    'Drink':      {bg:'rgba(245,158,11,.15)', color:'#f59e0b'}
   };
 
   function catStyle(cat){
@@ -417,8 +418,8 @@
 
     var html = sorted.map(function(p){
       var st  = getStatus(p);
-      var stockVal = p.stock !== undefined ? p.stock : (p.qty||0);
-    var pct = p.max > 0 ? Math.round(stockVal/p.max*100) : 0;
+      var box = p.box !== undefined ? p.box : (p.qty||0);
+      var pct = Math.min(box * 10, 100);
 
       /* Status colors */
       var stBg    = st==='ok'?'rgba(16,185,129,.15)':st==='low'?'rgba(245,158,11,.15)':'rgba(239,68,68,.15)';
@@ -429,27 +430,25 @@
       /* Left border accent */
       var borderLeft = st==='ok'?'3px solid #10b981':st==='low'?'3px solid #f59e0b':'3px solid #ef4444';
 
-      var stockQty = p.stock !== undefined ? p.stock : (p.qty||0);
-      return '<a class="tx-stroke-item" href="pages/stock.html" style="border-left:'+borderLeft+';border-radius:0 10px 10px 0;">'
-        +'<div class="tx-s-avatar" style="'+catStyle(p.cat)+';border-radius:8px;width:34px;height:34px">'+catInitial(p.cat)+'</div>'
-        +'<div class="tx-s-info" style="flex:1;min-width:0">'
-        +  '<div class="tx-s-name">'+p.name+'</div>'
-        +  '<div style="display:flex;align-items:center;gap:6px;margin-top:4px">'
-        +    '<div style="flex:1;height:4px;background:rgba(148,163,184,.2);border-radius:2px">'
-        +      '<div style="height:100%;width:'+pct+'%;background:'+barColor+';border-radius:2px"></div>'
+      return '<a class="tx-stroke-item" href="pages/stock.html" style="border-left:'+borderLeft+';border-radius:0 10px 10px 0;gap:10px;padding:10px 12px;align-items:center">'
+        // Avatar
+        +'<div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;'+catStyle(p.cat)+'">'+catInitial(p.cat)+'</div>'
+        // Info block
+        +'<div style="flex:1;min-width:0">'
+        //   Row 1: name + category pill
+        +  '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px">'
+        +    '<span style="font-size:12px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">'+p.name+'</span>'
+        +    '<span style="font-size:10px;padding:1px 7px;border-radius:8px;'+catStyle(p.cat)+';font-weight:700;flex-shrink:0;white-space:nowrap">'+p.cat+'</span>'
+        +  '</div>'
+        //   Row 2: bar + box count + status pill
+        +  '<div style="display:flex;align-items:center;gap:7px">'
+        +    '<div style="flex:1;height:5px;border-radius:3px;background:rgba(148,163,184,.18);overflow:hidden">'
+        +      '<div style="height:100%;width:'+pct+'%;border-radius:3px;background:'+barColor+'"></div>'
         +    '</div>'
-        +    '<span style="font-size:10px;color:#94a3b8;min-width:30px">'+pct+'%</span>'
+        +    '<span style="font-size:10px;color:var(--muted);flex-shrink:0;white-space:nowrap">Box: '+box+'</span>'
+        +    '<span style="font-size:10px;padding:1px 7px;border-radius:8px;background:'+stBg+';color:'+stColor+';font-weight:700;flex-shrink:0;white-space:nowrap">'+stLabel+'</span>'
         +  '</div>'
         +'</div>'
-        +'<span style="font-size:10px;padding:2px 8px;border-radius:20px;'+catStyle(p.cat)+';font-weight:600;flex-shrink:0">'+p.cat+'</span>'
-        +'<div class="tx-s-right" style="min-width:70px;align-items:flex-end">'
-        +  '<div style="display:flex;align-items:baseline;gap:4px">'
-        +    '<span style="font-size:14px;font-weight:700;color:#f1f5f9">'+stockQty+'</span>'
-        +    '<span style="font-size:10px;color:#94a3b8">/ QTY:'+p.qty+'</span>'
-        +  '</div>'
-        +  '<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:'+stBg+';color:'+stColor+';font-weight:600">'+stLabel+'</span>'
-        +'</div>'
-        +'<span class="tx-s-arrow">›</span>'
         +'</a>';
     }).join('');
 
