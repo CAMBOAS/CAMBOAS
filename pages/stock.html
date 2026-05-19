@@ -500,6 +500,7 @@ function saveStock(){ try{ localStorage.setItem('cambo_stock_v2',JSON.stringify(
 
 /* ── Edit Modal ── */
 var _editId=null;
+var _editDirty=false;
 function openEdit(id){
   var p=S.find(function(x){ return x.id===id; });
   if(!p) return;
@@ -563,18 +564,26 @@ function openEdit(id){
     '<span style="color:'+stColor+';font-weight:700">'+stLabel+'</span>'+
     '<span style="color:var(--muted);font-size:12px;margin-left:8px">BOX: '+p.box+'</span>';
   document.getElementById('editStockIndicator').style.background=stBg;
+  _editDirty=false;
   document.getElementById('editOverlay').classList.add('open');
 }
 
-function closeEdit(e){
+async function closeEdit(e){
   if(e && e.target!==document.getElementById('editOverlay')) return;
-  document.getElementById('editOverlay').classList.remove('open'); _editId=null;
+  if(_editDirty){
+    var ok=await macUI.confirm('មានការផ្លាស់ប្ដូរដែលមិនទាន់រក្សាទុក!\nចង់ចេញដោយមិនរក្សាទុកមែនទេ?','⚠️ បោះបង់ការផ្លាស់ប្ដូរ');
+    if(!ok) return;
+  }
+  document.getElementById('editOverlay').classList.remove('open');
+  _editId=null; _editDirty=false;
 }
 
 async function saveEdit(){
   if(!_editId) return;
   var p=S.find(function(x){ return x.id===_editId; });
   if(!p) return;
+  var ok=await macUI.confirm('រក្សាទុកការផ្លាស់ប្ដូរសម្រាប់ "'+p.name+'" ?','💾 បញ្ជាក់ការរក្សាទុក');
+  if(!ok) return;
   var origName=p.name;
   p.name    =document.getElementById('eN').value.trim()||p.name;
   p.cat     =document.getElementById('eCat').value.trim()||p.cat;
@@ -584,7 +593,8 @@ async function saveEdit(){
   p.qty     =p.box;
   p.img=document.getElementById('eImg').value.trim();
   _imgCache[p.name]=p.img; saveImgCache();
-  document.getElementById('editOverlay').classList.remove('open'); _editId=null;
+  document.getElementById('editOverlay').classList.remove('open');
+  _editId=null; _editDirty=false;
   rt(); saveStock();
   try {
     var res=await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
@@ -673,6 +683,12 @@ async function saveAdd(){
 document.addEventListener('DOMContentLoaded',function(){
   loadImgCache();
   loadStroke();
+  // Track any change inside Edit modal → mark dirty
+  var editModal=document.querySelector('#editOverlay .edit-modal');
+  if(editModal){
+    editModal.addEventListener('input', function(){ _editDirty=true; });
+    editModal.addEventListener('change',function(){ _editDirty=true; });
+  }
 });
 </script>
 <script src="../assets/js/sw-register.js"></script>
