@@ -452,9 +452,8 @@ async function loadStroke(){
       var bpp=0, ratioText=String(item.ratio||item.pack2||'');
       if(ratioText){ var m=ratioText.match(/=\s*(\d+)/); if(m) bpp=parseInt(m[1]); }
       if(!bpp && pack>0 && bott>0) bpp=Math.round(bott/pack);
-      // packPerBox from col F (box2) or derive
-      var ppb=parseInt(item.packPerBox||item.box2)||0;
-      if(!ppb && box>0 && pack>0) ppb=Math.round(pack/box);
+      // packPerBox: col F (box2) is always 1 (reference marker only), derive from actual data C/B
+      var ppb=(box>0&&pack>0)?Math.round(pack/box):0;
       return { id:i+1, name:item.product||'', cat:item.type||'-',
                box:box, pack:pack, bottles:bott, qty:qty,
                packPerBox:ppb, bottPerPack:bpp,
