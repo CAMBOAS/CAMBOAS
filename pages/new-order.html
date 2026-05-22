@@ -2070,6 +2070,91 @@ document.addEventListener('DOMContentLoaded', function(){
 })();
 </script>
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     GLOBAL KEYBOARD SCROLL UTILITY
+     Ensures ANY focused input / textarea / select is always visible above
+     the mobile virtual keyboard.
+
+     How it works
+     ────────────
+     iOS   : window.innerHeight stays constant; visualViewport.height shrinks
+             by exactly the keyboard height.  We compare element.bottom with
+             vp.height and scrollBy the difference.
+     Android: window.innerHeight itself shrinks, so position:fixed bottom:0
+             is already above the keyboard automatically.  The resize fallback
+             below still fires and nudges scrollable inputs safely.
+
+     Integration with bottom-bar lift (orders-details.js)
+     ────────────────────────────────────────────────────
+     The receiptNo-specific handler in orders-details.js lifts the *fixed*
+     bottom bar via bar.style.bottom.  This utility handles all *scrollable*
+     inputs by scrolling the page.  Both run independently without conflict.
+══════════════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  var vp  = window.visualViewport;   // null on very old browsers
+  var PAD = 24;                      // px breathing room above keyboard edge
+  var SEL = 'input:not([type=hidden]):not([type=file]), textarea, select';
+  var focused = null;                // currently focused interactive element
+
+  /* ── Core nudge: scroll page so focused element clears the keyboard ── */
+  function nudge() {
+    if (!focused) return;
+
+    /* getBoundingClientRect() is relative to the *visual* viewport on iOS,
+       so comparing rect.bottom with vp.height gives the true overlap.      */
+    var rect   = focused.getBoundingClientRect();
+    var vpH    = vp ? vp.height : window.innerHeight;
+    var gap    = rect.bottom - (vpH - PAD);
+
+    if (gap > 0) {
+      window.scrollBy({ top: gap, behavior: 'smooth' });
+    }
+  }
+
+  /* ── Listeners for keyboard open / close ─────────────────────────── */
+  if (vp) {
+    // iOS: fires as keyboard animates in/out
+    vp.addEventListener('resize', nudge);
+    vp.addEventListener('scroll', nudge);
+  }
+  // Android Chrome: window itself resizes when keyboard opens
+  window.addEventListener('resize', nudge);
+
+  /* ── Track the active input across the whole page ────────────────── */
+  document.addEventListener('focusin', function (e) {
+    var t = e.target;
+    if (!t.matches || !t.matches(SEL)) return;
+
+    focused = t;
+
+    /* Prevent the scroll-hide handler from tucking away the bottom bar
+       while the user is typing anywhere on this page.                   */
+    window.__kbFocused = true;
+
+    /* Belt-and-suspenders: re-nudge after the keyboard finishes its
+       ~300 ms open animation (some browsers only fire one resize event
+       at the very end of the animation).                                */
+    setTimeout(nudge, 400);
+  }, true /* capture — fires before any stopPropagation */);
+
+  document.addEventListener('focusout', function () {
+    /* Small delay so we don't clear `focused` when focus merely jumps
+       between two inputs (blur fires before the next focusin).          */
+    setTimeout(function () {
+      var ae = document.activeElement;
+      if (!ae || !ae.matches || !ae.matches(SEL)) {
+        focused = null;
+        window.__kbFocused = false;
+      }
+    }, 200);
+  }, true);
+
+}());
+</script>
+
 <script src="../assets/js/product-manager.js"></script>
 <script src="../assets/js/printer-receipt.js"></script>
 <script src="../assets/js/copy-receipt.js"></script>
