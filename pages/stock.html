@@ -185,19 +185,24 @@
         <input type="number" id="eBox" min="0" placeholder="0">
       </div>
       <div class="edit-field">
-        <label>ឈុត (PACK)</label>
+        <label>ឈុត / Box <span style="font-weight:400;color:#64748b;text-transform:none">(សមាមាត្រ)</span></label>
+        <input type="number" id="ePackPerBox" min="0" placeholder="0" style="background:rgba(6,182,212,.07)">
+      </div>
+      <div class="edit-field">
+        <label>ឈុត (PACK) <span style="font-weight:400;color:#64748b;text-transform:none">auto</span></label>
         <input type="number" id="ePack" min="0" placeholder="0">
       </div>
       <div class="edit-field">
-        <label>ដប | ប្រអប់</label>
+        <label>ដប / ឈុត <span style="font-weight:400;color:#64748b;text-transform:none">(សមាមាត្រ)</span></label>
+        <input type="number" id="eBottPerPack" min="0" placeholder="0" style="background:rgba(6,182,212,.07)">
+      </div>
+      <div class="edit-field">
+        <label>ដប | ប្រអប់ <span style="font-weight:400;color:#64748b;text-transform:none">auto</span></label>
         <input type="number" id="eBott" min="0" placeholder="0">
       </div>
       <div class="edit-field">
         <label>ស្តុក​បច្ចុប្បន្ន <span style="font-weight:500;color:#8b5cf6;text-transform:none">(= BOX)</span></label>
         <input type="number" id="eQty" min="0" placeholder="0" readonly style="opacity:.65;cursor:default;background:rgba(139,92,246,.06)">
-      </div>
-      <div class="edit-field full">
-        <div id="eRatioHint" style="font-size:11px;color:var(--muted);padding:6px 10px;border-radius:8px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.12)"></div>
       </div>
       <div class="edit-field full">
         <label>រូបភាព — Custom URL <span style="font-weight:400;color:#64748b;text-transform:none">(optional, auto-detect ពី folder)</span></label>
@@ -514,20 +519,33 @@ function openEdit(id){
   document.getElementById('ePack').value =p.pack||0;
   document.getElementById('eBott').value =p.bottles||0;
   document.getElementById('eQty').value  =p.box||0;
-  // Derive ratios silently into module-level vars
+  // Derive ratios from stored data or calculate from existing values
   _ePpb=p.packPerBox||(p.box>0&&p.pack>0     ? Math.round(p.pack/p.box)     : 0);
   _eBpp=p.bottPerPack||(p.pack>0&&p.bottles>0 ? Math.round(p.bottles/p.pack) : 0);
-  // Show ratio hint
-  var hint=document.getElementById('eRatioHint');
-  if(hint) hint.textContent=_ePpb||_eBpp
-    ? '📦 1 Box = '+(_ePpb||'?')+' ឈុត  |  1 ឈុត = '+(_eBpp||'?')+' ដប|ប្រអប់'
-    : 'សមាមាត្រ: មិនទាន់មានទិន្នន័យ';
-  // Auto-calc when BOX changes
-  document.getElementById('eBox').oninput=function(){
-    var box=parseInt(this.value)||0;
+  // Populate editable ratio fields
+  document.getElementById('ePackPerBox').value  = _ePpb||0;
+  document.getElementById('eBottPerPack').value = _eBpp||0;
+  // Central recalculate: BOX × ratio → PACK → BOTT
+  function recalcEdit(){
+    var box=parseInt(document.getElementById('eBox').value)||0;
+    var ppb=parseInt(document.getElementById('ePackPerBox').value)||0;
+    var bpp=parseInt(document.getElementById('eBottPerPack').value)||0;
+    _ePpb=ppb; _eBpp=bpp;
     document.getElementById('eQty').value=box;
-    if(_ePpb){var pack=box*_ePpb; document.getElementById('ePack').value=pack;
-      if(_eBpp) document.getElementById('eBott').value=pack*_eBpp;}
+    if(ppb){
+      var pack=box*ppb;
+      document.getElementById('ePack').value=pack;
+      if(bpp) document.getElementById('eBott').value=pack*bpp;
+    }
+  }
+  document.getElementById('eBox').oninput        = recalcEdit;
+  document.getElementById('ePackPerBox').oninput = recalcEdit;
+  // BottPerPack changes only recalc BOTT from current PACK (don't touch PACK)
+  document.getElementById('eBottPerPack').oninput = function(){
+    var pack=parseInt(document.getElementById('ePack').value)||0;
+    var bpp=parseInt(this.value)||0;
+    _eBpp=bpp;
+    if(bpp) document.getElementById('eBott').value=pack*bpp;
   };
   var eImg=document.getElementById('eImg');
   var eImgPrev=document.getElementById('eImgPreview');
@@ -582,8 +600,8 @@ async function saveEdit(){
   p.pack       =parseInt(document.getElementById('ePack').value)||0;
   p.bottles    =parseInt(document.getElementById('eBott').value)||0;
   p.qty        =p.box;
-  p.packPerBox =_ePpb;
-  p.bottPerPack=_eBpp;
+  p.packPerBox =parseInt(document.getElementById('ePackPerBox').value) ||_ePpb;
+  p.bottPerPack=parseInt(document.getElementById('eBottPerPack').value)||_eBpp;
   p.img=document.getElementById('eImg').value.trim();
   _imgCache[p.name]=p.img; saveImgCache();
   document.getElementById('editOverlay').classList.remove('open');
