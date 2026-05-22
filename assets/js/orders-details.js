@@ -459,14 +459,12 @@ function bindActions() {
   bindProductDrawer();
 
   // ── Keyboard-aware bottom bar (mobile) ──────────────────────────────────────
-  // Strategy:
-  //   Primary  — visualViewport resize/scroll: measures the real keyboard height
-  //              and lifts the bar's `bottom` above it in real time.
-  //   Focus    — removes bar-hidden (re-shows bar if scroll hid it), scrolls the
-  //              page to the very bottom so the bar is flush with the viewport
-  //              edge before the keyboard opens.
-  //   Blur     — clears the inline bottom override so CSS takes over again.
-  //   Fallback — browsers without visualViewport get a timed scrollIntoView nudge.
+  // Bug fix notes vs. previous versions:
+  //   v138-140: subtracted visualViewport.offsetTop — wrong on iOS when the
+  //             browser auto-scrolls the page on focus; made kbH smaller than
+  //             the real keyboard height so the bar was still partly hidden.
+  //             Also missed Android Chrome which fires window.resize (not VP).
+  //   v141:     simpler formula (no offsetTop), dual listeners, 400 ms fallback.
   (function () {
     var bar     = document.getElementById('mobBottomBar');
     var input   = document.getElementById('receiptNo');
@@ -475,45 +473,50 @@ function bindActions() {
 
     var kbOpen = false;
 
-    function setOffset(kbH) {
-      if (kbH > 0) {
-        bar.style.bottom = kbH + 'px';
-        if (scrBtns) scrBtns.style.bottom = (kbH + 80) + 'px';
+    // Lift the bar (and scroll buttons) above the keyboard.
+    function setOffset(px) {
+      if (px > 0) {
+        bar.style.bottom = px + 'px';
+        if (scrBtns) scrBtns.style.bottom = (px + 80) + 'px';
       } else {
         bar.style.bottom = '';
         if (scrBtns) scrBtns.style.bottom = '';
       }
     }
 
-    // ── Primary: visualViewport ───────────────────────────────────────────────
-    if (window.visualViewport) {
-      function onVpChange() {
-        var kbH = Math.max(0,
-          window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop
-        );
-        kbOpen = kbH > 60;
-        setOffset(kbOpen ? kbH : 0);
-      }
-      window.visualViewport.addEventListener('resize', onVpChange);
-      window.visualViewport.addEventListener('scroll', onVpChange);
+    // Measure keyboard height and apply.
+    // iOS : window.innerHeight stays fixed; visualViewport.height shrinks → kbH = diff.
+    // Android: window.innerHeight itself shrinks → fixed bottom:0 already works,
+    //          kbH ≈ 0 so setOffset(0) → no-op, which is correct.
+    function applyKb() {
+      var kbH = window.visualViewport
+        ? Math.max(0, window.innerHeight - window.visualViewport.height)
+        : 0;
+      kbOpen = kbH > 50;
+      setOffset(kbOpen ? kbH : 0);
     }
 
-    // ── Focus: keep bar pinned above keyboard ────────────────────────────────
+    // ── Listeners ────────────────────────────────────────────────────────────
+    if (window.visualViewport) {
+      // iOS / modern Android via VisualViewport API
+      window.visualViewport.addEventListener('resize', applyKb);
+      window.visualViewport.addEventListener('scroll', applyKb);
+    }
+    // Android Chrome (and old browsers) resize window.innerHeight directly
+    window.addEventListener('resize', applyKb);
+
+    // ── Focus: ensure bar visible + belt-and-suspenders recheck ──────────────
     input.addEventListener('focus', function () {
-      // Signal the scroll-hide handler (new-order.html) to leave the bar alone.
       window.__kbFocused = true;
-      // Unhide bar in case scroll animation already hid it.
       bar.classList.remove('bar-hidden');
+      // Keyboard animation takes ~300 ms; re-measure after it settles.
+      setTimeout(applyKb, 400);
     });
 
-    // ── Blur: restore full scroll-hide behaviour ──────────────────────────────
+    // ── Blur: restore CSS-controlled position ────────────────────────────────
     input.addEventListener('blur', function () {
       window.__kbFocused = false;
-      // Give visualViewport a tick to fire first; if keyboard is already gone
-      // (kbOpen still false after the tick) we clear the override ourselves.
-      setTimeout(function () {
-        if (!kbOpen) setOffset(0);
-      }, 150);
+      setTimeout(function () { if (!kbOpen) setOffset(0); }, 200);
     });
   })();
 }
