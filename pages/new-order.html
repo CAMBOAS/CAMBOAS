@@ -1995,7 +1995,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function onScroll(){
     var y = window.scrollY, d = y - lastY;
     if(y <= 40)        showBars();
-    else if(d >= DELTA)  hideBars();
+    else if(d >= DELTA && !window.__kbFocused)  hideBars();
     else if(d <= -DELTA) showBars();
     lastY = y; ticking = false;
   }

@@ -498,26 +498,17 @@ function bindActions() {
       window.visualViewport.addEventListener('scroll', onVpChange);
     }
 
-    // ── Focus: guarantee bar is visible before keyboard animates in ───────────
+    // ── Focus: keep bar pinned above keyboard ────────────────────────────────
     input.addEventListener('focus', function () {
-      // If the scroll-hide animation tucked the bar away, bring it back.
+      // Signal the scroll-hide handler (new-order.html) to leave the bar alone.
+      window.__kbFocused = true;
+      // Unhide bar in case scroll animation already hid it.
       bar.classList.remove('bar-hidden');
-
-      // Scroll the document to its very bottom so the bar sits flush at the
-      // viewport edge — the keyboard then appears on top and our visualViewport
-      // handler lifts the bar above it.
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-
-      // Fallback for browsers without visualViewport (older WebViews).
-      if (!window.visualViewport) {
-        setTimeout(function () {
-          bar.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }, 350);
-      }
     });
 
-    // ── Blur: restore CSS-controlled position ────────────────────────────────
+    // ── Blur: restore full scroll-hide behaviour ──────────────────────────────
     input.addEventListener('blur', function () {
+      window.__kbFocused = false;
       // Give visualViewport a tick to fire first; if keyboard is already gone
       // (kbOpen still false after the tick) we clear the override ourselves.
       setTimeout(function () {
