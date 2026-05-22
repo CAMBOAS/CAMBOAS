@@ -459,32 +459,71 @@ function bindActions() {
   bindProductDrawer();
 
   // ── Keyboard-aware bottom bar (mobile) ──────────────────────────────────────
-  // When the soft keyboard opens it shrinks visualViewport, pushing the fixed
-  // bottom bar behind the keyboard.  We detect the change and nudge `bottom`
-  // upward so the bar stays visible.
+  // Strategy:
+  //   Primary  — visualViewport resize/scroll: measures the real keyboard height
+  //              and lifts the bar's `bottom` above it in real time.
+  //   Focus    — removes bar-hidden (re-shows bar if scroll hid it), scrolls the
+  //              page to the very bottom so the bar is flush with the viewport
+  //              edge before the keyboard opens.
+  //   Blur     — clears the inline bottom override so CSS takes over again.
+  //   Fallback — browsers without visualViewport get a timed scrollIntoView nudge.
   (function () {
-    const bar      = document.getElementById('mobBottomBar');
-    const scrBtns  = document.getElementById('scrollBtns');
-    if (!bar || !window.visualViewport) return;
+    var bar     = document.getElementById('mobBottomBar');
+    var input   = document.getElementById('receiptNo');
+    var scrBtns = document.getElementById('scrollBtns');
+    if (!bar || !input) return;
 
-    function onVpChange() {
-      // keyboard height = how much the visual viewport has shrunk vs the window
-      const kbH = Math.max(0,
-        window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop
-      );
-      if (kbH > 60) {
-        bar.style.bottom      = kbH + 'px';
-        bar.style.transition  = 'bottom .15s ease, transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease';
+    var kbOpen = false;
+
+    function setOffset(kbH) {
+      if (kbH > 0) {
+        bar.style.bottom = kbH + 'px';
         if (scrBtns) scrBtns.style.bottom = (kbH + 80) + 'px';
       } else {
-        bar.style.bottom      = '';
-        bar.style.transition  = '';
+        bar.style.bottom = '';
         if (scrBtns) scrBtns.style.bottom = '';
       }
     }
 
-    window.visualViewport.addEventListener('resize', onVpChange);
-    window.visualViewport.addEventListener('scroll', onVpChange);
+    // ── Primary: visualViewport ───────────────────────────────────────────────
+    if (window.visualViewport) {
+      function onVpChange() {
+        var kbH = Math.max(0,
+          window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop
+        );
+        kbOpen = kbH > 60;
+        setOffset(kbOpen ? kbH : 0);
+      }
+      window.visualViewport.addEventListener('resize', onVpChange);
+      window.visualViewport.addEventListener('scroll', onVpChange);
+    }
+
+    // ── Focus: guarantee bar is visible before keyboard animates in ───────────
+    input.addEventListener('focus', function () {
+      // If the scroll-hide animation tucked the bar away, bring it back.
+      bar.classList.remove('bar-hidden');
+
+      // Scroll the document to its very bottom so the bar sits flush at the
+      // viewport edge — the keyboard then appears on top and our visualViewport
+      // handler lifts the bar above it.
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+      // Fallback for browsers without visualViewport (older WebViews).
+      if (!window.visualViewport) {
+        setTimeout(function () {
+          bar.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 350);
+      }
+    });
+
+    // ── Blur: restore CSS-controlled position ────────────────────────────────
+    input.addEventListener('blur', function () {
+      // Give visualViewport a tick to fire first; if keyboard is already gone
+      // (kbOpen still false after the tick) we clear the override ourselves.
+      setTimeout(function () {
+        if (!kbOpen) setOffset(0);
+      }, 150);
+    });
   })();
 }
 
