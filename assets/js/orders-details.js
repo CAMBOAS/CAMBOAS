@@ -457,6 +457,35 @@ function bindActions() {
   if (els.shareBtn) els.shareBtn.addEventListener("click", handleShareInvoice);
 
   bindProductDrawer();
+
+  // ── Keyboard-aware bottom bar (mobile) ──────────────────────────────────────
+  // When the soft keyboard opens it shrinks visualViewport, pushing the fixed
+  // bottom bar behind the keyboard.  We detect the change and nudge `bottom`
+  // upward so the bar stays visible.
+  (function () {
+    const bar      = document.getElementById('mobBottomBar');
+    const scrBtns  = document.getElementById('scrollBtns');
+    if (!bar || !window.visualViewport) return;
+
+    function onVpChange() {
+      // keyboard height = how much the visual viewport has shrunk vs the window
+      const kbH = Math.max(0,
+        window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop
+      );
+      if (kbH > 60) {
+        bar.style.bottom      = kbH + 'px';
+        bar.style.transition  = 'bottom .15s ease, transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease';
+        if (scrBtns) scrBtns.style.bottom = (kbH + 80) + 'px';
+      } else {
+        bar.style.bottom      = '';
+        bar.style.transition  = '';
+        if (scrBtns) scrBtns.style.bottom = '';
+      }
+    }
+
+    window.visualViewport.addEventListener('resize', onVpChange);
+    window.visualViewport.addEventListener('scroll', onVpChange);
+  })();
 }
 
 function addItem(productId, qty, price, discount) {
