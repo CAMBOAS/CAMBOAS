@@ -2,6 +2,15 @@
 //  CAMBO MINI — Google Apps Script
 //  Spreadsheet : "Data Sale Product"
 //  Sheets      : Orders | Stroke | StrokeHistory
+//
+//  Stroke sheet column layout (A–G):
+//    A = Type (ប្រភេទ)
+//    B = Product Name (ផលិតផល)
+//    C = QTY / Box count  ← decremented by deductStock()
+//    D = Pack (ឈុត)
+//    E = Bottles (ដប/ប្រអប់)
+//    F = Ratio text  e.g. "1 ឈុត = 3 ដបប្រអប់"
+//    G = PackPerBox  (ឈុត per box — base multiplier)
 // ═══════════════════════════════════════════════════════════════════
 
 // ── Config ──────────────────────────────────────────────────────────
@@ -18,25 +27,47 @@ var TELEGRAM_CHAT_ID = '';   // e.g. '-1001234567890'
 
 
 // ═══════════════════════════════════════════════════════════════════
-//  ENTRY POINT
+//  ENTRY POINT — POST
+//  Routes on payload.action:
+//    (empty / undefined) → save order + deduct stock  (existing flow)
+//    'stroke_update'     → update one row in Stroke sheet
+//    'stroke_add'        → append a new row to Stroke sheet
+//    'stroke_delete'     → delete a row from Stroke sheet
 // ═══════════════════════════════════════════════════════════════════
 function doPost(e) {
   var lock = LockService.getScriptLock();
   try {
-    lock.waitLock(15000); // wait up to 15s to avoid race conditions
+    lock.waitLock(15000);
 
     var payload = JSON.parse(e.postData.contents);
+    var action  = String(payload.action || '').trim();
 
-    // 1. Save the order
+    // ── Stock management actions ──────────────────────────────────
+    if (action === 'stroke_update') {
+      var result = updateStroke(payload);
+      lock.releaseLock();
+      return _json(result);
+    }
+
+    if (action === 'stroke_add') {
+      var result = addStroke(payload);
+      lock.releaseLock();
+      return _json(result);
+    }
+
+    if (action === 'stroke_delete') {
+      var result = deleteStroke(payload);
+      lock.releaseLock();
+      return _json(result);
+    }
+
+    // ── Default: save order + deduct stock ────────────────────────
     var orderResult = saveOrder(payload);
-
-    // 2. Deduct stock for every item in the order
     var stockResult = deductStock(payload);
 
     lock.releaseLock();
 
     var telegramResult = { ok: true };
-    // 3. Send Telegram if any low-stock alert was raised
     if (stockResult.alerts && stockResult.alerts.length > 0) {
       telegramResult = sendLowStockAlert(stockResult.alerts, payload.id);
     }
@@ -55,7 +86,13 @@ function doPost(e) {
   }
 }
 
-// GET: health-check OR ?action=list to return orders
+
+// ═══════════════════════════════════════════════════════════════════
+//  ENTRY POINT — GET
+//    ?action=list    → list orders  (existing)
+//    ?action=stroke  → list all stock rows
+//    (none)          → health check
+// ═══════════════════════════════════════════════════════════════════
 function doGet(e) {
   var action = (e && e.parameter && e.parameter.action) || '';
 
@@ -63,7 +100,142 @@ function doGet(e) {
     return listOrders(e);
   }
 
+  if (action === 'stroke') {
+    return listStroke();
+  }
+
   return _json({ ok: true, message: 'CAMBO MINI API is running.' });
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  STOCK — LIST  (?action=stroke)
+//  Returns every non-empty row from the Stroke sheet.
+// ═══════════════════════════════════════════════════════════════════
+function listStroke() {
+  var sheet = SS.getSheetByName(SHEET_STROKE);
+  if (!sheet) return _json({ ok: false, message: 'Stroke sheet not found.' });
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return _json({ ok: true, stroke: [] });
+
+  var lastCol = Math.max(sheet.getLastColumn(), 7);
+  var data    = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+
+  var stroke = data
+    .filter(function (row) { return String(row[1] || '').trim() !== ''; })
+    .map(function (row) {
+      return {
+        product   : String(row[1] || '').trim(),
+        type      : String(row[0] || '').trim(),
+        qty       : Number(row[2] || 0),
+        box       : Number(row[2] || 0),   // same column as qty
+        pack      : Number(row[3] || 0),
+        bottles   : Number(row[4] || 0),
+        ratio     : String(row[5] || '').trim(),
+        packPerBox: Number(row[6] || 0)
+      };
+    });
+
+  return _json({ ok: true, stroke: stroke });
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  STOCK — UPDATE  (POST action:'stroke_update')
+//  Finds the row by originalName (or data.product) and overwrites it.
+// ═══════════════════════════════════════════════════════════════════
+function updateStroke(payload) {
+  var sheet = SS.getSheetByName(SHEET_STROKE);
+  if (!sheet) return { ok: false, message: 'Stroke sheet not found.' };
+
+  var d            = payload.data || {};
+  var originalName = String(payload.originalName || d.product || '').trim();
+  if (!originalName) return { ok: false, message: 'No product name provided.' };
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return { ok: false, message: 'No rows in Stroke sheet.' };
+
+  var names   = sheet.getRange(2, 2, lastRow - 1, 1).getValues(); // column B only
+  var rowIdx  = -1;
+  for (var i = 0; i < names.length; i++) {
+    if (String(names[i][0] || '').trim().toLowerCase() === originalName.toLowerCase()) {
+      rowIdx = i;
+      break;
+    }
+  }
+  if (rowIdx < 0) {
+    return { ok: false, message: 'Product "' + originalName + '" not found in Stroke sheet.' };
+  }
+
+  var sheetRow = rowIdx + 2;
+  var qty      = (d.qty !== undefined) ? Number(d.qty) : Number(d.box || 0);
+  sheet.getRange(sheetRow, 1, 1, 7).setValues([[
+    String(d.type    || ''),
+    String(d.product || originalName),
+    qty,
+    Number(d.pack       || 0),
+    Number(d.bottles    || 0),
+    String(d.ratio      || ''),
+    Number(d.packPerBox || 0)
+  ]]);
+
+  return { ok: true, message: 'Stock updated.' };
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  STOCK — ADD  (POST action:'stroke_add')
+//  Appends a new row (creates the sheet + headers if missing).
+// ═══════════════════════════════════════════════════════════════════
+function addStroke(payload) {
+  var sheet = _getOrCreateSheet(SHEET_STROKE,
+    ['Type', 'Product Name', 'QTY', 'Pack', 'Bottles', 'Ratio', 'PackPerBox']);
+
+  var d = payload.data || {};
+  if (!String(d.product || '').trim()) {
+    return { ok: false, message: 'No product name provided.' };
+  }
+
+  var qty = (d.qty !== undefined) ? Number(d.qty) : Number(d.box || 0);
+  sheet.appendRow([
+    String(d.type    || ''),
+    String(d.product),
+    qty,
+    Number(d.pack       || 0),
+    Number(d.bottles    || 0),
+    String(d.ratio      || ''),
+    Number(d.packPerBox || 0)
+  ]);
+
+  return { ok: true, message: 'Product added to Stroke sheet.' };
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  STOCK — DELETE  (POST action:'stroke_delete')
+//  Deletes the first row whose column-B matches payload.name.
+// ═══════════════════════════════════════════════════════════════════
+function deleteStroke(payload) {
+  var sheet = SS.getSheetByName(SHEET_STROKE);
+  if (!sheet) return { ok: false, message: 'Stroke sheet not found.' };
+
+  var name    = String(payload.name || '').trim();
+  if (!name)  return { ok: false, message: 'No product name provided.' };
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return { ok: false, message: 'No rows in Stroke sheet.' };
+
+  var names = sheet.getRange(2, 2, lastRow - 1, 1).getValues(); // column B only
+  // Iterate bottom-up so row deletions don't shift indices
+  for (var i = names.length - 1; i >= 0; i--) {
+    if (String(names[i][0] || '').trim().toLowerCase() === name.toLowerCase()) {
+      sheet.deleteRow(i + 2);
+      return { ok: true, message: 'Deleted "' + name + '".' };
+    }
+  }
+
+  return { ok: false, message: 'Product "' + name + '" not found in Stroke sheet.' };
 }
 
 
@@ -83,9 +255,6 @@ function listOrders(e) {
   var lastCol = Math.max(sheet.getLastColumn(), 19);
   var data    = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
 
-  // Format date cell to "DD/MM/YYYY HH:MM" using script's LOCAL timezone.
-  // Google Sheets returns Date objects for date-formatted cells — using
-  // String(dateObj) would give UTC which is wrong for Cambodia (UTC+7).
   function formatDate(v) {
     if (!v) return '';
     if (v instanceof Date) {
@@ -96,19 +265,14 @@ function listOrders(e) {
     return String(v);
   }
 
-  // Header order (1-based in sheet, 0-based in data row):
-  // 1=OrderID 2=Date 3=Status 4=Customer 5=Phone 6=Province
-  // 7=Address 8=Delivery 9=DeliveryFee 10=Payment 11=Page
-  // 12=CloseBy 13=Note 14=Items(JSON) 15=Subtotal 16=Total
-  // 17=TotalRiel 18=ReceiptNo 19=CreatedAt
   var orders = [];
-  for (var i = data.length - 1; i >= 0; i--) {  // newest first
-    var row = data[i];
+  for (var i = data.length - 1; i >= 0; i--) {
+    var row       = data[i];
     var rowStatus = String(row[2] || '').trim();
     if (status && rowStatus.toLowerCase() !== status.toLowerCase()) continue;
 
     var itemsRaw = row[13];
-    var items = [];
+    var items    = [];
     try { items = JSON.parse(itemsRaw || '[]'); } catch (_) {}
 
     orders.push({
@@ -183,7 +347,8 @@ function saveOrder(payload) {
 
 
 // ═══════════════════════════════════════════════════════════════════
-//  2. DEDUCT STOCK
+//  2. DEDUCT STOCK  (called for new orders, NOT for stroke_update)
+//  Reads Column C (QTY) from Stroke sheet and decrements ordered qty.
 // ═══════════════════════════════════════════════════════════════════
 function deductStock(payload) {
   var sheet = SS.getSheetByName(SHEET_STROKE);
@@ -192,17 +357,16 @@ function deductStock(payload) {
   var items = payload.items || [];
   if (items.length === 0) return { updated: [], notFound: [], alerts: [] };
 
-  // Read entire sheet once (faster than repeated getRange calls)
   var lastRow  = sheet.getLastRow();
   var lastCol  = Math.max(sheet.getLastColumn(), 3);
   var allData  = lastRow > 1
-    ? sheet.getRange(2, 1, lastRow - 1, lastCol).getValues()  // skip header row 1
+    ? sheet.getRange(2, 1, lastRow - 1, lastCol).getValues()
     : [];
 
-  // Build a lookup map: normalized-name → row-index (0-based in allData)
+  // Build lookup: normalised-name → row-index (0-based in allData)
   var nameMap = {};
   allData.forEach(function (row, i) {
-    var name = String(row[1]).trim(); // Column B = Product Name
+    var name = String(row[1]).trim();  // Column B = Product Name
     if (name) nameMap[name.toLowerCase()] = i;
   });
 
@@ -219,19 +383,17 @@ function deductStock(payload) {
       return;
     }
 
-    var currentQty  = Number(allData[rowIdx][2]) || 0; // Column C = QTY
-    var orderedQty  = Math.max(0, Number(item.qty) || 0);
-    var newQty      = Math.max(0, currentQty - orderedQty);
+    var currentQty = Number(allData[rowIdx][2]) || 0;  // Column C = QTY
+    var orderedQty = Math.max(0, Number(item.qty) || 0);
+    var newQty     = Math.max(0, currentQty - orderedQty);
 
-    // Write new QTY back (row index in sheet = rowIdx + 2 because header is row 1)
     var sheetRow = rowIdx + 2;
-    sheet.getRange(sheetRow, 3).setValue(newQty); // Column C
+    sheet.getRange(sheetRow, 3).setValue(newQty);  // Column C
 
-    // Log to StrokeHistory
     logToStrokeHistory({
       orderId    : payload.id,
-      type       : String(allData[rowIdx][0]).trim(), // Column A
-      productName: String(allData[rowIdx][1]).trim(), // Column B (original)
+      type       : String(allData[rowIdx][0]).trim(),
+      productName: String(allData[rowIdx][1]).trim(),
       deducted   : orderedQty,
       remaining  : newQty,
       unit       : item.unit  || '',
@@ -239,7 +401,6 @@ function deductStock(payload) {
       timestamp  : new Date()
     });
 
-    // Low-stock check: remaining < 30% of stock before this order
     var stockBefore = currentQty;
     if (stockBefore > 0 && newQty / stockBefore < LOW_STOCK_PCT) {
       alerts.push({
@@ -250,11 +411,7 @@ function deductStock(payload) {
       });
     }
 
-    updated.push({
-      name     : searchName,
-      deducted : orderedQty,
-      remaining: newQty
-    });
+    updated.push({ name: searchName, deducted: orderedQty, remaining: newQty });
   });
 
   return { updated: updated, notFound: notFound, alerts: alerts };
@@ -291,11 +448,10 @@ function logToStrokeHistory(data) {
 
 
 // ═══════════════════════════════════════════════════════════════════
-//  4. TELEGRAM LOW-STOCK ALERT  (hook — fill TELEGRAM_TOKEN above)
+//  4. TELEGRAM LOW-STOCK ALERT  (fill TELEGRAM_TOKEN above to enable)
 // ═══════════════════════════════════════════════════════════════════
 function sendLowStockAlert(alerts, orderId) {
   if (!TELEGRAM_TOKEN || !TELEGRAM_CHAT_ID) {
-    // Token not configured — skip silently
     return { ok: true, skipped: true };
   }
 
@@ -310,16 +466,14 @@ function sendLowStockAlert(alerts, orderId) {
     lines.push('   Remaining: *' + a.remaining + '* (' + a.pct + '% left)');
   });
 
-  var message = lines.join('\n');
   var url = 'https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage';
-
   try {
     var response = UrlFetchApp.fetch(url, {
       method     : 'post',
       contentType: 'application/json',
       payload    : JSON.stringify({
         chat_id   : TELEGRAM_CHAT_ID,
-        text      : message,
+        text      : lines.join('\n'),
         parse_mode: 'Markdown'
       })
     });
@@ -342,14 +496,13 @@ function _getOrCreateSheet(name, headers) {
     sheet = SS.insertSheet(name);
     sheet.appendRow(headers);
     sheet.setFrozenRows(1);
-    // Style header row
     var headerRange = sheet.getRange(1, 1, 1, headers.length);
     headerRange.setFontWeight('bold').setBackground('#4a4a9c').setFontColor('#ffffff');
   }
   return sheet;
 }
 
-/** Return a JSON ContentService output. */
+/** Wrap an object as a JSON ContentService output. */
 function _json(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
