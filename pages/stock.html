@@ -434,6 +434,88 @@ function notify(msg, ok){
   clearTimeout(el._t); el._t=setTimeout(function(){ el.style.opacity='0'; },2800);
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   DEFAULT RATIOS — per-product base multipliers (ឈុត/box & ដប/ឈុត).
+   Source: reference spreadsheet (the "#=1" column is always the base unit).
+   Format: 'Product Name': [packPerBox, bottPerCase]
+   bottPerPack is derived: bottPerCase / packPerBox.
+   Used as fallback when ratio cannot be derived from current stock data.
+══════════════════════════════════════════════════════════════════════ */
+var DEFAULT_RATIOS = {
+  // ── Drinks ────────────────────────────────────────────────────────
+  'ហ្វៃប័រផាសសិន CCR'                          : [28, 84],
+  'Fibery'                                       : [28, 84],
+  'ឈុតសម្រកទ្វេដង CCR'                         : [28, 84],
+  'កាហ្វេសម្រក CCR'                             : [28, 84],
+  'Coffee CCR'                                   : [28, 84],
+  // ── Face Care ─────────────────────────────────────────────────────
+  'សាប៊ូដុសមុខ JELY Gluta'                      : [50, 100],
+  'ប្លូបចាស (Facial Foam)'                      : [40, 120],
+  'ហ្គូម លាង (Facial Foam)'                     : [40, 120],
+  'ហ្គូមចាស (Facial Foam)'                      : [40, 120],
+  'ម៉ាស់បិទមុខ 6D CCR'                          : [40,  40],
+  'ម៉ាស់បិទមុខ 24k'                             : [40,  40],
+  'ស័ម្ភីវីតាមីន JELY Mask Pad'                 : [20,  40],
+  'ស្សសំ JELY Mask Pad'                         : [20,  40],
+  'BB Cream CCR'                                 : [40,  80],
+  'SUNSCREEN CCR'                                : [72,  72],
+  'ម្ជូរស្ហើប CCR'                              : [72,  72],
+  'ថ្នាំដុសធ្មេញ CCR'                           : [72,  72],
+  'ឈ្មួតមុខស្អាត JELY'                          : [70,  80],
+  'ឈុតមុខស្អាត JELY'                            : [70,  80],
+  'CC SERUM PINK TONE JELY'                      : [20,  40],
+  'CC SERUM JELY'                                : [20,  40],
+  'ក្រដាស់សើម Remove MakeUp CCR'                : [20,  40],
+  'លុបមុខស្អាត JELY'                            : [20,  40],
+  // ── Body Care ─────────────────────────────────────────────────────
+  'សេរ៉ូមលាបខ្លួន JELY'                         : [20,  40],
+  'JELY Body Serum'                              : [20,  40],
+  'សាប៊ូដុសខ្លួន មាសក្លិន'                     : [ 9,  36],
+  'សាប៊ូដុសខ្លួនមាស'                           : [ 9,  36],
+  'សាប៊ូដុសខ្លួនកុលាប'                         : [ 9,  36],
+  'សាប៊ូកក់សក់និងដុសខ្លួនក្មេង CCR'           : [35,  35],
+  'ទឹកអនាម័យស្រ្ដី JELY'                        : [20,  40],
+  'ឡេលាបខ្លួន JELY'                            : [20,  40],
+  'Body Lotion JELY'                             : [20,  40],
+  'ឡេលាបខ្លួន Gluta SUDO'                       : [75,  75],
+  'Gluta SUDO'                                   : [75,  75],
+  'ស្រ្ពៃក្លៀក និងឡេកលៀត'                      : [60,  60],
+  // ── Hair Care ─────────────────────────────────────────────────────
+  'សាប៊ូកក់សក់ និងស្បាសក់ JELY'                : [ 9,  36],
+  'សាប៊ូកក់សក់ និងម៉ាសសក់ CCR'                 : [ 9,  36],
+  'VIP 5in1 CCR'                                 : [ 9,  36],
+  '5in1 CCR'                                     : [ 9,  36],
+  'Premium CCR'                                  : [ 9,  36],
+  'ប្រេងលាបសក់ CCR'                             : [80,  80],
+  'ស្រ្ពៃបាញ់សក់'                               : [80,  80],
+  'Hair Spray CCR'                               : [80,  80],
+};
+
+/* Look up default ratio for a product name.
+   1st pass: exact key match.
+   2nd pass: one name contains the other (normalized).
+   Returns { ppb, bpp } or null. */
+function getDefaultRatio(name){
+  if(!name) return null;
+  // Pass 1: exact
+  if(DEFAULT_RATIOS[name]) {
+    var r=DEFAULT_RATIOS[name];
+    return { ppb:r[0], bpp: r[1]>0&&r[0]>0 ? Math.round(r[1]/r[0]) : 0 };
+  }
+  // Pass 2: normalized contains
+  var norm=function(s){ return s.toLowerCase().replace(/[\s\(\)\[\]\-\_\.]+/g,''); };
+  var nn=norm(name);
+  var keys=Object.keys(DEFAULT_RATIOS);
+  for(var i=0;i<keys.length;i++){
+    var k=norm(keys[i]);
+    if(nn===k||nn.includes(k)||k.includes(nn)){
+      var r=DEFAULT_RATIOS[keys[i]];
+      return { ppb:r[0], bpp: r[1]>0&&r[0]>0 ? Math.round(r[1]/r[0]) : 0 };
+    }
+  }
+  return null;
+}
+
 /* ── Load from Google Sheets ── */
 async function loadStroke(){
   document.getElementById('tbody').innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">⏳ កំពុងទាញទិន្នន័យពី Google Sheets...</td></tr>';
@@ -447,12 +529,22 @@ async function loadStroke(){
       var box  = parseInt(item.box)||0;
       var pack = parseInt(item.pack)||0;
       var bott = parseInt(item.bottles)||0;
-      // Parse bottPerPack from ratio text e.g. "1 ឈុត = 3 ដបប្រអប់"
+      // ── Resolve packPerBox (3-source priority) ──────────────────────
+      // 1. Explicit field saved by saveEdit (most reliable)
+      // 2. DEFAULT_RATIOS lookup table (spreadsheet base values)
+      // 3. Derive from pack÷box (works when stock > 0 and box = base unit)
+      var ppb = parseInt(item.packPerBox)||0;
+      if(!ppb){ var _dr=getDefaultRatio(item.product||''); if(_dr) ppb=_dr.ppb; }
+      if(!ppb && box>0 && pack>0) ppb=Math.round(pack/box);
+
+      // ── Resolve bottPerPack (3-source priority) ──────────────────────
+      // 1. Ratio text from Sheets e.g. "1 ឈុត = 3 ដបប្រអប់"
+      // 2. DEFAULT_RATIOS lookup
+      // 3. Derive from bott÷pack
       var bpp=0, ratioText=String(item.ratio||item.pack2||'');
       if(ratioText){ var m=ratioText.match(/=\s*(\d+)/); if(m) bpp=parseInt(m[1]); }
+      if(!bpp){ var _dr2=getDefaultRatio(item.product||''); if(_dr2) bpp=_dr2.bpp; }
       if(!bpp && pack>0 && bott>0) bpp=Math.round(bott/pack);
-      // packPerBox: col F (box2) is always 1 (reference marker only), derive from actual data C/B
-      var ppb=(box>0&&pack>0)?Math.round(pack/box):0;
       return { id:i+1, name:item.product||'', cat:item.type||'-',
                box:box, pack:pack, bottles:bott, qty:qty,
                packPerBox:ppb, bottPerPack:bpp,
@@ -519,9 +611,11 @@ function openEdit(id){
   document.getElementById('ePack').value =p.pack||0;
   document.getElementById('eBott').value =p.bottles||0;
   document.getElementById('eQty').value  =p.box||0;
-  // Derive ratios from stored data or calculate from existing values
+  // Resolve ratios: stored → DEFAULT_RATIOS → derive from current stock
   _ePpb=p.packPerBox||(p.box>0&&p.pack>0     ? Math.round(p.pack/p.box)     : 0);
   _eBpp=p.bottPerPack||(p.pack>0&&p.bottles>0 ? Math.round(p.bottles/p.pack) : 0);
+  if(!_ePpb||!_eBpp){ var _defR=getDefaultRatio(p.name);
+    if(_defR){ if(!_ePpb) _ePpb=_defR.ppb; if(!_eBpp) _eBpp=_defR.bpp; } }
   // Populate editable ratio fields
   document.getElementById('ePackPerBox').value  = _ePpb||0;
   document.getElementById('eBottPerPack').value = _eBpp||0;
