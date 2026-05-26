@@ -8,8 +8,8 @@
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=162">
-  <link rel="stylesheet" href="../assets/css/main.css?v=162">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=163">
+  <link rel="stylesheet" href="../assets/css/main.css?v=163">
   <style>
     /* Hide paste-receipt tool (order-plust.js) — not needed on New Order */
     .receipt-paste-tool { display: none !important; }
@@ -524,38 +524,36 @@
     .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     [data-theme="dark"] .pqty-inp { color: #c4b5fd; }
 
-    /* ── Tag row (category + unit toggle) top-right of card ── */
-    .prow-tags {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      flex-shrink: 0;
-      margin-top: 1px;
+    /* ── Unit toggle — gradient button in controls bar ── */
+    .pctrl-box.pctrl-unit-box {
+      flex: 0 0 58px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #7c5cff 0%, #9b73ff 100%);
+      border-color: transparent;
+      box-shadow: 0 3px 10px rgba(124,92,255,.32);
     }
-
-    /* ── Unit toggle button — pill next to category tag ── */
     .punit-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2px 10px;
-      border-radius: 20px;
-      font-size: 10.5px;
-      font-weight: 700;
+      position: absolute;
+      inset: 0;
       border: none;
-      background: linear-gradient(135deg, #7c5cff, #9b73ff);
+      background: transparent;
       color: #fff;
-      cursor: pointer;
+      font-size: 11px;
+      font-weight: 800;
       font-family: inherit;
-      line-height: 1.6;
+      cursor: pointer;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
-      transition: opacity .15s, transform .1s;
-      box-shadow: 0 2px 8px rgba(124,92,255,.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: .02em;
+      transition: opacity .12s, transform .1s;
     }
+    .punit-btn.is-case { background: linear-gradient(135deg,#0ea5e9,#38bdf8); box-shadow: 0 3px 10px rgba(14,165,233,.38); }
+    .punit-btn.is-lay  { background: linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow: 0 3px 10px rgba(245,158,11,.38); }
     .punit-btn:active { opacity: .78; transform: scale(.9); }
-    .punit-btn.is-case { background: linear-gradient(135deg,#0ea5e9,#38bdf8); box-shadow: 0 2px 8px rgba(14,165,233,.3); }
-    .punit-btn.is-lay  { background: linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow: 0 2px 8px rgba(245,158,11,.3); }
     .punit-icon { display: none; }
 
     /* ── ADD button ── */
@@ -1824,10 +1822,7 @@ function renderPList(list){
       +'<div class="prow-body">'
         +'<div class="prow-info">'
           +'<div class="pinfo"><b>'+escHtml(p.name)+'</b></div>'
-          +'<div class="prow-tags">'
-            +'<span class="pcat-tag">'+escHtml(p.category)+'</span>'
-            +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button"><span class="punit-lbl">ឈុត</span></button>'
-          +'</div>'
+          +'<span class="pcat-tag">'+escHtml(p.category)+'</span>'
         +'</div>'
         +'<div class="prow-spacer"></div>'
         +'<div class="prow-ctrl">'
@@ -1847,6 +1842,10 @@ function renderPList(list){
             +'<div class="pctrl-box">'
               +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
             +'</div>'
+          +'</div>'
+          /* Unit toggle */
+          +'<div class="pctrl-box pctrl-unit-box">'
+            +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button"><span class="punit-lbl">ឈុត</span></button>'
           +'</div>'
           /* Add */
           +'<div class="pctrl-box padd-box">'
@@ -2253,16 +2252,16 @@ document.addEventListener('DOMContentLoaded', function(){
 }());
 </script>
 
-<script src="../assets/js/product-manager.js?v=162"></script>
-<script src="../assets/js/printer-receipt.js?v=162"></script>
-<script src="../assets/js/copy-receipt.js?v=162"></script>
-<script src="../assets/js/phone-carrier.js?v=162"></script>
-<script src="../assets/js/order-plust.js?v=162"></script>
-<script src="../assets/js/layout.js?v=162"></script>
-<script src="../assets/js/dashboard-layout.js?v=162"></script>
+<script src="../assets/js/product-manager.js?v=163"></script>
+<script src="../assets/js/printer-receipt.js?v=163"></script>
+<script src="../assets/js/copy-receipt.js?v=163"></script>
+<script src="../assets/js/phone-carrier.js?v=163"></script>
+<script src="../assets/js/order-plust.js?v=163"></script>
+<script src="../assets/js/layout.js?v=163"></script>
+<script src="../assets/js/dashboard-layout.js?v=163"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="../assets/js/share-receipt.js?v=162"></script>
-<script src="../assets/js/searchable-combo.js?v=162"></script>
-<script src="../assets/js/sw-register.js?v=162"></script>
+<script src="../assets/js/share-receipt.js?v=163"></script>
+<script src="../assets/js/searchable-combo.js?v=163"></script>
+<script src="../assets/js/sw-register.js?v=163"></script>
 </body>
 </html>
