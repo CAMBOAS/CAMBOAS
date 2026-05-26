@@ -1134,6 +1134,76 @@
       }
       .fgrid.cols3 > :nth-child(3) { grid-column: 1 / -1; }
     }
+
+    /* ══════════════════════════════════════════════════════
+       DARK MODE — missing & improved rules
+    ══════════════════════════════════════════════════════ */
+
+    /* 1. Section header — subtle background to separate from body */
+    [data-theme="dark"] .mob-sect-head {
+      background: rgba(255,255,255,.028);
+    }
+
+    /* 2. Section header border — hide when section is collapsed */
+    .mob-sect-head:not(.is-open) {
+      border-bottom: none;
+    }
+
+    /* 3. Product price input — was missing dark override (qty had it, price didn't) */
+    [data-theme="dark"] .pprice-inp {
+      color: #c4b5fd;
+    }
+
+    /* 4. Category pill — brighter purple text for dark backgrounds */
+    [data-theme="dark"] .pcat-tag {
+      color: #a78bfa;
+      border-color: rgba(167,139,250,.38);
+      background: rgba(167,139,250,.08);
+    }
+
+    /* 5. Product controls bar — more visible border & bg in dark */
+    [data-theme="dark"] .prow-ctrl {
+      background: rgba(124,92,255,.12);
+      border-top-color: rgba(124,92,255,.22);
+    }
+
+    /* 6. Summary box — more visible purple tint in dark */
+    [data-theme="dark"] .sum-box {
+      background: rgba(124,92,255,.1);
+      border-top-color: rgba(124,92,255,.2);
+      border-bottom-color: rgba(124,92,255,.2);
+    }
+
+    /* 7. KHR rate row — more visible in dark */
+    [data-theme="dark"] .khr-row {
+      background: rgba(124,92,255,.1);
+      border-bottom-color: rgba(124,92,255,.18);
+    }
+
+    /* 8. Product search bar — cleaner in dark */
+    [data-theme="dark"] .psearch input {
+      background: rgba(255,255,255,.07);
+      color: #e8e0ff;
+    }
+    [data-theme="dark"] .psearch input:focus {
+      background: rgba(255,255,255,.1);
+      box-shadow: 0 0 0 2px rgba(124,92,255,.38);
+    }
+
+    /* 9. Payment button borders — slightly more visible in dark */
+    [data-theme="dark"] .pay-btn {
+      border-color: rgba(255,255,255,.16);
+    }
+    [data-theme="dark"] .pay-btn.active {
+      background: rgba(124,92,255,.22);
+      border-color: rgba(124,92,255,.6);
+      color: #e8e0ff;
+    }
+
+    /* 10. Product thumbnail placeholder bg — darker in dark mode */
+    [data-theme="dark"] .pthumb {
+      background: rgba(124,92,255,.12);
+    }
   </style>
 </head>
 <body>
