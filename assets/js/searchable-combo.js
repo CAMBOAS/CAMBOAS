@@ -13,7 +13,7 @@ var PROVINCES = [
 ];
 
 var PAGES = [
-  'Helen CCR','ហេឡេន CCR','Brand1 CCR','ចង់ទិញ CCR','ស្រីម៉ៅ JELY','សប្បាយទិញ CCR','JELY CCR BRAND','ចែម៉ៅ CCR BRAND','ចែម៉ៅ ចែលី BRAND','ចង់ស្អាត By HELEN','ស្រីម៉ៅ JELY BRAND','JELY BRAND BY HELEN'
+  'Helen CCR','ហេឡេន CCR','Brand1 CCR','ចង់ទិញ CCR','ស្រីម៉ៅ JELY','CCR Supplier','ហេឡេន CCR II','សប្បាយទិញ CCR','ហេឡេន CCR III','JELY CCR BRAND','ចែម៉ៅ CCR BRAND','ចែម៉ៅ ចែលី BRAND','ចង់ស្អាត By HELEN','ស្រីម៉ៅ JELY BRAND','JELY BRAND BY HELEN'
 ];
 
 var CLOSEBY = [

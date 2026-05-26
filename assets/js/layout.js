@@ -469,7 +469,7 @@
     function _setTopOffset() {
       if (!_topbarEl) return;
       const h = _topbarEl.getBoundingClientRect().height;
-      document.documentElement.style.setProperty('--topbar-offset', (h + 8) + 'px');
+      document.documentElement.style.setProperty('--topbar-offset', h + 'px');
     }
     setTimeout(_setTopOffset, 80);
     window.addEventListener('resize', _setTopOffset, { passive: true });
