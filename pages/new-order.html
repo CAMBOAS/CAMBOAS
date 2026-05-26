@@ -8,8 +8,8 @@
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=163">
-  <link rel="stylesheet" href="../assets/css/main.css?v=163">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=164">
+  <link rel="stylesheet" href="../assets/css/main.css?v=164">
   <style>
     /* Hide paste-receipt tool (order-plust.js) — not needed on New Order */
     .receipt-paste-tool { display: none !important; }
@@ -427,74 +427,47 @@
     .prow-div { display: none; }
 
     /* ══════════════════════════════════════════════════════
-       CONTROLS BAR — full-width strip at bottom of card
+       CONTROLS BAR — compact inline strip
     ══════════════════════════════════════════════════════ */
     .prow-ctrl {
       display: flex;
-      align-items: flex-end;
-      gap: 6px;
+      align-items: center;
+      gap: 7px;
       margin: 0 -10px;
-      padding: 6px 10px 10px;
-      background: rgba(124,92,255,.03);
-      border-top: 1px solid rgba(124,92,255,.07);
+      padding: 8px 10px 10px;
+      background: rgba(124,92,255,.04);
+      border-top: 1px solid rgba(124,92,255,.08);
     }
     [data-theme="dark"] .prow-ctrl {
-      background: rgba(124,92,255,.09);
-      border-top-color: rgba(124,92,255,.15);
+      background: rgba(124,92,255,.12);
+      border-top-color: rgba(124,92,255,.22);
     }
 
-    /* Column wrapper (label + input box) */
-    .pctrl-col {
-      flex: 1;
-      min-width: 0;
+    /* Price pill */
+    .pctrl-price {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
+      align-items: baseline;
+      gap: 2px;
+      background: rgba(124,92,255,.08);
+      border-radius: 10px;
+      padding: 6px 9px;
+      flex-shrink: 0;
     }
-    .pctrl-col .pctrl-box { width: 100%; }
-
-    /* Labels above */
-    .pctrl-above,
-    .pctrl-lbl-top {
-      font-size: 9px;
-      font-weight: 700;
-      color: #a0a8c0;
-      line-height: 1;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
-    /* ── Input box (qty & price — plain, no border, no bg) ── */
-    .pctrl-box {
-      flex: 1;
-      height: 42px;
-      border-radius: 12px;
-      border: none;
-      background: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    [data-theme="dark"] .pctrl-box { background: transparent; }
-
-    /* Price input */
-    .pctrl-price { display: flex; align-items: baseline; gap: 1px; }
+    [data-theme="dark"] .pctrl-price { background: rgba(124,92,255,.18); }
     .pprice-sym {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
       color: #7c5cff;
       line-height: 1;
     }
+    [data-theme="dark"] .pprice-sym { color: #c4b5fd; }
     .pprice-inp {
-      width: 36px;
-      height: 22px;
+      width: 34px;
+      height: 20px;
       border: none;
       background: transparent;
       color: #7c5cff;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 800;
       font-family: inherit;
       text-align: center;
@@ -504,25 +477,54 @@
     }
     .pprice-inp::-webkit-outer-spin-button,
     .pprice-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    [data-theme="dark"] .pprice-inp { color: #c4b5fd; }
 
-    /* Qty input */
+    /* × separator */
+    .pctrl-x {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(124,92,255,.4);
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    /* Qty pill */
     .pqty-inp {
-      width: 44px;
-      height: 28px;
+      width: 38px;
+      height: 34px;
+      background: rgba(124,92,255,.08);
+      border-radius: 10px;
       border: none;
-      background: transparent;
       color: #7c5cff;
-      font-size: 22px;
+      font-size: 18px;
       font-weight: 800;
       font-family: inherit;
       text-align: center;
       outline: none;
       padding: 0;
+      flex-shrink: 0;
       -moz-appearance: textfield;
     }
     .pqty-inp::-webkit-outer-spin-button,
     .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    [data-theme="dark"] .pqty-inp { color: #c4b5fd; }
+    [data-theme="dark"] .pqty-inp { color: #c4b5fd; background: rgba(124,92,255,.18); }
+
+    /* Spacer pushes unit+add to the right */
+    .pctrl-spacer { flex: 1; }
+
+    /* Unit/Add box container */
+    .pctrl-box {
+      height: 42px;
+      border-radius: 14px;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
 
     /* ── Unit toggle — gradient button in controls bar ── */
     .pctrl-box.pctrl-unit-box {
@@ -1826,23 +1828,17 @@ function renderPList(list){
         +'</div>'
         +'<div class="prow-spacer"></div>'
         +'<div class="prow-ctrl">'
-          /* Price — label above, bordered box */
-          +'<div class="pctrl-col">'
-            +'<span class="pctrl-above">Price</span>'
-            +'<div class="pctrl-box">'
-              +'<div class="pctrl-price">'
-                +'<span class="pprice-sym">$</span>'
-                +'<input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()">'
-              +'</div>'
-            +'</div>'
+          /* Price pill */
+          +'<div class="pctrl-price">'
+            +'<span class="pprice-sym">$</span>'
+            +'<input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()">'
           +'</div>'
-          /* Qty — label above input */
-          +'<div class="pctrl-col">'
-            +'<span class="pctrl-above pctrl-lbl">ឈុត</span>'
-            +'<div class="pctrl-box">'
-              +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
-            +'</div>'
-          +'</div>'
+          /* × separator */
+          +'<span class="pctrl-x">×</span>'
+          /* Qty pill */
+          +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
+          /* Spacer */
+          +'<span class="pctrl-spacer"></span>'
           /* Unit toggle */
           +'<div class="pctrl-box pctrl-unit-box">'
             +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button"><span class="punit-lbl">ឈុត</span></button>'
@@ -2252,16 +2248,16 @@ document.addEventListener('DOMContentLoaded', function(){
 }());
 </script>
 
-<script src="../assets/js/product-manager.js?v=163"></script>
-<script src="../assets/js/printer-receipt.js?v=163"></script>
-<script src="../assets/js/copy-receipt.js?v=163"></script>
-<script src="../assets/js/phone-carrier.js?v=163"></script>
-<script src="../assets/js/order-plust.js?v=163"></script>
-<script src="../assets/js/layout.js?v=163"></script>
-<script src="../assets/js/dashboard-layout.js?v=163"></script>
+<script src="../assets/js/product-manager.js?v=164"></script>
+<script src="../assets/js/printer-receipt.js?v=164"></script>
+<script src="../assets/js/copy-receipt.js?v=164"></script>
+<script src="../assets/js/phone-carrier.js?v=164"></script>
+<script src="../assets/js/order-plust.js?v=164"></script>
+<script src="../assets/js/layout.js?v=164"></script>
+<script src="../assets/js/dashboard-layout.js?v=164"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="../assets/js/share-receipt.js?v=163"></script>
-<script src="../assets/js/searchable-combo.js?v=163"></script>
-<script src="../assets/js/sw-register.js?v=163"></script>
+<script src="../assets/js/share-receipt.js?v=164"></script>
+<script src="../assets/js/searchable-combo.js?v=164"></script>
+<script src="../assets/js/sw-register.js?v=164"></script>
 </body>
 </html>
