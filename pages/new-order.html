@@ -8,8 +8,8 @@
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=158">
-  <link rel="stylesheet" href="../assets/css/main.css?v=158">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=160">
+  <link rel="stylesheet" href="../assets/css/main.css?v=160">
   <style>
     /* Hide paste-receipt tool (order-plust.js) — not needed on New Order */
     .receipt-paste-tool { display: none !important; }
@@ -515,36 +515,33 @@
     .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     [data-theme="dark"] .pqty-inp { color: #c4b5fd; }
 
-    /* ── Unit toggle — gradient purple same as ADD ── */
-    .pctrl-box.pctrl-unit-box {
-      flex: 0 0 58px;
-      height: 42px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #7c5cff 0%, #9b73ff 100%);
-      border-color: transparent;
-      box-shadow: 0 3px 10px rgba(124,92,255,.32);
-    }
-    .punit-btn {
-      position: absolute;
-      inset: 0;
+    /* ── Unit label — tappable above qty input ── */
+    .punit-lbl {
+      appearance: none;
+      -webkit-appearance: none;
       border: none;
-      background: transparent;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
+      padding: 2px 6px;
+      margin: 0;
+      background: rgba(124,92,255,.1);
+      border-radius: 6px;
       font-family: inherit;
+      font-size: 9px;
+      font-weight: 800;
+      color: #7c5cff;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      line-height: 1.4;
       cursor: pointer;
-      touch-action: manipulation;
+      transition: background .15s, color .15s, transform .1s;
       -webkit-tap-highlight-color: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      letter-spacing: .02em;
-      transition: opacity .12s, transform .1s;
+      touch-action: manipulation;
     }
-    .punit-btn.is-case { background: linear-gradient(135deg,#0ea5e9,#38bdf8); box-shadow: 0 3px 10px rgba(14,165,233,.38); }
-    .punit-btn.is-lay  { background: linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow: 0 3px 10px rgba(245,158,11,.38); }
-    .punit-btn:active { opacity: .78; transform: scale(.9); }
+    .punit-lbl:active { transform: scale(.88); opacity: .78; }
+    .punit-lbl.is-case { color: #0ea5e9; background: rgba(14,165,233,.12); }
+    .punit-lbl.is-lay  { color: #f59e0b; background: rgba(245,158,11,.12); }
+    [data-theme="dark"] .punit-lbl { color: #c4b5fd; background: rgba(124,92,255,.18); }
+    [data-theme="dark"] .punit-lbl.is-case { color: #38bdf8; background: rgba(14,165,233,.18); }
+    [data-theme="dark"] .punit-lbl.is-lay  { color: #fbbf24; background: rgba(245,158,11,.18); }
     .punit-icon { display: none; }
 
     /* ── ADD button ── */
@@ -1827,18 +1824,12 @@ function renderPList(list){
               +'</div>'
             +'</div>'
           +'</div>'
-          /* Qty — label above, bordered box */
+          /* Qty — tappable unit label above input */
           +'<div class="pctrl-col">'
-            +'<span class="pctrl-above pctrl-lbl">ឈុត</span>'
+            +'<button class="pctrl-above punit-lbl pctrl-lbl" onclick="toggleUnit(this,event)" type="button">ឈុត</button>'
             +'<div class="pctrl-box">'
               +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
             +'</div>'
-          +'</div>'
-          /* Unit toggle — gradient purple */
-          +'<div class="pctrl-box pctrl-unit-box">'
-            +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button">'
-              +'<span class="punit-lbl">ឈុត</span>'
-            +'</button>'
           +'</div>'
           /* Add */
           +'<div class="pctrl-box padd-box">'
@@ -1853,16 +1844,13 @@ function renderPList(list){
 function toggleUnit(btn, e){
   e.stopPropagation();
   playClick();
-  var lblEl = btn.querySelector('.punit-lbl');
-  var cur = (lblEl ? lblEl.textContent.trim() : btn.textContent.trim());
   var units = ['ឈុត','កេស','លាយ'];
+  var cur = btn.textContent.trim();
   var idx = units.indexOf(cur);
   var newUnit = units[(idx + 1) % units.length];
-  if(lblEl) lblEl.textContent = newUnit; else btn.textContent = newUnit;
+  btn.textContent = newUnit;
   btn.classList.toggle('is-case', newUnit === 'កេស');
   btn.classList.toggle('is-lay',  newUnit === 'លាយ');
-  var qtyLbl = btn.closest('.prow').querySelector('.pctrl-lbl');
-  if(qtyLbl) qtyLbl.textContent = newUnit;
 }
 
 function addFromCard(btn, e){
@@ -2245,16 +2233,16 @@ document.addEventListener('DOMContentLoaded', function(){
 }());
 </script>
 
-<script src="../assets/js/product-manager.js?v=158"></script>
-<script src="../assets/js/printer-receipt.js?v=158"></script>
-<script src="../assets/js/copy-receipt.js?v=158"></script>
-<script src="../assets/js/phone-carrier.js?v=158"></script>
-<script src="../assets/js/order-plust.js?v=158"></script>
-<script src="../assets/js/layout.js?v=158"></script>
-<script src="../assets/js/dashboard-layout.js?v=158"></script>
+<script src="../assets/js/product-manager.js?v=160"></script>
+<script src="../assets/js/printer-receipt.js?v=160"></script>
+<script src="../assets/js/copy-receipt.js?v=160"></script>
+<script src="../assets/js/phone-carrier.js?v=160"></script>
+<script src="../assets/js/order-plust.js?v=160"></script>
+<script src="../assets/js/layout.js?v=160"></script>
+<script src="../assets/js/dashboard-layout.js?v=160"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="../assets/js/share-receipt.js?v=158"></script>
-<script src="../assets/js/searchable-combo.js?v=158"></script>
-<script src="../assets/js/sw-register.js?v=158"></script>
+<script src="../assets/js/share-receipt.js?v=160"></script>
+<script src="../assets/js/searchable-combo.js?v=160"></script>
+<script src="../assets/js/sw-register.js?v=160"></script>
 </body>
 </html>
