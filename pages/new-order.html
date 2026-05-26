@@ -383,8 +383,16 @@
       padding: 11px 10px 0;
     }
 
-    /* Name */
-    .prow-info { display: flex; flex-direction: column; gap: 5px; margin-bottom: 6px; }
+    /* Name row — name left, category pill right */
+    .prow-info {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .pinfo { flex: 1; min-width: 0; }
     .pinfo b {
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -397,7 +405,7 @@
     }
     [data-theme="dark"] .pinfo b { color: #f0eaff; }
 
-    /* Category pill */
+    /* Category pill — top-right of card */
     .pcat-tag {
       display: inline-flex;
       align-items: center;
@@ -408,8 +416,9 @@
       border: 1.5px solid rgba(124,92,255,.28);
       color: #7c5cff;
       background: transparent;
-      align-self: flex-start;
+      flex-shrink: 0;
       line-height: 1.6;
+      margin-top: 1px;
     }
     [data-theme="dark"] .pcat-tag { border-color: rgba(124,92,255,.4); }
 
