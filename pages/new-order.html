@@ -8,8 +8,8 @@
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=160">
-  <link rel="stylesheet" href="../assets/css/main.css?v=160">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=162">
+  <link rel="stylesheet" href="../assets/css/main.css?v=162">
   <style>
     /* Hide paste-receipt tool (order-plust.js) — not needed on New Order */
     .receipt-paste-tool { display: none !important; }
@@ -524,33 +524,38 @@
     .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     [data-theme="dark"] .pqty-inp { color: #c4b5fd; }
 
-    /* ── Unit label — tappable above qty input ── */
-    .punit-lbl {
-      appearance: none;
-      -webkit-appearance: none;
-      border: none;
-      padding: 2px 6px;
-      margin: 0;
-      background: rgba(124,92,255,.1);
-      border-radius: 6px;
-      font-family: inherit;
-      font-size: 9px;
-      font-weight: 800;
-      color: #7c5cff;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      line-height: 1.4;
-      cursor: pointer;
-      transition: background .15s, color .15s, transform .1s;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+    /* ── Tag row (category + unit toggle) top-right of card ── */
+    .prow-tags {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+      margin-top: 1px;
     }
-    .punit-lbl:active { transform: scale(.88); opacity: .78; }
-    .punit-lbl.is-case { color: #0ea5e9; background: rgba(14,165,233,.12); }
-    .punit-lbl.is-lay  { color: #f59e0b; background: rgba(245,158,11,.12); }
-    [data-theme="dark"] .punit-lbl { color: #c4b5fd; background: rgba(124,92,255,.18); }
-    [data-theme="dark"] .punit-lbl.is-case { color: #38bdf8; background: rgba(14,165,233,.18); }
-    [data-theme="dark"] .punit-lbl.is-lay  { color: #fbbf24; background: rgba(245,158,11,.18); }
+
+    /* ── Unit toggle button — pill next to category tag ── */
+    .punit-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 10.5px;
+      font-weight: 700;
+      border: none;
+      background: linear-gradient(135deg, #7c5cff, #9b73ff);
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.6;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity .15s, transform .1s;
+      box-shadow: 0 2px 8px rgba(124,92,255,.3);
+    }
+    .punit-btn:active { opacity: .78; transform: scale(.9); }
+    .punit-btn.is-case { background: linear-gradient(135deg,#0ea5e9,#38bdf8); box-shadow: 0 2px 8px rgba(14,165,233,.3); }
+    .punit-btn.is-lay  { background: linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow: 0 2px 8px rgba(245,158,11,.3); }
     .punit-icon { display: none; }
 
     /* ── ADD button ── */
@@ -1819,7 +1824,10 @@ function renderPList(list){
       +'<div class="prow-body">'
         +'<div class="prow-info">'
           +'<div class="pinfo"><b>'+escHtml(p.name)+'</b></div>'
-          +'<span class="pcat-tag">'+escHtml(p.category)+'</span>'
+          +'<div class="prow-tags">'
+            +'<span class="pcat-tag">'+escHtml(p.category)+'</span>'
+            +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button"><span class="punit-lbl">ឈុត</span></button>'
+          +'</div>'
         +'</div>'
         +'<div class="prow-spacer"></div>'
         +'<div class="prow-ctrl">'
@@ -1833,9 +1841,9 @@ function renderPList(list){
               +'</div>'
             +'</div>'
           +'</div>'
-          /* Qty — tappable unit label above input */
+          /* Qty — label above input */
           +'<div class="pctrl-col">'
-            +'<button class="pctrl-above punit-lbl pctrl-lbl" onclick="toggleUnit(this,event)" type="button">ឈុត</button>'
+            +'<span class="pctrl-above pctrl-lbl">ឈុត</span>'
             +'<div class="pctrl-box">'
               +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
             +'</div>'
@@ -1853,13 +1861,16 @@ function renderPList(list){
 function toggleUnit(btn, e){
   e.stopPropagation();
   playClick();
+  var lblEl = btn.querySelector('.punit-lbl');
+  var cur = lblEl ? lblEl.textContent.trim() : btn.textContent.trim();
   var units = ['ឈុត','កេស','លាយ'];
-  var cur = btn.textContent.trim();
   var idx = units.indexOf(cur);
   var newUnit = units[(idx + 1) % units.length];
-  btn.textContent = newUnit;
+  if (lblEl) lblEl.textContent = newUnit; else btn.textContent = newUnit;
   btn.classList.toggle('is-case', newUnit === 'កេស');
   btn.classList.toggle('is-lay',  newUnit === 'លាយ');
+  var qtyLbl = btn.closest('.prow').querySelector('.pctrl-lbl');
+  if (qtyLbl) qtyLbl.textContent = newUnit;
 }
 
 function addFromCard(btn, e){
@@ -2242,16 +2253,16 @@ document.addEventListener('DOMContentLoaded', function(){
 }());
 </script>
 
-<script src="../assets/js/product-manager.js?v=160"></script>
-<script src="../assets/js/printer-receipt.js?v=160"></script>
-<script src="../assets/js/copy-receipt.js?v=160"></script>
-<script src="../assets/js/phone-carrier.js?v=160"></script>
-<script src="../assets/js/order-plust.js?v=160"></script>
-<script src="../assets/js/layout.js?v=160"></script>
-<script src="../assets/js/dashboard-layout.js?v=160"></script>
+<script src="../assets/js/product-manager.js?v=162"></script>
+<script src="../assets/js/printer-receipt.js?v=162"></script>
+<script src="../assets/js/copy-receipt.js?v=162"></script>
+<script src="../assets/js/phone-carrier.js?v=162"></script>
+<script src="../assets/js/order-plust.js?v=162"></script>
+<script src="../assets/js/layout.js?v=162"></script>
+<script src="../assets/js/dashboard-layout.js?v=162"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="../assets/js/share-receipt.js?v=160"></script>
-<script src="../assets/js/searchable-combo.js?v=160"></script>
-<script src="../assets/js/sw-register.js?v=160"></script>
+<script src="../assets/js/share-receipt.js?v=162"></script>
+<script src="../assets/js/searchable-combo.js?v=162"></script>
+<script src="../assets/js/sw-register.js?v=162"></script>
 </body>
 </html>
