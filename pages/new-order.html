@@ -165,10 +165,22 @@
       padding: 0 14px;
       font-size: 16px;
       width: 100%;
+      box-sizing: border-box;
       border: 1.5px solid var(--line, rgba(0,0,0,.12));
       background: var(--input, rgba(255,255,255,.9));
       color: var(--text, #18213a);
       transition: border-color .2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .fg input[type="date"],
+    .fg input[type="time"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 52px;
+      line-height: 52px;
+      padding: 0 14px;
+      cursor: pointer;
     }
     .fg input:focus,
     .fg select:focus,
