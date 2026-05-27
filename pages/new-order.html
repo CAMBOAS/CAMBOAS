@@ -509,6 +509,23 @@
     .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     [data-theme="dark"] .pqty-inp { color: #c4b5fd; background: rgba(124,92,255,.18); }
 
+    /* Label wrapper above price/qty */
+    .pctrl-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .pctrl-lbl {
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(124,92,255,.6);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      line-height: 1;
+    }
+    [data-theme="dark"] .pctrl-lbl { color: rgba(196,181,253,.6); }
+
     /* Spacer pushes unit+add to the right */
     .pctrl-spacer { flex: 1; }
 
@@ -1828,15 +1845,21 @@ function renderPList(list){
         +'</div>'
         +'<div class="prow-spacer"></div>'
         +'<div class="prow-ctrl">'
-          /* Price pill */
-          +'<div class="pctrl-price">'
-            +'<span class="pprice-sym">$</span>'
-            +'<input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()">'
+          /* Price group with label */
+          +'<div class="pctrl-group">'
+            +'<span class="pctrl-lbl">Price</span>'
+            +'<div class="pctrl-price">'
+              +'<span class="pprice-sym">$</span>'
+              +'<input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()">'
+            +'</div>'
           +'</div>'
           /* × separator */
           +'<span class="pctrl-x">×</span>'
-          /* Qty pill */
-          +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
+          /* Qty group with label */
+          +'<div class="pctrl-group">'
+            +'<span class="pctrl-lbl">QTY</span>'
+            +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
+          +'</div>'
           /* Spacer */
           +'<span class="pctrl-spacer"></span>'
           /* Unit toggle */
