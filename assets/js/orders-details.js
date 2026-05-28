@@ -397,14 +397,27 @@ function renderProducts() {
             <input type="number" min="0" step="0.01" value="${product.price}" class="price-input" data-id="${product.id}" />
           </div>
           <div class="pc-field">
-            <label>Discount</label>
-            <input type="number" min="0" step="0.01" value="0" class="discount-input" data-id="${product.id}" />
+            <label>Unit</label>
+            <button class="unit-toggle-btn" data-id="${product.id}" data-unit="ឈុត" type="button">ឈុត</button>
           </div>
           <button class="add-btn add-product-btn" data-id="${product.id}" type="button">+</button>
         </div>
       </div>
     </div>
   `).join("");
+
+  // Unit toggle cycle: ឈុត → កេស → លាយ → ឈុត
+  const UNITS = ['ឈុត', 'កេស', 'លាយ'];
+  document.querySelectorAll(".unit-toggle-btn").forEach((btn) => {
+    btn.onclick = null;
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const cur = UNITS.indexOf(btn.dataset.unit);
+      const next = UNITS[(cur + 1) % UNITS.length];
+      btn.dataset.unit = next;
+      btn.textContent = next;
+    };
+  });
 
   // Use onclick to prevent duplicate event listeners on re-render
   document.querySelectorAll(".add-product-btn").forEach((btn) => {
@@ -413,8 +426,8 @@ function renderProducts() {
       const id = btn.dataset.id;
       const qty = Number(document.querySelector(`.qty-input[data-id="${id}"]`)?.value || 1);
       const price = Number(document.querySelector(`.price-input[data-id="${id}"]`)?.value || 0);
-      const discount = Number(document.querySelector(`.discount-input[data-id="${id}"]`)?.value || 0);
-      addItem(id, qty, price, discount);
+      const unit = document.querySelector(`.unit-toggle-btn[data-id="${id}"]`)?.dataset.unit || 'ឈុត';
+      addItem(id, qty, price, unit);
     };
   });
 }
@@ -521,7 +534,7 @@ function bindActions() {
   })();
 }
 
-function addItem(productId, qty, price, discount) {
+function addItem(productId, qty, price, unit) {
   // Look in managed products (IndexedDB) first, then fall back to default array
   const managedList = (window.__camboProducts && window.__camboProducts.length)
     ? window.__camboProducts
@@ -530,16 +543,18 @@ function addItem(productId, qty, price, discount) {
                || products.find((p) => String(p.id) === String(productId));
   if (!product) return toast("Product not found.", "error");
   if (!qty || qty < 1) return toast("QTY must be at least 1.", "error");
-  if (price < 0 || discount < 0) return toast("Price or discount is invalid.", "error");
+  if (price < 0) return toast("Price is invalid.", "error");
 
+  const unitLabel = (typeof unit === 'string') ? unit : 'ឈុត';
   items.push({
     rowId: Date.now() + Math.random(),
     productId: product.id,
     name: product.name,
     qty,
     price,
-    discount,
-    subtotal: Math.max(0, qty * price - discount),
+    discount: 0,
+    unit: unitLabel,
+    subtotal: Math.max(0, qty * price),
   });
 
   renderTable();
