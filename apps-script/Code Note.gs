@@ -1,64 +1,19 @@
 /**
- * CAMBO MINI — Google Apps Script v3.1
+ * CAMBO MINI — Google Apps Script v3
  * ════════════════════════════════════════
- * Features:
- *  • Save Order → SaleOrder sheet (flat rows, newest at TOP)
- *  • Auto stock deduction (Stroke sheet) — ឈុត / កេស / លាយ
- *  • StrokeHistory daily snapshot at 11:58 PM Cambodia time
+ * NEW in v3:
+ *  • Auto stock deduction (Stroke sheet) on order save
+ *  • StrokeHistory daily backup at 11:58 PM (newest row at TOP)
  *  • Low-stock Telegram alert at 7:00 AM & 6:00 PM
- *  • Telegram order receipt on every new order
- *  • Order CRUD: add / update / delete
- *  • onOpen() — Auto setup triggers ពេលបើក Sheet
+ *  • Unit column added to CAMBO_ORDERS (ឈុត / កេស / លាយ)
+ *  • New orders insert at TOP of sheet (newest first)
  * ════════════════════════════════════════
  */
-
-/* ════════════════════════════════════════
-   AUTO TRIGGER SETUP — runs when Sheet opens
-   គ្មានអ្វីត្រូវ Run ដោយដៃទៀតទេ!
-   ════════════════════════════════════════ */
-function onOpen() {
-  autoSetupTriggers_();
-}
-
-/**
- * ពិនិត្យ Trigger មានឬអត់ — បើអត់ → បង្កើតភ្លាម
- * Safe to call multiple times (idempotent)
- */
-function autoSetupTriggers_() {
-  const existing = ScriptApp.getProjectTriggers().map(function(t) {
-    return t.getHandlerFunction();
-  });
-
-  // 7:00 AM — Low stock alert
-  if (!existing.includes('sendLowStockAlert_7am_')) {
-    ScriptApp.newTrigger('sendLowStockAlert_7am_')
-      .timeBased().atHour(7).everyDays(1).inTimezone(TZ).create();
-    Logger.log('✅ Trigger created: sendLowStockAlert_7am_');
-  }
-
-  // 6:00 PM — Low stock alert
-  if (!existing.includes('sendLowStockAlert_6pm_')) {
-    ScriptApp.newTrigger('sendLowStockAlert_6pm_')
-      .timeBased().atHour(18).everyDays(1).inTimezone(TZ).create();
-    Logger.log('✅ Trigger created: sendLowStockAlert_6pm_');
-  }
-
-  // 11:58 PM — Daily stock snapshot
-  if (!existing.includes('backupStrokeHistory_')) {
-    ScriptApp.newTrigger('backupStrokeHistory_')
-      .timeBased().atHour(23).nearMinute(58).everyDays(1).inTimezone(TZ).create();
-    Logger.log('✅ Trigger created: backupStrokeHistory_');
-  }
-}
-
-// Wrapper functions (trigger requires unique names)
-function sendLowStockAlert_7am_() { sendLowStockAlert_(); }
-function sendLowStockAlert_6pm_() { sendLowStockAlert_(); }
 
 /* ── Constants ── */
 const SHEET_NAME          = 'SaleOrder';
-const STROKE_SHEET        = 'Stock';
-const STROKE_HISTORY      = 'StockHistory';
+const STROKE_SHEET        = 'Stroke';
+const STROKE_HISTORY      = 'StrokeHistory';
 const TELEGRAM_ENABLED    = true;
 const BOT_TOKEN           = '5839552644:AAFYFyeJXEPYoGwZ3AiKDcYiGcnjl8L1ZGg';
 const TELEGRAM_CHAT_ID    = '-1001732018286';
@@ -72,15 +27,19 @@ const HEADER = [
   'DeliveryName','DeliveryFee','Payment','Note',
   'Number','Product','QTY','Unit','Price','Discount','Subtotal','GrandTotal'
 ];
+// Col index map (0-based for row arrays):
+// 0:DateTime 1:OrderID 2:Page 3:CloseBy 4:Status
+// 5:Customer 6:Phone 7:Province 8:DetailAddress
+// 9:DeliveryName 10:DeliveryFee 11:Payment 12:Note
+// 13:Number 14:Product 15:QTY 16:Unit 17:Price 18:Discount 19:Subtotal 20:GrandTotal
 
-/* ── Stroke sheet columns (1-based) ── */
+/* ── Stroke sheet columns (A–F) ── */
 const STK_COL = { PRODUCT:1, TYPE:2, BOX:3, PACK:4, BOTTLES:5, QTY:6 };
 
-/* ── StrokeHistory columns (daily snapshot) ── */
+/* ── StrokeHistory columns (daily backup snapshot only) ── */
 const HIST_HEADER = [
   'DateTime','Product','Type','Box','Pack','Bottles','QTY'
 ];
-
 
 /* ════════════════════════════════════════
    HTTP HANDLERS
@@ -88,7 +47,7 @@ const HIST_HEADER = [
 function doGet(e) {
   try {
     const action = String((e && e.parameter && e.parameter.action) || 'status').trim();
-    if (action === 'status') return jsonOutput_({ ok:true, status:'running', message:'CAMBO MINI v3.1 is working.' });
+    if (action === 'status') return jsonOutput_({ ok:true, status:'running', message:'CAMBO MINI v3 is working.' });
     if (action === 'list')   return jsonOutput_({ ok:true, orders: listOrders_() });
     if (action === 'stroke') return jsonOutput_({ ok:true, stroke: listStroke_() });
     return jsonOutput_({ ok:false, message:'Unknown action' });
@@ -126,7 +85,7 @@ function doPost(e) {
       return jsonOutput_({ ok:true });
     }
 
-    /* Legacy payload — no action field (from new-order.html submitOrder) */
+    /* Legacy payload (no action field) */
     if (!action && body && Array.isArray(body.items) && body.items.length) {
       const normalized = normalizeLegacyPayloadToOrder_(body);
       const saved = addOrder_(normalized, { preserveOrderId:true });
@@ -136,7 +95,6 @@ function doPost(e) {
     return jsonOutput_({ ok:false, message:'Unknown action' });
   } catch(err) { return jsonOutput_({ ok:false, message: err.message || String(err) }); }
 }
-
 
 /* ════════════════════════════════════════
    ORDER FUNCTIONS
@@ -150,7 +108,10 @@ function addOrder_(order, options) {
   const rows    = orderToRows_(orderId, order);
 
   /* Insert at TOP (row 2) so newest order appears first */
-  if (sheet.getLastRow() > 1) sheet.insertRowsBefore(2, rows.length);
+  const currentLastRow = sheet.getLastRow();
+  if (currentLastRow > 1) {
+    sheet.insertRowsBefore(2, rows.length);
+  }
   sheet.getRange(2, 1, rows.length, HEADER.length).setValues(rows);
 
   /* ── Auto stock deduction ── */
@@ -177,7 +138,12 @@ function updateOrder_(orderId, order) {
   deleteOrder_(orderId);
   const sheet = getSheet_();
   const rows  = orderToRows_(orderId, order);
-  if (sheet.getLastRow() > 1) sheet.insertRowsBefore(2, rows.length);
+
+  /* Insert at TOP after delete */
+  const currentLastRow = sheet.getLastRow();
+  if (currentLastRow > 1) {
+    sheet.insertRowsBefore(2, rows.length);
+  }
   sheet.getRange(2, 1, rows.length, HEADER.length).setValues(rows);
   return { orderId, rowsAdded: rows.length };
 }
@@ -212,27 +178,22 @@ function listOrders_() {
         detailAddress:safe_(row[8]), address:safe_(row[8]),
         deliveryName:safe_(row[9]), deliveryFee:toNumber_(row[10]),
         payment:safe_(row[11]), note:safe_(row[12]),
-        grandTotal:toNumber_(row[20]),
-        products:[], items:[]
+        grandTotal:toNumber_(row[20]),   // col 20 (was 19 before Unit column added)
+        products:[]
       };
     }
-    const item = {
-      number  : toNumber_(row[13]),
-      name    : safe_(row[14]), product: safe_(row[14]),
-      qty     : toNumber_(row[15]),
-      unit    : safe_(row[16]),
-      price   : toNumber_(row[17]),
-      discount: toNumber_(row[18]),
-      subtotal: toNumber_(row[19])
-    };
-    groups[orderId].products.push(item);
-    groups[orderId].items.push(item);
-    const gt = toNumber_(row[20]);
-    if (gt > 0) groups[orderId].grandTotal = gt;
+    groups[orderId].products.push({
+      number:toNumber_(row[13]),
+      name:safe_(row[14]), product:safe_(row[14]),
+      qty:toNumber_(row[15]),
+      unit:safe_(row[16]),             // NEW Unit column
+      price:toNumber_(row[17]),
+      discount:toNumber_(row[18]),
+      subtotal:toNumber_(row[19])
+    });
   });
   return Object.values(groups).sort((a,b) => String(b.dateTime).localeCompare(String(a.dateTime)));
 }
-
 
 /* ════════════════════════════════════════
    STROKE (STOCK) FUNCTIONS
@@ -240,13 +201,10 @@ function listOrders_() {
 
 /**
  * deductStroke_ — កាត់ស្តុកដោយស្វ័យប្រវត្តិ បន្ទាប់ពី order save
- *
- * Stroke columns (1-based): PRODUCT=1, TYPE=2, BOX=3, PACK=4, BOTTLES=5, QTY=6
- *
- * Unit rules:
- *   ឈុត (default) → ដក PACK (col 4) → recalc BOX & BOTTLES & QTY
- *   កេស           → ដក BOX  (col 3) → recalc PACK & BOTTLES & QTY
- *   លាយ           → ដក BOTTLES (col 5) → recalc PACK & BOX & QTY
+ * Unit logic:
+ *   ឈុត  → deduct from QTY column
+ *   លាយ  → deduct from QTY column
+ *   កេស  → deduct from Box column
  */
 function deductStroke_(products, orderId) {
   if (!products || !products.length) return;
@@ -270,49 +228,19 @@ function deductStroke_(products, orderId) {
       const stockName = normalizeForMatch_(safe_(data[i][STK_COL.PRODUCT - 1]));
       if (!stockMatch_(orderName, stockName)) continue;
 
-      const rowNum = i + 2; // 1-based sheet row
-
-      // Current values
-      const curBox  = Math.max(0, toNumber_(data[i][STK_COL.BOX     - 1])); // col C
-      const curPack = Math.max(0, toNumber_(data[i][STK_COL.PACK    - 1])); // col D
-      const curBott = Math.max(0, toNumber_(data[i][STK_COL.BOTTLES - 1])); // col E
-
-      // Derive ratios from existing data
-      const ppb = (curBox  > 0 && curPack > 0) ? Math.round(curPack / curBox)  : 1; // packs per box
-      const bpp = (curPack > 0 && curBott > 0) ? Math.round(curBott / curPack) : 1; // bottles per pack
-
-      let newBox, newPack, newBott;
+      const rowNum = i + 2;
 
       if (unit === 'កេស') {
-        // ដក BOX
-        newBox  = Math.max(0, curBox  - qty);
-        newPack = newBox * ppb;
-        newBott = newPack * bpp;
-
-      } else if (unit === 'លាយ') {
-        // ដក BOTTLES
-        newBott = Math.max(0, curBott - qty);
-        newPack = bpp > 0 ? Math.floor(newBott / bpp) : 0;
-        newBox  = ppb > 0 ? Math.floor(newPack  / ppb) : 0;
-
+        const boxBefore = toNumber_(data[i][STK_COL.BOX - 1]);
+        const boxAfter  = Math.max(0, boxBefore - qty);
+        sheet.getRange(rowNum, STK_COL.BOX).setValue(boxAfter);
+        data[i][STK_COL.BOX - 1] = boxAfter;
       } else {
-        // ឈុត (default) — ដក PACK
-        newPack = Math.max(0, curPack - qty);
-        newBox  = ppb > 0 ? Math.floor(newPack / ppb) : 0;
-        newBott = newPack * bpp;
+        const qtyBefore = toNumber_(data[i][STK_COL.QTY - 1]);
+        const qtyAfter  = Math.max(0, qtyBefore - qty);
+        sheet.getRange(rowNum, STK_COL.QTY).setValue(qtyAfter);
+        data[i][STK_COL.QTY - 1] = qtyAfter;
       }
-
-      // Write BOX(C), PACK(D), BOTTLES(E), QTY(F) ក្នុងតែ 1 call
-      sheet.getRange(rowNum, STK_COL.BOX, 1, 4).setValues([[newBox, newPack, newBott, newBox]]);
-
-      // Update local cache
-      data[i][STK_COL.BOX     - 1] = newBox;
-      data[i][STK_COL.PACK    - 1] = newPack;
-      data[i][STK_COL.BOTTLES - 1] = newBott;
-      data[i][STK_COL.QTY     - 1] = newBox;
-
-      Logger.log('[Stock] ' + safe_(data[i][0]) + ' | ' + unit + ' -' + qty +
-                 ' | Box:' + newBox + ' Pack:' + newPack + ' Bott:' + newBott);
       break;
     }
   });
@@ -335,6 +263,7 @@ function backupStrokeHistory_() {
 
   const histSheet = ensureStrokeHistorySheet_();
 
+  /* Build all backup rows — columns: DateTime, Product, Type, Box, Pack, Bottles, QTY */
   const rows = data
     .filter(function(row) { return !!safe_(row[0]); })
     .map(function(row) {
@@ -351,16 +280,19 @@ function backupStrokeHistory_() {
 
   if (!rows.length) return;
 
+  /* Insert all at TOP at once */
   const histLastRow = histSheet.getLastRow();
-  if (histLastRow > 1) histSheet.insertRowsBefore(2, rows.length);
+  if (histLastRow > 1) {
+    histSheet.insertRowsBefore(2, rows.length);
+  }
   histSheet.getRange(2, 1, rows.length, HIST_HEADER.length).setValues(rows);
 
-  Logger.log('✅ Stroke backup done: ' + rows.length + ' products at ' + now);
+  Logger.log('Stroke backup done: ' + rows.length + ' products at ' + now);
 }
 
 /**
  * sendLowStockAlert_ — ផ្ញើ Telegram ពេលស្តុកជិតអស់
- * Triggered at 7:00 AM & 6:00 PM Cambodia time
+ * Triggered at 7:00 AM & 6:00 PM
  */
 function sendLowStockAlert_() {
   if (!TELEGRAM_ENABLED || !BOT_TOKEN || !TELEGRAM_CHAT_ID) return;
@@ -396,7 +328,8 @@ function sendLowStockAlert_() {
   });
 
   if (!lowItems.length && !outItems.length) {
-    Logger.log('[' + now + '] No low stock items.'); return;
+    Logger.log('[' + now + '] No low stock items.');
+    return;
   }
 
   const SEP   = '................................................';
@@ -410,6 +343,7 @@ function sendLowStockAlert_() {
     outItems.forEach(function(l) { lines.push(l); });
     lines.push('');
   }
+
   if (lowItems.length) {
     lines.push('🟡 ផលិតផលជិតអស់ (≤ ' + LOW_STOCK_THRESHOLD + ') (' + lowItems.length + ' មុខ):');
     lowItems.forEach(function(l) { lines.push(l); });
@@ -420,17 +354,21 @@ function sendLowStockAlert_() {
 
   UrlFetchApp.fetch(
     'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage',
-    { method:'post', contentType:'application/json',
+    {
+      method: 'post', contentType: 'application/json',
       payload: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: lines.join('\n') }),
-      muteHttpExceptions: true }
+      muteHttpExceptions: true
+    }
   );
-  Logger.log('[' + now + '] Low stock alert sent.');
-}
 
+  Logger.log('[' + now + '] Low stock alert sent: ' + (outItems.length + lowItems.length) + ' items');
+}
 
 /* ════════════════════════════════════════
    STROKE HELPER FUNCTIONS
    ════════════════════════════════════════ */
+
+/** Update one row in Stroke sheet by matching product name */
 function strokeUpdate_(originalName, data) {
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(STROKE_SHEET);
@@ -440,14 +378,13 @@ function strokeUpdate_(originalName, data) {
   const names = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat();
   for (let i = 0; i < names.length; i++) {
     if (safe_(names[i]) === safe_(originalName)) {
-      const box = toNumber_(data.box || data.qty);
       sheet.getRange(i + 2, 1, 1, 6).setValues([[
         safe_(data.product || originalName),
         safe_(data.type   || ''),
-        box,
+        toNumber_(data.box),
         toNumber_(data.pack),
         toNumber_(data.bottles),
-        box   // QTY = BOX
+        toNumber_(data.qty)
       ]]);
       return;
     }
@@ -455,25 +392,26 @@ function strokeUpdate_(originalName, data) {
   throw new Error('Product not found: ' + originalName);
 }
 
+/** Add a new row to Stroke sheet */
 function strokeAdd_(data) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(STROKE_SHEET);
   if (!sheet) {
     sheet = ss.insertSheet(STROKE_SHEET);
-    sheet.getRange(1, 1, 1, 6).setValues([['Products','Types','Box','Pack','Bottles','QTY']]);
+    sheet.getRange(1, 1, 1, 6).setValues([['Product','Type','Box','Pack','Bottles','QTY']]);
     sheet.setFrozenRows(1);
   }
-  const box = toNumber_(data.box || data.qty);
   sheet.getRange(sheet.getLastRow() + 1, 1, 1, 6).setValues([[
     safe_(data.product || data.name || ''),
     safe_(data.type    || data.cat  || ''),
-    box,
+    toNumber_(data.box),
     toNumber_(data.pack),
     toNumber_(data.bottles),
-    box
+    toNumber_(data.qty)
   ]]);
 }
 
+/** Delete row(s) in Stroke sheet by product name */
 function strokeDelete_(name) {
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(STROKE_SHEET);
@@ -502,6 +440,7 @@ function listStroke_() {
   }).filter(function(r) { return !!r.product; });
 }
 
+/** Ensure StrokeHistory sheet exists with header, return sheet object */
 function ensureStrokeHistorySheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(STROKE_HISTORY);
@@ -516,15 +455,11 @@ function ensureStrokeHistorySheet_() {
   return sheet;
 }
 
-/** Normalize name for fuzzy matching */
+
 function normalizeForMatch_(name) {
-  return String(name || '').toLowerCase()
-    .replace(/\s+/g,'')
-    .replace(/[()（）]/g,'')
-    .replace(/\(កេស\)|\(លាយ\)/g,''); // strip unit suffix
+  return String(name || '').toLowerCase().replace(/\s+/g,'').replace(/[()（）]/g,'');
 }
 
-/** Fuzzy match: exact → contains → 70% character overlap */
 function stockMatch_(orderName, stockName) {
   if (!orderName || !stockName) return false;
   if (orderName === stockName) return true;
@@ -538,31 +473,27 @@ function stockMatch_(orderName, stockName) {
   return matches / shorter.length >= 0.70;
 }
 
-
 /* ════════════════════════════════════════
    TIME TRIGGERS SETUP
-   Run ONCE manually:
-   Apps Script → ជ្រើស setupTimeTriggers_ → ▶ Run
+   Run ONCE manually: Extensions → Apps Script → Run → setupTimeTriggers_
    ════════════════════════════════════════ */
 function setupTimeTriggers_() {
-  // Delete all existing triggers first
   ScriptApp.getProjectTriggers().forEach(function(t) { ScriptApp.deleteTrigger(t); });
 
-  // 7:00 AM — Low stock alert
+  /* Low stock alert: 7:00 AM daily */
   ScriptApp.newTrigger('sendLowStockAlert_')
     .timeBased().atHour(7).everyDays(1).inTimezone(TZ).create();
 
-  // 6:00 PM — Low stock alert
+  /* Low stock alert: 6:00 PM daily */
   ScriptApp.newTrigger('sendLowStockAlert_')
     .timeBased().atHour(18).everyDays(1).inTimezone(TZ).create();
 
-  // 11:58 PM — Daily stock snapshot
+  /* Daily stock backup: 11:58 PM */
   ScriptApp.newTrigger('backupStrokeHistory_')
     .timeBased().atHour(23).nearMinute(58).everyDays(1).inTimezone(TZ).create();
 
-  Logger.log('✅ Triggers setup: 7AM alert | 6PM alert | 11:58PM backup');
+  Logger.log('✅ Triggers setup complete: 7AM alert, 6PM alert, 11:58PM backup');
 }
-
 
 /* ════════════════════════════════════════
    ORDER HELPER FUNCTIONS
@@ -596,7 +527,7 @@ function orderToRows_(orderId, order) {
   if (!products.length) throw new Error('No products found.');
 
   const deliveryFee = toNumber_(order.deliveryFee);
-  const grandTotal  = (order.grandTotal != null && order.grandTotal !== '')
+  const grandTotal  = order.grandTotal !== undefined && order.grandTotal !== null && order.grandTotal !== ''
     ? toNumber_(order.grandTotal)
     : calcGrandTotal_(products, deliveryFee);
 
@@ -605,7 +536,7 @@ function orderToRows_(orderId, order) {
     const price    = toNumber_(line.price);
     const discount = toNumber_(line.discount);
     const unit     = safe_(line.unit || 'ឈុត');
-    const subtotal = (line.subtotal != null && line.subtotal !== '')
+    const subtotal = line.subtotal !== undefined && line.subtotal !== null && line.subtotal !== ''
       ? toNumber_(line.subtotal)
       : Math.max(0, qty * price - discount);
 
@@ -618,25 +549,25 @@ function orderToRows_(orderId, order) {
       deliveryFee, safe_(order.payment), safe_(order.note),
       idx + 1,
       safe_(line.name || line.product),
-      qty, unit, price, discount, subtotal,
-      idx === 0 ? grandTotal : 0   // GrandTotal on first row only
+      qty,
+      unit,       // NEW: Unit column
+      price, discount, subtotal, grandTotal
     ];
   });
 }
 
 function normalizeLegacyPayloadToOrder_(payload) {
   return {
-    id:           safe_(payload.id),
-    dateTime:     payload.createdAt || payload.date || '',
+    id: safe_(payload.id),
+    dateTime: payload.createdAt || payload.date || '',
     page:         safe_(payload.page),
     closeBy:      safe_(payload.closeBy),
     status:       safe_(payload.status || 'Pending'),
     customer:     safe_(payload.customer),
     phone:        safe_(payload.phone),
     province:     safe_(payload.province),
+    detailAddress: safe_(payload.addressDetail),
     address:      safe_(payload.addressDetail),
-    detailAddress:safe_(payload.addressDetail),
-    addressDetail:safe_(payload.addressDetail),
     deliveryName: safe_(payload.delivery),
     deliveryFee:  toNumber_(payload.deliveryFee),
     payment:      safe_(payload.payment),
@@ -644,16 +575,15 @@ function normalizeLegacyPayloadToOrder_(payload) {
     grandTotal:   toNumber_(payload.total),
     receiptNo:    safe_(payload.receiptNo || ''),
     items: (payload.items || []).map(function(item) {
-      const qty      = toNumber_(item.qty);
-      const price    = toNumber_(item.price);
-      const discount = toNumber_(item.discount);
       return {
         name:     safe_(item.name || item.product),
-        qty, price, discount,
+        qty:      toNumber_(item.qty),
+        price:    toNumber_(item.price),
+        discount: toNumber_(item.discount),
         unit:     safe_(item.unit || 'ឈុត'),
-        subtotal: (item.subtotal != null && item.subtotal !== '')
+        subtotal: item.subtotal !== undefined && item.subtotal !== null && item.subtotal !== ''
           ? toNumber_(item.subtotal)
-          : Math.max(0, qty * price - discount)
+          : Math.max(0, toNumber_(item.qty) * toNumber_(item.price) - toNumber_(item.discount))
       };
     })
   };
@@ -676,16 +606,15 @@ function nextOrderId_() {
   const ids = sheet.getRange(2, 2, lastRow - 1, 1).getValues().flat();
   let maxNum = 0;
   ids.forEach(id => {
-    const match = safe_(id).match(new RegExp('^ORD-' + todayKey + '-(\\d{3,})$'));
+    const text  = safe_(id);
+    const match = text.match(new RegExp('^ORD-' + todayKey + '-(\\d{3,})$'));
     if (match) maxNum = Math.max(maxNum, Number(match[1]));
   });
   return prefix + String(maxNum + 1).padStart(3, '0');
 }
 
 function calcGrandTotal_(products, deliveryFee) {
-  return products.reduce((sum, line) =>
-    sum + Math.max(0, toNumber_(line.qty) * toNumber_(line.price) - toNumber_(line.discount)), 0
-  ) + toNumber_(deliveryFee);
+  return products.reduce((sum, line) => sum + (toNumber_(line.qty) * toNumber_(line.price) - toNumber_(line.discount)), 0) + toNumber_(deliveryFee);
 }
 
 function normalizeDateTime_(value) {
@@ -709,7 +638,6 @@ function jsonOutput_(payload) {
   return ContentService.createTextOutput(JSON.stringify(payload)).setMimeType(ContentService.MimeType.JSON);
 }
 
-
 /* ════════════════════════════════════════
    TELEGRAM — ORDER RECEIPT
    ════════════════════════════════════════ */
@@ -730,27 +658,27 @@ function sendTelegramMessageFromOrder_(orderId, order) {
     return text;
   }
 
-  const items       = Array.isArray(order.products) ? order.products : (order.items || []);
-  const dateText    = formatDateText(order.dateTime || order.date);
-  const deliveryFee = toNumber_(order.deliveryFee);
-  const subtotalSum = items.reduce((sum, item) => {
+  const items        = Array.isArray(order.products) ? order.products : (order.items || []);
+  const dateText     = formatDateText(order.dateTime || order.date);
+  const deliveryFee  = toNumber_(order.deliveryFee);
+  const subtotalSum  = items.reduce((sum, item) => {
     const qty = toNumber_(item.qty), price = toNumber_(item.price);
-    const sub = (item.subtotal != null && item.subtotal !== '')
+    const sub = item.subtotal !== undefined && item.subtotal !== null && item.subtotal !== ''
       ? toNumber_(item.subtotal) : Math.max(0, qty*price - toNumber_(item.discount));
     return sum + sub;
   }, 0);
-  const total     = (order.grandTotal != null && order.grandTotal !== '')
+  const total     = order.grandTotal !== undefined && order.grandTotal !== null && order.grandTotal !== ''
     ? Number(order.grandTotal) : subtotalSum + deliveryFee;
   const totalRiel = Math.round(total * 4100);
 
   const lines = [];
   lines.push('🧾 វិក័យប័ត្រ 📅 ' + dateText);
   lines.push(SEP);
-  lines.push('👤 ឈ្មោះ:\t'          + (safe_(order.customer)                              || '-'));
-  lines.push('📞 លេខទូរសព្ទ:\t'     + (safe_(order.phone)                                 || '-'));
-  lines.push('📍 ទីតាំង:\t'          + (safe_(order.address || order.detailAddress || order.addressDetail) || '-'));
-  lines.push('🚚 អ្នកដឹកជញ្ជូន:\t'  + (safe_(order.deliveryName || order.delivery)        || '-'));
-  lines.push('📝 Note:\t\t'          + (safe_(order.note)                                  || '-'));
+  lines.push('👤 ឈ្មោះ:\t'          + (safe_(order.customer)                       || '-'));
+  lines.push('📞 លេខទូរសព្ទ:\t'     + (safe_(order.phone)                          || '-'));
+  lines.push('📍 ទីតាំង:\t'          + (safe_(order.address || order.detailAddress) || '-'));
+  lines.push('🚚 អ្នកដឹកជញ្ជូន:\t'  + (safe_(order.deliveryName)                   || '-'));
+  lines.push('📝 Note:\t\t'          + (safe_(order.note)                           || '-'));
   lines.push(SEP);
   lines.push('📦 ផលិតផល:');
   lines.push(SEP);
@@ -759,10 +687,10 @@ function sendTelegramMessageFromOrder_(orderId, order) {
     const qty      = toNumber_(item.qty);
     const price    = toNumber_(item.price);
     const unit     = safe_(item.unit || 'ឈុត');
-    const subtotal = (item.subtotal != null && item.subtotal !== '')
+    const subtotal = item.subtotal !== undefined && item.subtotal !== null && item.subtotal !== ''
       ? toNumber_(item.subtotal) : Math.max(0, qty*price - toNumber_(item.discount));
     lines.push((index+1) + '. ' + (safe_(item.name || item.product) || '-'));
-    lines.push('   ចំនួន ' + qty + ' ' + unit + ' x ' + money(price) + '  = ' + money(subtotal));
+    lines.push('   ចំនួន ' + qty + ' ' + unit + ' x ' + money(price) + '      = ' + money(subtotal));
   });
 
   lines.push(SEP);
@@ -773,7 +701,7 @@ function sendTelegramMessageFromOrder_(orderId, order) {
   lines.push('🇰🇭 ប្រាក់រៀល: ' + totalRiel.toLocaleString('en-US') + '៛');
   lines.push(SEP);
   lines.push('📄 Page: ' + (safe_(order.page)||'-') + ' | CloseBy: ' + (safe_(order.closeBy)||'-'));
-  lines.push('☎️ 015 58 68 78 / 089 58 68 78');
+  lines.push('☎️ លេខបម្រើអតិថិជន: 015 58 68 78 / 089 58 68 78');
   const receiptNo = safe_(order.receiptNo || '');
   if (receiptNo) lines.push('🔢 លេខប៉ុង: ' + receiptNo);
   lines.push(SEP);

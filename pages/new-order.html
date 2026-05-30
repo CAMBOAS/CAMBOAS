@@ -1552,7 +1552,7 @@
 <div id="printArea" style="display:none;"></div>
 
 <script>
-window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzW7fNFKrIoE2hB1afSuQfKGr4laKna4Ife0K82x_viFwM9uUBMsyfYjeNz0RpEG5F2xA/exec";
+window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNH8H0iaoIr4GVRLcsC14tD_SSs875hrnlAvJnsacU8B5WnpHafhoNlZjiGDpiNhPFFg/exec";
 
 var KHR_RATE = (function(){
   try { var r = Number(localStorage.getItem('cambo_khr_rate')); return r > 0 ? r : 4100; } catch(e) { return 4100; }
@@ -2000,7 +2000,7 @@ async function submitOrder(){
   try {
     var order=buildPayload(), result=await _postToAppsScript(order);
     try{var saved=JSON.parse(localStorage.getItem('camboOrders')||'[]');saved.push(order);localStorage.setItem('camboOrders',JSON.stringify(saved));}catch(e){}
-    toast(result.telegram&&result.telegram.ok===false?'Order saved. Telegram failed.':'Order saved!','success');
+    toast(result.telegram&&result.telegram.ok===false?'Order saved. Telegram failed.':'✅ Order saved! Stock updated.','success');
     clearAll();
   } catch(err){
     console.error(err); toast(err.message||'Save failed.','error');

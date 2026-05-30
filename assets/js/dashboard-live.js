@@ -1,4 +1,4 @@
-﻿const DASHBOARD_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzW7fNFKrIoE2hB1afSuQfKGr4laKna4Ife0K82x_viFwM9uUBMsyfYjeNz0RpEG5F2xA/exec';
+﻿const DASHBOARD_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxNH8H0iaoIr4GVRLcsC14tD_SSs875hrnlAvJnsacU8B5WnpHafhoNlZjiGDpiNhPFFg/exec';
 let revenueChart;
 let _chartPeriod = 'monthly';
 let _dashRows = [];
