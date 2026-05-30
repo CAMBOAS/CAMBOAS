@@ -1374,8 +1374,8 @@ function populateFilterOptions(){
 }
 
 async function init(){
-  var r = getPreset('today');
-  _date = {preset:'today', start:r.start, end:r.end, label:r.label};
+  var r = getPreset('all');
+  _date = {preset:'all', start:'', end:'', label:'All'};
   updateDateBtn();
 
   _orders = await loadOrders();
