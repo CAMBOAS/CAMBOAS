@@ -8,7 +8,7 @@ var _orders = [], _sel = new Set();
 var _qrOn = true; // QR Code toggle state
 var _sort = {col:'date', dir:'desc'};
 var _q = '', _f = {};
-var _date = {preset:'today', start:'', end:'', label:'Today'};
+var _date = {preset:'all', start:'', end:'', label:'All'};
 
 /* ── helpers ── */
 function $id(id){ return document.getElementById(id); }
