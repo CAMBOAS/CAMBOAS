@@ -510,6 +510,53 @@ function getSrc(){
   return getFiltered();
 }
 
+/* ══════════════════════════════════════════
+   SYNC ALL localStorage orders → Google Sheet
+   ══════════════════════════════════════════ */
+async function syncAllToSheet(){
+  var btn = document.getElementById('olSyncBtn');
+  var allOrders = local(); // all orders from localStorage
+  if(!allOrders.length){
+    if(window.macUI) macUI.toast('គ្មាន Order ក្នុង localStorage', 'warning');
+    return;
+  }
+
+  if(btn){ btn.textContent = '⏳ Syncing 0/' + allOrders.length + '...'; btn.disabled = true; }
+
+  var ok = 0, fail = 0;
+  var base = (window.CamboAPI && window.CamboAPI.getBase()) || SCRIPT_URL;
+
+  // Process in batches of 10 to avoid timeout
+  var BATCH = 10;
+  for(var i = 0; i < allOrders.length; i += BATCH){
+    var batch = allOrders.slice(i, i + BATCH);
+    var promises = batch.map(function(o){
+      return fetch(base, {
+        method: 'POST',
+        headers: {'Content-Type': 'text/plain;charset=utf-8'},
+        body: JSON.stringify({action: 'add', order: o})
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if(d && d.ok !== false) ok++; else fail++; })
+      .catch(function(){ fail++; });
+    });
+    await Promise.all(promises);
+    if(btn) btn.textContent = '⏳ Syncing ' + Math.min(i + BATCH, allOrders.length) + '/' + allOrders.length + '...';
+  }
+
+  if(btn){ btn.textContent = '☁️ Sync All → Sheet'; btn.disabled = false; }
+
+  var msg = '✅ Synced: ' + ok + ' | ❌ Failed: ' + fail;
+  if(window.macUI) macUI.toast(msg, ok > 0 ? 'success' : 'error');
+  console.log('[SyncSheet]', msg);
+
+  // Reload data after sync
+  if(ok > 0){
+    _orders = await loadOrders();
+    render();
+  }
+}
+
 function exportCSV(){
   var src=getSrc();
   var rows=[['Date','Customer','Phone','Province','Products','Page','CloseBy','Total','Status']];
@@ -1448,8 +1495,9 @@ async function init(){
     if(a==='printall') printTable();
     if(a==='printsel') printSelected();
     if(a==='reportdelivery') reportDelivery();
-    if(a==='markdel')  markStatus('Delivered');
-    if(a==='markpend') markStatus('Pending');
+    if(a==='markdel')   markStatus('Delivered');
+    if(a==='markpend')  markStatus('Pending');
+    if(a==='syncsheet'){ $id('olActDrop')?.classList.remove('open'); syncAllToSheet(); return; }
     $id('olActDrop')?.classList.remove('open');
   });
 
