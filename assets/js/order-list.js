@@ -1003,34 +1003,31 @@ function renderDrawerView(o){
     +(o.note ? drRow('Note', '<span style="color:#f87171">'+esc(o.note)+'</span>') : '')
     +'</div>'
 
-    // Products card
+    // Products card — card layout (mobile-friendly, no 5-col grid)
     +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:12px;padding:14px">'
     +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">🛍️ ផលិតផល ('+prods.length+')</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 46px 58px 65px 58px;gap:0 8px;font-size:12px">'
-    // Header row: ឈ្មោះ | ចំ | ប្រភេទ | តម្លៃ | សរុប
-    +'<span style="color:#64748b;font-weight:700;padding-bottom:8px;border-bottom:2px solid rgba(148,163,200,.15)">ឈ្មោះ</span>'
-    +'<span style="color:#64748b;font-weight:700;text-align:center;padding-bottom:8px;border-bottom:2px solid rgba(148,163,200,.15)">ចំ</span>'
-    +'<span style="color:#64748b;font-weight:700;text-align:center;padding-bottom:8px;border-bottom:2px solid rgba(148,163,200,.15)">ប្រភេទ</span>'
-    +'<span style="color:#64748b;font-weight:700;text-align:right;padding-bottom:8px;border-bottom:2px solid rgba(148,163,200,.15)">តម្លៃ</span>'
-    +'<span style="color:#64748b;font-weight:700;text-align:right;padding-bottom:8px;border-bottom:2px solid rgba(148,163,200,.15)">សរុប</span>'
-    // Data rows: ឈ្មោះ | ចំ | [badge] | តម្លៃ | សរុប
-    +prods.map(function(p){
+    +'<div style="display:flex;flex-direction:column;gap:0">'
+    +prods.map(function(p,i){
       var sub=Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0);
       var discount=Number(p.discount||0);
       var txtClr=themeVal('#e2e8f0','#0f172a');
-      var br='border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)');
+      var isLast=(i===prods.length-1);
+      var br=isLast?'':'border-bottom:1px solid '+themeVal('rgba(148,163,200,.08)','rgba(148,163,184,.12)');
       var u=getProdUnit(p);
       var ubs=unitBadgeStyle(u);
-      return '<div style="padding:7px 0;'+br+'">'
-          +'<span style="color:'+txtClr+';font-weight:600;font-size:12px">'+esc(cleanProdName(p))+'</span>'
-          +(discount>0?'<div style="font-size:10px;color:#f87171;margin-top:1px">ចុះ -$'+discount.toFixed(2)+'</div>':'')
+      return '<div style="padding:10px 0;'+br+'">'
+        // Row 1: Product name (full width)
+        +'<div style="font-weight:700;font-size:13px;color:'+txtClr+';margin-bottom:6px;line-height:1.4">'+esc(cleanProdName(p))+'</div>'
+        // Row 2: badge | ×qty | $price | = $sub
+        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">'
+          +'<span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:800;white-space:nowrap;flex-shrink:0;'+ubs+'">'+esc(u)+'</span>'
+          +'<span style="font-size:12px;color:#94a3b8;flex-shrink:0">×<b style="color:'+txtClr+'">'+p.qty+'</b></span>'
+          +'<span style="font-size:12px;color:#94a3b8;flex-shrink:0">$'+Number(p.price||0).toFixed(2)+'</span>'
+          +'<span style="flex:1"></span>'
+          +(discount>0?'<span style="font-size:11px;color:#f87171;flex-shrink:0">-$'+discount.toFixed(2)+'</span>':'')
+          +'<span style="font-size:14px;font-weight:800;color:'+themeVal('#7dd3fc','#4f46e5')+';flex-shrink:0">$'+sub.toFixed(2)+'</span>'
         +'</div>'
-        +'<div style="padding:7px 0;'+br+';text-align:center;font-size:13px;font-weight:800;color:'+txtClr+'">'+p.qty+'</div>'
-        +'<div style="padding:7px 0;'+br+';display:flex;align-items:center;justify-content:center">'
-          +'<span style="padding:2px 7px;border-radius:10px;font-size:10px;font-weight:800;white-space:nowrap;'+ubs+'">'+esc(u)+'</span>'
-        +'</div>'
-        +'<div style="padding:7px 0;'+br+';text-align:right;color:#94a3b8">$'+Number(p.price||0).toFixed(2)+'</div>'
-        +'<div style="padding:7px 0;'+br+';text-align:right;color:'+themeVal('#7dd3fc','#4f46e5')+';font-weight:800">$'+sub.toFixed(2)+'</div>';
+      +'</div>';
     }).join('')
     +'</div>'
     +(function(){
