@@ -216,18 +216,19 @@
       grid-template-columns: 1fr 36px 50px 55px !important;
     }
 
-    /* Footer action buttons: 2×2 grid */
-    #olDrFoot { padding:10px 12px !important; gap:6px !important; }
+    /* Footer action buttons: single row, compact */
+    #olDrFoot { padding:8px 12px !important; gap:6px !important; }
     #olDrFoot > div:first-child { gap:6px !important; }
     #olDrFoot > div:last-child {
-      display:grid !important;
-      grid-template-columns:1fr 1fr !important;
+      display:flex !important;
+      flex-direction:row !important;
       gap:6px !important;
     }
-    #olDrFoot button {
-      height:44px !important;
-      font-size:12px !important;
+    #olDrFoot > div:last-child button {
+      height:42px !important;
+      flex:1 !important;
       border-radius:10px !important;
+      min-width:0 !important;
     }
     /* Grand total font */
     #olDrBody [style*="font-size:18px"] { font-size:16px !important; }
