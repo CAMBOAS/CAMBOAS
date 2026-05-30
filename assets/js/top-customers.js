@@ -5,7 +5,8 @@
 (function(){
 'use strict';
 
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/exec';
+var SCRIPT_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
+  'https://script.google.com/macros/s/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/exec';
 var LS_KEY     = 'cambo_search_edit_orders_v3';
 var currentPeriod = 'monthly';
 var _cachedOrders = null;

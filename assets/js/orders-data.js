@@ -1,6 +1,7 @@
 ﻿
 (function(){
-  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/exec';
+  const WEB_APP_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
+    'https://script.google.com/macros/s/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/exec';
   const STORAGE_KEY = 'cambo_search_edit_orders_v3';
   function normalizeLooseText(value){ return String(value ?? '').replace(/\s+/g,' ').trim(); }
   function fixPhone(value){

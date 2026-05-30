@@ -1,7 +1,8 @@
 ﻿(function(){
 'use strict';
 
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/exec';
+var SCRIPT_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
+  'https://script.google.com/macros/s/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/exec';
 var LS_KEY = 'cambo_search_edit_orders_v3';
 
 var _orders = [], _sel = new Set();
@@ -177,8 +178,9 @@ function mergeOrders(sheetOrders, localOrders){
 async function loadOrders(){
   var camboLocal = localCamboOrders(); // orders from Smart Orderer not yet on Sheet
   try{
-    var r = await fetch(SCRIPT_URL+'?action=list&limit=1000&_='+Date.now());
-    var d = await r.json();
+    var d = window.CamboAPI
+      ? await window.CamboAPI.get({action:'list',limit:1000})
+      : await fetch(SCRIPT_URL+'?action=list&limit=1000&_='+Date.now()).then(function(r){return r.json();});
     var arr = Array.isArray(d?.orders)?d.orders
              :Array.isArray(d?.data?.orders)?d.data.orders
              :Array.isArray(d?.rows)?d.rows

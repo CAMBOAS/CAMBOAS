@@ -1,4 +1,5 @@
-﻿const DASHBOARD_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/exec';
+﻿const DASHBOARD_WEB_APP_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
+  'https://script.google.com/macros/s/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/exec';
 let revenueChart;
 let _chartPeriod = 'monthly';
 let _dashRows = [];
