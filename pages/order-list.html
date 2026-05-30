@@ -191,12 +191,17 @@
     #olTableCard { display:none !important; }
     #olCardList  { display:flex !important; }
 
-    /* Drawer: full screen on mobile */
+    /* Drawer: full screen on mobile, start BELOW navbar */
     #olDrawer {
       width:100vw !important;
-      top:0 !important; right:0 !important; bottom:0 !important; left:0 !important;
+      top: var(--topbar-offset, 56px) !important;
+      right:0 !important; bottom:0 !important; left:0 !important;
       border-left:none !important;
       border-radius:0 !important;
+    }
+    /* Overlay also starts below navbar */
+    #olOverlay {
+      top: var(--topbar-offset, 56px) !important;
     }
 
     /* Drawer header */
