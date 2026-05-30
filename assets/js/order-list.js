@@ -1006,10 +1006,11 @@ function renderDrawerView(o){
     // Products card — card layout (mobile-friendly, no 5-col grid)
     +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:12px;padding:14px">'
     +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">🛍️ ផលិតផល ('+prods.length+')</div>'
-    // Header row
-    +'<div style="display:grid;grid-template-columns:1fr 90px 56px 56px;gap:0 6px;padding-bottom:8px;border-bottom:2px solid '+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.2)')+';margin-bottom:2px">'
+    // Header row — ផលិតផល | ចំនួន | ប្រភេទ | តម្លៃ | សរុប
+    +'<div style="display:grid;grid-template-columns:1fr 80px 52px 52px 52px;gap:0 5px;padding-bottom:8px;border-bottom:2px solid '+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.2)')+';margin-bottom:2px">'
       +'<span style="font-size:11px;font-weight:800;color:#64748b">ផលិតផល</span>'
       +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:center">ចំនួន</span>'
+      +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:center">ប្រភេទ</span>'
       +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:right">តម្លៃ</span>'
       +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:right">សរុប</span>'
     +'</div>'
@@ -1019,14 +1020,20 @@ function renderDrawerView(o){
       var txtClr=themeVal('#e2e8f0','#0f172a');
       var isLast=(i===prods.length-1);
       var br=isLast?'':'border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)');
-      return '<div style="display:grid;grid-template-columns:1fr 90px 56px 56px;gap:0 6px;align-items:center;padding:10px 0;'+br+'">'
+      var u=getProdUnit(p);
+      var ubs=unitBadgeStyle(u);
+      return '<div style="display:grid;grid-template-columns:1fr 80px 52px 52px 52px;gap:0 5px;align-items:center;padding:9px 0;'+br+'">'
         // ផលិតផល
         +'<div style="font-weight:600;font-size:13px;color:'+txtClr+';line-height:1.4;word-break:break-word">'+esc(cleanProdName(p))+'</div>'
         // ចំនួន: [ - ] qty [ + ]
-        +'<div style="display:flex;align-items:center;justify-content:center;gap:4px">'
-          +'<span style="width:24px;height:24px;border-radius:6px;background:'+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.18)')+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#94a3b8">−</span>'
-          +'<span style="font-size:13px;font-weight:800;color:'+txtClr+';min-width:20px;text-align:center">'+p.qty+'</span>'
-          +'<span style="width:24px;height:24px;border-radius:6px;background:'+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.18)')+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#94a3b8">+</span>'
+        +'<div style="display:flex;align-items:center;justify-content:center;gap:3px">'
+          +'<span style="width:22px;height:22px;border-radius:5px;background:'+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.18)')+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#94a3b8">−</span>'
+          +'<span style="font-size:13px;font-weight:800;color:'+txtClr+';min-width:18px;text-align:center">'+p.qty+'</span>'
+          +'<span style="width:22px;height:22px;border-radius:5px;background:'+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.18)')+';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#94a3b8">+</span>'
+        +'</div>'
+        // ប្រភេទ badge
+        +'<div style="display:flex;justify-content:center">'
+          +'<span style="padding:2px 6px;border-radius:8px;font-size:10px;font-weight:800;white-space:nowrap;'+ubs+'">'+esc(u)+'</span>'
         +'</div>'
         // តម្លៃ
         +'<div style="font-size:12px;color:#94a3b8;text-align:right">$'+Number(p.price||0).toFixed(2).replace(/\.00$/,'')+'</div>'
