@@ -95,9 +95,16 @@ function doGet(e) {
   } catch(err) { return jsonOutput_({ ok:false, message: err.message || String(err) }); }
 }
 
+/* Handle CORS preflight OPTIONS — allows Vercel / any origin to POST */
+function doOptions(e) {
+  return ContentService.createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
 function doPost(e) {
   try {
-    const body   = e && e.postData && e.postData.contents ? JSON.parse(e.postData.contents) : {};
+    const raw  = (e && e.postData && e.postData.contents) ? e.postData.contents : '{}';
+    const body = JSON.parse(raw);
     const action = String(body.action || '').trim();
 
     if (action === 'add') {
@@ -706,7 +713,11 @@ function formatDateOnly_(value) {
 function toNumber_(value) { const n = Number(value); return isNaN(n) ? 0 : n; }
 function safe_(value) { return value == null ? '' : String(value).trim(); }
 function jsonOutput_(payload) {
-  return ContentService.createTextOutput(JSON.stringify(payload)).setMimeType(ContentService.MimeType.JSON);
+  // NOTE: Apps Script ContentService does not support custom response headers.
+  // CORS is handled by deploying as "Anyone, even anonymous" and using
+  // text/plain Content-Type on the client side to avoid OPTIONS preflight.
+  return ContentService.createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 
