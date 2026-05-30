@@ -2,7 +2,7 @@
 <html lang="km">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cambo_theme')||'light');}catch(e){}})();</script>
   <title>Order List — CAMBO MINI</title>
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
@@ -34,11 +34,18 @@
   [data-theme="light"] #olDrBody span { color: #0f172a !important; }
   [data-theme="light"] #olDrBody .dr-label { color: #64748b !important; }
 
-  /* Edit inputs */
+  /* Edit inputs — font-size:16px prevents iOS auto-zoom on focus */
   #olDrBody input, #olDrBody select, #olDrBody textarea {
     background: rgba(255,255,255,.08) !important;
     border-color: rgba(148,163,200,.2) !important;
     color: #e2e8f0 !important;
+    font-size: 16px !important;
+    touch-action: manipulation;
+  }
+  /* Receipt No input in footer */
+  #olDrReceiptNo, #olDrFoot input {
+    font-size: 16px !important;
+    touch-action: manipulation;
   }
   [data-theme="light"] #olDrBody input,
   [data-theme="light"] #olDrBody select,

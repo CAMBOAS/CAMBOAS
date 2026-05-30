@@ -1061,7 +1061,8 @@ function drRow(label, value){
 
 /* ── Edit mode (same layout as view, just inputs instead of text) ── */
 function renderDrawerEdit(o){
-  var inputStyle = 'width:100%;height:26px;padding:0 6px;border-radius:5px;border:1px solid rgba(148,163,200,.25);background:rgba(255,255,255,.06);color:'+themeVal('#e2e8f0','#0f172a')+';font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:600';
+  // font-size:16px prevents iOS Safari auto-zoom on input focus
+  var inputStyle = 'width:100%;height:36px;padding:0 10px;border-radius:8px;border:1px solid rgba(148,163,200,.25);background:rgba(255,255,255,.06);color:'+themeVal('#e2e8f0','#0f172a')+';font-size:16px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:600;touch-action:manipulation';
   function rowInp(id, val, label, type){
     type = type||'text';
     return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
@@ -1079,7 +1080,7 @@ function renderDrawerEdit(o){
   function rowTx(id, val, label){
     return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start;padding:7px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
       +'<span style="color:#64748b;padding-top:3px">'+label+'</span>'
-      +'<textarea id="'+id+'" rows="1" style="'+inputStyle+';height:auto;padding:4px 6px;resize:vertical">'+esc(val||'')+'</textarea>'
+      +'<textarea id="'+id+'" rows="2" style="'+inputStyle+';height:auto;min-height:44px;padding:8px 10px;resize:vertical">'+esc(val||'')+'</textarea>'
       +'</div>';
   }
 
