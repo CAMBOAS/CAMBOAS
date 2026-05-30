@@ -1006,27 +1006,32 @@ function renderDrawerView(o){
     // Products card — card layout (mobile-friendly, no 5-col grid)
     +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:12px;padding:14px">'
     +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">🛍️ ផលិតផល ('+prods.length+')</div>'
+    // Header row
+    +'<div style="display:grid;grid-template-columns:1fr 90px 56px 56px;gap:0 6px;padding-bottom:8px;border-bottom:2px solid '+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.2)')+';margin-bottom:2px">'
+      +'<span style="font-size:11px;font-weight:800;color:#64748b">ផលិតផល</span>'
+      +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:center">ចំនួន</span>'
+      +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:right">តម្លៃ</span>'
+      +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:right">សរុប</span>'
+    +'</div>'
     +'<div style="display:flex;flex-direction:column;gap:0">'
     +prods.map(function(p,i){
       var sub=Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0);
-      var discount=Number(p.discount||0);
       var txtClr=themeVal('#e2e8f0','#0f172a');
       var isLast=(i===prods.length-1);
-      var br=isLast?'':'border-bottom:1px solid '+themeVal('rgba(148,163,200,.08)','rgba(148,163,184,.12)');
-      var u=getProdUnit(p);
-      var ubs=unitBadgeStyle(u);
-      return '<div style="padding:10px 0;'+br+'">'
-        // Row 1: Product name (full width)
-        +'<div style="font-weight:700;font-size:13px;color:'+txtClr+';margin-bottom:6px;line-height:1.4">'+esc(cleanProdName(p))+'</div>'
-        // Row 2: badge | ×qty | $price | = $sub
-        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap">'
-          +'<span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:800;white-space:nowrap;flex-shrink:0;'+ubs+'">'+esc(u)+'</span>'
-          +'<span style="font-size:12px;color:#94a3b8;flex-shrink:0">×<b style="color:'+txtClr+'">'+p.qty+'</b></span>'
-          +'<span style="font-size:12px;color:#94a3b8;flex-shrink:0">$'+Number(p.price||0).toFixed(2)+'</span>'
-          +'<span style="flex:1"></span>'
-          +(discount>0?'<span style="font-size:11px;color:#f87171;flex-shrink:0">-$'+discount.toFixed(2)+'</span>':'')
-          +'<span style="font-size:14px;font-weight:800;color:'+themeVal('#7dd3fc','#4f46e5')+';flex-shrink:0">$'+sub.toFixed(2)+'</span>'
+      var br=isLast?'':'border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)');
+      return '<div style="display:grid;grid-template-columns:1fr 90px 56px 56px;gap:0 6px;align-items:center;padding:10px 0;'+br+'">'
+        // ផលិតផល
+        +'<div style="font-weight:600;font-size:13px;color:'+txtClr+';line-height:1.4;word-break:break-word">'+esc(cleanProdName(p))+'</div>'
+        // ចំនួន: [ - ] qty [ + ]
+        +'<div style="display:flex;align-items:center;justify-content:center;gap:4px">'
+          +'<span style="width:24px;height:24px;border-radius:6px;background:'+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.18)')+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#94a3b8">−</span>'
+          +'<span style="font-size:13px;font-weight:800;color:'+txtClr+';min-width:20px;text-align:center">'+p.qty+'</span>'
+          +'<span style="width:24px;height:24px;border-radius:6px;background:'+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.18)')+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#94a3b8">+</span>'
         +'</div>'
+        // តម្លៃ
+        +'<div style="font-size:12px;color:#94a3b8;text-align:right">$'+Number(p.price||0).toFixed(2).replace(/\.00$/,'')+'</div>'
+        // សរុប
+        +'<div style="font-size:13px;font-weight:800;color:'+themeVal('#7dd3fc','#4f46e5')+';text-align:right">$'+sub.toFixed(2).replace(/\.00$/,'')+'</div>'
       +'</div>';
     }).join('')
     +'</div>'
