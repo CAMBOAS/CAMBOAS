@@ -511,6 +511,23 @@ function getSrc(){
 }
 
 /* ══════════════════════════════════════════
+   CLEAR localStorage orders cache
+   ══════════════════════════════════════════ */
+async function clearLocalCache(){
+  var count = local().length;
+  if(!count){
+    if(window.macUI) macUI.toast('localStorage ទទេស្រាប់ហើយ', 'info');
+    return;
+  }
+  if(!confirm('🗑️ Clear ' + count + ' orders ចេញពី localStorage?\n\nSheet data នៅ safe — Reload ហើយ fetch ពី Sheet វិញ។')){
+    return;
+  }
+  localStorage.removeItem(LS_KEY);
+  if(window.macUI) macUI.toast('✅ Cleared ' + count + ' orders — Reloading...', 'success');
+  setTimeout(function(){ location.reload(); }, 1200);
+}
+
+/* ══════════════════════════════════════════
    SYNC ALL localStorage orders → Google Sheet
    ══════════════════════════════════════════ */
 async function syncAllToSheet(){
@@ -1497,7 +1514,8 @@ async function init(){
     if(a==='reportdelivery') reportDelivery();
     if(a==='markdel')   markStatus('Delivered');
     if(a==='markpend')  markStatus('Pending');
-    if(a==='syncsheet'){ $id('olActDrop')?.classList.remove('open'); syncAllToSheet(); return; }
+    if(a==='syncsheet'){  $id('olActDrop')?.classList.remove('open'); syncAllToSheet(); return; }
+    if(a==='clearcache'){ $id('olActDrop')?.classList.remove('open'); clearLocalCache(); return; }
     $id('olActDrop')?.classList.remove('open');
   });
 
