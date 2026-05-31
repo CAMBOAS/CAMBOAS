@@ -2,7 +2,7 @@
 <html lang="km">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-visual">
   <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('cambo_theme')||'light');}catch(e){}})();</script>
   <title>Order List — CAMBO MINI</title>
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
@@ -14,8 +14,36 @@
   .ol-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
   .ol-stat{padding:16px 20px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(148,163,200,.1)}
   [data-theme="light"] .ol-stat{background:#fff;border-color:rgba(148,163,184,.15);box-shadow:0 2px 8px rgba(15,23,42,.05)}
-  /* Drawer dark/light */
-  #olDrawer { background: #0f172a; }
+  /* ── Mobile stability: prevent keyboard-resize from shaking the drawer ── */
+  /* Lock body scroll when drawer is open */
+  body.drawer-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    touch-action: none;
+  }
+  /* Drawer: stable fixed layer, prevent overscroll bleed */
+  #olDrawer {
+    background: #0f172a;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    transform: translateZ(0); /* create stacking context, prevents flicker */
+    will-change: transform;
+  }
+  /* Scrollable body: smooth, contained */
+  #olDrBody {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  /* Inputs: scroll into view when focused, no tap highlight flash */
+  #olDrBody input, #olDrBody select, #olDrBody textarea {
+    scroll-margin-top: 80px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Overlay: block background scroll on touch */
+  #olOverlay { touch-action: none; }
+
   [data-theme="light"] #olDrawer { background: #ffffff; border-left-color: rgba(148,163,184,.2) !important; box-shadow: -8px 0 32px rgba(15,23,42,.12) !important; }
 
   /* Drawer head */
@@ -613,7 +641,7 @@
   <script src="../assets/js/printer-receipt.js?v=158"></script>
   <script src="../assets/js/cambo-api.js?v=160"></script>
   <script src="../assets/js/layout.js?v=158"></script>
-  <script src="../assets/js/order-list.js?v=161"></script>
+  <script src="../assets/js/order-list.js?v=162"></script>
 <script src="../assets/js/sw-register.js?v=158"></script>
 </body>
 </html>

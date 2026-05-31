@@ -847,7 +847,12 @@ function olOpenDrawer(id){
 
   $id('olDrTitle').textContent = o.customer || 'Order Detail';
   renderDrawerEdit(o);
-  document.body.style.overflow = 'hidden';
+
+  // Lock background scroll (mobile: use class for position:fixed trick)
+  var sy = window.scrollY || 0;
+  document.body.style.top = '-' + sy + 'px';
+  document.body.classList.add('drawer-open');
+  document.body._drawerScrollY = sy;
 
   // Take snapshot AFTER render so change-detection baseline is correct
   setTimeout(_drTakeSnapshot, 80);
@@ -856,7 +861,13 @@ function olOpenDrawer(id){
 function olCloseDrawer(){
   $id('olDrawer').style.display  = 'none';
   $id('olOverlay').style.display = 'none';
-  document.body.style.overflow   = '';
+
+  // Restore background scroll position
+  var sy = document.body._drawerScrollY || 0;
+  document.body.classList.remove('drawer-open');
+  document.body.style.top = '';
+  window.scrollTo(0, sy);
+
   _drawerOrderId = null; _editMode = false;
 }
 
