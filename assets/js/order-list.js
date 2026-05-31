@@ -1099,7 +1099,7 @@ function drRow(label, value){
 
 /* ── Edit mode (same layout as view, just inputs instead of text) ── */
 function renderDrawerEdit(o){
-  var inputStyle = 'width:100%;height:32px;padding:0 8px;border-radius:8px;border:1px solid '+themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.3)')+';background:'+themeVal('rgba(255,255,255,.06)','#f8fafc')+';color:'+themeVal('#e2e8f0','#0f172a')+';font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:500;touch-action:manipulation';
+  var inputStyle = 'width:100%;height:32px;padding:0 8px;border-radius:8px;border:1px solid '+themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.3)')+';background:'+themeVal('rgba(255,255,255,.06)','#f8fafc')+';color:'+themeVal('#e2e8f0','#0f172a')+';font-size:12px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:500;touch-action:manipulation';
   var rowWrap = 'display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.06)','rgba(148,163,184,.09)');
   var labelSt = 'flex-shrink:0;width:66px;font-size:10.5px;font-weight:600;color:#94a3b8;text-align:right';
   function rowInp(id, val, label, type){
@@ -1313,10 +1313,10 @@ function drProdRow(name, unit, qty, price){
   var bd = themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.32)');
   var inpS = 'height:36px;padding:0 8px;border-radius:8px;border:1px solid '+bd
     +';background:'+bg+';color:'+c
-    +';font-size:12px;font-family:inherit;outline:none;box-sizing:border-box;touch-action:manipulation;width:100%';
+    +';font-size:11px;font-family:inherit;outline:none;box-sizing:border-box;touch-action:manipulation;width:100%';
   var ubs  = unitBadgeStyle(unit);
   var selS = 'height:36px;padding:0 5px;border-radius:8px;border:1px solid '+bd
-    +';font-size:12px;font-weight:700;font-family:inherit;outline:none;box-sizing:border-box;cursor:pointer;touch-action:manipulation;width:100%;'+ubs;
+    +';font-size:11px;font-weight:700;font-family:inherit;outline:none;box-sizing:border-box;cursor:pointer;touch-action:manipulation;width:100%;'+ubs;
   var onchg = "var r=this.closest('.dr-prod-row');var q=Number(r.querySelector('.dr-prod-qty').value||0);var p=Number(r.querySelector('.dr-prod-price').value||0);var sp=r.querySelector('.dr-prod-sub');if(sp)sp.textContent='$'+(q*p).toFixed(2);";
 
   // Single row — 6 cols matching header: 1fr 64px 82px 64px 58px 32px
