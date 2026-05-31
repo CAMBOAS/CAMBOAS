@@ -1115,21 +1115,21 @@ function renderDrawerEdit(o){
   var labelSt = 'flex-shrink:0;width:80px;font-size:10.5px;font-weight:600;color:#94a3b8;text-align:right';
   function rowInp(id, val, label, type){
     type = type||'text';
-    return '<div style="'+rowWrap+'">'
-      +'<span style="'+labelSt+'">'+label+'</span>'
+    return '<div class="dr-row" style="'+rowWrap+'">'
+      +'<span class="dr-lbl" style="'+labelSt+'">'+label+'</span>'
       +'<input id="'+id+'" type="'+type+'" value="'+esc(val||'')+'" style="'+inputStyle+';flex:1">'
       +'</div>';
   }
   function rowSel(id, val, label, opts){
-    return '<div style="'+rowWrap+'">'
-      +'<span style="'+labelSt+'">'+label+'</span>'
+    return '<div class="dr-row" style="'+rowWrap+'">'
+      +'<span class="dr-lbl" style="'+labelSt+'">'+label+'</span>'
       +'<select id="'+id+'" style="'+inputStyle+';flex:1">'
       +opts.map(function(op){ return '<option value="'+op+'" '+(op===val?'selected':'')+'>'+op+'</option>'; }).join('')
       +'</select></div>';
   }
   function rowTx(id, val, label){
-    return '<div style="'+rowWrap+';align-items:flex-start">'
-      +'<span style="'+labelSt+';padding-top:6px">'+label+'</span>'
+    return '<div class="dr-row" style="'+rowWrap+';align-items:flex-start">'
+      +'<span class="dr-lbl" style="'+labelSt+';padding-top:6px">'+label+'</span>'
       +'<textarea id="'+id+'" rows="2" style="'+inputStyle+';flex:1;height:auto;min-height:34px;padding:5px 8px;resize:none">'+esc(val||'')+'</textarea>'
       +'</div>';
   }

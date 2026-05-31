@@ -62,17 +62,15 @@
   [data-theme="light"] #olDrBody span { color: #0f172a !important; }
   [data-theme="light"] #olDrBody .dr-label { color: #64748b !important; }
 
-  /* Edit inputs — font-size:16px prevents iOS auto-zoom on focus */
+  /* Edit inputs — viewport has user-scalable=no so iOS won't zoom on focus */
   #olDrBody input, #olDrBody select, #olDrBody textarea {
     background: rgba(255,255,255,.08) !important;
     border-color: rgba(148,163,200,.2) !important;
     color: #e2e8f0 !important;
-    font-size: 16px !important;
     touch-action: manipulation;
   }
   /* Receipt No input in footer */
   #olDrReceiptNo, #olDrFoot input {
-    font-size: 16px !important;
     touch-action: manipulation;
   }
   [data-theme="light"] #olDrBody input,
@@ -406,6 +404,27 @@
 
   @media(max-width:900px){.ol-stats{grid-template-columns:1fr 1fr}}
   @media(max-width:600px){.ol-toolbar{flex-direction:column;align-items:stretch}.ol-tr{flex-wrap:wrap}}
+
+  /* ── Mobile: stack label above input on small screens (iPhone 14 = 390px) ── */
+  @media(max-width:480px){
+    #olDrBody { padding: 10px 10px !important; }
+    .dr-row {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      padding: 6px 0 !important;
+      gap: 3px !important;
+    }
+    .dr-lbl {
+      width: auto !important;
+      text-align: left !important;
+      font-size: 10px !important;
+      padding-top: 0 !important;
+    }
+    .dr-row input, .dr-row select, .dr-row textarea {
+      flex: none !important;
+      width: 100% !important;
+    }
+  }
   </style>
 </head>
 <body>
@@ -641,7 +660,7 @@
   <script src="../assets/js/printer-receipt.js?v=158"></script>
   <script src="../assets/js/cambo-api.js?v=160"></script>
   <script src="../assets/js/layout.js?v=158"></script>
-  <script src="../assets/js/order-list.js?v=162"></script>
+  <script src="../assets/js/order-list.js?v=163"></script>
 <script src="../assets/js/sw-register.js?v=158"></script>
 </body>
 </html>
