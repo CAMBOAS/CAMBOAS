@@ -1141,7 +1141,7 @@ function renderDrawerEdit(o){
     +rowTx ('drNote',       o.note||'',         'Note')
 
     // Products editor section
-    +'<div style="margin-top:16px">'
+    +'<div style="margin-top:16px;padding-bottom:20px">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
     +'<span style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase">🛍️ ផលិតផល</span>'
     +'<button onclick="olAddProdRow()" type="button" style="height:28px;padding:0 12px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>'
