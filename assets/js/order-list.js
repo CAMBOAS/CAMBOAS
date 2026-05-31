@@ -384,6 +384,8 @@ function render(){
             ? displayDate(_date.start)
             : displayDate(_date.start) + ' → ' + displayDate(_date.end));
     tbody.innerHTML = '<tr><td colspan="10" class="ol-empty">' + emptyMsg + '</td></tr>';
+    // Clear mobile card view too
+    try { if(typeof window._olRenderCards==='function') window._olRenderCards([]); } catch(e){}
     return;
   }
 
@@ -1372,15 +1374,6 @@ async function init(){
   _orders = await loadOrders();
   // Auto-populate filter dropdowns from loaded data
   populateFilterOptions();
-
-  // If no orders match Today, fall back to All Time so data is visible
-  var todayCount = _orders.filter(function(o){ return inDate(o); }).length;
-  if(todayCount === 0){
-    var ra = getPreset('all');
-    _date = {preset:'all', start:ra.start, end:ra.end, label:ra.label};
-    updateDateBtn();
-  }
-
   render();
 
   /* Search */
@@ -1632,7 +1625,15 @@ document.addEventListener('DOMContentLoaded', init);
   var _renderCards = function(rows){
     var cardList = document.getElementById('olCardList');
     if(!cardList) return;
-    if(!rows || !rows.length){ cardList.innerHTML=''; return; }
+    if(!rows || !rows.length){
+      var emptyCard = _date && _date.preset === 'today'
+        ? '📭 គ្មាន Order ថ្ងៃនេះ (' + displayDate(todayYMD()) + ')'
+        : _date && _date.preset === 'all'
+          ? '📭 គ្មាន Order ទាំងអស់'
+          : '📭 គ្មាន Order';
+      cardList.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#94a3b8;font-size:14px">'+emptyCard+'</div>';
+      return;
+    }
     cardList.innerHTML = rows.map(function(o, idx){
       var total = orderTotal(o);
       var prods = getProds(o).map(function(p){
