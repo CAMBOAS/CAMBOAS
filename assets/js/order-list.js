@@ -3,7 +3,7 @@
 
 var SCRIPT_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
   'https://script.google.com/macros/s/AKfycbxX72HbRHi82ZLTeo_gTfGx-XuzehnGAShk9YUhiWg8hiWSlTDX7NKJOf95swi_nYHn1g/exec';
-var LS_KEY = 'cambo_search_edit_orders_v3';
+/* localStorage cache removed — always fetch direct from Google Sheet */
 
 var _orders = [], _sel = new Set();
 var _qrOn = true; // QR Code toggle state
@@ -151,60 +151,7 @@ document.addEventListener('click', function(e){
 });
 
 /* ── data ── */
-/* ── Local date-edits overlay (persists across Sheet reloads) ── */
-var DATE_EDITS_KEY = 'cambo_ol_date_edits_v1';
-
-function getLocalDateEdits(){
-  try{ return JSON.parse(localStorage.getItem(DATE_EDITS_KEY)||'{}'); }catch(e){ return {}; }
-}
-function saveLocalDateEdit(orderId, newDate){
-  var edits = getLocalDateEdits();
-  edits[String(orderId)] = newDate;
-  try{ localStorage.setItem(DATE_EDITS_KEY, JSON.stringify(edits)); }catch(e){}
-}
-function applyLocalDateEdits(orders){
-  var edits = getLocalDateEdits();
-  if(!Object.keys(edits).length) return orders;
-  return orders.map(function(o){
-    var edited = edits[String(o.id)];
-    if(edited) return Object.assign({}, o, { date: edited });
-    return o;
-  });
-}
-
-/* Load locally-saved orders from Smart Orderer/Mobile (key: "camboOrders") */
-function localCamboOrders(){
-  try{ return normalizeOrders(JSON.parse(localStorage.getItem('camboOrders')||'[]')); }catch(e){ return []; }
-}
-
-/* Merge two order arrays — Sheet wins on duplicate IDs, local-only appended.
-   EXCEPTION: if local has a DD/MM/YYYY date (timezone-safe), prefer it over
-   Sheet's date which may be UTC-shifted (e.g. 05:15 AM UTC+7 → previous day UTC). */
-function mergeOrders(sheetOrders, localOrders){
-  // Build map: id → local date, only when local date is DD/MM/YYYY (timezone-correct)
-  var localDateMap = {};
-  localOrders.forEach(function(o){
-    var d = String(o.date||'');
-    if(o.id && d && /^\d{2}\/\d{2}\/\d{4}/.test(d)){
-      localDateMap[String(o.id)] = d;
-    }
-  });
-
-  var sheetIds = new Set(sheetOrders.map(function(o){ return String(o.id); }));
-  var localOnly = localOrders.filter(function(o){ return !sheetIds.has(String(o.id)); });
-
-  // For matching orders: override Sheet date with local DD/MM/YYYY date if available
-  var sheetFixed = sheetOrders.map(function(o){
-    var localDate = localDateMap[String(o.id)];
-    if(localDate) return Object.assign({}, o, { date: localDate });
-    return o;
-  });
-
-  return sheetFixed.concat(localOnly);
-}
-
 async function loadOrders(){
-  var camboLocal = localCamboOrders(); // orders from Smart Orderer not yet on Sheet
   try{
     var d = window.CamboAPI
       ? await window.CamboAPI.get({action:'list',limit:1000})
@@ -214,13 +161,9 @@ async function loadOrders(){
              :Array.isArray(d?.rows)?d.rows
              :Array.isArray(d?.data)?d.data
              :null;
-    if(arr){
-      // Merge Sheet data with local orders not yet synced to Sheet
-      var merged = mergeOrders(normalizeOrders(arr), camboLocal);
-      return applyLocalDateEdits(merged);
-    }
-    return applyLocalDateEdits(mergeOrders(local(), camboLocal));
-  }catch(e){ return applyLocalDateEdits(mergeOrders(local(), camboLocal)); }
+    if(arr) return normalizeOrders(arr);
+    return [];
+  }catch(e){ return []; }
 }
 function fixPhone(v){
   var ph = String(v||'').trim();
@@ -272,12 +215,6 @@ function normalizeOrders(arr){
     norm.address      = norm.addressDetail;
     return norm;
   });
-}
-function local(){
-  try{
-    var orders = JSON.parse(localStorage.getItem(LS_KEY)||'[]');
-    return normalizeOrders(orders);
-  }catch(e){ return []; }
 }
 
 /* ── date ── */
@@ -538,68 +475,12 @@ function getSrc(){
   return getFiltered();
 }
 
-/* ══════════════════════════════════════════
-   CLEAR localStorage orders cache
-   ══════════════════════════════════════════ */
-async function clearLocalCache(){
-  var count = local().length;
-  if(!count){
-    if(window.macUI) macUI.toast('localStorage ទទេស្រាប់ហើយ', 'info');
-    return;
-  }
-  if(!confirm('🗑️ Clear ' + count + ' orders ចេញពី localStorage?\n\nSheet data នៅ safe — Reload ហើយ fetch ពី Sheet វិញ។')){
-    return;
-  }
-  localStorage.removeItem(LS_KEY);
-  if(window.macUI) macUI.toast('✅ Cleared ' + count + ' orders — Reloading...', 'success');
-  setTimeout(function(){ location.reload(); }, 1200);
-}
-
-/* ══════════════════════════════════════════
-   SYNC ALL localStorage orders → Google Sheet
-   ══════════════════════════════════════════ */
-async function syncAllToSheet(){
-  var btn = document.getElementById('olSyncBtn');
-  var allOrders = local(); // all orders from localStorage
-  if(!allOrders.length){
-    if(window.macUI) macUI.toast('គ្មាន Order ក្នុង localStorage', 'warning');
-    return;
-  }
-
-  if(btn){ btn.textContent = '⏳ Syncing 0/' + allOrders.length + '...'; btn.disabled = true; }
-
-  var ok = 0, fail = 0;
-  var base = (window.CamboAPI && window.CamboAPI.getBase()) || SCRIPT_URL;
-
-  // Process in batches of 10 to avoid timeout
-  var BATCH = 10;
-  for(var i = 0; i < allOrders.length; i += BATCH){
-    var batch = allOrders.slice(i, i + BATCH);
-    var promises = batch.map(function(o){
-      return fetch(base, {
-        method: 'POST',
-        headers: {'Content-Type': 'text/plain;charset=utf-8'},
-        body: JSON.stringify({action: 'add', order: o})
-      })
-      .then(function(r){ return r.json(); })
-      .then(function(d){ if(d && d.ok !== false) ok++; else fail++; })
-      .catch(function(){ fail++; });
-    });
-    await Promise.all(promises);
-    if(btn) btn.textContent = '⏳ Syncing ' + Math.min(i + BATCH, allOrders.length) + '/' + allOrders.length + '...';
-  }
-
-  if(btn){ btn.textContent = '☁️ Sync All → Sheet'; btn.disabled = false; }
-
-  var msg = '✅ Synced: ' + ok + ' | ❌ Failed: ' + fail;
-  if(window.macUI) macUI.toast(msg, ok > 0 ? 'success' : 'error');
-  console.log('[SyncSheet]', msg);
-
-  // Reload data after sync
-  if(ok > 0){
-    _orders = await loadOrders();
-    render();
-  }
+/* Reload fresh from Sheet */
+async function refreshFromSheet(){
+  _orders = await loadOrders();
+  populateFilterOptions();
+  render();
+  if(window.macUI) macUI.toast('✅ Refreshed from Google Sheet', 'success');
 }
 
 function exportCSV(){
@@ -715,7 +596,6 @@ function printSelected(){
 function markStatus(status){
   if(_sel.size===0){ alert('Please select orders first'); return; }
   _sel.forEach(function(id){ var o=_orders.find(function(x){return String(x.id)===id;}); if(o){o.status=status;o.orderStatus=status;} });
-  try{ localStorage.setItem(LS_KEY, JSON.stringify(_orders)); }catch(e){}
   render();
 }
 
@@ -1022,10 +902,7 @@ async function olSaveEdit(){
       if(newProds.length){ o.products = newProds; o.items = newProds; }
     }
 
-    // ── 3. Persist to localStorage ──
-    try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); }catch(e){}
-
-    // ── 4. Close drawer + refresh table ──
+    // ── 3. Close drawer + refresh table ──
     olCloseDrawer();
     render(); // refresh table row
 
@@ -1289,20 +1166,7 @@ window.olDeleteOrder = async function(){
     /* ── 1. Remove from memory ── */
     _orders = _orders.filter(function(x){ return String(x.id)!==deletedId; });
 
-    /* ── 2. Remove from ALL localStorage keys ── */
-    try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); }catch(e){}
-    try{
-      var _co = JSON.parse(localStorage.getItem('camboOrders')||'[]');
-      _co = _co.filter(function(x){ return String(x.id)!==deletedId; });
-      localStorage.setItem('camboOrders', JSON.stringify(_co));
-    }catch(e){}
-    try{
-      var _de = JSON.parse(localStorage.getItem('cambo_ol_date_edits_v1')||'{}');
-      delete _de[deletedId];
-      localStorage.setItem('cambo_ol_date_edits_v1', JSON.stringify(_de));
-    }catch(e){}
-
-    /* ── 3. Close drawer + re-render table ── */
+    /* ── 2. Close drawer + re-render table ── */
     olCloseDrawer();
     render();
 
@@ -1431,11 +1295,7 @@ window.olSaveInlineDate = function(){
   var formatted = dp[2]+'/'+dp[1]+'/'+dp[0]+' '+time;
   o.date = formatted;
 
-  /* ── 4. Persist: local edits overlay + full snapshot ── */
-  saveLocalDateEdit(o.id, formatted);
-  try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); } catch(e){}
-
-  /* ── 5. Button feedback — show ✅ so user knows it worked ── */
+  /* ── 4. Button feedback — show ✅ so user knows it worked ── */
   var btn = document.querySelector('button[onclick="olSaveInlineDate()"]');
   if(btn){
     var origText = btn.textContent;
@@ -1634,8 +1494,7 @@ async function init(){
     if(a==='reportdelivery') reportDelivery();
     if(a==='markdel')   markStatus('Delivered');
     if(a==='markpend')  markStatus('Pending');
-    if(a==='syncsheet'){  $id('olActDrop')?.classList.remove('open'); syncAllToSheet(); return; }
-    if(a==='clearcache'){ $id('olActDrop')?.classList.remove('open'); clearLocalCache(); return; }
+    if(a==='syncsheet'){  $id('olActDrop')?.classList.remove('open'); refreshFromSheet(); return; }
     $id('olActDrop')?.classList.remove('open');
   });
 
