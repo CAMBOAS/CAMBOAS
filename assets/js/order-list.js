@@ -848,11 +848,19 @@ function olOpenDrawer(id){
   $id('olDrTitle').textContent = o.customer || 'Order Detail';
   renderDrawerEdit(o);
 
-  // Lock background scroll (mobile: use class for position:fixed trick)
-  var sy = window.scrollY || 0;
+  // Lock background scroll (mobile: position:fixed trick)
+  var sy = window.scrollY || window.pageYOffset || 0;
   document.body.style.top = '-' + sy + 'px';
   document.body.classList.add('drawer-open');
+  document.documentElement.classList.add('drawer-open'); // lock html too
   document.body._drawerScrollY = sy;
+
+  // Block touchmove on overlay to stop background bounce (iOS)
+  var ol = $id('olOverlay');
+  if(ol && !ol._tmBlocked){
+    ol._tmBlocked = true;
+    ol.addEventListener('touchmove', function(e){ e.preventDefault(); }, { passive: false });
+  }
 
   // Take snapshot AFTER render so change-detection baseline is correct
   setTimeout(_drTakeSnapshot, 80);
@@ -865,6 +873,7 @@ function olCloseDrawer(){
   // Restore background scroll position
   var sy = document.body._drawerScrollY || 0;
   document.body.classList.remove('drawer-open');
+  document.documentElement.classList.remove('drawer-open');
   document.body.style.top = '';
   window.scrollTo(0, sy);
 

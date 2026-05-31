@@ -14,35 +14,61 @@
   .ol-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
   .ol-stat{padding:16px 20px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(148,163,200,.1)}
   [data-theme="light"] .ol-stat{background:#fff;border-color:rgba(148,163,184,.15);box-shadow:0 2px 8px rgba(15,23,42,.05)}
-  /* ── Mobile stability: prevent keyboard-resize from shaking the drawer ── */
-  /* Lock body scroll when drawer is open */
+  /* ══════════════════════════════════════════════
+     MOBILE STABILITY — prevent wobble / shake
+     ══════════════════════════════════════════════ */
+
+  /* 1. Prevent whole-page bounce on iOS (rubber-band) */
+  html, body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+  }
+
+  /* 2. Lock BOTH html + body when drawer is open */
+  html.drawer-open,
   body.drawer-open {
     overflow: hidden !important;
     position: fixed !important;
     width: 100% !important;
-    touch-action: none;
+    height: 100% !important;
+    touch-action: none !important;
   }
-  /* Drawer: stable fixed layer, prevent overscroll bleed */
+
+  /* 3. Drawer: GPU layer, NO smooth scroll (smooth scroll = wobble) */
   #olDrawer {
     background: #0f172a;
-    overscroll-behavior: contain;
+    overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;
-    transform: translateZ(0); /* create stacking context, prevents flicker */
-    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
-  /* Scrollable body: smooth, contained */
+
+  /* 4. Drawer scroll area: only pan-y, no diagonal drift */
   #olDrBody {
-    overscroll-behavior: contain;
+    overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
+    scroll-behavior: auto;        /* NO smooth — causes jank on keyboard open */
+    touch-action: pan-y;
   }
-  /* Inputs: scroll into view when focused, no tap highlight flash */
+
+  /* 5. Inputs: scroll into view above keyboard, no flash */
   #olDrBody input, #olDrBody select, #olDrBody textarea {
-    scroll-margin-top: 80px;
+    scroll-margin-top: 100px;
     -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
   }
-  /* Overlay: block background scroll on touch */
-  #olOverlay { touch-action: none; }
+
+  /* 6. Overlay: block ALL touch through */
+  #olOverlay {
+    touch-action: none;
+    overscroll-behavior: none;
+  }
+
+  /* 7. Footer: safe-area padding for iPhone home bar */
+  #olDrFoot {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
 
   [data-theme="light"] #olDrawer { background: #ffffff; border-left-color: rgba(148,163,184,.2) !important; box-shadow: -8px 0 32px rgba(15,23,42,.12) !important; }
 
@@ -660,7 +686,7 @@
   <script src="../assets/js/printer-receipt.js?v=158"></script>
   <script src="../assets/js/cambo-api.js?v=160"></script>
   <script src="../assets/js/layout.js?v=158"></script>
-  <script src="../assets/js/order-list.js?v=164"></script>
+  <script src="../assets/js/order-list.js?v=165"></script>
 <script src="../assets/js/sw-register.js?v=158"></script>
 </body>
 </html>
