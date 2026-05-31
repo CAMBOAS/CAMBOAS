@@ -1998,6 +1998,13 @@ function buildReceiptData(){
 
 /* ── POST order ── */
 async function _postToAppsScript(order){
+  // Use CamboAPI when available — routes through /api/proxy on Vercel (avoids CORS)
+  if(window.CamboAPI){
+    var data = await window.CamboAPI.post(order);
+    if(!data.ok) throw new Error(data.message||'Save failed.');
+    return data;
+  }
+  // Fallback: direct fetch (local dev / file://)
   var url=window.APPS_SCRIPT_URL;
   if(!url) throw new Error('Apps Script URL missing.');
   var res=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(order)});
