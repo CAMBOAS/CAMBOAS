@@ -1157,7 +1157,7 @@ function renderDrawerEdit(o){
     +'<button onclick="olAddProdRow()" type="button" style="height:26px;padding:0 10px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#4ade80;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>'
     +'</div>'
     // Header: ផលិតផល | ចំនួន | ប្រភេទ | តម្លៃ | សរុប | ×
-    +'<div style="display:grid;grid-template-columns:1fr 48px 70px 52px 50px 28px;gap:5px;padding:5px 0;margin-bottom:3px;border-bottom:2px solid '+themeVal('rgba(148,163,200,.12)','rgba(148,163,184,.18)')+';font-size:10px;font-weight:700;letter-spacing:.04em;color:#64748b">'
+    +'<div style="display:grid;grid-template-columns:1fr 38px 60px 46px 46px 24px;gap:4px;padding:5px 0;margin-bottom:3px;border-bottom:2px solid '+themeVal('rgba(148,163,200,.12)','rgba(148,163,184,.18)')+';font-size:10px;font-weight:700;letter-spacing:.04em;color:#64748b">'
     +'<span>ផលិតផល</span><span style="text-align:center">ចំនួន</span><span style="text-align:center">ប្រភេទ</span><span style="text-align:right">តម្លៃ</span><span style="text-align:right">សរុប</span><span></span>'
     +'</div>'
     +'<div id="drProdList">'
@@ -1322,24 +1322,24 @@ function drProdRow(name, unit, qty, price){
   var c  = themeVal('#e2e8f0','#0f172a');
   var bg = themeVal('rgba(255,255,255,.07)','#fff');
   var bd = themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.32)');
-  var inpS = 'height:36px;padding:0 8px;border-radius:8px;border:1px solid '+bd
+  var inpS = 'height:30px;padding:0 6px;border-radius:7px;border:1px solid '+bd
     +';background:'+bg+';color:'+c
     +';font-size:11px;font-family:inherit;outline:none;box-sizing:border-box;touch-action:manipulation;width:100%';
   var ubs  = unitBadgeStyle(unit);
-  var selS = 'height:36px;padding:0 5px;border-radius:8px;border:1px solid '+bd
+  var selS = 'height:30px;padding:0 4px;border-radius:7px;border:1px solid '+bd
     +';font-size:11px;font-weight:700;font-family:inherit;outline:none;box-sizing:border-box;cursor:pointer;touch-action:manipulation;width:100%;'+ubs;
   var onchg = "var r=this.closest('.dr-prod-row');var q=Number(r.querySelector('.dr-prod-qty').value||0);var p=Number(r.querySelector('.dr-prod-price').value||0);var sp=r.querySelector('.dr-prod-sub');if(sp)sp.textContent='$'+(q*p).toFixed(2);";
 
-  // Single row — 6 cols matching header: 1fr 64px 82px 64px 58px 32px
-  return '<div class="dr-prod-row" style="display:grid;grid-template-columns:1fr 48px 70px 52px 50px 28px;gap:5px;align-items:center;padding:6px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.08)','rgba(148,163,184,.1)')+'">'
+  // Single row — 6 cols: name | qty | unit | price | subtotal | X
+  return '<div class="dr-prod-row" style="display:grid;grid-template-columns:1fr 38px 60px 46px 46px 24px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.08)','rgba(148,163,184,.1)')+'">'
     +'<input class="dr-prod-name" type="text" value="'+esc(name)+'" placeholder="ឈ្មោះ" style="'+inpS+';font-weight:600">'
     +'<input class="dr-prod-qty" type="number" value="'+Number(qty||1)+'" min="1" style="'+inpS+';text-align:center" oninput="'+onchg+'">'
     +'<select class="dr-prod-unit" style="'+selS+'">'
     +['ឈុត','កេស','លាយ'].map(function(u){ return '<option value="'+u+'"'+(u===unit?' selected':'')+'>'+u+'</option>'; }).join('')
     +'</select>'
     +'<input class="dr-prod-price" type="number" value="'+Number(price||0)+'" min="0" step="0.01" style="'+inpS+';text-align:right" oninput="'+onchg+'">'
-    +'<span class="dr-prod-sub" style="font-size:12px;font-weight:800;color:'+themeVal('#7dd3fc','#4f46e5')+';white-space:nowrap;text-align:right">$'+sub.toFixed(2)+'</span>'
-    +'<button class="dr-prod-remove" type="button" title="Remove" style="width:28px;height:28px;border-radius:7px;border:none;background:rgba(239,68,68,.12);color:#f87171;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>'
+    +'<span class="dr-prod-sub" style="font-size:11px;font-weight:800;color:'+themeVal('#7dd3fc','#4f46e5')+';white-space:nowrap;text-align:right">$'+sub.toFixed(2)+'</span>'
+    +'<button class="dr-prod-remove" type="button" title="Remove" style="width:24px;height:24px;border-radius:6px;border:none;background:rgba(239,68,68,.12);color:#f87171;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>'
   +'</div>';
 }
 window.olToggleEdit  = olToggleEdit;
