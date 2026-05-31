@@ -1075,13 +1075,13 @@ function renderDrawerView(o){
       var khrRate = (function(){ try{ var r=Number(localStorage.getItem('cambo_khr_rate')); return r>0?r:4100; }catch(e){ return 4100; } })();
       var fee = Number(o.deliveryFee||0);
       var riel = Math.round(total * khrRate);
-      return '<div style="margin-top:14px;padding:12px 14px;border-radius:10px;background:'+themeVal('rgba(124,92,255,.08)','rgba(99,102,241,.06)')+';border:1px solid '+themeVal('rgba(124,92,255,.2)','rgba(99,102,241,.15)')+'">'
-        +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px"><span>🚚 ថ្លៃដឹក</span><span>'+(fee>0?'$'+fee.toFixed(2):'ហ្វ្រីដឹក')+'</span></div>'
+      return '<div style="margin-top:10px;padding:10px 12px;border-radius:10px;background:'+themeVal('rgba(124,92,255,.08)','rgba(99,102,241,.06)')+';border:1px solid '+themeVal('rgba(124,92,255,.2)','rgba(99,102,241,.15)')+'">'
+        +'<div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:5px"><span>🚚 ថ្លៃដឹក</span><span>'+(fee>0?'$'+fee.toFixed(2):'ហ្វ្រីដឹក')+'</span></div>'
         +'<div style="display:flex;justify-content:space-between;align-items:baseline">'
-          +'<span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Grand Total</span>'
+          +'<span style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Grand Total</span>'
           +'<div style="text-align:right">'
-            +'<div style="font-size:18px;font-weight:900;color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+total.toFixed(2)+'</div>'
-            +'<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-top:1px">'+riel.toLocaleString()+'៛</div>'
+            +'<div style="font-size:15px;font-weight:900;color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+total.toFixed(2)+'</div>'
+            +'<div style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:1px">'+riel.toLocaleString()+'៛</div>'
           +'</div>'
         +'</div>'
       +'</div>';
@@ -1099,10 +1099,9 @@ function drRow(label, value){
 
 /* ── Edit mode (same layout as view, just inputs instead of text) ── */
 function renderDrawerEdit(o){
-  // font-size:16px prevents iOS Safari auto-zoom; height compact but tappable
-  var inputStyle = 'width:100%;height:34px;padding:0 8px;border-radius:7px;border:1px solid '+themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.35)')+';background:'+themeVal('rgba(255,255,255,.06)','#f8fafc')+';color:'+themeVal('#e2e8f0','#0f172a')+';font-size:16px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:500;touch-action:manipulation';
-  var rowWrap = 'display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)');
-  var labelSt = 'flex-shrink:0;width:72px;font-size:11px;font-weight:600;color:#94a3b8;text-align:right';
+  var inputStyle = 'width:100%;height:32px;padding:0 8px;border-radius:8px;border:1px solid '+themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.3)')+';background:'+themeVal('rgba(255,255,255,.06)','#f8fafc')+';color:'+themeVal('#e2e8f0','#0f172a')+';font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:500;touch-action:manipulation';
+  var rowWrap = 'display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.06)','rgba(148,163,184,.09)');
+  var labelSt = 'flex-shrink:0;width:66px;font-size:10.5px;font-weight:600;color:#94a3b8;text-align:right';
   function rowInp(id, val, label, type){
     type = type||'text';
     return '<div style="'+rowWrap+'">'
@@ -1120,12 +1119,12 @@ function renderDrawerEdit(o){
   function rowTx(id, val, label){
     return '<div style="'+rowWrap+';align-items:flex-start">'
       +'<span style="'+labelSt+';padding-top:6px">'+label+'</span>'
-      +'<textarea id="'+id+'" rows="2" style="'+inputStyle+';flex:1;height:auto;min-height:40px;padding:6px 8px;resize:none">'+esc(val||'')+'</textarea>'
+      +'<textarea id="'+id+'" rows="2" style="'+inputStyle+';flex:1;height:auto;min-height:34px;padding:5px 8px;resize:none">'+esc(val||'')+'</textarea>'
       +'</div>';
   }
 
   $id('olDrBody').innerHTML =
-    '<div style="font-size:13px;font-weight:700;color:#8b5cf6;padding:8px 0;display:flex;align-items:center;gap:6px">👤 ព័ត៌មានអតិថិជន</div>'
+    '<div style="font-size:11px;font-weight:800;color:#8b5cf6;padding:6px 0;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:5px">👤 ព័ត៌មានអតិថិជន</div>'
     +rowInp('drCustomer',   o.customer||'',     'ឈ្មោះ')
     +rowInp('drPhone',      o.phone||'',        'ទូរស័ព្ទ')
     +rowInp('drAddress',    (o.addressDetail||o.address||'')||'','អាសយដ្ឋាន')
@@ -1141,13 +1140,13 @@ function renderDrawerEdit(o){
     +rowTx ('drNote',       o.note||'',         'Note')
 
     // Products editor section
-    +'<div style="margin-top:16px;padding-bottom:20px">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+    +'<div style="margin-top:12px;padding-bottom:20px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
     +'<span style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase">🛍️ ផលិតផល</span>'
-    +'<button onclick="olAddProdRow()" type="button" style="height:28px;padding:0 12px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>'
+    +'<button onclick="olAddProdRow()" type="button" style="height:26px;padding:0 10px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#4ade80;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>'
     +'</div>'
     // Header: ផលិតផល | ចំនួន | ប្រភេទ | តម្លៃ | សរុប | ×
-    +'<div style="display:grid;grid-template-columns:1fr 64px 82px 64px 58px 36px;gap:6px;padding:6px 0;margin-bottom:4px;border-bottom:2px solid '+themeVal('rgba(148,163,200,.12)','rgba(148,163,184,.18)')+';font-size:11px;font-weight:700;letter-spacing:.04em;color:#64748b">'
+    +'<div style="display:grid;grid-template-columns:1fr 64px 82px 64px 58px 32px;gap:5px;padding:5px 0;margin-bottom:3px;border-bottom:2px solid '+themeVal('rgba(148,163,200,.12)','rgba(148,163,184,.18)')+';font-size:10px;font-weight:700;letter-spacing:.04em;color:#64748b">'
     +'<span>ផលិតផល</span><span style="text-align:center">ចំនួន</span><span style="text-align:center">ប្រភេទ</span><span style="text-align:right">តម្លៃ</span><span style="text-align:right">សរុប</span><span></span>'
     +'</div>'
     +'<div id="drProdList">'
@@ -1312,24 +1311,24 @@ function drProdRow(name, unit, qty, price){
   var c  = themeVal('#e2e8f0','#0f172a');
   var bg = themeVal('rgba(255,255,255,.07)','#fff');
   var bd = themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.32)');
-  var inpS = 'height:42px;padding:0 10px;border-radius:10px;border:1px solid '+bd
+  var inpS = 'height:36px;padding:0 8px;border-radius:8px;border:1px solid '+bd
     +';background:'+bg+';color:'+c
-    +';font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;touch-action:manipulation;width:100%';
+    +';font-size:12px;font-family:inherit;outline:none;box-sizing:border-box;touch-action:manipulation;width:100%';
   var ubs  = unitBadgeStyle(unit);
-  var selS = 'height:42px;padding:0 6px;border-radius:10px;border:1px solid '+bd
-    +';font-size:13px;font-weight:700;font-family:inherit;outline:none;box-sizing:border-box;cursor:pointer;touch-action:manipulation;width:100%;'+ubs;
+  var selS = 'height:36px;padding:0 5px;border-radius:8px;border:1px solid '+bd
+    +';font-size:12px;font-weight:700;font-family:inherit;outline:none;box-sizing:border-box;cursor:pointer;touch-action:manipulation;width:100%;'+ubs;
   var onchg = "var r=this.closest('.dr-prod-row');var q=Number(r.querySelector('.dr-prod-qty').value||0);var p=Number(r.querySelector('.dr-prod-price').value||0);var sp=r.querySelector('.dr-prod-sub');if(sp)sp.textContent='$'+(q*p).toFixed(2);";
 
-  // Single row — 6 cols matching header: 1fr 64px 82px 64px 58px 36px
-  return '<div class="dr-prod-row" style="display:grid;grid-template-columns:1fr 64px 82px 64px 58px 36px;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.08)','rgba(148,163,184,.1)')+'">'
+  // Single row — 6 cols matching header: 1fr 64px 82px 64px 58px 32px
+  return '<div class="dr-prod-row" style="display:grid;grid-template-columns:1fr 64px 82px 64px 58px 32px;gap:5px;align-items:center;padding:6px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.08)','rgba(148,163,184,.1)')+'">'
     +'<input class="dr-prod-name" type="text" value="'+esc(name)+'" placeholder="ឈ្មោះ" style="'+inpS+';font-weight:600">'
     +'<input class="dr-prod-qty" type="number" value="'+Number(qty||1)+'" min="1" style="'+inpS+';text-align:center" oninput="'+onchg+'">'
     +'<select class="dr-prod-unit" style="'+selS+'">'
     +['ឈុត','កេស','លាយ'].map(function(u){ return '<option value="'+u+'"'+(u===unit?' selected':'')+'>'+u+'</option>'; }).join('')
     +'</select>'
     +'<input class="dr-prod-price" type="number" value="'+Number(price||0)+'" min="0" step="0.01" style="'+inpS+';text-align:right" oninput="'+onchg+'">'
-    +'<span class="dr-prod-sub" style="font-size:13px;font-weight:800;color:'+themeVal('#7dd3fc','#4f46e5')+';white-space:nowrap;text-align:right">$'+sub.toFixed(2)+'</span>'
-    +'<button class="dr-prod-remove" type="button" title="Remove" style="width:36px;height:36px;border-radius:9px;border:none;background:rgba(239,68,68,.12);color:#f87171;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>'
+    +'<span class="dr-prod-sub" style="font-size:12px;font-weight:800;color:'+themeVal('#7dd3fc','#4f46e5')+';white-space:nowrap;text-align:right">$'+sub.toFixed(2)+'</span>'
+    +'<button class="dr-prod-remove" type="button" title="Remove" style="width:32px;height:32px;border-radius:8px;border:none;background:rgba(239,68,68,.12);color:#f87171;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>'
   +'</div>';
 }
 window.olToggleEdit  = olToggleEdit;
