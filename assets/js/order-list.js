@@ -22,9 +22,13 @@ function fmtDisplay(s){
   if(!s) return '';
   // Already DD/MM/YYYY (with optional time after)
   if(/^\d{2}\/\d{2}\/\d{4}/.test(s)) return s.slice(0,10);
-  // YYYY-MM-DD or YYYY-MM-DDTHH:MM
-  if(/^\d{4}-\d{2}-\d{2}/.test(s)){ var p=s.slice(0,10).split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
-  // Any JS date string (e.g. "Wed Apr 08 2026 00:00:00 GMT+0700")
+  // YYYY-MM-DD (date-only, no timezone) — safe to slice
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)){ var p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+  // YYYY-MM-DDTHH:MM with NO timezone suffix — safe to slice (local time)
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(s) && !/Z|[+-]\d{2}:?\d{2}$/.test(s)){
+    var p=s.slice(0,10).split('-'); return p[2]+'/'+p[1]+'/'+p[0];
+  }
+  // ISO with Z or +07:00 suffix — MUST parse via Date() to get LOCAL date (not UTC)
   try{
     var d = new Date(s);
     if(!isNaN(d)){
@@ -41,7 +45,18 @@ function fmtDisplayFull(s){
   // DD/MM/YYYY HH:MM... → show date + time
   var m1 = str.match(/^(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})/);
   if(m1) return m1[1]+' '+m1[2];
-  // YYYY-MM-DDTHH:MM → convert
+  // ISO with Z or timezone offset — parse via Date() to get LOCAL time
+  if(/^\d{4}-\d{2}-\d{2}T/.test(str) && (/Z$/.test(str) || /[+-]\d{2}:?\d{2}$/.test(str))){
+    try{
+      var d = new Date(str);
+      if(!isNaN(d)){
+        var dateStr = pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
+        var hh2 = d.getHours(), mm2 = d.getMinutes();
+        return (hh2===0 && mm2===0) ? dateStr : dateStr+' '+pad(hh2)+':'+pad(mm2);
+      }
+    }catch(e){}
+  }
+  // YYYY-MM-DDTHH:MM (no timezone, local time) → safe regex parse
   var m2 = str.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
   if(m2){
     var dateStr = m2[3]+'/'+m2[2]+'/'+m2[1];
