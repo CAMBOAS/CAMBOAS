@@ -1,7 +1,7 @@
 ﻿(function(){
 'use strict';
 
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/exec';
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxX72HbRHi82ZLTeo_gTfGx-XuzehnGAShk9YUhiWg8hiWSlTDX7NKJOf95swi_nYHn1g/exec';
 var LS_KEY  = 'cambo_search_edit_orders_v3';
 var PKG_KEY = 'cambo_pkg_status_v1';
 

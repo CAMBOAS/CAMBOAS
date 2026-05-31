@@ -3,7 +3,33 @@
     "allow": [
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(python3 -c \"import sys; print\\(sys.version\\)\")",
+      "Bash(where node *)",
+      "Bash(where npm *)",
+      "Bash(where yarn *)",
+      "Bash(where pnpm *)",
+      "Bash(where bun *)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Program Files \\(x86\\)/**)",
+      "Bash(where code *)",
+      "Bash(where \"code.cmd\")",
+      "Read(//c/Users/Admin/AppData/Local/Programs/Microsoft VS Code/bin/**)",
+      "Bash(\"C:\\\\Users\\\\Admin\\\\AppData\\\\Local\\\\Programs\\\\Microsoft VS Code\\\\bin\\\\code.cmd\" --list-extensions)",
+      "Bash(ls \"C:\\\\Users\\\\Admin\\\\AppData\\\\Local\\\\Programs\\\\Microsoft VS Code\\\\\" | head -20)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(ls \"C:/Users/Admin/.vscode/extensions/\" | grep live)",
+      "Bash(netstat -ano)",
+      "Bash(tasklist)",
+      "Bash(gh run *)",
+      "Bash(sed -i 's/?v=158/?v=167/g' \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\pages\\\\orders-details.html\")",
+      "Bash(sed -i 's/?v=158/?v=167/g' \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\pages\\\\smart-mobile.html\")",
+      "Bash(git restore *)",
+      "Bash(git revert *)",
+      "Bash(ls vercel.json)",
+      "Bash(cat package.json)",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "Bash(xargs sed -i 's/AKfycbxX72HbRHi82ZLTeo_gTfGx-XuzehnGAShk9YUhiWg8hiWSlTDX7NKJOf95swi_nYHn1g/AKfycbxX72HbRHi82ZLTeo_gTfGx-XuzehnGAShk9YUhiWg8hiWSlTDX7NKJOf95swi_nYHn1g/g')"
     ]
   }
 }

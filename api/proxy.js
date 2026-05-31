@@ -5,7 +5,7 @@
  */
 
 const APPS_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/exec';
+  'https://script.google.com/macros/s/AKfycbxX72HbRHi82ZLTeo_gTfGx-XuzehnGAShk9YUhiWg8hiWSlTDX7NKJOf95swi_nYHn1g/exec';
 
 export default async function handler(req, res) {
   // Allow all origins (CORS headers for browser)
