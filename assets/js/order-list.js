@@ -793,25 +793,28 @@ function olOpenDrawer(id){
   var o = _orders.find(function(x){ return String(x.id)===String(id); });
   if(!o) return;
   _drawerOrderId = String(id);
-  _editMode = false;
+  _editMode = true;  // Always open directly in edit mode
 
   var drawer  = $id('olDrawer');
   var overlay = $id('olOverlay');
   var foot    = $id('olDrFoot');
-  var editBtn = $id('olDrEditBtn');
 
-  if(drawer)  { drawer.style.display  = 'flex'; }
-  if(overlay) { overlay.style.display = 'block'; }
-  if(foot)    { foot.style.display    = 'flex'; }  // always show footer
-  if(editBtn) { editBtn.textContent   = '✏️ Edit'; }
-  // Hide save/cancel in view mode
+  if(drawer)  drawer.style.display  = 'flex';
+  if(overlay) overlay.style.display = 'block';
+  if(foot)    foot.style.display    = 'flex';
+
+  // Hide Edit/View toggle — no longer needed (always edit mode)
+  var editBtn = $id('olDrEditBtn');
+  if(editBtn) editBtn.style.display = 'none';
+
+  // Always show Save + Cancel
   var saveBtn   = $id('olDrSaveBtn');
   var cancelBtn = $id('olDrCancelBtn');
-  if(saveBtn)   saveBtn.style.display   = 'none';
-  if(cancelBtn) cancelBtn.style.display = 'none';
+  if(saveBtn)   saveBtn.style.display   = 'flex';
+  if(cancelBtn) cancelBtn.style.display = 'flex';
 
   $id('olDrTitle').textContent = o.customer || 'Order Detail';
-  renderDrawerView(o);
+  renderDrawerContent(o);  // renders in edit mode (dr-edit class)
   document.body.style.overflow = 'hidden';
 }
 
@@ -824,34 +827,29 @@ function olCloseDrawer(){
 
 function olToggleEdit(){
   if(!_drawerOrderId) return;
-  var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
-  if(!o) return;
   _editMode = !_editMode;
-  var foot    = $id('olDrFoot');
+  // Only toggle CSS class — NO re-render, no layout jump
+  _drApplyMode();
   var editBtn = $id('olDrEditBtn');
-  // Footer always stays visible — only Save/Cancel toggle
-  if(foot) foot.style.display = 'flex';
   if(editBtn) editBtn.textContent = _editMode ? '👁 View' : '✏️ Edit';
-  _editMode ? renderDrawerEdit(o) : renderDrawerView(o);
-  // Show/hide save+cancel in footer
   var saveBtn   = $id('olDrSaveBtn');
   var cancelBtn = $id('olDrCancelBtn');
   if(saveBtn)   saveBtn.style.display   = _editMode ? 'flex' : 'none';
   if(cancelBtn) cancelBtn.style.display = _editMode ? 'flex' : 'none';
 }
 
-function olCancelEdit(){
-  _editMode = false;
-  var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
-  if(o) renderDrawerView(o);
-  var saveBtn   = $id('olDrSaveBtn');
-  var cancelBtn = $id('olDrCancelBtn');
-  var editBtn   = $id('olDrEditBtn');
-  var foot      = $id('olDrFoot');
-  if(saveBtn)   saveBtn.style.display   = 'none';
-  if(cancelBtn) cancelBtn.style.display = 'none';
-  if(editBtn)   editBtn.textContent     = '✏️ Edit';
-  if(foot)      foot.style.display      = 'flex'; // always keep footer visible
+async function olCancelEdit(){
+  // If nothing changed → close immediately, no dialog
+  if(!_drHasChanges()){
+    olCloseDrawer();
+    return;
+  }
+  // Something was edited → ask confirmation (standard style, not destructive)
+  var confirmed = window.macUI
+    ? await macUI.confirm('មានការកែប្រែដែលមិនទាន់ Save។ តើអ្នកចង់បោះបង់ដែរឬទេ?', 'បោះបង់ការកែប្រែ', false)
+    : window.confirm('មានការកែប្រែដែលមិនទាន់ Save។\nតើអ្នកចង់បោះបង់ដែរឬទេ?');
+  if(!confirmed) return;
+  olCloseDrawer();
 }
 
 function _olShowToast(msg, color){
@@ -871,10 +869,16 @@ function _olShowToast(msg, color){
   setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 300); }, 2500);
 }
 
-function olSaveEdit(){
+async function olSaveEdit(){
   // Guard: must have an open order
   var o = _orders.find(function(x){ return String(x.id) === String(_drawerOrderId); });
   if(!o){ alert('⚠️ Order រកមិនឃើញ'); return; }
+
+  // ── Confirm before saving ──
+  var confirmed = window.macUI
+    ? await macUI.confirm('តើអ្នកពិតជាចង់រក្សាទុកការផ្លាស់ប្ដូរដែរឬទេ?', 'រក្សាទុក', false)
+    : window.confirm('តើអ្នកពិតជាចង់រក្សាទុកការផ្លាស់ប្ដូរដែរឬទេ?');
+  if(!confirmed) return;
 
   try {
     // ── 1. Read edited values from form ──
@@ -934,19 +938,11 @@ function olSaveEdit(){
     // ── 3. Persist to localStorage ──
     try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); }catch(e){}
 
-    // ── 4. Switch UI back to view mode (footer stays visible) ──
-    _editMode = false;
-    var foot      = document.getElementById('olDrFoot');
-    var saveBtn   = document.getElementById('olDrSaveBtn');
-    var cancelBtn = document.getElementById('olDrCancelBtn');
-    var editBtn   = document.getElementById('olDrEditBtn');
-    var titleEl   = document.getElementById('olDrTitle');
-    if(saveBtn)   saveBtn.style.display   = 'none';
-    if(cancelBtn) cancelBtn.style.display = 'none';
-    if(editBtn)   editBtn.textContent     = '✏️ Edit';
-    if(foot)      foot.style.display      = 'flex';  // KEEP footer visible
-    if(titleEl)   titleEl.textContent     = o.customer || 'Order Detail';
-    renderDrawerView(o);
+    // ── 4. Stay in edit mode — just re-render with updated values ──
+    _editMode = true;
+    var titleEl = document.getElementById('olDrTitle');
+    if(titleEl) titleEl.textContent = o.customer || 'Order Detail';
+    renderDrawerContent(o);  // re-render in edit mode with saved values
     render(); // refresh table row
 
     // ── 5. Toast: saving ──
@@ -971,8 +967,177 @@ function olSaveEdit(){
   }
 }
 
-/* ── View mode ── */
-function renderDrawerView(o){
+/* ══════════════════════════════════════════════════════
+   DRAWER — single unified render, CSS class controls view/edit
+   Clicking Edit only toggles CSS class — NO re-render, NO layout jump
+   ══════════════════════════════════════════════════════ */
+
+/* Apply view/edit CSS class without re-rendering */
+function _drApplyMode(){
+  var body = $id('olDrBody');
+  if(!body) return;
+  body.classList.toggle('dr-view', !_editMode);
+  body.classList.toggle('dr-edit', _editMode);
+}
+
+/* drRow helper (still used in legacy paths) */
+function drRow(label, value){
+  return '<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px">'
+    +'<span class="dr-label" style="color:#64748b">'+label+'</span>'
+    +'<span style="color:'+themeVal('#e2e8f0','#0f172a')+';font-weight:600;text-align:left;word-break:break-word">'+value+'</span>'
+    +'</div>';
+}
+
+/* renderDrawerContent — renders once; view/edit toggled by CSS class only */
+function renderDrawerContent(o){
+  var prods = getProds(o);
+  var khrRate=(function(){try{var r=Number(localStorage.getItem('cambo_khr_rate'));return r>0?r:4100;}catch(e){return 4100;}})();
+
+  // Stacked layout: label above, full-width input below (like New Order form)
+  var inpSt='width:100%;height:42px;padding:0 12px;border-radius:10px;border:1px solid '
+    +themeVal('rgba(148,163,200,.25)','rgba(148,163,184,.35)')
+    +';background:'+themeVal('rgba(255,255,255,.06)','#f8fafc')
+    +';color:'+themeVal('#e2e8f0','#0f172a')
+    +';font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:500;touch-action:manipulation;transition:border-color .15s';
+
+  var lblSt='font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px;display:block';
+  var valSt='font-size:13px;font-weight:600;color:'+themeVal('#e2e8f0','#0f172a')+';word-break:break-word;padding:10px 12px;min-height:42px;display:flex;align-items:center;border-radius:10px;border:1px solid '+themeVal('rgba(148,163,200,.12)','rgba(148,163,184,.2)')+';background:'+themeVal('rgba(255,255,255,.03)','#f8fafc');
+  var itemSt='margin-bottom:10px';
+
+  // Each field: label on top, view-span OR edit-input below (full width)
+  function dualRow(label, viewHtml, editHtml){
+    return '<div style="'+itemSt+'">'
+      +'<label style="'+lblSt+'">'+label+'</label>'
+      +'<span class="dr-view-only" style="'+valSt+'">'+viewHtml+'</span>'
+      +editHtml
+    +'</div>';
+  }
+  function rowInp(id, viewText, editVal, label, type){
+    return dualRow(label,
+      esc(viewText||'—'),
+      '<input class="dr-edit-only" id="'+id+'" type="'+(type||'text')+'" value="'+esc(editVal||'')+'" style="'+inpSt+'">');
+  }
+  function rowSel(id, val, label, opts){
+    var viewSpan;
+    if(id==='drStatus'){
+      var s=String(val||'Pending'),isDel=s==='Delivered',isCan=s==='Cancelled';
+      var bg=isDel?'rgba(34,197,94,.15)':isCan?'rgba(239,68,68,.15)':'rgba(245,158,11,.15)';
+      var clr=isDel?themeVal('#4ade80','#16a34a'):isCan?themeVal('#f87171','#dc2626'):themeVal('#fbbf24','#d97706');
+      viewSpan='<span class="dr-status-badge" style="background:'+bg+';color:'+clr+';padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700">'+esc(s)+'</span>';
+    } else {
+      viewSpan='<span style="'+valSt+'">'+esc(val||'—')+'</span>';
+    }
+    return dualRow(label, viewSpan,
+      '<select class="dr-edit-only" id="'+id+'" style="'+inpSt+';cursor:pointer">'
+      +opts.map(function(op){return '<option value="'+op+'"'+(op===val?' selected':'')+'>'+op+'</option>';}).join('')
+      +'</select>');
+  }
+  function rowTx(id, val, label){
+    var noteColor=val?themeVal('#f87171','#ef4444'):themeVal('#94a3b8','#94a3b8');
+    return dualRow(label,
+      '<span style="color:'+noteColor+';font-weight:500;white-space:pre-wrap">'+esc(val||'—')+'</span>',
+      '<textarea class="dr-edit-only" id="'+id+'" rows="3" style="'+inpSt+';height:auto;min-height:70px;padding:10px 12px;resize:none">'+esc(val||'')+'</textarea>');
+  }
+  function rowFee(val){
+    var feeDisp=val>0?'$'+Number(val).toFixed(2):'ហ្វ្រីដឹក';
+    return dualRow('ថ្លៃដឹក',
+      '<span style="'+valSt+'">'+feeDisp+'</span>',
+      '<input class="dr-edit-only" id="drDeliveryFee" type="number" value="'+(val||0)+'" min="0" step="0.5" style="'+inpSt+'" oninput="_drRecalcTotal()">');
+  }
+
+  var sub0=prods.reduce(function(s,p){return s+Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0);},0);
+  var fee0=Number(o.deliveryFee||0), grand0=sub0+fee0;
+
+  $id('olDrBody').innerHTML=
+    '<div style="display:flex;flex-direction:column;gap:16px">'
+
+    // ── Customer info card ──
+    +'<div>'
+    +'<div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:#64748b;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid '+themeVal('rgba(148,163,200,.12)','rgba(148,163,184,.15)')+'">👤 ព័ត៌មានអតិថិជន</div>'
+    +rowInp('drCustomer', o.customer||'',                  o.customer||'',                  'ឈ្មោះ')
+    +rowInp('drPhone',    o.phone||'',                     o.phone||'',                     'ទូរស័ព្ទ')
+    +rowInp('drAddress',  o.addressDetail||o.address||'',  o.addressDetail||o.address||'',  'អាសយដ្ឋាន')
+    +rowInp('drProvince', o.province||'',                  o.province||'',                  'ខេត្ត/ក្រុង')
+    // Date: view shows DD/MM/YYYY HH:MM, edit shows datetime-local picker
+    +dualRow('ថ្ងៃ/ម៉ោង',
+        esc(fmtDisplayFull(o.date)||'—'),
+        '<input class="dr-edit-only" id="drDate" type="datetime-local" value="'+esc(toDatetimeLocalEdit(o.date))+'" style="'+inpSt+';display:none;width:100%">')
+    +rowInp('drDelivery', (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:'')||'—',
+                          (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:''), 'ដឹកជញ្ជូន')
+    +rowFee(fee0)
+    +rowInp('drPayment',  o.payment||'',       o.payment||'',       'Payment')
+    +rowInp('drPage',     o.page||o.pages||'', o.page||o.pages||'', 'Pages')
+    +rowInp('drCloseBy',  o.closeBy||o.closeby||'', o.closeBy||o.closeby||'','CloseBy')
+    +rowSel('drPriority', o.priority||'Medium',  'Priority',['High','Medium','Low'])
+    +rowSel('drStatus',   o.status||o.orderStatus||'Pending','Status',['Pending','Delivered','Cancelled'])
+    +rowTx ('drNote',     o.note||'', 'Note')
+    +'</div>'
+
+    // ── Products card ──
+    +'<div>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid '+themeVal('rgba(148,163,200,.12)','rgba(148,163,184,.15)')+'">'
+    +'<div style="font-size:10px;font-weight:800;letter-spacing:.08em;color:#64748b;text-transform:uppercase">🛍️ ផលិតផល ('+prods.length+')</div>'
+    +'<button class="dr-add-btn" onclick="olAddProdRow()" type="button" style="height:26px;padding:0 12px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>'
+    +'</div>'
+    // Header: 6 cols (5 data + 1 remove-button col)
+    +'<div style="display:grid;grid-template-columns:1fr 56px 68px 58px 52px 26px;gap:0 5px;padding-bottom:5px;border-bottom:2px solid '+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.2)')+';margin-bottom:2px">'
+      +'<span style="font-size:10px;font-weight:800;color:#64748b">ផលិតផល</span>'
+      +'<span style="font-size:10px;font-weight:800;color:#64748b;text-align:center">ចំនួន</span>'
+      +'<span style="font-size:10px;font-weight:800;color:#64748b;text-align:center">ប្រភេទ</span>'
+      +'<span style="font-size:10px;font-weight:800;color:#64748b;text-align:right">តម្លៃ</span>'
+      +'<span style="font-size:10px;font-weight:800;color:#64748b;text-align:right">សរុប</span>'
+      +'<span class="dr-col-remove"></span>'
+    +'</div>'
+    +'<div id="drProdList">'
+    +prods.map(function(p){ return drProdRow(cleanProdName(p),getProdUnit(p),p.qty||1,p.price||0); }).join('')
+    +'</div>'
+    // Grand Total
+    +'<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:'+themeVal('rgba(124,92,255,.08)','rgba(99,102,241,.06)')+';border:1px solid '+themeVal('rgba(124,92,255,.2)','rgba(99,102,241,.15)')+'">'
+      +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px"><span>🚚 ថ្លៃដឹក</span><span id="drFeeDisplay">'+(fee0>0?'$'+fee0.toFixed(2):'ហ្វ្រីដឹក')+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:baseline">'
+        +'<span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Grand Total</span>'
+        +'<div style="text-align:right">'
+          +'<div id="drGrandTotal" style="font-size:16px;font-weight:900;color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+grand0.toFixed(2)+'</div>'
+          +'<div id="drGrandRiel" style="font-size:11px;font-weight:700;color:#a78bfa;margin-top:1px">'+Math.round(grand0*khrRate).toLocaleString()+'៛</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>'
+    +'</div>'   // end products section
+    +'</div>';  // end outer column
+
+  // Apply mode class AFTER innerHTML is set
+  _drApplyMode();
+
+  // Live grand total recalc
+  window._drRecalcTotal=function(){
+    var fee=Number(($id('drDeliveryFee')||{}).value||0),sub=0;
+    document.querySelectorAll('#drProdList .dr-prod-row').forEach(function(r){
+      var q=Number((r.querySelector('.dr-prod-qty')||{}).value||0);
+      var p=Number((r.querySelector('.dr-prod-price')||{}).value||0);
+      sub+=q*p;
+      var sp=r.querySelector('.dr-prod-sub');if(sp)sp.textContent='$'+(q*p).toFixed(2);
+    });
+    var grand=sub+fee,khr=(function(){try{var r=Number(localStorage.getItem('cambo_khr_rate'));return r>0?r:4100;}catch(e){return 4100;}})();
+    var gt=$id('drGrandTotal');if(gt)gt.textContent='$'+grand.toFixed(2);
+    var kr=$id('drGrandRiel'); if(kr)kr.textContent=Math.round(grand*khr).toLocaleString()+'៛';
+    var fd=$id('drFeeDisplay');if(fd)fd.textContent=fee>0?'$'+fee.toFixed(2):'ហ្វ្រីដឹក';
+  };
+
+  // Bind remove buttons + take initial snapshot for change-detection
+  setTimeout(function(){
+    document.querySelectorAll('#drProdList .dr-prod-remove').forEach(function(btn){
+      btn.addEventListener('click',function(){btn.closest('.dr-prod-row').remove();if(window._drRecalcTotal)_drRecalcTotal();});
+    });
+    _drTakeSnapshot(); // snapshot AFTER render so Cancel knows original state
+  },50);
+}
+
+/* Legacy aliases — keep olToggleEdit / olOpenDrawer working */
+function renderDrawerView(o){ _editMode=false; renderDrawerContent(o); }
+function renderDrawerEdit(o){ _editMode=true;  renderDrawerContent(o); }
+
+/* ── (old renderDrawerView body replaced — kept for reference only) ── */
+function _unusedRenderRef(o){
   var total = orderTotal(o);
   var prods = getProds(o);
   $id('olDrBody').innerHTML =
@@ -1068,89 +1233,132 @@ function drRow(label, value){
     +'</div>';
 }
 
-/* ── Edit mode (same layout as view, just inputs instead of text) ── */
+/* ── Edit mode — same card layout as view, just inputs instead of text ── */
 function renderDrawerEdit(o){
-  // font-size:16px prevents iOS Safari auto-zoom; height compact but tappable
-  var inputStyle = 'width:100%;height:34px;padding:0 8px;border-radius:7px;border:1px solid '+themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.35)')+';background:'+themeVal('rgba(255,255,255,.06)','#f8fafc')+';color:'+themeVal('#e2e8f0','#0f172a')+';font-size:16px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:500;touch-action:manipulation';
-  var rowWrap = 'display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)');
-  var labelSt = 'flex-shrink:0;width:78px;font-size:11.5px;font-weight:600;color:#94a3b8;text-align:right';
+  var prods = getProds(o);
+  // Shared input style: font-size:16px prevents iOS Safari auto-zoom
+  var inpSt = 'width:100%;height:32px;padding:0 8px;border-radius:7px;border:1px solid '
+    +themeVal('rgba(148,163,200,.25)','rgba(148,163,184,.4)')
+    +';background:'+themeVal('rgba(255,255,255,.07)','#f1f5f9')
+    +';color:'+themeVal('#e2e8f0','#0f172a')
+    +';font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:500;touch-action:manipulation';
+  var selSt = inpSt + ';cursor:pointer';
+  var txSt  = inpSt + ';height:auto;min-height:38px;padding:5px 8px;resize:none';
+
+  // drRow-alike but right cell is an editable input — preserves the 120px|1fr grid of view mode
+  var rowBase = 'display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid '
+    +themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+';font-size:13px';
+  var rowBaseTA = rowBase.replace('align-items:center','align-items:flex-start');
+  var lblSt = 'color:#64748b';
+
   function rowInp(id, val, label, type){
-    type = type||'text';
-    return '<div style="'+rowWrap+'">'
-      +'<span style="'+labelSt+'">'+label+'</span>'
-      +'<input id="'+id+'" type="'+type+'" value="'+esc(val||'')+'" style="'+inputStyle+';flex:1">'
+    return '<div style="'+rowBase+'">'
+      +'<span style="'+lblSt+'">'+label+'</span>'
+      +'<input id="'+id+'" type="'+(type||'text')+'" value="'+esc(val||'')+'" style="'+inpSt+'">'
       +'</div>';
   }
   function rowSel(id, val, label, opts){
-    return '<div style="'+rowWrap+'">'
-      +'<span style="'+labelSt+'">'+label+'</span>'
-      +'<select id="'+id+'" style="'+inputStyle+';flex:1">'
-      +opts.map(function(op){ return '<option value="'+op+'" '+(op===val?'selected':'')+'>'+op+'</option>'; }).join('')
+    return '<div style="'+rowBase+'">'
+      +'<span style="'+lblSt+'">'+label+'</span>'
+      +'<select id="'+id+'" style="'+selSt+'">'
+      +opts.map(function(op){ return '<option value="'+op+'"'+(op===val?' selected':'')+'>'+op+'</option>'; }).join('')
       +'</select></div>';
   }
   function rowTx(id, val, label){
-    return '<div style="'+rowWrap+';align-items:flex-start">'
-      +'<span style="'+labelSt+';padding-top:6px">'+label+'</span>'
-      +'<textarea id="'+id+'" rows="2" style="'+inputStyle+';flex:1;height:auto;min-height:40px;padding:6px 8px;resize:none">'+esc(val||'')+'</textarea>'
+    return '<div style="'+rowBaseTA+'">'
+      +'<span style="'+lblSt+';padding-top:5px">'+label+'</span>'
+      +'<textarea id="'+id+'" rows="2" style="'+txSt+'">'+esc(val||'')+'</textarea>'
       +'</div>';
   }
 
+  // Grand total recalc (live, called by product inputs)
+  window._drRecalcTotal = function(){
+    var fee = Number(($id('drDeliveryFee')||{}).value||0);
+    var sub = 0;
+    document.querySelectorAll('.dr-prod-row').forEach(function(r){
+      var q=Number((r.querySelector('.dr-prod-qty')||{}).value||0);
+      var p=Number((r.querySelector('.dr-prod-price')||{}).value||0);
+      sub += q*p;
+      var sp=r.querySelector('.dr-prod-sub');
+      if(sp) sp.textContent='$'+(q*p).toFixed(2);
+    });
+    var grand = sub+fee;
+    var khrRate=(function(){ try{var r=Number(localStorage.getItem('cambo_khr_rate'));return r>0?r:4100;}catch(e){return 4100;} })();
+    var gt=$id('drGrandTotal'); if(gt) gt.textContent='$'+grand.toFixed(2);
+    var kr=$id('drGrandRiel');  if(kr) kr.textContent=Math.round(grand*khrRate).toLocaleString()+'៛';
+    var fd=$id('drFeeDisplay'); if(fd) fd.textContent=fee>0?'$'+fee.toFixed(2):'ហ្វ្រីដឹក';
+  };
+
+  var khrRate=(function(){ try{var r=Number(localStorage.getItem('cambo_khr_rate'));return r>0?r:4100;}catch(e){return 4100;}})();
+  var sub0=prods.reduce(function(s,p){return s+Number(p.qty||0)*Number(p.price||0);},0);
+  var fee0=Number(o.deliveryFee||0);
+  var grand0=sub0+fee0;
+
   $id('olDrBody').innerHTML =
-    '<div style="font-size:13px;font-weight:700;color:#8b5cf6;padding:8px 0;display:flex;align-items:center;gap:6px">👤 ព័ត៌មានអតិថិជន</div>'
-    +rowInp('drCustomer',   o.customer||'',     'ឈ្មោះ')
-    +rowInp('drPhone',      o.phone||'',        'ទូរស័ព្ទ')
-    +rowInp('drAddress',    (o.addressDetail||o.address||'')||'','អាសយដ្ឋាន')
-    +rowInp('drProvince',   o.province||'',     'ខេត្ត/ក្រុង')
-    +rowInp('drDate',       toDatetimeLocalEdit(o.date), 'ថ្ងៃ/ម៉ោង', 'datetime-local')
-    +rowInp('drDelivery',   (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:''), 'ដឹកជញ្ជូន')
-    +rowInp('drDeliveryFee',o.deliveryFee||0,   'ថ្លៃដឹក', 'number')
-    +rowInp('drPayment',    o.payment||'',      'Payment')
+    '<div style="display:flex;flex-direction:column;gap:16px">'
+
+    // ── Customer info card (same as view) ──
+    +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:12px;padding:14px">'
+    +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">👤 ព័ត៌មានអតិថិជន</div>'
+    +rowInp('drCustomer',   o.customer||'',    'ឈ្មោះ')
+    +rowInp('drPhone',      o.phone||'',       'ទូរស័ព្ទ')
+    +rowInp('drAddress',    o.addressDetail||o.address||'','អាសយដ្ឋាន')
+    +rowInp('drProvince',   o.province||'',    'ខេត្ត/ក្រុង')
+    +rowInp('drDate',       toDatetimeLocalEdit(o.date),'ថ្ងៃ/ម៉ោង','datetime-local')
+    +rowInp('drDelivery',   (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:''),'ដឹកជញ្ជូន')
+    +'<div style="'+rowBase+'">'
+      +'<span style="'+lblSt+'">ថ្លៃដឹក</span>'
+      +'<input id="drDeliveryFee" type="number" value="'+(o.deliveryFee||0)+'" min="0" step="0.5" style="'+inpSt+'" oninput="_drRecalcTotal()">'
+    +'</div>'
+    +rowInp('drPayment',    o.payment||'',     'Payment')
     +rowInp('drPage',       o.page||o.pages||'','Pages')
     +rowInp('drCloseBy',    o.closeBy||o.closeby||'','CloseBy')
     +rowSel('drPriority',   o.priority||'Medium','Priority',['High','Medium','Low'])
     +rowSel('drStatus',     o.status||o.orderStatus||'Pending','Status',['Pending','Delivered','Cancelled'])
-    +rowTx ('drNote',       o.note||'',         'Note')
-
-    // Products editor section
-    +'<div style="margin-top:16px">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
-    +'<span style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase">🛍️ ផលិតផល</span>'
-    +'<button onclick="olAddProdRow()" type="button" style="height:28px;padding:0 12px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>'
+    +rowTx ('drNote',       o.note||'',        'Note')
     +'</div>'
-    // Header: ឈ្មោះ | ចំ | ប្រភេទ | តម្លៃ | សរុប | ×
-    +'<div style="display:grid;grid-template-columns:1fr 46px 58px 65px 58px 30px;gap:6px;margin-bottom:6px;font-size:10px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase">'
-    +'<span>ឈ្មោះ</span><span style="text-align:center">ចំ</span><span style="text-align:center">ប្រភេទ</span><span style="text-align:right">តម្លៃ</span><span style="text-align:right">សរុប</span><span></span>'
+
+    // ── Products card (same outer shell as view) ──
+    +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:12px;padding:14px">'
+    // Header row with "+ Add" button
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+    +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase">🛍️ ផលិតផល ('+prods.length+')</div>'
+    +'<button onclick="olAddProdRow()" type="button" style="height:26px;padding:0 12px;border-radius:7px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.1);color:#4ade80;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add</button>'
+    +'</div>'
+    // Column headers — same 5-col grid as view + extra col for remove btn
+    +'<div style="display:grid;grid-template-columns:1fr 56px 68px 58px 52px 26px;gap:0 5px;padding-bottom:8px;border-bottom:2px solid '+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.2)')+';margin-bottom:2px">'
+      +'<span style="font-size:11px;font-weight:800;color:#64748b">ផលិតផល</span>'
+      +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:center">ចំនួន</span>'
+      +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:center">ប្រភេទ</span>'
+      +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:right">តម្លៃ</span>'
+      +'<span style="font-size:11px;font-weight:800;color:#64748b;text-align:right">សរុប</span>'
+      +'<span></span>'
     +'</div>'
     +'<div id="drProdList">'
-    +getProds(o).map(function(p,i){
-      return drProdRow(cleanProdName(p), getProdUnit(p), p.qty||1, p.price||0);
-    }).join('')
+    +prods.map(function(p){ return drProdRow(cleanProdName(p), getProdUnit(p), p.qty||1, p.price||0); }).join('')
     +'</div>'
-    // Grand Total box
+
+    // Grand Total box (same as view, but IDs so JS can update live)
     +(function(){
-      var khrRate = (function(){ try{ var r=Number(localStorage.getItem('cambo_khr_rate')); return r>0?r:4100; }catch(e){ return 4100; } })();
-      var sub = getProds(o).reduce(function(s,p){ return s+Number(p.qty||0)*Number(p.price||0); },0);
-      var fee = Number(o.deliveryFee||0);
-      var grand = sub + fee;
-      var riel = Math.round(grand * khrRate);
-      var txtClr = themeVal('#e2e8f0','#0f172a');
       return '<div style="margin-top:14px;padding:12px 14px;border-radius:10px;background:'+themeVal('rgba(124,92,255,.08)','rgba(99,102,241,.06)')+';border:1px solid '+themeVal('rgba(124,92,255,.2)','rgba(99,102,241,.15)')+'">'
-        +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px"><span>🚚 ថ្លៃដឹក</span><span>'+(fee>0?'$'+fee.toFixed(2):'ហ្វ្រីដឹក')+'</span></div>'
+        +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px"><span>🚚 ថ្លៃដឹក</span><span id="drFeeDisplay">'+(fee0>0?'$'+fee0.toFixed(2):'ហ្វ្រីដឹក')+'</span></div>'
         +'<div style="display:flex;justify-content:space-between;align-items:baseline">'
           +'<span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Grand Total</span>'
           +'<div style="text-align:right">'
-            +'<div style="font-size:18px;font-weight:900;color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+grand.toFixed(2)+'</div>'
-            +'<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-top:1px">'+riel.toLocaleString()+'៛</div>'
+            +'<div id="drGrandTotal" style="font-size:18px;font-weight:900;color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+grand0.toFixed(2)+'</div>'
+            +'<div id="drGrandRiel" style="font-size:12px;font-weight:700;color:#a78bfa;margin-top:1px">'+Math.round(grand0*khrRate).toLocaleString()+'៛</div>'
           +'</div>'
         +'</div>'
       +'</div>';
     })()
-    +'</div>';
+    +'</div>'  // end products card
+
+    +'</div>'; // end outer column
 
   // Re-bind remove buttons after render
   setTimeout(function(){
     document.querySelectorAll('.dr-prod-remove').forEach(function(btn){
-      btn.addEventListener('click', function(){ btn.closest('.dr-prod-row').remove(); });
+      btn.addEventListener('click', function(){ btn.closest('.dr-prod-row').remove(); _drRecalcTotal(); });
     });
   }, 0);
 }
@@ -1161,6 +1369,52 @@ window.olOpenDrawer  = olOpenDrawer;
 window.getProds      = getProds;
 window.orderTotal    = orderTotal;
 window.fmtDisplay    = fmtDisplay;
+
+/* ══════════════════════════════════════════
+   Drawer: change-detection snapshot
+   ══════════════════════════════════════════ */
+var _drSnapshot = null;
+
+function _drTakeSnapshot(){
+  var body = $id('olDrBody');
+  if(!body){ _drSnapshot = null; return; }
+  var snap = {};
+  body.querySelectorAll('input.dr-edit-only[id], select.dr-edit-only[id], textarea.dr-edit-only[id]').forEach(function(el){
+    snap[el.id] = el.value;
+  });
+  var prods = [];
+  body.querySelectorAll('#drProdList .dr-prod-row').forEach(function(r){
+    prods.push([
+      (r.querySelector('.dr-prod-name')||{}).value||'',
+      (r.querySelector('.dr-prod-qty')||{}).value||'',
+      (r.querySelector('.dr-prod-unit')||{}).value||'',
+      (r.querySelector('.dr-prod-price')||{}).value||''
+    ].join('|'));
+  });
+  snap['__prods__'] = prods.join(';;');
+  _drSnapshot = snap;
+}
+
+function _drHasChanges(){
+  if(!_drSnapshot) return false;
+  var body = $id('olDrBody');
+  if(!body) return false;
+  var changed = false;
+  body.querySelectorAll('input.dr-edit-only[id], select.dr-edit-only[id], textarea.dr-edit-only[id]').forEach(function(el){
+    if(_drSnapshot[el.id] !== undefined && el.value !== _drSnapshot[el.id]) changed = true;
+  });
+  var prods = [];
+  body.querySelectorAll('#drProdList .dr-prod-row').forEach(function(r){
+    prods.push([
+      (r.querySelector('.dr-prod-name')||{}).value||'',
+      (r.querySelector('.dr-prod-qty')||{}).value||'',
+      (r.querySelector('.dr-prod-unit')||{}).value||'',
+      (r.querySelector('.dr-prod-price')||{}).value||''
+    ].join('|'));
+  });
+  if(prods.join(';;') !== _drSnapshot['__prods__']) changed = true;
+  return changed;
+}
 
 /* ── Drawer QR toggle ── */
 var _drQrOn = true;
@@ -1270,40 +1524,43 @@ window.olDrPrint = function(){
 };
 window.olAddProdRow  = function(){
   var list = $id('drProdList'); if(!list) return;
-  var div = document.createElement('div');
-  div.className = 'dr-prod-row';
-  div.innerHTML = drProdRow('','ឈុត',1,0);
-  list.appendChild(div);
-  div.querySelector('.dr-prod-remove')?.addEventListener('click', function(){ div.remove(); });
+  var tmp = document.createElement('div');
+  tmp.innerHTML = drProdRow('','ឈុត',1,0);
+  var row = tmp.firstElementChild;
+  list.appendChild(row);
+  row.querySelector('.dr-prod-remove')?.addEventListener('click', function(){ row.remove(); if(typeof _drRecalcTotal==='function') _drRecalcTotal(); });
 };
 
 function drProdRow(name, unit, qty, price){
   unit = unit || 'ឈុត';
   var sub = Number(qty||0) * Number(price||0);
-  // font-size:16px prevents iOS auto-zoom
-  var c = themeVal('#e2e8f0','#0f172a');
-  var bg = themeVal('rgba(255,255,255,.07)','#f8fafc');
-  var bd = themeVal('rgba(148,163,200,.2)','rgba(148,163,184,.3)');
-  var inpS = 'height:34px;padding:0 8px;border-radius:7px;border:1px solid '+bd+';background:'+bg+';color:'+c+';font-size:16px;font-family:inherit;outline:none;box-sizing:border-box;touch-action:manipulation';
+  var c  = themeVal('#e2e8f0','#0f172a');
+  var bg = themeVal('rgba(255,255,255,.07)','#f1f5f9');
+  var bd = themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.35)');
+  // font-size:16px prevents iOS Safari auto-zoom on tap
+  var inpS = 'height:28px;padding:0 5px;border-radius:6px;border:1px solid '+bd+';background:'+bg+';color:'+c
+    +';font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;touch-action:manipulation;width:100%';
   var ubs  = unitBadgeStyle(unit);
-  var selS = 'height:34px;padding:0 6px;border-radius:7px;border:1px solid '+bd+';font-size:14px;font-weight:700;font-family:inherit;outline:none;box-sizing:border-box;cursor:pointer;touch-action:manipulation;'+ubs;
-  var onchg = "var r=this.closest('.dr-prod-row');var q=Number(r.querySelector('.dr-prod-qty').value||0);var p=Number(r.querySelector('.dr-prod-price').value||0);var sp=r.querySelector('.dr-prod-sub');if(sp)sp.textContent='$'+(q*p).toFixed(2);";
+  var selS = inpS+';cursor:pointer;padding:0 4px;font-weight:700;'+ubs;
+  // oninput calls the global recalc so Grand Total updates live
+  var onchg = "_drRecalcTotal();";
 
-  return '<div class="dr-prod-row" style="border-bottom:1px solid '+themeVal('rgba(148,163,200,.08)','rgba(148,163,184,.12)')+';padding:8px 0;margin-bottom:2px">'
-    // Row 1: ឈ្មោះ (full) + X
-    +'<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">'
-      +'<input class="dr-prod-name" type="text" value="'+esc(name)+'" placeholder="ឈ្មោះ" style="'+inpS+';flex:1;font-weight:600">'
-      +'<button class="dr-prod-remove" type="button" style="width:34px;height:34px;border-radius:7px;border:none;background:rgba(239,68,68,.15);color:#f87171;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>'
-    +'</div>'
-    // Row 2: [ប្រភេទ] [ចំ] [$price] =$sub
-    +'<div style="display:grid;grid-template-columns:72px 56px 1fr auto;gap:5px;align-items:center">'
-      +'<select class="dr-prod-unit" style="'+selS+';width:100%">'
-      +['ឈុត','កេស','លាយ'].map(function(u){ return '<option value="'+u+'"'+(u===unit?' selected':'')+'>'+u+'</option>'; }).join('')
-      +'</select>'
-      +'<input class="dr-prod-qty" type="number" value="'+qty+'" min="1" style="'+inpS+';width:100%;text-align:center" oninput="'+onchg+'">'
-      +'<input class="dr-prod-price" type="number" value="'+price+'" min="0" step="0.01" style="'+inpS+';width:100%;text-align:right" oninput="'+onchg+'">'
-      +'<span class="dr-prod-sub" style="font-size:13px;font-weight:800;color:#7dd3fc;white-space:nowrap;text-align:right;min-width:44px">$'+sub.toFixed(2)+'</span>'
-    +'</div>'
+  // Same 6-column grid as header: 1fr 64px 52px 60px 52px 28px
+  return '<div class="dr-prod-row" style="display:grid;grid-template-columns:1fr 56px 68px 58px 52px 26px;gap:0 5px;align-items:center;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)')+'">'
+    // ផលិតផល — name input
+    +'<input class="dr-prod-name" type="text" value="'+esc(name)+'" placeholder="ឈ្មោះ" style="'+inpS+';font-weight:600">'
+    // ចំនួន — number input (centered)
+    +'<input class="dr-prod-qty" type="number" value="'+Number(qty||1)+'" min="1" style="'+inpS+';text-align:center" oninput="'+onchg+'">'
+    // ប្រភេទ — unit select (colored badge style)
+    +'<select class="dr-prod-unit" style="'+selS+'" oninput="'+onchg+'">'
+    +['ឈុត','កេស','លាយ'].map(function(u){ return '<option value="'+u+'"'+(u===unit?' selected':'')+'>'+u+'</option>'; }).join('')
+    +'</select>'
+    // តម្លៃ — price input (right-aligned)
+    +'<input class="dr-prod-price" type="number" value="'+Number(price||0)+'" min="0" step="0.01" style="'+inpS+';text-align:right" oninput="'+onchg+'">'
+    // សរុប — auto-calculated (read-only display, same color as view)
+    +'<span class="dr-prod-sub" style="font-size:12px;font-weight:800;color:'+themeVal('#7dd3fc','#4f46e5')+';text-align:right;white-space:nowrap">$'+sub.toFixed(2)+'</span>'
+    // Remove button
+    +'<button class="dr-prod-remove" type="button" title="Remove" style="width:24px;height:24px;border-radius:5px;border:none;background:rgba(239,68,68,.15);color:#f87171;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0">✕</button>'
   +'</div>';
 }
 window.olToggleEdit  = olToggleEdit;
