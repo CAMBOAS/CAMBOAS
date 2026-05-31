@@ -464,7 +464,6 @@ function render(){
     return '<tr class="'+(selected?'sel':'')+'" data-id="'+o.id+'">'
       +'<td class="ol-cb-th ol-col-cb"><input type="checkbox" class="ol-chk" data-id="'+o.id+'" '+(selected?'checked':'')+' onclick="event.stopPropagation()"></td>'
       +'<td class="ol-col-num">'+(idx+1)+'</td>'
-      +'<td class="ol-muted ol-col-date">'+fmtDisplay(o.date)+'</td>'
       +'<td class="ol-customer ol-col-cust">'+esc(o.customer||'—')+'</td>'
       +'<td class="ol-phone ol-col-tel">'+esc(o.phone||'')+'</td>'
       +'<td class="ol-col-prov">'+esc(o.province||'')+'</td>'
@@ -472,6 +471,7 @@ function render(){
       +'<td class="ol-muted ol-col-page">'+esc(o.page||o.pages||'')+'</td>'
       +'<td class="ol-muted ol-col-cb2">'+esc(o.closeBy||o.closeby||'')+'</td>'
       +'<td class="ol-total ol-col-tot">$'+total.toFixed(2)+'</td>'
+      +'<td class="ol-muted ol-col-date">'+fmtDisplay(o.date)+'</td>'
       +'</tr>';
   }).join('');
 
