@@ -979,7 +979,7 @@ function renderDrawerView(o){
     '<div style="display:flex;flex-direction:column;gap:16px">'
 
     // Customer info card
-    +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:12px;padding:14px">'
+    +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:10px;padding:10px 8px">'
     +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">👤 ព័ត៌មានអតិថិជន</div>'
     +drRow('ឈ្មោះ', o.customer||'—')
     +drRow('ទូរស័ព្ទ', '<span style="color:#60a5fa">'+esc(o.phone||'—')+'</span>')
@@ -1004,7 +1004,7 @@ function renderDrawerView(o){
     +'</div>'
 
     // Products card — card layout (mobile-friendly, no 5-col grid)
-    +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:12px;padding:14px">'
+    +'<div style="background:'+themeVal('rgba(255,255,255,.04)','#f8fafc')+';border:1px solid '+themeVal('rgba(148,163,200,.1)','rgba(148,163,184,.15)')+';border-radius:10px;padding:10px 8px">'
     +'<div style="font-size:11px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:10px">🛍️ ផលិតផល ('+prods.length+')</div>'
     // Header row — ផលិតផល | ចំនួន | ប្រភេទ | តម្លៃ | សរុប
     +'<div style="display:grid;grid-template-columns:1fr 80px 52px 52px 52px;gap:0 5px;padding-bottom:8px;border-bottom:2px solid '+themeVal('rgba(148,163,200,.15)','rgba(148,163,184,.2)')+';margin-bottom:2px">'
@@ -1073,7 +1073,7 @@ function renderDrawerEdit(o){
   // font-size:16px prevents iOS Safari auto-zoom; height compact but tappable
   var inputStyle = 'width:100%;height:34px;padding:0 8px;border-radius:7px;border:1px solid '+themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.35)')+';background:'+themeVal('rgba(255,255,255,.06)','#f8fafc')+';color:'+themeVal('#e2e8f0','#0f172a')+';font-size:16px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:500;touch-action:manipulation';
   var rowWrap = 'display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.07)','rgba(148,163,184,.1)');
-  var labelSt = 'flex-shrink:0;width:78px;font-size:11.5px;font-weight:600;color:#94a3b8;text-align:right';
+  var labelSt = 'flex-shrink:0;width:72px;font-size:11px;font-weight:600;color:#94a3b8;text-align:right';
   function rowInp(id, val, label, type){
     type = type||'text';
     return '<div style="'+rowWrap+'">'
