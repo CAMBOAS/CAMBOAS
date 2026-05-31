@@ -1101,7 +1101,7 @@ function drRow(label, value){
 function renderDrawerEdit(o){
   var inputStyle = 'width:100%;height:32px;padding:0 8px;border-radius:8px;border:1px solid '+themeVal('rgba(148,163,200,.22)','rgba(148,163,184,.3)')+';background:'+themeVal('rgba(255,255,255,.06)','#f8fafc')+';color:'+themeVal('#e2e8f0','#0f172a')+';font-size:12px;font-family:inherit;outline:none;box-sizing:border-box;font-weight:500;touch-action:manipulation';
   var rowWrap = 'display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.06)','rgba(148,163,184,.09)');
-  var labelSt = 'flex-shrink:0;width:66px;font-size:10.5px;font-weight:600;color:#94a3b8;text-align:right';
+  var labelSt = 'flex-shrink:0;width:80px;font-size:10.5px;font-weight:600;color:#94a3b8;text-align:right';
   function rowInp(id, val, label, type){
     type = type||'text';
     return '<div style="'+rowWrap+'">'
