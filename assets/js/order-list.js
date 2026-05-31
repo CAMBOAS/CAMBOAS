@@ -9,7 +9,7 @@ var _orders = [], _sel = new Set();
 var _qrOn = true; // QR Code toggle state
 var _sort = {col:'date', dir:'desc'};
 var _q = '', _f = {};
-var _date = {preset:'all', start:'', end:'', label:'All'};
+var _date = {preset:'today', start:'', end:'', label:'Today'}; // start/end filled on DOMContentLoaded
 
 /* ── helpers ── */
 function $id(id){ return document.getElementById(id); }
@@ -1460,8 +1460,8 @@ function populateFilterOptions(){
 }
 
 async function init(){
-  var r = getPreset('all');
-  _date = {preset:'all', start:'', end:'', label:'All'};
+  var r = getPreset('today');
+  _date = {preset:'today', start:r.start, end:r.end, label:r.label};
   updateDateBtn();
 
   _orders = await loadOrders();
