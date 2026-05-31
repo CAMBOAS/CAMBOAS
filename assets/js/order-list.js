@@ -71,6 +71,19 @@ function toDatetimeLocalEdit(s){
   return base;
 }
 
+/* Format YYYY-MM-DDTHH:MM → "DD/MM/YY HH:MM AM/PM" for custom date display */
+function fmtDtDisplay(s){
+  if(!s) return '';
+  var m = s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if(!m) return s;
+  var hh = parseInt(m[4],10), mi = m[5];
+  var ampm = hh >= 12 ? 'PM' : 'AM';
+  var h12 = hh % 12 || 12;
+  var yy = m[1].slice(2);
+  return m[3]+'/'+m[2]+'/'+yy+' '+pad(h12)+':'+mi+' '+ampm;
+}
+window.fmtDtDisplay = fmtDtDisplay;
+
 /* Convert any date format → "YYYY-MM-DDTHH:MM" for datetime-local input */
 function toDatetimeLocal(s){
   if(!s) return '';
@@ -1152,7 +1165,24 @@ function renderDrawerEdit(o){
     +rowInp('drPhone',      o.phone||'',        'ទូរស័ព្ទ')
     +rowInp('drAddress',    (o.addressDetail||o.address||'')||'','អាសយដ្ឋាន')
     +rowInp('drProvince',   o.province||'',     'ខេត្ត/ក្រុង')
-    +rowInp('drDate',       toDatetimeLocalEdit(o.date), 'ថ្ងៃ/ម៉ោង', 'datetime-local')
+    +(function(){
+      var dtVal = toDatetimeLocalEdit(o.date);
+      var disp  = fmtDtDisplay(dtVal);
+      var wrapSt = rowWrap;
+      var inpHidden = 'position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;pointer-events:none;z-index:0';
+      return '<div class="dr-row" style="'+wrapSt+'">'
+        +'<span class="dr-lbl" style="'+labelSt+'">ថ្ងៃ/ម៉ោង</span>'
+        +'<div style="flex:1;position:relative">'
+          +'<div id="drDateDisplay" onclick="var p=document.getElementById(\'drDate\');p.style.pointerEvents=\'auto\';try{p.showPicker();}catch(e){p.focus();}" '
+            +'style="'+inputStyle+';flex:1;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 8px">'
+            +'<span id="drDateText">'+esc(disp)+'</span>'
+            +'<span style="color:#64748b;font-size:13px">📅</span>'
+          +'</div>'
+          +'<input id="drDate" type="datetime-local" value="'+esc(dtVal)+'" style="'+inpHidden+'" '
+            +'oninput="var d=document.getElementById(\'drDateText\');if(d&&window.fmtDtDisplay)d.textContent=window.fmtDtDisplay(this.value);">'
+        +'</div>'
+      +'</div>';
+    })()
     +rowInp('drDelivery',   (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:''), 'ដឹកជញ្ជូន')
     +rowInp('drDeliveryFee',o.deliveryFee||0,   'ថ្លៃដឹក', 'number')
     +rowInp('drPayment',    o.payment||'',      'Payment')
