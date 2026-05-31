@@ -238,7 +238,7 @@
     const rows = data.items.map((it, i) => `
       <div class="share-item-row">
         <div class="share-col-product">${i + 1}. ${escapeHtml(it.product)}</div>
-        <div class="share-col-qty">${escapeHtml(String(it.qty))} ឈុត</div>
+        <div class="share-col-qty">${escapeHtml(String(it.qty))} ${escapeHtml(it.unit || 'ឈុត')}</div>
         <div class="share-col-price">${escapeHtml(formatDisplayMoney(it.price))}</div>
         <div class="share-col-subtotal">${escapeHtml(formatDisplayMoney(it.subtotal))}</div>
       </div>

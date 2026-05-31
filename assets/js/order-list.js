@@ -622,7 +622,8 @@ function printTable(){
       items:prods.map(function(p){
         return {product:p.name||'',qty:Number(p.qty||1),price:Number(p.price||0),
           discount:Number(p.discount||0),
-          subtotal:Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0)};
+          subtotal:Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0),
+          unit:getProdUnit(p)};
       }),
       subtotal:subtotal, deliveryFee:deliveryFee,
       grandTotal:grandTotal, grandRiel:Math.round(grandTotal*rielRate)
@@ -672,7 +673,8 @@ function printSelected(){
       items:prods.map(function(p){
         return {product:p.name||'',qty:Number(p.qty||1),price:Number(p.price||0),
           discount:Number(p.discount||0),
-          subtotal:Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0)};
+          subtotal:Number(p.qty||0)*Number(p.price||0)-Number(p.discount||0),
+          unit:getProdUnit(p)};
       }),
       subtotal:subtotal, deliveryFee:deliveryFee,
       grandTotal:grandTotal, grandRiel:Math.round(grandTotal*rielRate)
@@ -741,7 +743,8 @@ function shareImg(){
         qty:      Number(p.qty||1),
         price:    Number(p.price||0),
         discount: Number(p.discount||0),
-        subtotal: Number(p.qty||0)*Number(p.price||0) - Number(p.discount||0)
+        subtotal: Number(p.qty||0)*Number(p.price||0) - Number(p.discount||0),
+        unit:     getProdUnit(p)
       };
     }),
     subtotal:    subtotal,
@@ -1662,7 +1665,7 @@ window.olDrCopyText = function(){
       var qty   = Number(p.qty||1);
       var price = Number(p.price||0);
       var disc  = Number(p.discount||0);
-      return { product: p.name||p.product||'', qty: qty, price: price, subtotal: qty*price-disc };
+      return { product: p.name||p.product||'', qty: qty, price: price, subtotal: qty*price-disc, unit: getProdUnit(p) };
     });
     window.CopyReceipt.copy({
       date:         dateStr,
@@ -1686,7 +1689,7 @@ window.olDrCopyText = function(){
     var riel = Math.round(total*(window.KHR_RATE||4100)).toLocaleString();
     var prods = rawLines.map(function(p,i){
       var qty=Number(p.qty||1),price=Number(p.price||0),disc=Number(p.discount||0);
-      return (i+1)+'. '+(p.name||p.product||'')+'\n   ចំនួន '+qty+' ឈុត x $'+price+'      = $'+(qty*price-disc);
+      return (i+1)+'. '+(p.name||p.product||'')+'\n   ចំនួន '+qty+' '+getProdUnit(p)+' x $'+price+'      = $'+(qty*price-disc);
     }).join('\n');
     var text = [
       '🧾 វិក័យប័ត្រ 📅 '+dateStr, dot,
