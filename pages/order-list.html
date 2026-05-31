@@ -26,82 +26,39 @@
   #olDrTitle { color: #e2e8f0 !important; }
   [data-theme="light"] #olDrTitle { color: #0f172a !important; }
 
-  /* ── Drawer body: VIEW mode ── */
-  #olDrBody.dr-view input,
-  #olDrBody.dr-view select,
-  #olDrBody.dr-view textarea {
-    border-color: transparent !important;
-    background:   transparent !important;
-    box-shadow:   none !important;
-    pointer-events: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    cursor: default;
+  /* Info cards in view mode */
+  [data-theme="light"] #olDrBody > div > div {
+    background: #f8fafc !important;
+    border-color: rgba(148,163,184,.15) !important;
   }
-  /* view-only: block (full width), edit-only: hidden */
-  #olDrBody.dr-view  .dr-view-only { display: block !important; }
-  #olDrBody.dr-view  .dr-edit-only { display: none  !important; }
-  /* edit-only: block (full width), view-only: hidden */
-  #olDrBody.dr-edit  .dr-view-only { display: none  !important; }
-  #olDrBody.dr-edit  .dr-edit-only { display: block !important; }
-  /* Status badge stays inline-block inside its block wrapper */
-  #olDrBody .dr-status-badge { display: inline-block !important; }
-  /* Remove / Add buttons */
-  #olDrBody.dr-view .dr-prod-remove { opacity:0; pointer-events:none; }
-  #olDrBody.dr-view .dr-add-btn     { opacity:0; pointer-events:none; }
-  #olDrBody.dr-view .dr-col-remove  { opacity:0; }
-
-  /* ── EDIT mode inputs ── */
-  #olDrBody.dr-edit input,
-  #olDrBody.dr-edit select,
-  #olDrBody.dr-edit textarea {
-    border-color: rgba(148,163,200,.3) !important;
-    background:   rgba(255,255,255,.06) !important;
-    pointer-events: auto;
-    appearance: auto;
-    -webkit-appearance: auto;
-    cursor: text;
-    width: 100%;
-  }
-  #olDrBody.dr-edit select { cursor: pointer; }
-  #olDrBody.dr-edit input:focus,
-  #olDrBody.dr-edit select:focus,
-  #olDrBody.dr-edit textarea:focus {
-    border-color: #8b5cf6 !important;
-    background:   rgba(139,92,246,.07) !important;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(139,92,246,.12);
-  }
-  /* Base input styles */
-  #olDrBody input, #olDrBody select, #olDrBody textarea {
-    font-size: 13px !important;
-    touch-action: manipulation;
-    color: inherit;
-    font-family: inherit;
-    box-sizing: border-box;
-  }
-  /* Light theme */
-  [data-theme="light"] #olDrBody.dr-edit input,
-  [data-theme="light"] #olDrBody.dr-edit select,
-  [data-theme="light"] #olDrBody.dr-edit textarea {
-    background: #ffffff !important;
-    border-color: rgba(148,163,184,.4) !important;
-    color: #0f172a !important;
-  }
-  [data-theme="light"] #olDrBody.dr-edit input:focus,
-  [data-theme="light"] #olDrBody.dr-edit select:focus,
-  [data-theme="light"] #olDrBody.dr-edit textarea:focus {
-    border-color: #8b5cf6 !important;
-    background: #fff !important;
-    box-shadow: 0 0 0 3px rgba(139,92,246,.1);
-  }
+  [data-theme="light"] #olDrBody span { color: #0f172a !important; }
   [data-theme="light"] #olDrBody .dr-label { color: #64748b !important; }
 
-  /* Receipt No input in footer (always editable) */
+  /* Edit inputs — font-size:16px prevents iOS auto-zoom on focus */
+  #olDrBody input, #olDrBody select, #olDrBody textarea {
+    background: rgba(255,255,255,.08) !important;
+    border-color: rgba(148,163,200,.2) !important;
+    color: #e2e8f0 !important;
+    font-size: 16px !important;
+    touch-action: manipulation;
+  }
+  /* Receipt No input in footer */
   #olDrReceiptNo, #olDrFoot input {
     font-size: 16px !important;
     touch-action: manipulation;
+  }
+  [data-theme="light"] #olDrBody input,
+  [data-theme="light"] #olDrBody select,
+  [data-theme="light"] #olDrBody textarea {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+  }
+  [data-theme="light"] #olDrBody input:focus,
+  [data-theme="light"] #olDrBody select:focus,
+  [data-theme="light"] #olDrBody textarea:focus {
+    border-color: #8b5cf6 !important;
+    background: #fff !important;
   }
 
   /* Drawer footer */
@@ -114,7 +71,12 @@
   #olOverlay { background: rgba(2,6,23,.45) !important; }
   [data-theme="light"] #olOverlay { background: rgba(15,23,42,.3) !important; }
 
-  /* Remove button base style */
+  /* Product rows */
+  [data-theme="light"] .dr-prod-row input {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+  }
   [data-theme="light"] .dr-prod-remove {
     background: rgba(239,68,68,.1) !important;
     color: #dc2626 !important;
@@ -494,18 +456,12 @@
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(148,163,200,.1);flex-shrink:0">
       <h3 id="olDrTitle" style="margin:0;font-size:16px;color:#e2e8f0">Order Detail</h3>
       <div style="display:flex;gap:8px;align-items:center">
-        <!-- Edit/View toggle hidden — drawer always opens in edit mode -->
-        <button id="olDrEditBtn" onclick="olToggleEdit()" style="display:none;height:36px;padding:0 14px;border-radius:8px;border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.12);color:#c4b5fd;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✏️ Edit</button>
-        <!-- Cancel button (with discard confirmation) moved here from footer -->
-        <button id="olDrCancelBtn" onclick="olCancelEdit()" title="Cancel / Close"
-          style="height:36px;padding:0 14px;border-radius:8px;border:1.5px solid rgba(148,163,200,.25);background:transparent;color:#94a3b8;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          Cancel
-        </button>
+        <button id="olDrEditBtn" onclick="olToggleEdit()" style="height:36px;padding:0 14px;border-radius:8px;border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.12);color:#c4b5fd;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✏️ Edit</button>
+        <button onclick="olCloseDrawer()" style="width:36px;height:36px;border-radius:8px;border:none;background:rgba(239,68,68,.12);color:#fca5a5;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
       </div>
     </div>
     <!-- Drawer Body -->
-    <div id="olDrBody" style="flex:1;overflow-y:auto;padding:16px 18px 24px;scrollbar-width:thin"></div>
+    <div id="olDrBody" style="flex:1;overflow-y:auto;padding:18px 20px;scrollbar-width:thin"></div>
     <!-- Drawer Footer -->
     <div id="olDrFoot" style="padding:12px 14px;border-top:1px solid rgba(148,163,200,.1);flex-shrink:0;display:flex;flex-direction:column;gap:8px">
       <!-- Row 1: Receipt No + QR icon toggle -->
@@ -523,6 +479,13 @@
       </div>
       <!-- Row 2: Action icon buttons — flex so hidden buttons don't create extra rows -->
       <div style="display:flex;gap:6px">
+        <!-- Cancel (edit mode only) — LEFT of Delete, hidden until edit mode -->
+        <button id="olDrCancelBtn" onclick="olCancelEdit()" title="Cancel"
+          style="flex:1;height:44px;border-radius:12px;border:1.5px solid rgba(148,163,200,.2);background:transparent;color:#94a3b8;cursor:pointer;display:none;align-items:center;justify-content:center;transition:opacity .15s">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
         <!-- Delete -->
         <button onclick="olDeleteOrder()" title="Delete"
           style="flex:1;height:44px;border-radius:12px;border:1.5px solid rgba(239,68,68,.3);background:rgba(239,68,68,.1);color:#f87171;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s">
@@ -551,9 +514,9 @@
             <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
           </svg>
         </button>
-        <!-- Save — always visible -->
+        <!-- Save (edit mode only) — hidden until edit mode -->
         <button id="olDrSaveBtn" onclick="olSaveEdit()" title="Save"
-          style="flex:1;height:44px;border-radius:12px;border:none;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s">
+          style="flex:1;height:44px;border-radius:12px;border:none;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;transition:opacity .15s">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
           </svg>
