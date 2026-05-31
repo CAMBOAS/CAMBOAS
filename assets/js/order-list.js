@@ -1468,8 +1468,14 @@ async function init(){
   // Auto-populate filter dropdowns from loaded data
   populateFilterOptions();
 
-  // Show actual filtered data (no auto-switch).
-  // Default preset = Today. User can manually switch via filter button.
+  // If no orders match Today, fall back to All Time so data is visible
+  var todayCount = _orders.filter(function(o){ return inDate(o); }).length;
+  if(todayCount === 0){
+    var ra = getPreset('all');
+    _date = {preset:'all', start:ra.start, end:ra.end, label:ra.label};
+    updateDateBtn();
+  }
+
   render();
 
   /* Search */
