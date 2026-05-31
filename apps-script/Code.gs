@@ -634,7 +634,7 @@ function orderToRows_(orderId, order) {
 function normalizeLegacyPayloadToOrder_(payload) {
   return {
     id:           safe_(payload.id),
-    dateTime:     payload.createdAt || payload.date || '',
+    dateTime:     payload.date || payload.createdAt || '', // prefer local date (DD/MM/YYYY) over UTC createdAt
     page:         safe_(payload.page),
     closeBy:      safe_(payload.closeBy),
     status:       safe_(payload.status || 'Pending'),
@@ -696,16 +696,33 @@ function calcGrandTotal_(products, deliveryFee) {
 }
 
 function normalizeDateTime_(value) {
-  if (!value) return Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd HH:mm:ss');
+  if (!value) return Utilities.formatDate(new Date(), TZ, 'dd/MM/yyyy HH:mm');
+  // JS Date object → format in Cambodia TZ
   if (Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value.getTime()))
-    return Utilities.formatDate(value, TZ, 'yyyy-MM-dd HH:mm:ss');
+    return Utilities.formatDate(value, TZ, 'dd/MM/yyyy HH:mm');
   const text = String(value).trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text + ' 00:00:00';
+  // Already DD/MM/YYYY → keep as-is
+  if (/^\d{2}\/\d{2}\/\d{4}/.test(text)) return text;
+  // ISO UTC string (e.g. "2026-05-31T22:20:00.000Z") → convert to Cambodia local
+  if (/^\d{4}-\d{2}-\d{2}T/.test(text)) {
+    try {
+      const d = new Date(text);
+      if (!isNaN(d.getTime())) return Utilities.formatDate(d, TZ, 'dd/MM/yyyy HH:mm');
+    } catch(e) {}
+  }
+  // YYYY-MM-DD only → convert
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    const p = text.split('-');
+    return p[2]+'/'+p[1]+'/'+p[0]+' 00:00';
+  }
   return text;
 }
 
 function formatDateOnly_(value) {
-  const text  = safe_(value);
+  const text = safe_(value);
+  // DD/MM/YYYY ... → return DD/MM/YYYY
+  if (/^\d{2}\/\d{2}\/\d{4}/.test(text)) return text.substring(0, 10);
+  // YYYY-MM-DD ... → return YYYY-MM-DD (for backwards compat, though new data won't use this)
   const match = text.match(/^(\d{4}-\d{2}-\d{2})/);
   return match ? match[1] : text;
 }
