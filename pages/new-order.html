@@ -1347,7 +1347,16 @@
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
                 <div class="fg">
                   <label>📅 ថ្ងៃខែឆ្នាំ</label>
-                  <input id="datePart" type="date" style="width:100%;">
+                  <div style="position:relative;width:100%;">
+                    <div id="datePartDisplay"
+                      onclick="var p=document.getElementById('datePart');p.style.pointerEvents='auto';try{p.showPicker();}catch(e){p.focus();}"
+                      style="display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 10px;border-radius:10px;border:1.5px solid rgba(124,92,255,.18);background:var(--input,rgba(255,255,255,.9));color:var(--text,#18213a);font-size:14px;cursor:pointer;box-sizing:border-box;font-family:inherit;">
+                      <span id="datePartText" style="color:#aaa;">ថ្ងៃ/ខែ/ឆ្នាំ</span>
+                      <span style="color:#94a3b8;font-size:16px">📅</span>
+                    </div>
+                    <input id="datePart" type="date" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;pointer-events:none;z-index:1;"
+                      oninput="(function(v){var t=document.getElementById('datePartText');if(!t)return;if(!v){t.textContent='ថ្ងៃ/ខែ/ឆ្នាំ';t.style.color='#aaa';return;}var p=v.split('-');t.textContent=p[2]+'/'+p[1]+'/'+p[0].slice(2);t.style.color='var(--text,#18213a)';})(this.value)">
+                  </div>
                 </div>
                 <div class="fg">
                   <label>⏰ ម៉ោង</label>
@@ -1932,7 +1941,12 @@ function clearAll(){
   _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){ b.classList.remove('active'); });
   (function(){
     var n=new Date(), pad=function(x){return String(x).padStart(2,'0');};
-    if(_el('datePart')) _el('datePart').value = n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate());
+    var yy=n.getFullYear(), mo=pad(n.getMonth()+1), dd=pad(n.getDate());
+    if(_el('datePart')){
+      _el('datePart').value = yy+'-'+mo+'-'+dd;
+      var t=document.getElementById('datePartText');
+      if(t){ t.textContent=dd+'/'+mo+'/'+String(yy).slice(2); t.style.color='var(--text,#18213a)'; }
+    }
     if(_el('timePart')) _el('timePart').value = pad(n.getHours())+':'+pad(n.getMinutes());
   })();
   calcTotal();
@@ -2026,7 +2040,17 @@ document.addEventListener('DOMContentLoaded', function(){
   els={customer:_el('customer'),phone:_el('phone'),datePart:_el('datePart'),timePart:_el('timePart'),province:_el('province'),addressDetail:_el('addressDetail'),deliveryName:_el('deliveryName'),deliveryFee:_el('deliveryFee'),payment:_el('payment'),paymentOptions:_el('paymentOptions'),note:_el('note'),page:_el('page'),closeBy:_el('closeBy'),status:_el('status')};
 
   /* Set current date & time */
-  (function(){ var n=new Date(),pad=function(x){return String(x).padStart(2,'0');}; if(_el('datePart')) _el('datePart').value=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate()); if(_el('timePart')) _el('timePart').value=pad(n.getHours())+':'+pad(n.getMinutes()); })();
+  (function(){
+    var n=new Date(), pad=function(x){return String(x).padStart(2,'0');};
+    var yy=n.getFullYear(), mo=pad(n.getMonth()+1), dd=pad(n.getDate());
+    if(_el('datePart')){
+      _el('datePart').value = yy+'-'+mo+'-'+dd;
+      // Update custom display to DD/MM/YY
+      var t = document.getElementById('datePartText');
+      if(t){ t.textContent = dd+'/'+mo+'/'+String(yy).slice(2); t.style.color='var(--text,#18213a)'; }
+    }
+    if(_el('timePart')) _el('timePart').value=pad(n.getHours())+':'+pad(n.getMinutes());
+  })();
 
   /* Payment buttons */
   _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(btn){
