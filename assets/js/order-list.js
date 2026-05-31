@@ -789,11 +789,45 @@ function shareImg(){
 var _drawerOrderId = null;
 var _editMode = false;
 
+// Snapshot for change-detection (Cancel without confirm if nothing changed)
+var _drSnapshot = null;
+function _drTakeSnapshot(){
+  var snap = {};
+  ['drCustomer','drPhone','drAddress','drProvince','drDate','drDelivery',
+   'drDeliveryFee','drPayment','drPage','drCloseBy','drPriority','drStatus','drNote']
+  .forEach(function(id){ var el=$id(id); if(el) snap[id]=el.value; });
+  var prods=[];
+  document.querySelectorAll('#drProdList .dr-prod-row').forEach(function(r){
+    var n=(r.querySelector('.dr-prod-name')||{}).value||'';
+    var q=(r.querySelector('.dr-prod-qty')||{}).value||'';
+    var p=(r.querySelector('.dr-prod-price')||{}).value||'';
+    prods.push(n+'|'+q+'|'+p);
+  });
+  snap['__prods__']=prods.join(';;');
+  _drSnapshot=snap;
+}
+function _drHasChanges(){
+  if(!_drSnapshot) return false;
+  var changed=false;
+  ['drCustomer','drPhone','drAddress','drProvince','drDate','drDelivery',
+   'drDeliveryFee','drPayment','drPage','drCloseBy','drPriority','drStatus','drNote']
+  .forEach(function(id){ var el=$id(id); if(el && _drSnapshot[id]!==undefined && el.value!==_drSnapshot[id]) changed=true; });
+  var prods=[];
+  document.querySelectorAll('#drProdList .dr-prod-row').forEach(function(r){
+    var n=(r.querySelector('.dr-prod-name')||{}).value||'';
+    var q=(r.querySelector('.dr-prod-qty')||{}).value||'';
+    var p=(r.querySelector('.dr-prod-price')||{}).value||'';
+    prods.push(n+'|'+q+'|'+p);
+  });
+  if(prods.join(';;')!==_drSnapshot['__prods__']) changed=true;
+  return changed;
+}
+
 function olOpenDrawer(id){
   var o = _orders.find(function(x){ return String(x.id)===String(id); });
   if(!o) return;
   _drawerOrderId = String(id);
-  _editMode = false;
+  _editMode = true; // Always open directly in edit mode
 
   var drawer  = $id('olDrawer');
   var overlay = $id('olOverlay');
@@ -802,17 +836,21 @@ function olOpenDrawer(id){
 
   if(drawer)  { drawer.style.display  = 'flex'; }
   if(overlay) { overlay.style.display = 'block'; }
-  if(foot)    { foot.style.display    = 'flex'; }  // always show footer
-  if(editBtn) { editBtn.textContent   = '✏️ Edit'; }
-  // Hide save/cancel in view mode
+  if(foot)    { foot.style.display    = 'flex'; }
+  if(editBtn) { editBtn.style.display = 'none'; } // hide Edit toggle btn
+
+  // Show Save + Cancel immediately
   var saveBtn   = $id('olDrSaveBtn');
   var cancelBtn = $id('olDrCancelBtn');
-  if(saveBtn)   saveBtn.style.display   = 'none';
-  if(cancelBtn) cancelBtn.style.display = 'none';
+  if(saveBtn)   saveBtn.style.display   = 'flex';
+  if(cancelBtn) cancelBtn.style.display = 'flex';
 
   $id('olDrTitle').textContent = o.customer || 'Order Detail';
-  renderDrawerView(o);
+  renderDrawerEdit(o);
   document.body.style.overflow = 'hidden';
+
+  // Take snapshot AFTER render so change-detection baseline is correct
+  setTimeout(_drTakeSnapshot, 80);
 }
 
 function olCloseDrawer(){
@@ -840,18 +878,14 @@ function olToggleEdit(){
   if(cancelBtn) cancelBtn.style.display = _editMode ? 'flex' : 'none';
 }
 
-function olCancelEdit(){
-  _editMode = false;
-  var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
-  if(o) renderDrawerView(o);
-  var saveBtn   = $id('olDrSaveBtn');
-  var cancelBtn = $id('olDrCancelBtn');
-  var editBtn   = $id('olDrEditBtn');
-  var foot      = $id('olDrFoot');
-  if(saveBtn)   saveBtn.style.display   = 'none';
-  if(cancelBtn) cancelBtn.style.display = 'none';
-  if(editBtn)   editBtn.textContent     = '✏️ Edit';
-  if(foot)      foot.style.display      = 'flex'; // always keep footer visible
+async function olCancelEdit(){
+  // If nothing changed → close immediately, no dialog
+  if(!_drHasChanges()){ olCloseDrawer(); return; }
+  // Has unsaved changes → ask for confirmation
+  var ok = window.macUI
+    ? await macUI.confirm('មានការកែប្រែដែលមិនទាន់ Save។\nតើអ្នកចង់បោះបង់ដែរឬទេ?','បោះបង់ការកែប្រែ',false)
+    : window.confirm('មានការកែប្រែដែលមិនទាន់ Save។\nតើអ្នកចង់បោះបង់ដែរឬទេ?');
+  if(ok) olCloseDrawer();
 }
 
 function _olShowToast(msg, color){
@@ -871,10 +905,16 @@ function _olShowToast(msg, color){
   setTimeout(function(){ t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 300); }, 2500);
 }
 
-function olSaveEdit(){
+async function olSaveEdit(){
   // Guard: must have an open order
   var o = _orders.find(function(x){ return String(x.id) === String(_drawerOrderId); });
   if(!o){ alert('⚠️ Order រកមិនឃើញ'); return; }
+
+  // Confirm before saving
+  var ok = window.macUI
+    ? await macUI.confirm('តើអ្នកពិតជាចង់រក្សាទុកការផ្លាស់ប្ដូរដែរឬទេ?','រក្សាទុក',false)
+    : window.confirm('តើអ្នកពិតជាចង់រក្សាទុកការផ្លាស់ប្ដូរដែរឬទេ?');
+  if(!ok) return;
 
   try {
     // ── 1. Read edited values from form ──
@@ -934,19 +974,8 @@ function olSaveEdit(){
     // ── 3. Persist to localStorage ──
     try{ localStorage.setItem('cambo_search_edit_orders_v3', JSON.stringify(_orders)); }catch(e){}
 
-    // ── 4. Switch UI back to view mode (footer stays visible) ──
-    _editMode = false;
-    var foot      = document.getElementById('olDrFoot');
-    var saveBtn   = document.getElementById('olDrSaveBtn');
-    var cancelBtn = document.getElementById('olDrCancelBtn');
-    var editBtn   = document.getElementById('olDrEditBtn');
-    var titleEl   = document.getElementById('olDrTitle');
-    if(saveBtn)   saveBtn.style.display   = 'none';
-    if(cancelBtn) cancelBtn.style.display = 'none';
-    if(editBtn)   editBtn.textContent     = '✏️ Edit';
-    if(foot)      foot.style.display      = 'flex';  // KEEP footer visible
-    if(titleEl)   titleEl.textContent     = o.customer || 'Order Detail';
-    renderDrawerView(o);
+    // ── 4. Close drawer + refresh table ──
+    olCloseDrawer();
     render(); // refresh table row
 
     // ── 5. Toast: saving ──
