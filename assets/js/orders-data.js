@@ -1,8 +1,6 @@
 ﻿
 (function(){
-  const WEB_APP_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
-    'https://script.google.com/macros/s/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/exec';
-  const STORAGE_KEY = 'cambo_search_edit_orders_v3';
+  const DIRECT_URL = 'https://script.google.com/macros/s/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/exec';
   function normalizeLooseText(value){ return String(value ?? '').replace(/\s+/g,' ').trim(); }
   function fixPhone(value){
     var ph = normalizeLooseText(value);
@@ -27,10 +25,17 @@
   function toYMD(value){
     if (!value) return '';
     const text = String(value).trim();
-    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
-    const parsed = new Date(text);
-    if (Number.isNaN(parsed.getTime())) return '';
-    return `${parsed.getFullYear()}-${String(parsed.getMonth()+1).padStart(2,'0')}-${String(parsed.getDate()).padStart(2,'0')}`;
+    // YYYY-MM-DD already correct
+    if (/^\d{4}-\d{2}-\d{2}/.test(text)) return text.slice(0,10);
+    // DD/MM/YYYY (Cambodia format from Sheet)
+    const ddmm = text.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if (ddmm) return `${ddmm[3]}-${ddmm[2]}-${ddmm[1]}`;
+    // ISO with Z — parse via Date() to get UTC→local
+    if (/^\d{4}-\d{2}-\d{2}T/.test(text)) {
+      const d = new Date(text);
+      if (!isNaN(d.getTime())) return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    return '';
   }
   function sameLooseText(left,right){ return compactCompareText(left)===compactCompareText(right); }
   function aggregateServerOrders(rows){
@@ -101,24 +106,26 @@
   }
   async function fetchOrders(limit=5000){
     try{
-      const url = new URL(WEB_APP_URL); url.searchParams.set('action','list'); url.searchParams.set('limit', String(limit)); url.searchParams.set('_', Date.now());
-      const res = await fetch(url.toString(), {method:'GET'});
-      const data = await res.json();
+      let data;
+      if (window.CamboAPI) {
+        // Use CamboAPI helper — handles Vercel proxy vs direct URL automatically
+        data = await window.CamboAPI.get({action:'list', limit:String(limit)});
+      } else {
+        const url = DIRECT_URL + '?action=list&limit=' + limit + '&_=' + Date.now();
+        const res = await fetch(url, {method:'GET'});
+        data = await res.json();
+      }
       let rows = [];
       if (Array.isArray(data?.orders)) rows = data.orders;
       else if (Array.isArray(data?.data?.orders)) rows = data.data.orders;
       else if (Array.isArray(data?.rows)) rows = data.rows;
       else if (Array.isArray(data?.data)) rows = data.data;
       const aggregated = aggregateServerOrders(rows).map(normalizeOrder);
-      if (aggregated.length) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(aggregated));
-        return aggregated;
-      }
-    }catch(err){ console.warn('fetchOrders fallback to local', err); }
-    try{
-      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      return Array.isArray(raw) ? raw.map(normalizeOrder) : [];
-    }catch{ return []; }
+      return aggregated;
+    }catch(err){
+      console.warn('fetchOrders error', err);
+      return [];
+    }
   }
   function calcSubtotal(line){ return (Number(line.qty||0)*Number(line.price||0))-Number(line.discount||0); }
   function calcOrderTotal(order){ return (order.products||[]).reduce((sum, line)=> sum + calcSubtotal(line), 0) + Number(order.deliveryFee || 0); }
