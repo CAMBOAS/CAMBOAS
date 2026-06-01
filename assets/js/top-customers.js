@@ -5,29 +5,41 @@
 (function(){
 'use strict';
 
-var SCRIPT_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
-  'https://script.google.com/macros/s/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/exec';
-var LS_KEY     = 'cambo_search_edit_orders_v3';
+var DIRECT_URL = 'https://script.google.com/macros/s/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/exec';
 var currentPeriod = 'monthly';
 var _cachedOrders = null;
 
-/* ── Fetch orders (same as dashboard-live.js) ── */
+/* ── Parse DD/MM/YYYY or YYYY-MM-DD correctly ── */
+function parseOrderDate(value) {
+  if (!value) return null;
+  const s = String(value).trim();
+  const ddmm = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (ddmm) return new Date(+ddmm[3], +ddmm[2]-1, +ddmm[1]);
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s.slice(0,10)+'T00:00:00');
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
+/* ── Fetch orders ── */
 async function fetchOrders() {
   if (_cachedOrders) return _cachedOrders;
   try {
-    const res  = await fetch(`${SCRIPT_URL}?action=list&limit=1000&_=${Date.now()}`);
-    const data = await res.json();
-    const rows = Array.isArray(data?.orders)      ? data.orders
+    let data;
+    if (window.CamboAPI) {
+      data = await window.CamboAPI.get({action:'list', limit:'1000'});
+    } else {
+      const res = await fetch(DIRECT_URL + '?action=list&limit=1000&_=' + Date.now());
+      data = await res.json();
+    }
+    const rows = Array.isArray(data?.orders)       ? data.orders
                : Array.isArray(data?.data?.orders) ? data.data.orders
                : Array.isArray(data?.rows)         ? data.rows
                : Array.isArray(data?.data)         ? data.data
-               : JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+               : [];
     _cachedOrders = rows;
     return rows;
   } catch {
-    const rows = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
-    _cachedOrders = rows;
-    return rows;
+    return [];
   }
 }
 
@@ -56,9 +68,8 @@ function getRange(period) {
 }
 
 function inRange(dateStr, range) {
-  const raw = String(dateStr||'').slice(0,10);
-  const d   = new Date(raw + 'T00:00:00');
-  if (isNaN(d)) return true;
+  const d = parseOrderDate(dateStr);
+  if (!d) return false;
   const t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
   return t >= range.start && t <= range.end;
 }
