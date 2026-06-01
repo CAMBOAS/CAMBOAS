@@ -1,20 +1,38 @@
-﻿const DASHBOARD_WEB_APP_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
-  'https://script.google.com/macros/s/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/exec';
-let revenueChart;
+﻿let revenueChart;
 let _chartPeriod = 'monthly';
 let _dashRows = [];
 
+/* Parse any date format → JS Date (local midnight) */
+function parseOrderDate(value) {
+  if (!value) return null;
+  const s = String(value).trim();
+  // DD/MM/YYYY (Cambodia Sheet format)
+  const ddmm = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (ddmm) return new Date(+ddmm[3], +ddmm[2]-1, +ddmm[1]);
+  // YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s.slice(0,10)+'T00:00:00');
+  // ISO with Z — parse as-is (will give local time via Date())
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
 async function fetchDashboardOrders() {
   try {
-    const res = await fetch(`${DASHBOARD_WEB_APP_URL}?action=list&limit=1000&_=${Date.now()}`);
-    const data = await res.json();
-    return Array.isArray(data?.orders)      ? data.orders
+    let data;
+    if (window.CamboAPI) {
+      data = await window.CamboAPI.get({action:'list', limit:'1000'});
+    } else {
+      const DIRECT = 'https://script.google.com/macros/s/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/exec';
+      const res = await fetch(DIRECT + '?action=list&limit=1000&_=' + Date.now());
+      data = await res.json();
+    }
+    return Array.isArray(data?.orders)       ? data.orders
          : Array.isArray(data?.data?.orders) ? data.data.orders
          : Array.isArray(data?.rows)         ? data.rows
          : Array.isArray(data?.data)         ? data.data
-         : JSON.parse(localStorage.getItem('cambo_search_edit_orders_v3') || '[]');
+         : [];
   } catch {
-    return JSON.parse(localStorage.getItem('cambo_search_edit_orders_v3') || '[]');
+    return [];
   }
 }
 
@@ -39,8 +57,8 @@ function updateStats(rows) {
   // Today stats
   const today = new Date(); today.setHours(0,0,0,0);
   const todayRows = rows.filter(o => {
-    const d = new Date(String(o.date||'').slice(0,10));
-    return !isNaN(d) && d >= today;
+    const d = parseOrderDate(o.date);
+    return d && d >= today;
   });
   const todayRev = document.getElementById('todayRevenue');
   const todayOrd = document.getElementById('todayOrders');
@@ -70,8 +88,8 @@ function buildChartData(rows, period) {
     }
     const totals = Array(8).fill(0);
     rows.forEach(o => {
-      const d = new Date(String(o.date||'').slice(0,10));
-      if (isNaN(d)) return;
+      const d = parseOrderDate(o.date);
+      if (!d) return;
       const t = d.getTime();
       weeks.forEach((w, i) => { if (t >= w.start && t <= w.end) totals[i] += orderTotal(o); });
     });
@@ -86,8 +104,8 @@ function buildChartData(rows, period) {
       labels.push((d.getMonth()+1) + '/' + d.getDate());
     }
     rows.forEach(o => {
-      const d = new Date(String(o.date||'').slice(0,10));
-      if (isNaN(d)) return;
+      const d = parseOrderDate(o.date);
+      if (!d) return;
       const diff = Math.floor((now - d) / 86400000);
       if (diff >= 0 && diff < 30) totals[29 - diff] += orderTotal(o);
     });
@@ -99,8 +117,8 @@ function buildChartData(rows, period) {
   const yr = now.getFullYear();
   const totals = Array(12).fill(0);
   rows.forEach(o => {
-    const d = new Date(String(o.date||'').slice(0,10));
-    if (isNaN(d) || d.getFullYear() !== yr) return;
+    const d = parseOrderDate(o.date);
+    if (!d || d.getFullYear() !== yr) return;
     totals[d.getMonth()] += orderTotal(o);
   });
   return { labels: monthNames, totals };
