@@ -1050,7 +1050,7 @@ function renderDrawerEdit(o){
     var comboInpS = inputStyle+';flex:1;cursor:pointer';
     return '<div class="dr-row" style="'+rowWrap+'">'
       +'<span class="dr-lbl" style="'+labelSt+'">'+label+'</span>'
-      +'<div style="flex:1;position:relative" class="sc-dr-wrap" id="'+wrapId+'">'
+      +'<div style="flex:1;min-width:0;width:100%;position:relative" class="sc-dr-wrap" id="'+wrapId+'">'
         +'<input class="combo-input" type="text" value="'+esc(val||'')+'" placeholder="'+placeholder+'" style="'+comboInpS+'" autocomplete="off">'
         +'<input type="hidden" id="'+hidId+'" value="'+esc(val||'')+'">'
       +'</div>'
