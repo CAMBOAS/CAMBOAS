@@ -159,6 +159,57 @@
     .sp-head { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px; }
     .sp-head .sp-title { margin:0; }
 
+    /* ── Actions button ── */
+    .sk-act-btn {
+      display:flex;align-items:center;gap:6px;
+      height:34px;padding:0 12px;border-radius:10px;border:none;
+      background:rgba(16,185,129,.15);color:#34d399;
+      font-size:12px;font-weight:800;cursor:pointer;
+      font-family:inherit;white-space:nowrap;flex-shrink:0;
+      border:1px solid rgba(16,185,129,.3);
+      transition:background .15s;touch-action:manipulation;
+    }
+    .sk-act-btn:active { background:rgba(16,185,129,.28); }
+    [data-theme="light"] .sk-act-btn { background:rgba(16,185,129,.1);color:#059669;border-color:rgba(16,185,129,.25); }
+
+    /* ── Actions popup ── */
+    .sk-act-overlay { display:none;position:fixed;inset:0;z-index:9990; }
+    .sk-act-overlay.open { display:block; }
+    .sk-act-pop {
+      position:fixed;z-index:9999;
+      background:#1e1b3a;border:1px solid rgba(16,185,129,.3);
+      border-radius:16px;padding:10px;width:260px;
+      box-shadow:0 16px 48px rgba(0,0,0,.6);display:none;
+    }
+    .sk-act-pop.open { display:block; }
+    [data-theme="light"] .sk-act-pop { background:#fff;border-color:rgba(16,185,129,.25);box-shadow:0 16px 48px rgba(15,23,42,.18); }
+    @media(max-width:640px){
+      .sk-act-overlay.open { background:rgba(0,0,0,.5); }
+      .sk-act-pop {
+        position:fixed!important;bottom:0!important;top:auto!important;
+        left:0!important;right:0!important;width:100%!important;
+        border-radius:22px 22px 0 0!important;border-bottom:none!important;
+        padding:8px 16px 28px!important;
+        transform:translateY(100%);transition:transform .32s cubic-bezier(.32,.72,0,1);
+        display:block!important;pointer-events:none;
+      }
+      .sk-act-pop.open { transform:translateY(0)!important;pointer-events:all; }
+    }
+    .sk-act-item {
+      display:flex;align-items:center;gap:10px;
+      width:100%;padding:11px 12px;border-radius:10px;border:none;
+      background:transparent;color:var(--text);
+      font-size:13px;font-weight:700;font-family:inherit;
+      cursor:pointer;text-align:left;transition:background .12s;
+      touch-action:manipulation;
+    }
+    .sk-act-item:hover { background:rgba(255,255,255,.07); }
+    .sk-act-item:active { background:rgba(255,255,255,.12); }
+    [data-theme="light"] .sk-act-item:hover { background:rgba(0,0,0,.05); }
+    .sk-act-icon { font-size:18px;flex-shrink:0; }
+    .sk-act-label b { display:block;font-size:13px;font-weight:800; }
+    .sk-act-label small { font-size:10px;font-weight:500;color:var(--muted); }
+
     /* ── Date filter button ── */
     .sk-date-btn {
       display:flex;align-items:center;gap:6px;
@@ -270,12 +321,17 @@
       </div>
       <div class="slayout">
         <article class="glass-card sp">
-          <!-- Header row: title + date button -->
+          <!-- Header row: title + buttons -->
           <div class="sp-head">
             <h3 class="sp-title">Stock Inventory</h3>
-            <button class="sk-date-btn" id="skDateBtn" onclick="skTogglePop(event)">
-              📅 <span id="skDateLabel">All Time</span> ▾
-            </button>
+            <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+              <button class="sk-date-btn" id="skDateBtn" onclick="skTogglePop(event)">
+                📅 <span id="skDateLabel">All Time</span> ▾
+              </button>
+              <button class="sk-act-btn" id="skActBtn" onclick="skToggleAct(event)">
+                ⚡ Actions ▾
+              </button>
+            </div>
           </div>
 
           <div class="tools">
@@ -1105,12 +1161,215 @@ async function saveAdd(){
   } catch(e){ notify('⚠️ Offline — added locally only',false); }
 }
 
+/* ════════════════════════════════════════
+   ACTIONS POPUP — toggle / open / close
+════════════════════════════════════════ */
+function skOpenAct(){
+  var pop=document.getElementById('skActPop');
+  var ovl=document.getElementById('skActOverlay');
+  var btn=document.getElementById('skActBtn');
+  pop.classList.add('open'); ovl.classList.add('open');
+  if(window.innerWidth>640){
+    var rect=btn.getBoundingClientRect();
+    var popW=260, vw=window.innerWidth;
+    var left=rect.right-popW;
+    if(left<8) left=8;
+    if(left+popW>vw-8) left=vw-popW-8;
+    pop.style.top=(rect.bottom+8)+'px';
+    pop.style.left=left+'px';
+  }
+}
+function skCloseAct(){
+  document.getElementById('skActPop').classList.remove('open');
+  document.getElementById('skActOverlay').classList.remove('open');
+}
+function skToggleAct(e){
+  e.stopPropagation();
+  var pop=document.getElementById('skActPop');
+  if(pop.classList.contains('open')) skCloseAct();
+  else { skClosePop(); skOpenAct(); }
+}
+
+/* ════════════════════════════════════════
+   EXPORT HELPERS
+════════════════════════════════════════ */
+function _reportDate(){
+  var d=new Date();
+  return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear();
+}
+function _getReportList(){
+  var q=(document.getElementById('srch').value||'').toLowerCase();
+  var f=document.getElementById('flt').value;
+  var ORDER={out:0,low:1,ok:2};
+  return S.filter(function(p){ return(!q||p.name.toLowerCase().includes(q))&&(!f||gs(p)===f); })
+          .sort(function(a,b){ return ORDER[gs(a)]-ORDER[gs(b)]; });
+}
+function _buildReportHTML(list, forPrint){
+  var date=_reportDate();
+  var rows=list.map(function(p,i){
+    var bg=i%2===0?'#dce6f1':'#ffffff';
+    return '<tr style="background:'+bg+'">'+
+      '<td style="text-align:center;padding:8px 6px;border:1px solid #b8cce4">'+(i+1)+'</td>'+
+      '<td style="padding:8px 10px;border:1px solid #b8cce4">'+p.name+'</td>'+
+      '<td style="text-align:center;padding:8px 6px;border:1px solid #b8cce4">'+p.cat+'</td>'+
+      '<td style="text-align:center;padding:8px 6px;border:1px solid #b8cce4">'+(p.box||'-')+'</td>'+
+      '<td style="text-align:center;padding:8px 6px;border:1px solid #b8cce4">'+(p.pack||'-')+'</td>'+
+      '<td style="text-align:center;padding:8px 6px;border:1px solid #b8cce4">'+(p.bottles||'-')+'</td>'+
+    '</tr>';
+  }).join('');
+  var printStyle=forPrint?'@media print{body{margin:0}@page{margin:15mm}}':'';
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;600;700;900&display=swap" rel="stylesheet">'+
+    '<style>body{font-family:"Noto Sans Khmer",sans-serif;padding:28px 32px;color:#1a2b5e;background:#fff;margin:0}'+printStyle+'</style>'+
+    '</head><body>'+
+    '<div style="font-size:12px;color:#1a2b5e;margin-bottom:18px">របាយការណ៍ស្តុកថ្ងៃទី: '+date+'</div>'+
+    '<h2 style="text-align:center;font-size:22px;font-weight:900;color:#1a2b5e;margin:0 0 18px;letter-spacing:.04em">តារាងស្តុកទំនិញ</h2>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:13px">'+
+    '<thead><tr style="background:#1a2b5e;color:#fff">'+
+    '<th style="padding:10px 6px;border:1px solid #b8cce4;width:42px">លរ</th>'+
+    '<th style="padding:10px;border:1px solid #b8cce4;text-align:left">ឈ្មោះទំនិញ</th>'+
+    '<th style="padding:10px 6px;border:1px solid #b8cce4">ប្រភេទ</th>'+
+    '<th style="padding:10px 6px;border:1px solid #b8cce4">កេស</th>'+
+    '<th style="padding:10px 6px;border:1px solid #b8cce4">ឈុត</th>'+
+    '<th style="padding:10px 6px;border:1px solid #b8cce4">ដប/ប្រអប់</th>'+
+    '</tr></thead>'+
+    '<tbody>'+rows+'</tbody></table>'+
+    '</body></html>';
+}
+
+/* ── PDF Export ── */
+function exportStockPDF(){
+  skCloseAct();
+  var list=_getReportList();
+  if(!list.length){ notify('⚠️ គ្មានទិន្នន័យ',false); return; }
+  var w=window.open('','_blank','width=900,height=700');
+  if(!w){ notify('⚠️ Pop-up blocked — អនុញ្ញាត pop-up សិន',false); return; }
+  w.document.write(_buildReportHTML(list,true));
+  w.document.close();
+  w.focus();
+  setTimeout(function(){ w.print(); },900);
+}
+
+/* ── IMG Export ── */
+async function exportStockIMG(){
+  skCloseAct();
+  var list=_getReportList();
+  if(!list.length){ notify('⚠️ គ្មានទិន្នន័យ',false); return; }
+  notify('⏳ កំពុង Generate រូបភាព...', true);
+  var date=_reportDate();
+  var rows=list.map(function(p,i){
+    var bg=i%2===0?'#dce6f1':'#ffffff';
+    return '<tr style="background:'+bg+'">'+
+      '<td style="text-align:center;padding:7px 5px;border:1px solid #b8cce4;font-size:12px">'+(i+1)+'</td>'+
+      '<td style="padding:7px 10px;border:1px solid #b8cce4;font-size:12px">'+p.name+'</td>'+
+      '<td style="text-align:center;padding:7px 5px;border:1px solid #b8cce4;font-size:12px">'+p.cat+'</td>'+
+      '<td style="text-align:center;padding:7px 5px;border:1px solid #b8cce4;font-size:12px">'+(p.box||'-')+'</td>'+
+      '<td style="text-align:center;padding:7px 5px;border:1px solid #b8cce4;font-size:12px">'+(p.pack||'-')+'</td>'+
+      '<td style="text-align:center;padding:7px 5px;border:1px solid #b8cce4;font-size:12px">'+(p.bottles||'-')+'</td>'+
+    '</tr>';
+  }).join('');
+  var div=document.createElement('div');
+  div.style.cssText='position:fixed;left:-9999px;top:0;background:#fff;padding:28px 32px;width:720px;'+
+    'font-family:"Noto Sans Khmer",Arial,sans-serif;color:#1a2b5e;z-index:-1';
+  div.innerHTML=
+    '<div style="font-size:11px;margin-bottom:14px">របាយការណ៍ស្តុកថ្ងៃទី: '+date+'</div>'+
+    '<h2 style="text-align:center;font-size:20px;font-weight:900;color:#1a2b5e;margin:0 0 14px">តារាងស្តុកទំនិញ</h2>'+
+    '<table style="width:100%;border-collapse:collapse">'+
+    '<thead><tr style="background:#1a2b5e;color:#fff">'+
+    '<th style="padding:9px 6px;border:1px solid #b8cce4;font-size:12px;width:38px">លរ</th>'+
+    '<th style="padding:9px 10px;border:1px solid #b8cce4;font-size:12px;text-align:left">ឈ្មោះទំនិញ</th>'+
+    '<th style="padding:9px 6px;border:1px solid #b8cce4;font-size:12px">ប្រភេទ</th>'+
+    '<th style="padding:9px 6px;border:1px solid #b8cce4;font-size:12px">កេស</th>'+
+    '<th style="padding:9px 6px;border:1px solid #b8cce4;font-size:12px">ឈុត</th>'+
+    '<th style="padding:9px 6px;border:1px solid #b8cce4;font-size:12px">ដប/ប្រអប់</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table>';
+  document.body.appendChild(div);
+  try {
+    if(!window.html2canvas){
+      await new Promise(function(res,rej){
+        var s=document.createElement('script');
+        s.src='../assets/js/vendor/html2canvas-lite.js';
+        s.onload=res; s.onerror=rej;
+        document.head.appendChild(s);
+      });
+    }
+    var canvas=await html2canvas(div,{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false});
+    var link=document.createElement('a');
+    link.download='stock-report-'+date.replace(/\//g,'-')+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    notify('✅ រូបភាព Download ជោគជ័យ!', true);
+  } catch(err){
+    notify('⚠️ Generate រូបភាពបរាជ័យ — ព្យាយាមម្ដងទៀត', false);
+  } finally {
+    document.body.removeChild(div);
+  }
+}
+
+/* ── TEXT Export ── */
+function exportStockTEXT(){
+  skCloseAct();
+  var list=_getReportList();
+  if(!list.length){ notify('⚠️ គ្មានទិន្នន័យ',false); return; }
+  var date=_reportDate();
+  var SEP='════════════════════════════════';
+  var lines=[
+    '📦 របាយការណ៍ស្តុកទំនិញ — CAMBO MINI',
+    '📅 ថ្ងៃទី: '+date,
+    SEP
+  ];
+  list.forEach(function(p,i){
+    var status=gs(p)==='ok'?'✅':gs(p)==='low'?'⚠️':'❌';
+    lines.push(status+' '+(i+1)+'. '+p.name);
+    lines.push('   ប្រភេទ: '+p.cat+' | កេស: '+(p.box||0)+' | ឈុត: '+(p.pack||0)+' | ដប: '+(p.bottles||0));
+  });
+  lines.push(SEP);
+  var inStock=list.filter(function(p){return gs(p)==='ok';}).length;
+  var low=list.filter(function(p){return gs(p)==='low';}).length;
+  var out=list.filter(function(p){return gs(p)==='out';}).length;
+  lines.push('📊 សរុប: '+list.length+' | ✅ '+inStock+' | ⚠️ '+low+' | ❌ '+out);
+  var text=lines.join('\n');
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){
+      notify('✅ Copy TEXT រួចរាល់! Paste ទៅ Chat បាន', true);
+    }).catch(function(){_fallbackCopy(text);});
+  } else { _fallbackCopy(text); }
+}
+function _fallbackCopy(text){
+  var ta=document.createElement('textarea');
+  ta.value=text; ta.style.cssText='position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); notify('✅ Copy TEXT រួចរាល់!', true); }
+  catch(e){ notify('⚠️ Copy បរាជ័យ — សូម Copy ដោយដៃ', false); }
+  document.body.removeChild(ta);
+}
+
 document.addEventListener('DOMContentLoaded',function(){
   loadImgCache();
   loadStroke();
 });
 </script>
 <script src="../assets/js/sw-register.js?v=158"></script>
+
+<!-- Actions popup + overlay at BODY level -->
+<div class="sk-act-overlay" id="skActOverlay" onclick="skCloseAct()"></div>
+<div class="sk-act-pop" id="skActPop">
+  <div class="sk-bs-handle-bar"></div>
+  <div style="padding:4px 0 2px">
+    <button class="sk-act-item" onclick="exportStockPDF()">
+      <span class="sk-act-icon">📄</span>
+      <div class="sk-act-label"><b>PDF</b><small>Print ជាឯកសារ / Save PDF</small></div>
+    </button>
+    <button class="sk-act-item" onclick="exportStockIMG()">
+      <span class="sk-act-icon">🖼️</span>
+      <div class="sk-act-label"><b>IMG</b><small>Share ទៅ Chat / Save ទុក</small></div>
+    </button>
+    <button class="sk-act-item" onclick="exportStockTEXT()">
+      <span class="sk-act-icon">📋</span>
+      <div class="sk-act-label"><b>TEXT</b><small>Copy Paste ទៅ Chat</small></div>
+    </button>
+  </div>
+</div>
 
 <!-- Date popup + overlay at BODY level (escapes backdrop-filter stacking context) -->
 <div class="sk-date-overlay" id="skDateOverlay" onclick="skClosePop()"></div>
