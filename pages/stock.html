@@ -699,6 +699,7 @@ async function loadStroke(){
                packPerBox:ppb, bottPerPack:bpp,
                img:_imgCache[item.product]||'' };
     });
+    _sCurrent = S.slice(); // backup for "All Time" restore
     saveStock();
     rt();
   } catch(err){
@@ -715,7 +716,7 @@ function rt(){
   var q=document.getElementById('srch').value.toLowerCase();
   var f=document.getElementById('flt').value;
   var ORDER={out:0,low:1,ok:2};
-  var list=S.filter(function(p){ return(!q||p.name.toLowerCase().includes(q))&&(!f||gs(p)===f)&&matchesDateFilter(p); })
+  var list=S.filter(function(p){ return(!q||p.name.toLowerCase().includes(q))&&(!f||gs(p)===f); })
             .sort(function(a,b){ return ORDER[gs(a)]-ORDER[gs(b)]; });
 
   // ── Desktop table ──
@@ -829,7 +830,8 @@ function skSetPreset(p){
   document.getElementById('skDateLabel').textContent=r.label;
   document.querySelectorAll('.sk-preset-btn').forEach(function(b){b.classList.toggle('active',b.dataset.p===p);});
   skClosePop();
-  rt();
+  if(p==='all'){ S=_sCurrent.slice(); rt(); }
+  else loadStockHistory(r.start, r.end);
 }
 function skApplyCustom(){
   var s=document.getElementById('skDs').value;
@@ -839,7 +841,55 @@ function skApplyCustom(){
   document.getElementById('skDateLabel').textContent=(s&&e ? s+' → '+e : s||e);
   document.querySelectorAll('.sk-preset-btn').forEach(function(b){b.classList.remove('active');});
   skClosePop();
-  rt();
+  loadStockHistory(s||e, e||s);
+}
+
+/* ── Load Stock History from Google Sheet ── */
+var _sCurrent = []; // backup of current Stroke data
+async function loadStockHistory(start, end){
+  // Show loading
+  var emptyMsg = '⏳ កំពុងទាញ StockHistory...';
+  document.getElementById('tbody').innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">'+emptyMsg+'</td></tr>';
+  var cardsEl=document.getElementById('stockCards');
+  if(cardsEl) cardsEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)">'+emptyMsg+'</div>';
+
+  try {
+    var url=APPS_SCRIPT_URL+'?action=stock_history';
+    if(start) url+='&start='+start;
+    if(end)   url+='&end='+end;
+    var res=await fetch(url+'&_='+Date.now());
+    var data=await res.json();
+    if(!data.ok) throw new Error(data.message||'Load failed');
+
+    // Map history rows → same format as S
+    var hist=(data.history||[]).map(function(h,i){
+      return {
+        id:i+1, name:h.product||h.name||'',
+        cat:h.type||h.cat||'-',
+        box:Number(h.box)||0,
+        pack:Number(h.pack)||0,
+        bottles:Number(h.bottles)||Number(h.bottle)||0,
+        qty:Number(h.box)||0,
+        date:h.date||'',
+        img:_imgCache[h.product||h.name]||''
+      };
+    });
+
+    // Deduplicate: if multiple rows same product same date, keep latest
+    var seen={};
+    hist=hist.reverse().filter(function(h){
+      var k=h.date+'|'+h.name;
+      if(seen[k]) return false;
+      seen[k]=true; return true;
+    }).reverse();
+
+    S=hist;
+    rt();
+    notify('📅 '+( hist.length ? hist.length+' ផលិតផល — '+start+(end&&end!==start?' → '+end:'') : 'គ្មានទិន្នន័យ'), hist.length>0);
+  } catch(err){
+    document.getElementById('tbody').innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:#fca5a5">❌ StockHistory: '+err.message+'</td></tr>';
+    if(cardsEl) cardsEl.innerHTML='<div style="text-align:center;padding:32px;color:#fca5a5;font-size:13px">❌ '+err.message+'</div>';
+  }
 }
 function matchesDateFilter(p){
   if(_skDate.preset==='all'&&!_skDate.start) return true;
