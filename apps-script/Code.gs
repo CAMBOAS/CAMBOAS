@@ -88,9 +88,10 @@ const HIST_HEADER = [
 function doGet(e) {
   try {
     const action = String((e && e.parameter && e.parameter.action) || 'status').trim();
-    if (action === 'status') return jsonOutput_({ ok:true, status:'running', message:'CAMBO MINI v3.1 is working.' });
-    if (action === 'list')   return jsonOutput_({ ok:true, orders: listOrders_() });
-    if (action === 'stroke') return jsonOutput_({ ok:true, stroke: listStroke_() });
+    if (action === 'status')        return jsonOutput_({ ok:true, status:'running', message:'CAMBO MINI v3.1 is working.' });
+    if (action === 'list')          return jsonOutput_({ ok:true, orders: listOrders_() });
+    if (action === 'stroke')        return jsonOutput_({ ok:true, stroke: listStroke_() });
+    if (action === 'stock_history') return jsonOutput_(listStrokeHistory_(e));
     return jsonOutput_({ ok:false, message:'Unknown action' });
   } catch(err) { return jsonOutput_({ ok:false, message: err.message || String(err) }); }
 }
@@ -507,6 +508,66 @@ function listStroke_() {
       bottles: toNumber_(row[4]), qty: toNumber_(row[5])
     };
   }).filter(function(r) { return !!r.product; });
+}
+
+/**
+ * listStrokeHistory_ — ទាញទិន្នន័យ StockHistory តាម date range
+ * Called by doGet when action=stock_history
+ * Params: start=YYYY-MM-DD, end=YYYY-MM-DD (optional)
+ */
+function listStrokeHistory_(e) {
+  const start = String((e && e.parameter && e.parameter.start) || '').trim();
+  const end   = String((e && e.parameter && e.parameter.end)   || '').trim();
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getSheetByName(STROKE_HISTORY); // 'StockHistory'
+  if (!sh) return { ok:false, message:'StockHistory sheet not found' };
+
+  const lastRow = sh.getLastRow();
+  if (lastRow <= 1) return { ok:true, history:[] };
+
+  // Read all rows (skip header row 1)
+  const data = sh.getRange(2, 1, lastRow - 1, 7).getValues();
+
+  const history = [];
+  data.forEach(function(r) {
+    const rawDate = r[0]; // Column A = DateTime
+    if (!rawDate) return;
+
+    // Parse DateTime → YYYY-MM-DD
+    let ds = '';
+    try {
+      if (rawDate instanceof Date) {
+        ds = Utilities.formatDate(rawDate, TZ, 'yyyy-MM-dd');
+      } else {
+        const str = String(rawDate).trim();
+        if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+          ds = str.slice(0, 10); // "2026-06-01 23:59:41" → "2026-06-01"
+        } else {
+          // "6/1/2026 23:59:41" → parse via Date
+          ds = Utilities.formatDate(new Date(str), TZ, 'yyyy-MM-dd');
+        }
+      }
+    } catch(err) { return; }
+
+    if (!ds) return;
+
+    // Filter by date range
+    if (start && ds < start) return;
+    if (end   && ds > end)   return;
+
+    history.push({
+      date:    ds,
+      product: safe_(r[1]),      // Column B = Product
+      type:    safe_(r[2]),      // Column C = Type
+      box:     toNumber_(r[3]),  // Column D = Box
+      pack:    toNumber_(r[4]),  // Column E = Pack
+      bottles: toNumber_(r[5]),  // Column F = Bottles
+      qty:     toNumber_(r[6])   // Column G = QTY
+    });
+  });
+
+  return { ok:true, history:history };
 }
 
 function ensureStrokeHistorySheet_() {
