@@ -261,6 +261,15 @@ function makeCombo(wrap, dataList, title) {
   window.addEventListener('resize', function(){ if(shown) rePos(); }, {passive:true});
 }
 
+/* ── Expose API for external use (e.g. Order List drawer) ── */
+window.SearchableCombo = {
+  makeCombo : makeCombo,
+  PROVINCES : PROVINCES,
+  PAGES     : PAGES,
+  CLOSEBY   : CLOSEBY,
+  DELIVERY  : DELIVERY
+};
+
 /* ── Init on DOM ready ── */
 document.addEventListener('DOMContentLoaded', function(){
   var pagesWrap = document.getElementById('pagesCombo');

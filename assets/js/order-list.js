@@ -867,20 +867,27 @@ async function olSaveEdit(){
 
     if(custEl)  o.customer     = custEl.value  || o.customer;
     if(phoneEl) o.phone        = phoneEl.value || o.phone;
-    if(provEl)  o.province     = provEl.value  || o.province;
+    // Province — read hidden input (combo) or plain input fallback
+    var _provVal = (document.getElementById('drProvince')||provEl||{}).value;
+    if(_provVal !== undefined) o.province = _provVal || o.province;
     if(addrEl){ var _addr = addrEl.value; o.addressDetail = _addr; o.address = _addr; }
     if(dateEl && dateEl.value){
       var _dp = dateEl.value.split('T');
       var _d  = _dp[0].split('-');
       o.date  = _d[2]+'/'+_d[1]+'/'+_d[0]+' '+(_dp[1]||'00:00');
     }
-    if(delivEl) o.deliveryName = delivEl.value  || o.deliveryName;
+    // Delivery — read hidden input (combo) or plain input fallback
+    var _delivVal = (document.getElementById('drDelivery')||delivEl||{}).value;
+    if(_delivVal !== undefined) o.deliveryName = _delivVal || o.deliveryName;
     if(feeEl)   o.deliveryFee  = Number(feeEl.value||0);
     if(payEl)   o.payment      = payEl.value   || o.payment;
     if(statEl)  o.status       = statEl.value  || o.status;
     if(noteEl)  o.note         = noteEl.value;
-    if(pageEl)  o.page         = pageEl.value  || o.page;
-    if(closeEl) o.closeBy      = closeEl.value || o.closeBy;
+    // Page + CloseBy — read hidden inputs (combo) or plain input fallback
+    var _pageVal    = (document.getElementById('drPage')   ||pageEl ||{}).value;
+    var _closeVal   = (document.getElementById('drCloseBy')||closeEl||{}).value;
+    if(_pageVal  !== undefined) o.page    = _pageVal  || o.page;
+    if(_closeVal !== undefined) o.closeBy = _closeVal || o.closeBy;
     if(priorEl) o.priority     = priorEl.value || o.priority;
 
     // ── 2. Read products ──
@@ -1039,6 +1046,16 @@ function renderDrawerEdit(o){
       +'<input id="'+id+'" type="'+type+'" value="'+esc(val||'')+'" style="'+inputStyle+';flex:1">'
       +'</div>';
   }
+  function rowCombo(wrapId, hidId, val, label, placeholder){
+    var comboInpS = inputStyle+';flex:1;cursor:pointer';
+    return '<div class="dr-row" style="'+rowWrap+'">'
+      +'<span class="dr-lbl" style="'+labelSt+'">'+label+'</span>'
+      +'<div style="flex:1;position:relative" class="sc-dr-wrap" id="'+wrapId+'">'
+        +'<input class="combo-input" type="text" value="'+esc(val||'')+'" placeholder="'+placeholder+'" style="'+comboInpS+'" autocomplete="off">'
+        +'<input type="hidden" id="'+hidId+'" value="'+esc(val||'')+'">'
+      +'</div>'
+    +'</div>';
+  }
   function rowSel(id, val, label, opts){
     return '<div class="dr-row" style="'+rowWrap+'">'
       +'<span class="dr-lbl" style="'+labelSt+'">'+label+'</span>'
@@ -1058,7 +1075,7 @@ function renderDrawerEdit(o){
     +rowInp('drCustomer',   o.customer||'',     'ឈ្មោះ')
     +rowInp('drPhone',      o.phone||'',        'ទូរស័ព្ទ')
     +rowInp('drAddress',    (o.addressDetail||o.address||'')||'','អាសយដ្ឋាន')
-    +rowInp('drProvince',   o.province||'',     'ខេត្ត/ក្រុង')
+    +rowCombo('drProvinceCombo','drProvince', o.province||'', 'ខេត្ត/ក្រុង', 'ខេត្ត...')
     +(function(){
       var dtVal = toDatetimeLocalEdit(o.date);
       var disp  = fmtDtDisplay(dtVal);
@@ -1077,11 +1094,11 @@ function renderDrawerEdit(o){
         +'</div>'
       +'</div>';
     })()
-    +rowInp('drDelivery',   (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:''), 'ដឹកជញ្ជូន')
+    +rowCombo('drDeliveryCombo','drDelivery', (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:''), 'ដឹកជញ្ជូន', 'ដឹកជញ្ជូន...')
     +rowInp('drDeliveryFee',o.deliveryFee||0,   'ថ្លៃដឹក', 'number')
     +rowInp('drPayment',    o.payment||'',      'Payment')
-    +rowInp('drPage',       o.page||o.pages||'','Pages')
-    +rowInp('drCloseBy',    o.closeBy||o.closeby||'','CloseBy')
+    +rowCombo('drPageCombo',   'drPage',    o.page||o.pages||'',       'Pages',    'Pages...')
+    +rowCombo('drCloseByCombo','drCloseBy', o.closeBy||o.closeby||'',  'CloseBy',  'CloseBy...')
     +rowSel('drPriority',   o.priority||'Medium','Priority',['High','Medium','Low'])
     +rowSel('drStatus',     o.status||o.orderStatus||'Pending','Status',['Pending','Delivered','Cancelled'])
     +rowTx ('drNote',       o.note||'',         'Note')
@@ -1122,13 +1139,27 @@ function renderDrawerEdit(o){
     })()
     +'</div>';
 
-  // Re-bind remove buttons after render
+  // Re-bind remove buttons + init combos after render
   setTimeout(function(){
     document.querySelectorAll('.dr-prod-remove').forEach(function(btn){
       btn.addEventListener('click', function(){ btn.closest('.dr-prod-row').remove(); if(window.olRecalcTotal)window.olRecalcTotal(); });
     });
     var feeInp = document.getElementById('drDeliveryFee');
     if(feeInp) feeInp.addEventListener('input', function(){ if(window.olRecalcTotal)window.olRecalcTotal(); });
+
+    // Init searchable combos
+    if(window.SearchableCombo && window.SearchableCombo.makeCombo){
+      var SC = window.SearchableCombo;
+      [
+        {id:'drProvinceCombo', list:SC.PROVINCES, title:'ខេត្ត / ក្រុង'},
+        {id:'drDeliveryCombo', list:SC.DELIVERY,  title:'ដឹកជញ្ជូន'},
+        {id:'drPageCombo',     list:SC.PAGES,     title:'Pages'},
+        {id:'drCloseByCombo',  list:SC.CLOSEBY,   title:'CloseBy'}
+      ].forEach(function(c){
+        var wrap = document.getElementById(c.id);
+        if(wrap) SC.makeCombo(wrap, c.list, c.title);
+      });
+    }
   }, 0);
 }
 
