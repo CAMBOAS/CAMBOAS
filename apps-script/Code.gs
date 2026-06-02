@@ -458,21 +458,36 @@ function strokeUpdate_(originalName, data) {
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) throw new Error('No data in Stroke sheet');
   const names = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat();
+  const normOrig = normalizeForMatch_(safe_(originalName));
+
+  // Pass 1: exact match
   for (let i = 0; i < names.length; i++) {
     if (safe_(names[i]) === safe_(originalName)) {
-      const box = toNumber_(data.box || data.qty);
-      sheet.getRange(i + 2, 1, 1, 6).setValues([[
-        safe_(data.product || originalName),
-        safe_(data.type   || ''),
-        box,
-        toNumber_(data.pack),
-        toNumber_(data.bottles),
-        box   // QTY = BOX
-      ]]);
+      _writeStrokeRow_(sheet, i + 2, originalName, data);
+      return;
+    }
+  }
+  // Pass 2: fuzzy match (same logic as deductStroke_)
+  for (let i = 0; i < names.length; i++) {
+    const normName = normalizeForMatch_(safe_(names[i]));
+    if (stockMatch_(normOrig, normName)) {
+      _writeStrokeRow_(sheet, i + 2, originalName, data);
       return;
     }
   }
   throw new Error('Product not found: ' + originalName);
+}
+
+function _writeStrokeRow_(sheet, rowNum, originalName, data) {
+  const box = toNumber_(data.box != null ? data.box : data.qty);
+  sheet.getRange(rowNum, 1, 1, 6).setValues([[
+    safe_(data.product || originalName),
+    safe_(data.type   || ''),
+    box,
+    toNumber_(data.pack),
+    toNumber_(data.bottles),
+    box   // QTY = BOX
+  ]]);
 }
 
 function strokeAdd_(data) {

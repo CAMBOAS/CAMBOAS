@@ -5,7 +5,7 @@
 (function(){
 'use strict';
 
-var DIRECT_URL = 'https://script.google.com/macros/s/AKfycbyph_bm7AUhicz5TDBTmHZysXO1NcjMCvoAEqiBD-C4hFtGHT_jgafUDSOrgvdsl456lQ/exec';
+var DIRECT_URL = 'https://script.google.com/macros/s/AKfycbyxP7hagbYx1X567BaxIT6T4JYQ-jm7auut3OnNACxdB42e8cbEu8IQOZoEwVeTHI6YUA/exec';
 var currentPeriod = 'monthly';
 var _cachedOrders = null;
 

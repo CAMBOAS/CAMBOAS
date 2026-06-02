@@ -429,7 +429,7 @@
   <script src="../assets/js/layout.js?v=158"></script>
 <script src="../assets/js/dashboard-layout.js?v=158"></script>
 <script>
-const APPS_SCRIPT_URL = (window.CamboAPI && window.CamboAPI.getBase()) || 'https://script.google.com/macros/s/AKfycbyph_bm7AUhicz5TDBTmHZysXO1NcjMCvoAEqiBD-C4hFtGHT_jgafUDSOrgvdsl456lQ/exec';
+const APPS_SCRIPT_URL = (window.CamboAPI && window.CamboAPI.getBase()) || 'https://script.google.com/macros/s/AKfycbyxP7hagbYx1X567BaxIT6T4JYQ-jm7auut3OnNACxdB42e8cbEu8IQOZoEwVeTHI6YUA/exec';
 let S = [];
 let _imgCache = {};
 
@@ -987,7 +987,6 @@ async function saveEdit(){
   if(!_editId) return;
   var p=S.find(function(x){ return x.id===_editId; });
   if(!p) return;
-  // No confirm dialog — save directly on button click
   var origName=p.name;
   p.name       =document.getElementById('eN').value.trim()||p.name;
   p.cat        =document.getElementById('eCat').value.trim()||p.cat;
@@ -995,29 +994,40 @@ async function saveEdit(){
   p.pack       =parseInt(document.getElementById('ePack').value)||0;
   p.bottles    =parseInt(document.getElementById('eBott').value)||0;
   p.qty        =p.box;
-  p.packPerBox =parseInt(document.getElementById('ePackPerBox').value) ||_ePpb;
+  p.packPerBox =parseInt(document.getElementById('ePackPerBox').value)||_ePpb;
   p.bottPerPack=parseInt(document.getElementById('eBottPerPack').value)||_eBpp;
-  p.img=document.getElementById('eImg').value.trim();
-  p.lastUpdated = new Date().toISOString();
+  p.img        =document.getElementById('eImg').value.trim();
+  p.lastUpdated=new Date().toISOString();
   _imgCache[p.name]=p.img; saveImgCache();
   document.getElementById('editOverlay').classList.remove('open');
   _editId=null; _editDirty=false;
-  rt(); saveStock(); updateDateBadges();
+  rt(); saveStock();
+  // Show saving indicator
+  var saveBtn=document.querySelector('.ebtn-save');
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent='⏳ កំពុង Save...'; }
+  notify('⏳ កំពុងរក្សាទុក...', true);
   var ratioText=_eBpp?'1 ឈុត = '+_eBpp+' ដបប្រអប់':'';
   try {
-    var res=await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({action:'stroke_update',originalName:origName,
+    var res=await fetch(APPS_SCRIPT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({
+        action:'stroke_update',
+        originalName:origName,
         data:{product:p.name,type:p.cat,box:p.box,pack:p.pack,bottles:p.bottles,qty:p.qty,
-              packPerBox:p.packPerBox,ratio:ratioText}})});
+              packPerBox:p.packPerBox,ratio:ratioText}
+      })
+    });
     var r=await res.json();
     if(r.ok){
       notify('✅ រក្សាទុករួចរាល់!', true);
-      // Reload fresh data from Sheet to confirm save
       setTimeout(function(){ loadStroke(); }, 800);
     } else {
       notify('⚠️ '+(r.message||'Save failed'), false);
     }
-  } catch(e){ notify('⚠️ Network error — saved locally',false); }
+  } catch(e){
+    notify('⚠️ Network error — saved locally only', false);
+  }
 }
 
 async function deleteProduct(){
@@ -1090,12 +1100,17 @@ async function saveAdd(){
           packPerBox:aPpb,bottPerPack:aBpp,img:d.img,lastUpdated:new Date().toISOString()});
   if(d.img){ _imgCache[d.product]=d.img; saveImgCache(); }
   document.getElementById('addOverlay').classList.remove('open');
-  rt(); saveStock(); updateDateBadges();
+  rt(); saveStock();
+  notify('⏳ កំពុងបន្ថែម...', true);
   try {
-    var res=await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({action:'stroke_add',data:d})});
+    var res=await fetch(APPS_SCRIPT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'stroke_add',data:d})
+    });
     var r=await res.json();
     notify(r.ok?'✅ បន្ថែមរួចរាល់!':'⚠️ '+(r.message||'Add failed'), r.ok);
+    if(r.ok) setTimeout(function(){ loadStroke(); }, 800);
   } catch(e){ notify('⚠️ Offline — added locally only',false); }
 }
 
