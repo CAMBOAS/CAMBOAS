@@ -4,7 +4,7 @@
    Network-first strategy for data (localStorage)
    ═══════════════════════════════════════════════ */
 
-const CACHE_NAME = 'cambo-mini-v164';
+const CACHE_NAME = 'cambo-mini-v165';
 
 const STATIC_ASSETS = [
   /* Pages */
@@ -108,7 +108,21 @@ self.addEventListener('fetch', function(e) {
     return;
   }
 
-  // CSS/JS/Images → Cache first, network fallback (fast!)
+  // JS/CSS → Network first, cache fallback (always get latest on all devices!)
+  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+    e.respondWith(
+      fetch(req).then(function(res) {
+        var clone = res.clone();
+        caches.open(CACHE_NAME).then(function(cache) { cache.put(req, clone); });
+        return res;
+      }).catch(function() {
+        return caches.match(req);
+      })
+    );
+    return;
+  }
+
+  // Images/Fonts → Cache first, network fallback (fast! rarely change)
   e.respondWith(
     caches.match(req).then(function(cached) {
       if (cached) return cached;
