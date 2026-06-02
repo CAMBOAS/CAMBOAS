@@ -174,47 +174,84 @@
     .sk-date-btn:active { background:rgba(139,92,246,.25); }
     [data-theme="light"] .sk-date-btn { background:rgba(139,92,246,.09);color:#7c3aed;border-color:rgba(139,92,246,.2); }
 
-    /* ── Date popup dropdown ── */
+    /* ── Date popup — Desktop dropdown ── */
+    .sk-date-overlay {
+      display:none;position:fixed;inset:0;z-index:9990;
+    }
+    .sk-date-overlay.open { display:block; }
     .sk-date-pop {
       position:fixed;z-index:9999;
       background:#1e1b3a;
       border:1px solid rgba(139,92,246,.3);
-      border-radius:16px;padding:14px;width:300px;
-      box-shadow:0 16px 48px rgba(0,0,0,.55);
+      border-radius:16px;padding:16px;width:300px;
+      box-shadow:0 16px 48px rgba(0,0,0,.6);
       display:none;
     }
     .sk-date-pop.open { display:block; }
     [data-theme="light"] .sk-date-pop { background:#fff;border-color:rgba(99,102,241,.2);box-shadow:0 16px 48px rgba(15,23,42,.18); }
-    .sk-preset-grid {
-      display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;
+
+    /* ── Mobile: Bottom Sheet override ── */
+    @media(max-width:640px){
+      .sk-date-overlay.open {
+        background:rgba(0,0,0,.5);
+      }
+      .sk-date-pop {
+        position:fixed !important;
+        bottom:0 !important;top:auto !important;
+        left:0 !important;right:0 !important;
+        width:100% !important;
+        border-radius:22px 22px 0 0 !important;
+        border-bottom:none !important;
+        padding:8px 18px 28px !important;
+        transform:translateY(100%);
+        transition:transform .32s cubic-bezier(.32,.72,0,1);
+        display:block !important;
+        pointer-events:none;
+      }
+      .sk-date-pop.open {
+        transform:translateY(0) !important;
+        pointer-events:all;
+      }
+      .sk-bs-handle-bar {
+        width:38px;height:4px;border-radius:2px;
+        background:rgba(148,163,200,.25);
+        margin:0 auto 14px;
+      }
     }
+    @media(min-width:641px){
+      .sk-bs-handle-bar { display:none; }
+    }
+
+    .sk-preset-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px; }
     .sk-preset-btn {
-      padding:9px 8px;border-radius:10px;border:none;
+      padding:10px 8px;border-radius:10px;border:none;
       background:rgba(255,255,255,.06);color:#cbd5e1;
-      font-size:12px;font-weight:700;cursor:pointer;
+      font-size:13px;font-weight:700;cursor:pointer;
       font-family:inherit;text-align:center;
       transition:background .12s;touch-action:manipulation;
     }
     .sk-preset-btn:active,.sk-preset-btn.active {
-      background:rgba(139,92,246,.25);color:#c4b5fd;
+      background:rgba(139,92,246,.28);color:#c4b5fd;
+      border:1px solid rgba(139,92,246,.4);
     }
     [data-theme="light"] .sk-preset-btn { background:#f1f5f9;color:#334155; }
-    [data-theme="light"] .sk-preset-btn:active,
-    [data-theme="light"] .sk-preset-btn.active { background:rgba(139,92,246,.12);color:#7c3aed; }
-    .sk-pop-label { font-size:10px;font-weight:700;color:#64748b;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px; }
-    .sk-pop-row { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px; }
+    [data-theme="light"] .sk-preset-btn.active { background:rgba(139,92,246,.12);color:#7c3aed;border-color:rgba(139,92,246,.3); }
+    .sk-pop-divider { border:none;border-top:1px solid rgba(148,163,200,.12);margin:12px 0 10px; }
+    .sk-pop-label { font-size:10px;font-weight:800;color:#64748b;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px; }
+    .sk-pop-row { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px; }
+    .sk-pop-field label { display:block;font-size:10px;font-weight:700;color:#64748b;margin-bottom:4px; }
     .sk-pop-inp {
-      width:100%;height:34px;padding:0 8px;border-radius:9px;
+      width:100%;height:36px;padding:0 10px;border-radius:9px;
       background:rgba(255,255,255,.06);color:#e2e8f0;
-      border:1px solid rgba(148,163,200,.2);font-size:12px;
+      border:1px solid rgba(148,163,200,.2);font-size:13px;
       font-family:inherit;box-sizing:border-box;
     }
     [data-theme="light"] .sk-pop-inp { background:#f8fafc;color:#0f172a;border-color:rgba(148,163,184,.3); }
     .sk-pop-ok {
-      width:100%;height:34px;border-radius:9px;border:none;
+      width:100%;height:40px;border-radius:11px;border:none;
       background:linear-gradient(135deg,#8b5cf6,#06b6d4);
-      color:#fff;font-size:13px;font-weight:800;
-      cursor:pointer;font-family:inherit;
+      color:#fff;font-size:14px;font-weight:800;
+      cursor:pointer;font-family:inherit;touch-action:manipulation;
     }
   </style>
 </head>
@@ -243,8 +280,12 @@
             </button>
           </div>
 
-          <!-- Date popup -->
+          <!-- Date popup overlay (closes on tap outside) -->
+          <div class="sk-date-overlay" id="skDateOverlay" onclick="skClosePop()"></div>
+
+          <!-- Date popup / bottom sheet -->
           <div class="sk-date-pop" id="skDatePop">
+            <div class="sk-bs-handle-bar"></div>
             <div class="sk-preset-grid">
               <button class="sk-preset-btn" data-p="today"     onclick="skSetPreset('today')">ថ្ងៃនេះ</button>
               <button class="sk-preset-btn" data-p="yesterday" onclick="skSetPreset('yesterday')">ម្សិលមិញ</button>
@@ -253,14 +294,15 @@
               <button class="sk-preset-btn" data-p="lastMonth" onclick="skSetPreset('lastMonth')">Last Month</button>
               <button class="sk-preset-btn active" data-p="all" onclick="skSetPreset('all')">All Time</button>
             </div>
-            <div class="sk-pop-label">ជ្រើសរើស Custom Range</div>
+            <hr class="sk-pop-divider">
+            <div class="sk-pop-label">Custom Range</div>
             <div class="sk-pop-row">
-              <div>
-                <div class="sk-pop-label">ពី</div>
+              <div class="sk-pop-field">
+                <label>ពី</label>
                 <input class="sk-pop-inp" type="date" id="skDs">
               </div>
-              <div>
-                <div class="sk-pop-label">ដល់</div>
+              <div class="sk-pop-field">
+                <label>ដល់</label>
                 <input class="sk-pop-inp" type="date" id="skDe">
               </div>
             </div>
@@ -783,30 +825,39 @@ function _skGetPreset(p){
   if(p==='lastMonth'){var lm=new Date(now.getFullYear(),now.getMonth()-1,1),lme=new Date(now.getFullYear(),now.getMonth(),0);return {start:_ymd(lm),end:_ymd(lme),label:'Last Month'};}
   return {start:'',end:'',label:'All Time'};
 }
-function skTogglePop(e){
-  e.stopPropagation();
+function skOpenPop(){
   var pop=document.getElementById('skDatePop');
+  var ovl=document.getElementById('skDateOverlay');
   var btn=document.getElementById('skDateBtn');
-  var open=pop.classList.contains('open');
-  pop.classList.toggle('open',!open);
-  if(!open){
+  pop.classList.add('open');
+  ovl.classList.add('open');
+  // Desktop only: position dropdown below button
+  if(window.innerWidth>640){
     var rect=btn.getBoundingClientRect();
     var popW=300, vw=window.innerWidth;
-    // Align RIGHT edge of popup with RIGHT edge of button
     var left=rect.right-popW;
     if(left<8) left=8;
     if(left+popW>vw-8) left=vw-popW-8;
     pop.style.top=(rect.bottom+8)+'px';
     pop.style.left=left+'px';
-    pop.style.right='auto';
   }
+}
+function skClosePop(){
+  document.getElementById('skDatePop').classList.remove('open');
+  document.getElementById('skDateOverlay').classList.remove('open');
+}
+function skTogglePop(e){
+  e.stopPropagation();
+  var pop=document.getElementById('skDatePop');
+  if(pop.classList.contains('open')) skClosePop();
+  else skOpenPop();
 }
 function skSetPreset(p){
   var r=_skGetPreset(p);
   _skDate={preset:p,start:r.start,end:r.end,label:r.label};
   document.getElementById('skDateLabel').textContent=r.label;
   document.querySelectorAll('.sk-preset-btn').forEach(function(b){b.classList.toggle('active',b.dataset.p===p);});
-  document.getElementById('skDatePop').classList.remove('open');
+  skClosePop();
   rt();
 }
 function skApplyCustom(){
@@ -814,17 +865,11 @@ function skApplyCustom(){
   var e=document.getElementById('skDe').value;
   if(!s&&!e) return;
   _skDate={preset:'custom',start:s||e,end:e||s,label:'Custom'};
-  document.getElementById('skDateLabel').textContent=(s||e)+' → '+(e||s);
+  document.getElementById('skDateLabel').textContent=(s&&e ? s+' → '+e : s||e);
   document.querySelectorAll('.sk-preset-btn').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('skDatePop').classList.remove('open');
+  skClosePop();
   rt();
 }
-document.addEventListener('click',function(e){
-  var pop=document.getElementById('skDatePop');
-  if(pop&&pop.classList.contains('open')&&!pop.contains(e.target)&&e.target.id!=='skDateBtn'){
-    pop.classList.remove('open');
-  }
-});
 function matchesDateFilter(p){
   if(_skDate.preset==='all'&&!_skDate.start) return true;
   var lu=(p.lastUpdated||'').slice(0,10);
