@@ -129,7 +129,7 @@
       .stock-cards-wrap { display:none !important; }
     }
     .sk-card {
-      display:flex;align-items:stretch;gap:10px;
+      display:flex;flex-direction:column;gap:8px;
       padding:12px 12px;border-radius:14px;
       background:rgba(255,255,255,.045);
       border:1px solid rgba(148,163,200,.1);
@@ -143,17 +143,17 @@
     [data-theme="light"] .sk-card { background:#f8fafc; border-color:rgba(148,163,184,.18); }
     .sk-img { width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid rgba(148,163,200,.15); }
     .sk-img-ph { width:64px;height:64px;border-radius:10px;flex-shrink:0;background:rgba(148,163,200,.1);display:flex;align-items:center;justify-content:center;font-size:24px; }
-    .sk-body { flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between; }
+    .sk-top-row { display:flex;gap:10px;align-items:flex-start; }
+    .sk-body { flex:1;min-width:0; }
     .sk-name { font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px; }
     [data-theme="light"] .sk-name { color:#0f172a; }
-    .sk-meta { display:flex;align-items:center;gap:6px;margin-bottom:6px; }
-    .sk-nums { display:flex;gap:0; }
-    .sk-n { display:flex;flex-direction:column;align-items:center;min-width:52px;padding:4px 6px;border-radius:8px;background:rgba(148,163,200,.07);margin-right:4px; }
+    .sk-meta { display:flex;align-items:center;gap:6px;margin-top:4px; }
+    .sk-nums { display:flex;gap:6px; }
+    .sk-n { display:flex;flex-direction:column;align-items:center;flex:1;padding:5px 4px;border-radius:8px;background:rgba(148,163,200,.07); }
     .sk-n b { font-size:14px;font-weight:800;color:var(--text);line-height:1.2; }
     .sk-n small { font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em; }
     [data-theme="light"] .sk-n { background:rgba(148,163,184,.1); }
     [data-theme="light"] .sk-n b { color:#0f172a; }
-    .sk-right { flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:6px; }
     .stock-cards-wrap { display:flex;flex-direction:column;gap:8px;padding-top:4px; }
 
     /* ── Stock Inventory header row ── */
@@ -753,18 +753,22 @@ function rt(){
         var packNum = (p.pack    !== undefined && p.pack    !== null && p.pack    !== '') ? p.pack    : '-';
         var bottNum = (p.bottles !== undefined && p.bottles !== null && p.bottles !== '') ? p.bottles : '-';
         return '<div class="sk-card st-'+s+'" onclick="openEdit('+p.id+')">'
-          +'<div style="flex-shrink:0">'+ imgEl +'</div>'
-          +'<div class="sk-body">'
-            +'<div class="sk-name">'+p.name+'</div>'
-            +'<div class="sk-meta"><span class="pill p-b" style="font-size:10px">'+p.cat+'</span></div>'
-            +'<div class="sk-nums">'
-              +'<div class="sk-n"><b>'+boxNum+'</b><small>កេស</small></div>'
-              +'<div class="sk-n"><b>'+packNum+'</b><small>ឈុត</small></div>'
+          // ── Row 1: image + name/status/type ──
+          +'<div class="sk-top-row">'
+            +'<div style="flex-shrink:0">'+ imgEl +'</div>'
+            +'<div class="sk-body">'
+              +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">'
+                +'<div class="sk-name">'+p.name+'</div>'
+                +'<span class="pill '+pc(s)+'" style="white-space:nowrap;font-size:10px;flex-shrink:0">'+pl(s)+'</span>'
+              +'</div>'
+              +'<div class="sk-meta"><span class="pill p-b" style="font-size:10px">'+p.cat+'</span></div>'
             +'</div>'
           +'</div>'
-          +'<div class="sk-right">'
-            +'<span class="pill '+pc(s)+'" style="white-space:nowrap;font-size:10px;text-align:center">'+pl(s)+'</span>'
-            +'<div class="sk-n" style="margin-right:0;min-width:44px"><b>'+bottNum+'</b><small>ដប</small></div>'
+          // ── Row 2: 3 numbers evenly spread full width ──
+          +'<div class="sk-nums">'
+            +'<div class="sk-n"><b>'+boxNum+'</b><small>កេស</small></div>'
+            +'<div class="sk-n"><b>'+packNum+'</b><small>ឈុត</small></div>'
+            +'<div class="sk-n"><b>'+bottNum+'</b><small>ដប</small></div>'
           +'</div>'
         +'</div>';
       }).join('');
