@@ -35,7 +35,11 @@
       "Bash(gh api *)",
       "WebFetch(domain:api.github.com)",
       "Bash(findstr /n \"buildImg\\\\|imgHtml\\\\|localImg\\\\|resolveImg\" pages/stock.html)",
-      "Bash(findstr /n \"buildImg imgHtml _localImg\" stock.html)"
+      "Bash(findstr /n \"buildImg imgHtml _localImg\" stock.html)",
+      "Bash(findstr /n \"saveEdit saveAdd saveStock\" stock.html)",
+      "WebFetch(domain:script.google.com)",
+      "WebFetch(domain:script.googleusercontent.com)",
+      "Bash(powershell -Command ' *)"
     ]
   }
 }

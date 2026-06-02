@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CAMBO MINI — Central API helper
  * - On Vercel (https): routes through /api/proxy to avoid CORS
  * - On Local (file:// or localhost): calls Apps Script directly
@@ -8,7 +8,7 @@
   'use strict';
 
   const APPS_SCRIPT_URL =
-    'https://script.google.com/macros/s/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/exec';
+    'https://script.google.com/macros/s/AKfycbyLIx9D-3k97BDE_MV7_0nHyQxMmOSULv_x4xbRYiCCepsrAxFYB4d1eu5dfFi0epodNg/exec';
 
   // Use Vercel proxy when running on vercel.app domain
   function isVercel() {
