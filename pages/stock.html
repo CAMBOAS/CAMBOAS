@@ -830,7 +830,7 @@ function skSetPreset(p){
   document.getElementById('skDateLabel').textContent=r.label;
   document.querySelectorAll('.sk-preset-btn').forEach(function(b){b.classList.toggle('active',b.dataset.p===p);});
   skClosePop();
-  if(p==='all'){ S=_sCurrent.slice(); rt(); }
+  if(p==='all'||p==='today'){ S=_sCurrent.slice(); rt(); }
   else loadStockHistory(r.start, r.end);
 }
 function skApplyCustom(){
