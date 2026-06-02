@@ -280,35 +280,6 @@
             </button>
           </div>
 
-          <!-- Date popup overlay (closes on tap outside) -->
-          <div class="sk-date-overlay" id="skDateOverlay" onclick="skClosePop()"></div>
-
-          <!-- Date popup / bottom sheet -->
-          <div class="sk-date-pop" id="skDatePop">
-            <div class="sk-bs-handle-bar"></div>
-            <div class="sk-preset-grid">
-              <button class="sk-preset-btn" data-p="today"     onclick="skSetPreset('today')">ថ្ងៃនេះ</button>
-              <button class="sk-preset-btn" data-p="yesterday" onclick="skSetPreset('yesterday')">ម្សិលមិញ</button>
-              <button class="sk-preset-btn" data-p="last7"     onclick="skSetPreset('last7')">Last 7 Days</button>
-              <button class="sk-preset-btn" data-p="thisMonth" onclick="skSetPreset('thisMonth')">This Month</button>
-              <button class="sk-preset-btn" data-p="lastMonth" onclick="skSetPreset('lastMonth')">Last Month</button>
-              <button class="sk-preset-btn active" data-p="all" onclick="skSetPreset('all')">All Time</button>
-            </div>
-            <hr class="sk-pop-divider">
-            <div class="sk-pop-label">Custom Range</div>
-            <div class="sk-pop-row">
-              <div class="sk-pop-field">
-                <label>ពី</label>
-                <input class="sk-pop-inp" type="date" id="skDs">
-              </div>
-              <div class="sk-pop-field">
-                <label>ដល់</label>
-                <input class="sk-pop-inp" type="date" id="skDe">
-              </div>
-            </div>
-            <button class="sk-pop-ok" onclick="skApplyCustom()">OK</button>
-          </div>
-
           <div class="tools">
             <input type="text" id="srch" placeholder="ស្វែងរក..." oninput="rt()">
             <select id="flt" onchange="rt()">
@@ -1085,5 +1056,32 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 </script>
 <script src="../assets/js/sw-register.js?v=158"></script>
+
+<!-- Date popup + overlay at BODY level (escapes backdrop-filter stacking context) -->
+<div class="sk-date-overlay" id="skDateOverlay" onclick="skClosePop()"></div>
+<div class="sk-date-pop" id="skDatePop">
+  <div class="sk-bs-handle-bar"></div>
+  <div class="sk-preset-grid">
+    <button class="sk-preset-btn" data-p="today"     onclick="skSetPreset('today')">ថ្ងៃនេះ</button>
+    <button class="sk-preset-btn" data-p="yesterday" onclick="skSetPreset('yesterday')">ម្សិលមិញ</button>
+    <button class="sk-preset-btn" data-p="last7"     onclick="skSetPreset('last7')">Last 7 Days</button>
+    <button class="sk-preset-btn" data-p="thisMonth" onclick="skSetPreset('thisMonth')">This Month</button>
+    <button class="sk-preset-btn" data-p="lastMonth" onclick="skSetPreset('lastMonth')">Last Month</button>
+    <button class="sk-preset-btn active" data-p="all" onclick="skSetPreset('all')">All Time</button>
+  </div>
+  <hr class="sk-pop-divider">
+  <div class="sk-pop-label">Custom Range</div>
+  <div class="sk-pop-row">
+    <div class="sk-pop-field">
+      <label>ពី</label>
+      <input class="sk-pop-inp" type="date" id="skDs">
+    </div>
+    <div class="sk-pop-field">
+      <label>ដល់</label>
+      <input class="sk-pop-inp" type="date" id="skDe">
+    </div>
+  </div>
+  <button class="sk-pop-ok" onclick="skApplyCustom()">OK</button>
+</div>
 </body>
 </html>
