@@ -157,41 +157,64 @@
     .sk-edit-icon { font-size:11px;color:var(--muted); }
     .stock-cards-wrap { display:flex;flex-direction:column;gap:8px;padding-top:4px; }
 
-    /* ── Bottom Date Filter Bar (mobile) ── */
-    @media(max-width:640px){
-      .sw { padding-bottom: 72px; }
+    /* ── Stock Inventory header row ── */
+    .sp-head { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px; }
+    .sp-head .sp-title { margin:0; }
+
+    /* ── Date filter button ── */
+    .sk-date-btn {
+      display:flex;align-items:center;gap:6px;
+      height:34px;padding:0 12px;border-radius:10px;border:none;
+      background:rgba(139,92,246,.15);color:#a78bfa;
+      font-size:12px;font-weight:800;cursor:pointer;
+      font-family:inherit;white-space:nowrap;flex-shrink:0;
+      border:1px solid rgba(139,92,246,.3);
+      transition:background .15s;touch-action:manipulation;
     }
-    .sk-date-bar {
-      position:fixed;bottom:0;left:0;right:0;z-index:200;
-      background:rgba(255,255,255,.96);
-      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-      border-top:1px solid rgba(148,163,200,.18);
+    .sk-date-btn:active { background:rgba(139,92,246,.25); }
+    [data-theme="light"] .sk-date-btn { background:rgba(139,92,246,.09);color:#7c3aed;border-color:rgba(139,92,246,.2); }
+
+    /* ── Date popup dropdown ── */
+    .sk-date-pop {
+      position:fixed;z-index:9999;
+      background:#1e1b3a;
+      border:1px solid rgba(139,92,246,.3);
+      border-radius:16px;padding:14px;width:300px;
+      box-shadow:0 16px 48px rgba(0,0,0,.55);
       display:none;
-      padding:0 0 env(safe-area-inset-bottom);
     }
-    [data-theme="dark"] .sk-date-bar {
-      background:rgba(18,15,35,.96);
-      border-top-color:rgba(148,163,200,.12);
+    .sk-date-pop.open { display:block; }
+    [data-theme="light"] .sk-date-pop { background:#fff;border-color:rgba(99,102,241,.2);box-shadow:0 16px 48px rgba(15,23,42,.18); }
+    .sk-preset-grid {
+      display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;
     }
-    @media(max-width:640px){ .sk-date-bar { display:flex; } }
-    .sk-dt-btn {
-      flex:1;min-width:0;border:none;background:transparent;
-      padding:8px 2px 10px;
-      font-size:10px;font-weight:700;color:#94a3b8;
-      cursor:pointer;display:flex;flex-direction:column;
-      align-items:center;gap:2px;font-family:inherit;
-      transition:color .15s;border-top:2px solid transparent;
-      touch-action:manipulation;
+    .sk-preset-btn {
+      padding:9px 8px;border-radius:10px;border:none;
+      background:rgba(255,255,255,.06);color:#cbd5e1;
+      font-size:12px;font-weight:700;cursor:pointer;
+      font-family:inherit;text-align:center;
+      transition:background .12s;touch-action:manipulation;
     }
-    .sk-dt-btn .sk-dt-icon { font-size:17px;line-height:1; }
-    .sk-dt-btn.active { color:#8b5cf6;border-top-color:#8b5cf6; }
-    [data-theme="dark"] .sk-dt-btn { color:#64748b; }
-    [data-theme="dark"] .sk-dt-btn.active { color:#a78bfa;border-top-color:#a78bfa; }
-    .sk-dt-badge {
-      display:inline-block;min-width:18px;height:16px;padding:0 5px;
-      border-radius:8px;background:#8b5cf6;color:#fff;
-      font-size:9px;font-weight:800;line-height:16px;text-align:center;
-      margin-top:1px;
+    .sk-preset-btn:active,.sk-preset-btn.active {
+      background:rgba(139,92,246,.25);color:#c4b5fd;
+    }
+    [data-theme="light"] .sk-preset-btn { background:#f1f5f9;color:#334155; }
+    [data-theme="light"] .sk-preset-btn:active,
+    [data-theme="light"] .sk-preset-btn.active { background:rgba(139,92,246,.12);color:#7c3aed; }
+    .sk-pop-label { font-size:10px;font-weight:700;color:#64748b;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px; }
+    .sk-pop-row { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px; }
+    .sk-pop-inp {
+      width:100%;height:34px;padding:0 8px;border-radius:9px;
+      background:rgba(255,255,255,.06);color:#e2e8f0;
+      border:1px solid rgba(148,163,200,.2);font-size:12px;
+      font-family:inherit;box-sizing:border-box;
+    }
+    [data-theme="light"] .sk-pop-inp { background:#f8fafc;color:#0f172a;border-color:rgba(148,163,184,.3); }
+    .sk-pop-ok {
+      width:100%;height:34px;border-radius:9px;border:none;
+      background:linear-gradient(135deg,#8b5cf6,#06b6d4);
+      color:#fff;font-size:13px;font-weight:800;
+      cursor:pointer;font-family:inherit;
     }
   </style>
 </head>
@@ -212,7 +235,38 @@
       </div>
       <div class="slayout">
         <article class="glass-card sp">
-          <h3 class="sp-title">Stock Inventory</h3>
+          <!-- Header row: title + date button -->
+          <div class="sp-head">
+            <h3 class="sp-title">Stock Inventory</h3>
+            <button class="sk-date-btn" id="skDateBtn" onclick="skTogglePop(event)">
+              📅 <span id="skDateLabel">All Time</span> ▾
+            </button>
+          </div>
+
+          <!-- Date popup -->
+          <div class="sk-date-pop" id="skDatePop">
+            <div class="sk-preset-grid">
+              <button class="sk-preset-btn" data-p="today"     onclick="skSetPreset('today')">ថ្ងៃនេះ</button>
+              <button class="sk-preset-btn" data-p="yesterday" onclick="skSetPreset('yesterday')">ម្សិលមិញ</button>
+              <button class="sk-preset-btn" data-p="last7"     onclick="skSetPreset('last7')">Last 7 Days</button>
+              <button class="sk-preset-btn" data-p="thisMonth" onclick="skSetPreset('thisMonth')">This Month</button>
+              <button class="sk-preset-btn" data-p="lastMonth" onclick="skSetPreset('lastMonth')">Last Month</button>
+              <button class="sk-preset-btn active" data-p="all" onclick="skSetPreset('all')">All Time</button>
+            </div>
+            <div class="sk-pop-label">ជ្រើសរើស Custom Range</div>
+            <div class="sk-pop-row">
+              <div>
+                <div class="sk-pop-label">ពី</div>
+                <input class="sk-pop-inp" type="date" id="skDs">
+              </div>
+              <div>
+                <div class="sk-pop-label">ដល់</div>
+                <input class="sk-pop-inp" type="date" id="skDe">
+              </div>
+            </div>
+            <button class="sk-pop-ok" onclick="skApplyCustom()">OK</button>
+          </div>
+
           <div class="tools">
             <input type="text" id="srch" placeholder="ស្វែងរក..." oninput="rt()">
             <select id="flt" onchange="rt()">
@@ -231,25 +285,6 @@
           </div>
           <!-- Mobile card list -->
           <div class="stock-cards-wrap" id="stockCards"></div>
-
-<!-- Bottom Date Filter Bar (mobile only) -->
-<div class="sk-date-bar" id="skDateBar">
-  <button class="sk-dt-btn active" data-d="all" onclick="setDateFilter('all')">
-    <span class="sk-dt-icon">📋</span>ទាំងអស់
-  </button>
-  <button class="sk-dt-btn" data-d="today" onclick="setDateFilter('today')">
-    <span class="sk-dt-icon">📅</span>ថ្ងៃនេះ
-  </button>
-  <button class="sk-dt-btn" data-d="yesterday" onclick="setDateFilter('yesterday')">
-    <span class="sk-dt-icon">🗓️</span>ម្សិល
-  </button>
-  <button class="sk-dt-btn" data-d="week" onclick="setDateFilter('week')">
-    <span class="sk-dt-icon">📆</span>សប្ដាហ៍
-  </button>
-  <button class="sk-dt-btn" data-d="month" onclick="setDateFilter('month')">
-    <span class="sk-dt-icon">🗃️</span>ខែនេះ
-  </button>
-</div>
         </article>
 
       </div>
@@ -735,57 +770,64 @@ function us(){
 
 function saveStock(){ try{ localStorage.setItem('cambo_stock_v2',JSON.stringify(S)); }catch(e){} }
 
-/* ── Date filter helpers ── */
-var _dateFilter = 'all';
+/* ── Date filter (popup style) ── */
+var _skDate = { preset:'all', start:'', end:'', label:'All Time' };
 function _pad2(n){ return String(n).padStart(2,'0'); }
-function _todayStr(){
-  var d=new Date();
-  return d.getFullYear()+'-'+_pad2(d.getMonth()+1)+'-'+_pad2(d.getDate());
+function _ymd(d){ return d.getFullYear()+'-'+_pad2(d.getMonth()+1)+'-'+_pad2(d.getDate()); }
+function _skGetPreset(p){
+  var t=_ymd(new Date()), now=new Date(t+'T00:00:00');
+  if(p==='today')     return {start:t,end:t,label:'ថ្ងៃនេះ'};
+  if(p==='yesterday'){var y=new Date(now);y.setDate(y.getDate()-1);var ys=_ymd(y);return {start:ys,end:ys,label:'ម្សិលមិញ'};}
+  if(p==='last7')    {var w=new Date(now);w.setDate(w.getDate()-6);return {start:_ymd(w),end:t,label:'Last 7 Days'};}
+  if(p==='thisMonth'){var ms=new Date(now.getFullYear(),now.getMonth(),1),me=new Date(now.getFullYear(),now.getMonth()+1,0);return {start:_ymd(ms),end:_ymd(me),label:'This Month'};}
+  if(p==='lastMonth'){var lm=new Date(now.getFullYear(),now.getMonth()-1,1),lme=new Date(now.getFullYear(),now.getMonth(),0);return {start:_ymd(lm),end:_ymd(lme),label:'Last Month'};}
+  return {start:'',end:'',label:'All Time'};
 }
-function setDateFilter(preset){
-  _dateFilter = preset;
-  document.querySelectorAll('.sk-dt-btn').forEach(function(b){
-    b.classList.toggle('active', b.dataset.d === preset);
-  });
+function skTogglePop(e){
+  e.stopPropagation();
+  var pop=document.getElementById('skDatePop');
+  var btn=document.getElementById('skDateBtn');
+  var open=pop.classList.contains('open');
+  pop.classList.toggle('open',!open);
+  if(!open){
+    var rect=btn.getBoundingClientRect();
+    var popW=300, vw=window.innerWidth;
+    var left=Math.min(rect.right-popW, vw-popW-8);
+    if(left<8) left=8;
+    pop.style.top=(rect.bottom+6)+'px';
+    pop.style.left=left+'px';
+  }
+}
+function skSetPreset(p){
+  var r=_skGetPreset(p);
+  _skDate={preset:p,start:r.start,end:r.end,label:r.label};
+  document.getElementById('skDateLabel').textContent=r.label;
+  document.querySelectorAll('.sk-preset-btn').forEach(function(b){b.classList.toggle('active',b.dataset.p===p);});
+  document.getElementById('skDatePop').classList.remove('open');
   rt();
-  updateDateBadges();
 }
-function updateDateBadges(){
-  var today = _todayStr();
-  var yest  = (function(){ var d=new Date(); d.setDate(d.getDate()-1); return d.getFullYear()+'-'+_pad2(d.getMonth()+1)+'-'+_pad2(d.getDate()); })();
-  var counts = {all:0, today:0, yesterday:0, week:0, month:0};
-  S.forEach(function(p){
-    counts.all++;
-    var lu = (p.lastUpdated||'').slice(0,10);
-    if(!lu) return;
-    if(lu === today)  counts.today++;
-    if(lu === yest)   counts.yesterday++;
-    var weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate()-6);
-    if(new Date(lu) >= weekAgo) counts.week++;
-    if(lu.slice(0,7) === today.slice(0,7)) counts.month++;
-  });
-  document.querySelectorAll('.sk-dt-btn').forEach(function(b){
-    var d = b.dataset.d;
-    var old = b.querySelector('.sk-dt-badge');
-    if(old) old.remove();
-    if(d !== 'all' && counts[d] > 0){
-      var badge = document.createElement('span');
-      badge.className = 'sk-dt-badge';
-      badge.textContent = counts[d];
-      b.appendChild(badge);
-    }
-  });
+function skApplyCustom(){
+  var s=document.getElementById('skDs').value;
+  var e=document.getElementById('skDe').value;
+  if(!s&&!e) return;
+  _skDate={preset:'custom',start:s||e,end:e||s,label:'Custom'};
+  document.getElementById('skDateLabel').textContent=(s||e)+' → '+(e||s);
+  document.querySelectorAll('.sk-preset-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('skDatePop').classList.remove('open');
+  rt();
 }
+document.addEventListener('click',function(e){
+  var pop=document.getElementById('skDatePop');
+  if(pop&&pop.classList.contains('open')&&!pop.contains(e.target)&&e.target.id!=='skDateBtn'){
+    pop.classList.remove('open');
+  }
+});
 function matchesDateFilter(p){
-  if(_dateFilter === 'all') return true;
-  var lu = (p.lastUpdated||'').slice(0,10);
-  if(!lu) return false; // not yet edited → hide in date views
-  var today = _todayStr();
-  var yest  = (function(){ var d=new Date(); d.setDate(d.getDate()-1); return d.getFullYear()+'-'+_pad2(d.getMonth()+1)+'-'+_pad2(d.getDate()); })();
-  if(_dateFilter === 'today')     return lu === today;
-  if(_dateFilter === 'yesterday') return lu === yest;
-  if(_dateFilter === 'week'){ var wa=new Date(); wa.setDate(wa.getDate()-6); return new Date(lu) >= wa; }
-  if(_dateFilter === 'month')     return lu.slice(0,7) === today.slice(0,7);
+  if(_skDate.preset==='all'&&!_skDate.start) return true;
+  var lu=(p.lastUpdated||'').slice(0,10);
+  if(!lu) return false;
+  if(_skDate.start&&lu<_skDate.start) return false;
+  if(_skDate.end  &&lu>_skDate.end)   return false;
   return true;
 }
 
@@ -985,7 +1027,7 @@ async function saveAdd(){
 
 document.addEventListener('DOMContentLoaded',function(){
   loadImgCache();
-  loadStroke().then(function(){ updateDateBadges(); }).catch(function(){ updateDateBadges(); });
+  loadStroke();
   // Track any change inside Edit modal → mark dirty
   var editModal=document.querySelector('#editOverlay .edit-modal');
   if(editModal){
