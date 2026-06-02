@@ -1005,14 +1005,26 @@ async function saveEdit(){
   _editId=null; _editDirty=false;
   rt(); saveStock(); updateDateBadges();
   var ratioText=_eBpp?'1 ឈុត = '+_eBpp+' ដបប្រអប់':'';
+  var _payload={action:'stroke_update',originalName:origName,
+    data:{product:p.name,type:p.cat,box:p.box,pack:p.pack,bottles:p.bottles,qty:p.qty,
+          packPerBox:p.packPerBox,ratio:ratioText}};
+  console.log('[saveEdit] Sending to:', APPS_SCRIPT_URL);
+  console.log('[saveEdit] Payload:', JSON.stringify(_payload));
   try {
     var res=await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({action:'stroke_update',originalName:origName,
-        data:{product:p.name,type:p.cat,box:p.box,pack:p.pack,bottles:p.bottles,qty:p.qty,
-              packPerBox:p.packPerBox,ratio:ratioText}})});
-    var r=await res.json();
+      body:JSON.stringify(_payload)});
+    console.log('[saveEdit] HTTP status:', res.status);
+    var _text=await res.text();
+    console.log('[saveEdit] Raw response:', _text);
+    var r; try{ r=JSON.parse(_text); }catch(_){ r={ok:false,message:'Invalid response: '+_text}; }
+    console.log('[saveEdit] Parsed:', r);
     notify(r.ok?'✅ រក្សាទុករួចរាល់!':'⚠️ '+(r.message||'Save failed'), r.ok);
-  } catch(e){ notify('⚠️ Offline — saved locally only',false); }
+    if(!r.ok) alert('❌ Save Error:\n'+(r.message||'Unknown error'));
+  } catch(e){
+    console.error('[saveEdit] Fetch error:', e);
+    notify('⚠️ Network error: '+e.message, false);
+    alert('❌ Network Error:\n'+e.message);
+  }
 }
 
 async function deleteProduct(){
