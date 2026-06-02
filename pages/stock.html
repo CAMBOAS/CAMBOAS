@@ -1250,11 +1250,26 @@ function exportStockPDF(){
   setTimeout(function(){ w.print(); },900);
 }
 
-/* ── IMG Export — open new window + real html2canvas from CDN ── */
-function exportStockIMG(){
+/* ── IMG Export — no preview, direct share/download ── */
+async function exportStockIMG(){
   skCloseAct();
   var list=_getReportList();
   if(!list.length){ notify('⚠️ គ្មានទិន្នន័យ',false); return; }
+  notify('⏳ កំពុង Generate រូបភាព...', true);
+
+  // Load real html2canvas from CDN (once, cached after first load)
+  if(!window.html2canvas || !window.html2canvas._real){
+    try {
+      await new Promise(function(res,rej){
+        var s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload=function(){ window.html2canvas._real=true; res(); };
+        s.onerror=rej;
+        document.head.appendChild(s);
+      });
+    } catch(e){ notify('⚠️ Network error — ត្រូវការ Internet ដើម្បី Generate IMG',false); return; }
+  }
+
   var date=_reportDate();
   var rows=list.map(function(p,i){
     var bg=i%2===0?'#dce6f1':'#ffffff';
@@ -1268,25 +1283,14 @@ function exportStockIMG(){
     '</tr>';
   }).join('');
 
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;600;700;900&display=swap" rel="stylesheet">'+
-    '<style>'+
-    '*{box-sizing:border-box;margin:0;padding:0}'+
-    'body{font-family:"Noto Sans Khmer",sans-serif;background:#f0f4f8;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:20px}'+
-    '#report{background:#fff;padding:28px 32px;width:760px;max-width:100%;color:#1a2b5e}'+
-    '#toolbar{margin-bottom:14px;display:flex;gap:10px;align-items:center}'+
-    '#dlBtn{padding:10px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,#1a2b5e,#2563eb);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}'+
-    '#status{font-size:12px;color:#64748b}'+
-    'table{width:100%;border-collapse:collapse}'+
-    '</style></head><body>'+
-    '<div id="toolbar">'+
-    '<button id="dlBtn" onclick="doCapture()">📥 Save as Image</button>'+
-    '<span id="status">⏳ ចាំ font load...</span>'+
-    '</div>'+
-    '<div id="report">'+
-    '<div style="font-size:12px;color:#1a2b5e;margin-bottom:16px">របាយការណ៍ស្តុកថ្ងៃទី: '+date+'</div>'+
-    '<h2 style="text-align:center;font-size:22px;font-weight:900;color:#1a2b5e;margin:0 0 16px;letter-spacing:.04em">តារាងស្តុកទំនិញ</h2>'+
-    '<table>'+
+  // Create off-screen capture div (fixed, behind UI, proper width)
+  var div=document.createElement('div');
+  div.style.cssText='position:fixed;top:0;left:0;width:760px;z-index:-9999;pointer-events:none;'+
+    'background:#fff;padding:28px 32px;font-family:"Noto Sans Khmer",Arial,sans-serif;color:#1a2b5e';
+  div.innerHTML=
+    '<div style="font-size:12px;margin-bottom:16px">របាយការណ៍ស្តុកថ្ងៃទី: '+date+'</div>'+
+    '<h2 style="text-align:center;font-size:22px;font-weight:900;margin:0 0 16px;letter-spacing:.04em">តារាងស្តុកទំនិញ</h2>'+
+    '<table style="width:100%;border-collapse:collapse">'+
     '<thead><tr style="background:#1a2b5e;color:#fff">'+
     '<th style="padding:10px 6px;border:1px solid #b8cce4;width:42px">លរ</th>'+
     '<th style="padding:10px;border:1px solid #b8cce4;text-align:left">ឈ្មោះទំនិញ</th>'+
@@ -1294,39 +1298,38 @@ function exportStockIMG(){
     '<th style="padding:10px 6px;border:1px solid #b8cce4">កេស</th>'+
     '<th style="padding:10px 6px;border:1px solid #b8cce4">ឈុត</th>'+
     '<th style="padding:10px 6px;border:1px solid #b8cce4">ដប/ប្រអប់</th>'+
-    '</tr></thead>'+
-    '<tbody>'+rows+'</tbody></table></div>'+
-    '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>'+
-    '<script>'+
-    'var _ready=false;'+
-    'document.fonts.ready.then(function(){'+
-    '  _ready=true;'+
-    '  document.getElementById("status").textContent="✅ ត្រៀមរួចហើយ — ចុច Save as Image";'+
-    '});'+
-    'function doCapture(){'+
-    '  var btn=document.getElementById("dlBtn");'+
-    '  var st=document.getElementById("status");'+
-    '  btn.disabled=true; btn.textContent="⏳ កំពុង Generate..."; st.textContent="";'+
-    '  var el=document.getElementById("report");'+
-    '  html2canvas(el,{scale:2,useCORS:true,backgroundColor:"#ffffff",logging:false}).then(function(canvas){'+
-    '    var a=document.createElement("a");'+
-    '    a.download="stock-report-'+date.replace(/\//g,'-')+'.png";'+
-    '    a.href=canvas.toDataURL("image/png");'+
-    '    a.click();'+
-    '    btn.disabled=false; btn.textContent="📥 Save as Image";'+
-    '    st.textContent="✅ Download ជោគជ័យ!";'+
-    '  }).catch(function(e){'+
-    '    btn.disabled=false; btn.textContent="📥 Save as Image";'+
-    '    st.textContent="❌ Error: "+e.message;'+
-    '  });'+
-    '}'+
-    '<\/script></body></html>';
+    '</tr></thead><tbody>'+rows+'</tbody></table>';
+  document.body.appendChild(div);
 
-  var w=window.open('','_blank','width=860,height=700');
-  if(!w){ notify('⚠️ Pop-up blocked — អនុញ្ញាត pop-up សិន',false); return; }
-  w.document.write(html);
-  w.document.close();
-  notify('📷 បើ window ថ្មី → ចុច "Save as Image"', true);
+  // Wait for Khmer fonts to load before capture
+  await document.fonts.ready;
+
+  try {
+    var canvas=await html2canvas(div,{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false,
+      windowWidth:760,width:760});
+    var filename='stock-report-'+date.replace(/\//g,'-')+'.png';
+
+    // Convert canvas → Blob
+    var blob=await new Promise(function(res){ canvas.toBlob(res,'image/png'); });
+    var file=new File([blob],filename,{type:'image/png'});
+
+    // Mobile: Web Share API (Telegram, Messenger, WhatsApp, Save to Gallery)
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:'Stock Report — CAMBO MINI'});
+      notify('✅ Share ជោគជ័យ!', true);
+    } else {
+      // Desktop: direct download
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url; a.download=filename; a.click();
+      setTimeout(function(){ URL.revokeObjectURL(url); },1500);
+      notify('✅ Download រូបភាព ជោគជ័យ!', true);
+    }
+  } catch(err){
+    if(err.name!=='AbortError') notify('⚠️ Generate រូបភាពបរាជ័យ: '+err.message, false);
+  } finally {
+    document.body.removeChild(div);
+  }
 }
 
 /* ── TEXT Export ── */
