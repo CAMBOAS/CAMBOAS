@@ -130,7 +130,7 @@
     }
     .sk-card {
       display:flex;align-items:stretch;gap:10px;
-      padding:12px;border-radius:14px;
+      padding:12px 14px;border-radius:16px;
       background:rgba(255,255,255,.045);
       border:1px solid rgba(148,163,200,.1);
       cursor:pointer;transition:background .15s;
@@ -140,23 +140,23 @@
     .sk-card.st-low { border-left-color:#f59e0b; }
     .sk-card.st-ok  { border-left-color:#10b981; }
     .sk-card:active { background:rgba(139,92,246,.1); }
-    [data-theme="light"] .sk-card { background:#f8fafc; border-color:rgba(148,163,184,.18); }
-    .sk-img { width:64px;height:64px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid rgba(148,163,200,.15); }
-    .sk-img-ph { width:64px;height:64px;border-radius:10px;flex-shrink:0;background:rgba(148,163,200,.1);display:flex;align-items:center;justify-content:center;font-size:24px; }
+    [data-theme="light"] .sk-card { background:#fff;border-color:rgba(148,163,184,.18);box-shadow:0 2px 8px rgba(0,0,0,.05); }
+    .sk-img { width:68px;height:68px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid rgba(148,163,200,.15); }
+    .sk-img-ph { width:68px;height:68px;border-radius:12px;flex-shrink:0;background:rgba(148,163,200,.1);display:flex;align-items:center;justify-content:center;font-size:26px; }
     /* Middle column */
-    .sk-body { flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:6px; }
-    .sk-name { font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .sk-body { flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between; }
+    .sk-name { font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px; }
     [data-theme="light"] .sk-name { color:#0f172a; }
-    .sk-meta { display:flex;align-items:center;gap:6px; }
-    .sk-nums { display:flex;gap:5px; }
-    .sk-n { display:flex;flex-direction:column;align-items:center;min-width:50px;padding:5px 6px;border-radius:8px;background:rgba(148,163,200,.07); }
-    .sk-n b { font-size:14px;font-weight:800;color:var(--text);line-height:1.2; }
-    .sk-n small { font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em; }
+    .sk-meta { display:flex;align-items:center;gap:6px;margin-bottom:2px; }
+    .sk-nums { display:flex;gap:6px; }
+    .sk-n { display:flex;flex-direction:column;align-items:center;flex:1;padding:6px 4px;border-radius:9px;background:rgba(148,163,200,.08); }
+    .sk-n b { font-size:15px;font-weight:800;color:var(--text);line-height:1.2; }
+    .sk-n small { font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:1px; }
     [data-theme="light"] .sk-n { background:rgba(148,163,184,.1); }
     [data-theme="light"] .sk-n b { color:#0f172a; }
     /* Right column */
-    .sk-right { flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:6px; }
-    .stock-cards-wrap { display:flex;flex-direction:column;gap:8px;padding-top:4px; }
+    .sk-right { flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between; }
+    .stock-cards-wrap { display:flex;flex-direction:column;gap:10px;padding-top:4px; }
 
     /* ── Stock Inventory header row ── */
     .sp-head { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px; }
@@ -770,8 +770,8 @@ function rt(){
           +'</div>'
           // ── Right: [Status] top / [ដប] bottom ──
           +'<div class="sk-right">'
-            +'<span class="pill '+pc(s)+'" style="white-space:nowrap;font-size:10px;text-align:center">'+pl(s)+'</span>'
-            +'<div class="sk-n" style="min-width:50px"><b>'+bottNum+'</b><small>ដប</small></div>'
+            +'<span class="pill '+pc(s)+'" style="white-space:nowrap;font-size:10px;text-align:center;padding:4px 10px">'+pl(s)+'</span>'
+            +'<div class="sk-n" style="width:58px"><b>'+bottNum+'</b><small>ដប</small></div>'
           +'</div>'
         +'</div>';
       }).join('');
