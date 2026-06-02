@@ -60,8 +60,8 @@ const SHEET_NAME          = 'SaleOrder';
 const STROKE_SHEET        = 'Stock';
 const STROKE_HISTORY      = 'StockHistory';
 const TELEGRAM_ENABLED    = true;
-const BOT_TOKEN           = '5839552644:AAFYFyeJXEPYoGwZ3AiKDcYiGcnjl8L1ZGg';
-const TELEGRAM_CHAT_ID    = '-1001732018286';
+const BOT_TOKEN           = '8665831170:AAF-affx337A48GnTGHuWRe3wuvPDvtnYdo';
+const TELEGRAM_CHAT_ID    = '-1003800250508';
 const TZ                  = 'Asia/Phnom_Penh';
 const LOW_STOCK_THRESHOLD = 4;
 
@@ -790,6 +790,35 @@ function formatDateOnly_(value) {
 
 function toNumber_(value) { const n = Number(value); return isNaN(n) ? 0 : n; }
 function safe_(value) { return value == null ? '' : String(value).trim(); }
+
+/**
+ * testWrite_ — Run this ONCE manually to authorize Apps Script to write to Sheet
+ * Apps Script Editor → Select "testWrite_" → ▶ Run → Allow permissions
+ */
+function testWrite_() {
+  try {
+    const ss    = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(STROKE_SHEET);
+    if (!sheet) {
+      Logger.log('❌ Sheet "' + STROKE_SHEET + '" NOT FOUND!');
+      Logger.log('Available sheets: ' + ss.getSheets().map(function(s){return s.getName();}).join(', '));
+      return;
+    }
+    Logger.log('✅ Sheet found: "' + sheet.getName() + '"');
+    Logger.log('✅ Total rows: ' + sheet.getLastRow());
+
+    const lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      const rows = sheet.getRange(2, 1, Math.min(3, lastRow - 1), 6).getValues();
+      rows.forEach(function(r, i) {
+        Logger.log('Row ' + (i+2) + ': ' + r[0] + ' | Box:' + r[2] + ' Pack:' + r[3]);
+      });
+    }
+    Logger.log('✅ Authorization OK — Stock save will work now!');
+  } catch(err) {
+    Logger.log('❌ Error: ' + err.message);
+  }
+}
 function jsonOutput_(payload) {
   // NOTE: Apps Script ContentService does not support custom response headers.
   // CORS is handled by deploying as "Anyone, even anonymous" and using
