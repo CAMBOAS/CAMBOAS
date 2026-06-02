@@ -792,10 +792,13 @@ function skTogglePop(e){
   if(!open){
     var rect=btn.getBoundingClientRect();
     var popW=300, vw=window.innerWidth;
-    var left=Math.min(rect.right-popW, vw-popW-8);
+    // Align RIGHT edge of popup with RIGHT edge of button
+    var left=rect.right-popW;
     if(left<8) left=8;
-    pop.style.top=(rect.bottom+6)+'px';
+    if(left+popW>vw-8) left=vw-popW-8;
+    pop.style.top=(rect.bottom+8)+'px';
     pop.style.left=left+'px';
+    pop.style.right='auto';
   }
 }
 function skSetPreset(p){
