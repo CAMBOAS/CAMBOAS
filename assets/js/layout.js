@@ -13,7 +13,6 @@
       'index.html':               { title: t('ផ្ទាំងគ្រប់គ្រង','Dashboard'),    subtitle: t('ទិដ្ឋភាពរួមនៃការលក់ ចំណូល និងសកម្មភាព','Overview of sales, revenue, and live activity') },
       'pages/analytics.html':     { title: t('វិភាគទិន្នន័យ','Analytics'),       subtitle: t('វិភាគស៊ីជម្រៅលើអាជីវកម្មរបស់អ្នក','Deep dive into your business metrics') },
       'pages/orders-details.html':{ title: t('Smart Orders','Smart Orders'),     subtitle: t('បង្កើតបញ្ជាទិញបានលឿន និងឆ្លាតវៃ','Create orders quickly and smartly') },
-      'pages/smart-mobile.html':  { title: t('Smart Mobile','Smart Mobile'),     subtitle: t('បញ្ចូលបញ្ជាទិញផ្តល់ជូនតាម Smartphone','Mobile-optimized order entry for smartphones') },
       'pages/order-list.html':    { title: t('បញ្ជីបញ្ជាទិញ','Order List'),      subtitle: t('មើល និងគ្រប់គ្រងបញ្ជាទិញទាំងអស់','View and manage all orders in one place') },
       'pages/new-order.html':     { title: t('បញ្ជាទិញថ្មី','New Order'),        subtitle: t('បង្កើតបញ្ជាទិញថ្មី','Create a new order') },
       'pages/customers.html':     { title: t('អតិថិជន','Customers'),             subtitle: t('គ្រប់គ្រងបញ្ជីអតិថិជន','Manage your customer base') },
@@ -93,7 +92,6 @@
           ${link('pages/analytics.html',      ic.analytics, t('វិភាគទិន្នន័យ','Analytics'))}
           ${link('pages/new-order.html',      ic.neworder,  t('បញ្ជាទិញថ្មី','New Order'))}
           ${link('pages/orders-details.html', ic.orders,    t('Smart Orders','Smart Orders'))}
-          ${link('pages/smart-mobile.html',   ic.orders,    t('Smart Mobile','Smart Mobile'))}
           ${link('pages/order-list.html',     ic.orderlist, t('បញ្ជីបញ្ជាទិញ','Order List'))}
         </ul>
         <div class="sb-divider sb-divider-sm"></div>
