@@ -1,19 +1,31 @@
-﻿/**
+/**
  * Vercel Serverless Proxy — CAMBO MINI
  * Forwards requests to Google Apps Script to bypass browser CORS restrictions.
- * Browser → Vercel /api/proxy → Apps Script (server-to-server, no CORS issue)
  */
 
 const APPS_SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbyph_bm7AUhicz5TDBTmHZysXO1NcjMCvoAEqiBD-C4hFtGHT_jgafUDSOrgvdsl456lQ/exec';
 
+// Disable Vercel's automatic body parser so we get raw body string
+export const config = {
+  api: { bodyParser: false },
+};
+
+// Read raw body from stream
+function readRawBody(req) {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', chunk => { data += chunk.toString(); });
+    req.on('end', () => resolve(data));
+    req.on('error', reject);
+  });
+}
+
 export default async function handler(req, res) {
-  // Allow all origins (CORS headers for browser)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -22,27 +34,23 @@ export default async function handler(req, res) {
     let response;
 
     if (req.method === 'POST') {
-      // Forward POST body to Apps Script
-      const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+      // Read raw body string (works for text/plain)
+      const rawBody = await readRawBody(req);
       response = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body,
+        body: rawBody,
         redirect: 'follow',
       });
     } else {
-      // Forward GET query params to Apps Script
       const params = new URLSearchParams(req.query).toString();
       const url = params ? `${APPS_SCRIPT_URL}?${params}` : APPS_SCRIPT_URL;
       response = await fetch(url, { redirect: 'follow' });
     }
 
     const text = await response.text();
-
-    // Try to parse as JSON, return as-is if not
     try {
-      const json = JSON.parse(text);
-      return res.status(200).json(json);
+      return res.status(200).json(JSON.parse(text));
     } catch {
       return res.status(200).send(text);
     }

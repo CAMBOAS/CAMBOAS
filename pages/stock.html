@@ -1010,8 +1010,14 @@ async function saveEdit(){
         data:{product:p.name,type:p.cat,box:p.box,pack:p.pack,bottles:p.bottles,qty:p.qty,
               packPerBox:p.packPerBox,ratio:ratioText}})});
     var r=await res.json();
-    notify(r.ok?'✅ រក្សាទុករួចរាល់!':'⚠️ '+(r.message||'Save failed'), r.ok);
-  } catch(e){ notify('⚠️ Offline — saved locally only',false); }
+    if(r.ok){
+      notify('✅ រក្សាទុករួចរាល់!', true);
+      // Reload fresh data from Sheet to confirm save
+      setTimeout(function(){ loadStroke(); }, 800);
+    } else {
+      notify('⚠️ '+(r.message||'Save failed'), false);
+    }
+  } catch(e){ notify('⚠️ Network error — saved locally',false); }
 }
 
 async function deleteProduct(){
