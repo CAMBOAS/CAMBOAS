@@ -1217,10 +1217,10 @@ function _buildReportHTML(list, forPrint){
       '<td style="text-align:center;padding:8px 6px;border:1px solid #b8cce4">'+(p.bottles||'-')+'</td>'+
     '</tr>';
   }).join('');
-  var printStyle=forPrint?'@media print{body{margin:0}@page{margin:15mm}}':'';
+  var printStyle=forPrint?'@media print{body{padding:0;margin:0}@page{size:A4;margin:12.7mm}}':'';
   return '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
     '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@400;600;700;900&display=swap" rel="stylesheet">'+
-    '<style>body{font-family:"Noto Sans Khmer",sans-serif;padding:28px 32px;color:#1a2b5e;background:#fff;margin:0}'+printStyle+'</style>'+
+    '<style>body{font-family:"Noto Sans Khmer",sans-serif;padding:12.7mm;color:#1a2b5e;background:#fff;margin:0}'+printStyle+'</style>'+
     '</head><body>'+
     '<div style="font-size:12px;color:#1a2b5e;margin-bottom:18px">របាយការណ៍ស្តុកថ្ងៃទី: '+date+'</div>'+
     '<h2 style="text-align:center;font-size:22px;font-weight:900;color:#1a2b5e;margin:0 0 18px;letter-spacing:.04em">តារាងស្តុកទំនិញ</h2>'+
