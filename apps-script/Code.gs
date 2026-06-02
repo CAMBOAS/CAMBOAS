@@ -92,6 +92,18 @@ function doGet(e) {
     if (action === 'list')          return jsonOutput_({ ok:true, orders: listOrders_() });
     if (action === 'stroke')        return jsonOutput_({ ok:true, stroke: listStroke_() });
     if (action === 'stock_history') return jsonOutput_(listStrokeHistory_(e));
+    // ── Debug: test write directly via GET ──
+    if (action === 'test_write') {
+      const name = String((e && e.parameter && e.parameter.name) || '').trim();
+      const box  = Number((e && e.parameter && e.parameter.box)  || 0);
+      if (!name) return jsonOutput_({ ok:false, message:'Missing name param' });
+      try {
+        strokeUpdate_(name, { product:name, type:'', box:box, pack:0, bottles:0, qty:box });
+        return jsonOutput_({ ok:true, message:'Updated "'+name+'" box='+box });
+      } catch(err) {
+        return jsonOutput_({ ok:false, message:err.message });
+      }
+    }
     return jsonOutput_({ ok:false, message:'Unknown action' });
   } catch(err) { return jsonOutput_({ ok:false, message: err.message || String(err) }); }
 }
