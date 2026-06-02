@@ -129,7 +129,7 @@
       .stock-cards-wrap { display:none !important; }
     }
     .sk-card {
-      display:flex;align-items:center;gap:10px;
+      display:flex;align-items:flex-start;gap:10px;
       padding:12px 12px;border-radius:14px;
       background:rgba(255,255,255,.045);
       border:1px solid rgba(148,163,200,.1);
@@ -754,19 +754,18 @@ function rt(){
         var packNum = (p.pack    !== undefined && p.pack    !== null && p.pack    !== '') ? p.pack    : '-';
         var bottNum = (p.bottles !== undefined && p.bottles !== null && p.bottles !== '') ? p.bottles : '-';
         return '<div class="sk-card st-'+s+'" onclick="openEdit('+p.id+')">'
-          +'<div style="position:relative">'+ imgEl +'</div>'
+          +'<div style="position:relative;flex-shrink:0">'+ imgEl +'</div>'
           +'<div class="sk-body">'
-            +'<div class="sk-name">'+p.name+'</div>'
+            +'<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px">'
+              +'<div class="sk-name" style="margin-bottom:0">'+p.name+'</div>'
+              +'<span class="pill '+pc(s)+'" style="white-space:nowrap;flex-shrink:0;font-size:10px">'+pl(s)+'</span>'
+            +'</div>'
             +'<div class="sk-meta"><span class="pill p-b" style="font-size:10px">'+p.cat+'</span></div>'
             +'<div class="sk-nums">'
               +'<div class="sk-n"><b>'+boxNum+'</b><small>កេស</small></div>'
               +'<div class="sk-n"><b>'+packNum+'</b><small>ឈុត</small></div>'
               +'<div class="sk-n"><b>'+bottNum+'</b><small>ដប</small></div>'
             +'</div>'
-          +'</div>'
-          +'<div class="sk-right">'
-            +'<span class="pill '+pc(s)+'" style="white-space:nowrap">'+pl(s)+'</span>'
-            +''
           +'</div>'
         +'</div>';
       }).join('');
