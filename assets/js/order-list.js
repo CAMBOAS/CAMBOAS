@@ -1110,12 +1110,12 @@ function renderDrawerEdit(o){
       var riel = Math.round(grand * khrRate);
       var txtClr = themeVal('#e2e8f0','#0f172a');
       return '<div style="margin-top:14px;padding:12px 14px;border-radius:10px;background:'+themeVal('rgba(124,92,255,.08)','rgba(99,102,241,.06)')+';border:1px solid '+themeVal('rgba(124,92,255,.2)','rgba(99,102,241,.15)')+'">'
-        +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px"><span>🚚 ថ្លៃដឹក</span><span>'+(fee>0?'$'+fee.toFixed(2):'ហ្វ្រីដឹក')+'</span></div>'
+        +'<div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:6px"><span>🚚 ថ្លៃដឹក</span><span id="drDelivFeeDisp">'+(fee>0?'$'+fee.toFixed(2):'ហ្វ្រីដឹក')+'</span></div>'
         +'<div style="display:flex;justify-content:space-between;align-items:baseline">'
           +'<span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em">Grand Total</span>'
           +'<div style="text-align:right">'
-            +'<div style="font-size:18px;font-weight:900;color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+grand.toFixed(2)+'</div>'
-            +'<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-top:1px">'+riel.toLocaleString()+'៛</div>'
+            +'<div id="drGrandTotal" style="font-size:18px;font-weight:900;color:'+themeVal('#7dd3fc','#4f46e5')+'">$'+grand.toFixed(2)+'</div>'
+            +'<div id="drGrandRiel" style="font-size:12px;font-weight:700;color:#a78bfa;margin-top:1px">'+riel.toLocaleString()+'៛</div>'
           +'</div>'
         +'</div>'
       +'</div>';
@@ -1125,8 +1125,10 @@ function renderDrawerEdit(o){
   // Re-bind remove buttons after render
   setTimeout(function(){
     document.querySelectorAll('.dr-prod-remove').forEach(function(btn){
-      btn.addEventListener('click', function(){ btn.closest('.dr-prod-row').remove(); });
+      btn.addEventListener('click', function(){ btn.closest('.dr-prod-row').remove(); if(window.olRecalcTotal)window.olRecalcTotal(); });
     });
+    var feeInp = document.getElementById('drDeliveryFee');
+    if(feeInp) feeInp.addEventListener('input', function(){ if(window.olRecalcTotal)window.olRecalcTotal(); });
   }, 0);
 }
 
@@ -1236,7 +1238,26 @@ window.olAddProdRow  = function(){
   tmp.innerHTML = drProdRow('','ឈុត',1,0);
   var row = tmp.firstElementChild;
   list.appendChild(row);
-  row.querySelector('.dr-prod-remove')?.addEventListener('click', function(){ row.remove(); });
+  row.querySelector('.dr-prod-remove')?.addEventListener('click', function(){ row.remove(); if(window.olRecalcTotal)window.olRecalcTotal(); });
+};
+
+window.olRecalcTotal = function(){
+  var khrRate = (function(){ try{ var r=Number(localStorage.getItem('cambo_khr_rate')); return r>0?r:4100; }catch(e){ return 4100; } })();
+  var sub = 0;
+  document.querySelectorAll('#drProdList .dr-prod-row').forEach(function(row){
+    var q = Number((row.querySelector('.dr-prod-qty')||{}).value||0);
+    var p = Number((row.querySelector('.dr-prod-price')||{}).value||0);
+    sub += q * p;
+  });
+  var fee = Number((document.getElementById('drDeliveryFee')||{}).value||0);
+  var grand = sub + fee;
+  var riel = Math.round(grand * khrRate);
+  var gtEl = document.getElementById('drGrandTotal');
+  var grEl = document.getElementById('drGrandRiel');
+  var dfEl = document.getElementById('drDelivFeeDisp');
+  if(gtEl) gtEl.textContent = '$'+grand.toFixed(2).replace(/\.00$/,'');
+  if(grEl) grEl.textContent = riel.toLocaleString()+'៛';
+  if(dfEl) dfEl.textContent = fee>0 ? '$'+fee.toFixed(2) : 'ហ្វ្រីដឹក';
 };
 
 function drProdRow(name, unit, qty, price){
@@ -1251,7 +1272,7 @@ function drProdRow(name, unit, qty, price){
   var ubs  = unitBadgeStyle(unit);
   var selS = 'height:30px;padding:0 4px;border-radius:7px;border:1px solid '+bd
     +';font-size:11px;font-weight:700;font-family:inherit;outline:none;box-sizing:border-box;cursor:pointer;touch-action:manipulation;width:100%;'+ubs;
-  var onchg = "var r=this.closest('.dr-prod-row');var q=Number(r.querySelector('.dr-prod-qty').value||0);var p=Number(r.querySelector('.dr-prod-price').value||0);var sp=r.querySelector('.dr-prod-sub');if(sp)sp.textContent='$'+(q*p).toFixed(2);";
+  var onchg = "var r=this.closest('.dr-prod-row');var q=Number(r.querySelector('.dr-prod-qty').value||0);var p=Number(r.querySelector('.dr-prod-price').value||0);var sp=r.querySelector('.dr-prod-sub');if(sp)sp.textContent='$'+(q*p).toFixed(2);if(window.olRecalcTotal)window.olRecalcTotal();";
 
   // Single row — 6 cols: name | qty | unit | price | subtotal | X
   return '<div class="dr-prod-row" style="display:grid;grid-template-columns:1fr 38px 60px 46px 46px 24px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid '+themeVal('rgba(148,163,200,.08)','rgba(148,163,184,.1)')+'">'
