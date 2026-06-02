@@ -30,7 +30,12 @@
       "Bash(cat package.json)",
       "mcp__Claude_in_Chrome__list_connected_browsers",
       "Bash(xargs sed -i 's/AKfycbzpQpk-84SBMW8zvvozTAOfZZSZhfCVqusWNx1rDMyYj52M_Js3egxRfH1f2qw9K9Fi6A/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/g')",
-      "Bash(xargs sed -i 's/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/g')"
+      "Bash(xargs sed -i 's/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/AKfycbzJJLdwbdGW8GKxb1gRKhAqM5JiHKcHhqdAK8WK-JjjDXaTZIfvtDIRWG4fh0qveb2Vgw/g')",
+      "Bash(xargs sed -i 's/orders-data\\\\.js?v=158/orders-data.js?v=159/g')",
+      "Bash(gh api *)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(findstr /n \"buildImg\\\\|imgHtml\\\\|localImg\\\\|resolveImg\" pages/stock.html)",
+      "Bash(findstr /n \"buildImg imgHtml _localImg\" stock.html)"
     ]
   }
 }
