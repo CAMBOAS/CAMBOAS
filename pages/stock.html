@@ -326,7 +326,7 @@
             <h3 class="sp-title">Stock Inventory</h3>
             <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
               <button class="sk-date-btn" id="skDateBtn" onclick="skTogglePop(event)">
-                📅 <span id="skDateLabel">All Time</span> ▾
+                📅 <span id="skDateLabel">ថ្ងៃនេះ</span> ▾
               </button>
               <button class="sk-act-btn" id="skActBtn" onclick="skToggleAct(event)">
                 ⚡ Actions ▾
@@ -842,7 +842,7 @@ function us(){
 function saveStock(){ try{ localStorage.setItem('cambo_stock_v2',JSON.stringify(S)); }catch(e){} }
 
 /* ── Date filter (popup style) ── */
-var _skDate = { preset:'all', start:'', end:'', label:'All Time' };
+var _skDate = (function(){ var t=_ymd(new Date()); return {preset:'today',start:t,end:t,label:'ថ្ងៃនេះ'}; })();
 function _pad2(n){ return String(n).padStart(2,'0'); }
 function _ymd(d){ return d.getFullYear()+'-'+_pad2(d.getMonth()+1)+'-'+_pad2(d.getDate()); }
 function _skGetPreset(p){
@@ -950,6 +950,7 @@ async function loadStockHistory(start, end){
 }
 function matchesDateFilter(p){
   if(_skDate.preset==='all'&&!_skDate.start) return true;
+  if(_skDate.preset==='today') return true;
   var lu=(p.lastUpdated||'').slice(0,10);
   if(!lu) return false;
   if(_skDate.start&&lu<_skDate.start) return false;
@@ -1402,12 +1403,12 @@ document.addEventListener('DOMContentLoaded',function(){
 <div class="sk-date-pop" id="skDatePop">
   <div class="sk-bs-handle-bar"></div>
   <div class="sk-preset-grid">
-    <button class="sk-preset-btn" data-p="today"     onclick="skSetPreset('today')">ថ្ងៃនេះ</button>
+    <button class="sk-preset-btn active" data-p="today"     onclick="skSetPreset('today')">ថ្ងៃនេះ</button>
     <button class="sk-preset-btn" data-p="yesterday" onclick="skSetPreset('yesterday')">ម្សិលមិញ</button>
     <button class="sk-preset-btn" data-p="last7"     onclick="skSetPreset('last7')">Last 7 Days</button>
     <button class="sk-preset-btn" data-p="thisMonth" onclick="skSetPreset('thisMonth')">This Month</button>
     <button class="sk-preset-btn" data-p="lastMonth" onclick="skSetPreset('lastMonth')">Last Month</button>
-    <button class="sk-preset-btn active" data-p="all" onclick="skSetPreset('all')">All Time</button>
+    <button class="sk-preset-btn" data-p="all" onclick="skSetPreset('all')">All Time</button>
   </div>
   <hr class="sk-pop-divider">
   <div class="sk-pop-label">Custom Range</div>
