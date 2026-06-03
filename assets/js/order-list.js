@@ -203,7 +203,7 @@ function normalizeOrders(arr){
     // Override with normalized values
     norm.customer     = norm.customer     || pick(['customer','Customer','name','Name']);
     norm.phone        = fixPhone(pick(['phone','Phone','tel','Tel']));
-    norm.date         = pick(['date','Date','dateTime','DateTime']);
+    norm.date         = pick(['dateTime','DateTime','date','Date']); // prefer full datetime (incl. time) over date-only
     norm.province     = pick(['province','Province']);
     norm.page         = pick(['page','Page','pages','Pages']);
     norm.closeBy      = pick(['closeBy','CloseBy','closeby']);
@@ -874,7 +874,9 @@ async function olSaveEdit(){
     if(dateEl && dateEl.value){
       var _dp = dateEl.value.split('T');
       var _d  = _dp[0].split('-');
-      o.date  = _d[2]+'/'+_d[1]+'/'+_d[0]+' '+(_dp[1]||'00:00');
+      var _formatted = _d[2]+'/'+_d[1]+'/'+_d[0]+' '+(_dp[1]||'00:00');
+      o.date     = _formatted;
+      o.dateTime = _formatted; // keep dateTime in sync so Apps Script uses the new date
     }
     // Delivery — read hidden input (combo) or plain input fallback
     var _delivVal = (document.getElementById('drDelivery')||delivEl||{}).value;
@@ -1347,7 +1349,8 @@ window.olSaveInlineDate = function(){
   var dp    = parts[0].split('-');        // ["YYYY","MM","DD"]
   var time  = (parts[1] || '00:00').slice(0, 5);
   var formatted = dp[2]+'/'+dp[1]+'/'+dp[0]+' '+time;
-  o.date = formatted;
+  o.date     = formatted;
+  o.dateTime = formatted; // keep dateTime in sync so Apps Script uses the new date
 
   /* ── 4. Button feedback — show ✅ so user knows it worked ── */
   var btn = document.querySelector('button[onclick="olSaveInlineDate()"]');
