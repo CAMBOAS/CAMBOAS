@@ -16,7 +16,7 @@ const products = [
   {
     id: 2,
     name: "សាប៊ូកក់&ម៉ាសសក់ CCR",
-    price: 16,
+    price: 18.5,
     category: "Hair",
     image: "../images/products/hair/សាប៊ូកក់សក់ និងម៉ាសសក់ CCR.png",
     detail: "សាប៊ូកក់ និងម៉ាសសក់ CCR"
@@ -32,7 +32,7 @@ const products = [
   {
     id: 4,
     name: "សាប៊ូកក់&ម៉ាសសក់ VIP 5in1 CCR",
-    price: 16,
+    price: 18,
     category: "Hair",
     image: "../images/products/hair/សក់និងម៉ាស 5in1.png",
     detail: "សាប៊ូកក់ និងម៉ាសសក់ VIP 5in1 CCR"
@@ -40,7 +40,7 @@ const products = [
   {
     id: 5,
     name: "សាប៊ូកក់&ម៉ាសសក់ Premium CCR",
-    price: 16,
+    price: 18.5,
     category: "Hair",
     image: "../images/products/hair/សក់និងម៉ាស Premium CCR.png",
     detail: "សាប៊ូកក់ និងម៉ាសសក់ Premium CCR"
@@ -152,7 +152,7 @@ const products = [
   {
     id: 19,
     name: "សាប៊ូមុខ JELY Gluta",
-    price: 8.5,
+    price: 10,
     category: "Face",
     image: "../images/products/face/សាប៊ូដុសមុខ JELY Gluta.png",
     detail: "សាប៊ូមុខ​​​ ​JELY Gluta"
@@ -184,7 +184,7 @@ const products = [
   {
     id: 23,
     name: "ថ្នាំដុសធ្មេញ CCR",
-    price: 10,
+    price: 12,
     category: "Face",
     image: "../images/products/face/ថ្នាំដុសធ្មេញ CCR.png",
     detail: "ថ្នាំដុសធ្មេញ CCR"
@@ -220,6 +220,14 @@ const products = [
     category: "Drink",
     image: "../images/products/drink/SlimSetX2_CCR.png",
     detail: "ឈុតសម្រកទ្វេដង CCR"
+  },
+  {
+    id: 28,
+    name: "ឈុតស្បែកហ្មត់ JELY",
+    price: 22.5,
+    category: "Body",
+    image: "../images/products/body/ឈុតស្បែកហ្មត់ JELY.png",
+    detail: "ឈុតស្បែកហ្មត់ JELY"
   }
 ];
 
