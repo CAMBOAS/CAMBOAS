@@ -84,10 +84,16 @@ function _doInit(defaults){
       var syncDone = 0, syncNeeded = 0;
       saved.forEach(function(p){
         var def = defaultMap[String(p.id)];
-        var newImg = def ? (def.image || def.img || '') : p.img;
-        if(def && newImg && newImg !== p.img){
+        var newImg   = def ? (def.image || def.img || '') : p.img;
+        var newPrice = def ? def.price : p.price;
+        var imgChanged   = def && newImg && newImg !== p.img;
+        var priceChanged = def && newPrice !== undefined && newPrice !== p.price;
+        if(imgChanged || priceChanged){
           syncNeeded++;
-          dbPut(Object.assign({}, p, { img: newImg }), function(){
+          var updated = Object.assign({}, p);
+          if(imgChanged)   updated.img   = newImg;
+          if(priceChanged) updated.price = newPrice;
+          dbPut(updated, function(){
             if(++syncDone === syncNeeded){
               dbGetAll(function(list){ window.__camboProducts = list; doRenderGrid(); });
             }
