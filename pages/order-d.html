@@ -1235,99 +1235,84 @@
     }
 
     /* ══════════════════════════════════════════════════════
-       ORDER D — Customer Block + List-form redesign
+       ORDER D — Bordered-Input Form Style
     ══════════════════════════════════════════════════════ */
 
-    /* ── Customer block card ── */
+    /* ── Section block ── */
     #custSection {
-      border-radius: 18px !important;
-      border: 1.5px solid rgba(124,92,255,.18) !important;
-      overflow: hidden;
-      box-shadow: 0 6px 28px rgba(124,92,255,.10), 0 1px 4px rgba(0,0,0,.06);
-      margin: 0 12px 8px;
-    }
-    [data-theme="dark"] #custSection {
-      border-color: rgba(124,92,255,.28) !important;
-      box-shadow: 0 6px 28px rgba(0,0,0,.3);
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      margin: 0 !important;
     }
 
     /* ── Section header ── */
     #custHead {
-      padding: 13px 16px !important;
-      background: linear-gradient(135deg, rgba(139,92,246,.07) 0%, rgba(6,182,212,.04) 100%) !important;
-      border-bottom: 1px solid rgba(124,92,255,.1) !important;
+      padding: 12px 16px !important;
+      background: var(--card, rgba(255,255,255,.95)) !important;
+      border-bottom: 1px solid rgba(0,0,0,.08) !important;
       min-height: auto !important;
-      gap: 12px !important;
+      gap: 10px !important;
     }
     [data-theme="dark"] #custHead {
-      background: linear-gradient(135deg, rgba(139,92,246,.14) 0%, rgba(6,182,212,.08) 100%) !important;
-      border-bottom-color: rgba(124,92,255,.18) !important;
+      background: rgba(18,14,36,.95) !important;
+      border-bottom-color: rgba(255,255,255,.08) !important;
     }
 
-    /* ── Icon badge ── */
+    /* ── Icon badge (simple) ── */
     .od-sect-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 11px;
-      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background: rgba(124,92,255,.12);
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      font-size: 19px;
-      box-shadow: 0 3px 10px rgba(139,92,246,.35);
+      font-size: 17px;
     }
+    [data-theme="dark"] .od-sect-badge { background: rgba(124,92,255,.22); }
 
-    /* ── Title group ── */
+    /* ── Title ── */
     .od-sect-info { flex: 1; min-width: 0; }
     .od-sect-info h3 {
       font-size: 15px !important;
       font-weight: 800 !important;
       color: var(--text, #18213a) !important;
-      margin: 0 0 2px !important;
-      letter-spacing: -.01em;
+      margin: 0 !important;
     }
     [data-theme="dark"] .od-sect-info h3 { color: #e8e0ff !important; }
-    .od-sect-info span {
-      font-size: 11px;
-      color: var(--muted, #6b7898);
-      font-weight: 500;
-      letter-spacing: .01em;
-    }
+    .od-sect-info span { display: none; }
 
-    /* ── Chevron pill ── */
+    /* ── Chevron ── */
     .od-chevron-pill {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      background: rgba(139,92,246,.12);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      background: rgba(0,0,0,.06);
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      color: #8b5cf6;
-      transition: transform .28s cubic-bezier(.4,0,.2,1), background .15s;
+      color: var(--muted, #6b7898);
+      transition: transform .28s cubic-bezier(.4,0,.2,1);
       pointer-events: none;
     }
-    [data-theme="dark"] .od-chevron-pill { background: rgba(139,92,246,.2); color: #c4b5fd; }
+    [data-theme="dark"] .od-chevron-pill { background: rgba(255,255,255,.08); color: #a0aabf; }
     #custHead.is-open .od-chevron-pill { transform: rotate(180deg); }
 
-    #custBody { padding: 0 !important; }
+    /* ── Form body ── */
+    #custBody { padding: 14px 16px 18px !important; }
 
+    /* ── Each row: label left + bordered input right ── */
     .od-row {
       display: flex;
       align-items: center;
-      min-height: 52px;
-      padding: 7px 16px;
-      border-bottom: 1px solid rgba(0,0,0,.07);
-      gap: 10px;
-      position: relative;
+      gap: 12px;
+      margin-bottom: 10px;
+      min-height: auto;
+      padding: 0;
+      border-bottom: none;
+      position: static;
     }
-    [data-theme="dark"] .od-row { border-bottom-color: rgba(255,255,255,.07); }
-    .od-row:last-child { border-bottom: none; }
+    .od-row:last-child { margin-bottom: 0; }
 
     .od-lbl {
-      flex: 0 0 108px;
+      flex: 0 0 110px;
       font-size: 14px;
       font-weight: 700;
       color: var(--text, #18213a);
@@ -1335,139 +1320,179 @@
     }
     [data-theme="dark"] .od-lbl { color: #e8e0ff; }
 
+    /* ── Inputs: visible bordered box ── */
     .od-inp {
       flex: 1;
-      min-width: 0;
-      height: 38px;
-      border: none;
-      background: transparent;
+      height: 48px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(0,0,0,.13);
+      background: var(--input, rgba(255,255,255,.95));
+      padding: 0 14px;
       font-size: 15px;
       font-family: inherit;
       color: var(--text, #18213a);
       outline: none;
-      text-align: right;
+      text-align: left;
       -webkit-appearance: none;
       appearance: none;
-      padding: 0;
       width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
     }
-    [data-theme="dark"] .od-inp { color: #e8e0ff; }
-    .od-inp::placeholder { color: rgba(107,120,152,.45); }
+    .od-inp:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139,92,246,.12);
+    }
+    .od-inp::placeholder { color: rgba(107,120,152,.5); }
+    [data-theme="dark"] .od-inp {
+      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.07);
+      color: #e8e0ff;
+    }
+    [data-theme="dark"] .od-inp:focus { border-color: #8b5cf6; }
     .od-inp[type="number"]::-webkit-outer-spin-button,
     .od-inp[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
     .od-inp[type="number"] { -moz-appearance: textfield; }
-    .od-inp[type="time"] { cursor: pointer; }
 
+    /* ── Combo: same bordered box ── */
     .od-combo { flex: 1; min-width: 0; }
     .od-combo .combo-input {
-      height: 38px !important;
-      border: none !important;
-      border-radius: 0 !important;
-      background: transparent !important;
-      box-shadow: none !important;
-      text-align: right !important;
+      height: 48px !important;
+      border-radius: 12px !important;
+      border: 1.5px solid rgba(0,0,0,.13) !important;
+      background: var(--input, rgba(255,255,255,.95)) !important;
+      padding: 0 14px !important;
       font-size: 15px !important;
-      padding: 0 !important;
-      width: 100% !important;
+      font-family: inherit !important;
       color: var(--text, #18213a) !important;
+      outline: none !important;
+      text-align: left !important;
+      width: 100% !important;
+      box-shadow: none !important;
+      box-sizing: border-box !important;
     }
-    [data-theme="dark"] .od-combo .combo-input { color: #e8e0ff !important; }
+    .od-combo .combo-input:focus {
+      border-color: #8b5cf6 !important;
+      box-shadow: 0 0 0 3px rgba(139,92,246,.12) !important;
+    }
+    [data-theme="dark"] .od-combo .combo-input {
+      border-color: rgba(255,255,255,.12) !important;
+      background: rgba(255,255,255,.07) !important;
+      color: #e8e0ff !important;
+    }
 
+    /* ── Payment row ── */
     .od-row-pay {
       flex-direction: column;
       align-items: flex-start;
       gap: 8px;
-      padding-top: 12px;
-      padding-bottom: 12px;
+      margin-bottom: 10px;
     }
     .od-row-pay .payment-opts { width: 100%; padding-bottom: 0; }
-    .od-row-pay .pay-btn { flex: 1; }
+    .od-row-pay .pay-btn { flex: 1; height: 44px; border-radius: 12px; font-size: 14px; }
 
+    /* ── Note row ── */
     .od-row-note {
       flex-direction: column;
       align-items: stretch;
       gap: 8px;
-      padding: 10px 16px 14px;
+      padding: 0;
       border-bottom: none;
+      margin-bottom: 0;
     }
     .od-note-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
     }
     .od-note-label {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text, #18213a);
+      padding: 6px 12px;
+      border: 1.5px solid rgba(0,0,0,.13);
+      border-radius: 10px;
     }
-    [data-theme="dark"] .od-note-label { color: #e8e0ff; }
+    [data-theme="dark"] .od-note-label { color: #e8e0ff; border-color: rgba(255,255,255,.12); }
     .od-note-invoice {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
       font-size: 13px;
       font-weight: 700;
       color: var(--muted, #6b7898);
-      background: none;
-      border: none;
+      padding: 6px 12px;
+      border: 1.5px solid rgba(0,0,0,.12);
+      border-radius: 10px;
+      background: transparent;
       cursor: pointer;
       font-family: inherit;
-      padding: 4px 0;
     }
-    #od-note-area {
-      width: 100%;
-      min-height: 72px;
-      border: none;
-      background: transparent;
-      font-size: 15px;
-      font-family: inherit;
-      color: var(--text, #18213a);
-      outline: none;
-      resize: none;
-      padding: 0;
-      line-height: 1.55;
-    }
-    [data-theme="dark"] #od-note-area { color: #e8e0ff; }
-    #od-note-area::placeholder { color: rgba(107,120,152,.4); }
+    [data-theme="dark"] .od-note-invoice { border-color: rgba(255,255,255,.1); }
 
-    /* date+time inline row */
+    /* ── Date + Time ── */
     .od-datetime {
       flex: 1;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       min-width: 0;
     }
     .od-date-wrap {
       flex: 1;
       position: relative;
-      height: 38px;
+      height: 48px;
       min-width: 0;
+    }
+    .od-date-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(0,0,0,.13);
+      background: var(--input, rgba(255,255,255,.95));
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    [data-theme="dark"] .od-date-overlay {
+      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.07);
+    }
+    .od-sep {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted, #6b7898);
+      flex-shrink: 0;
     }
     .od-time-inp {
       flex: 1;
-      height: 38px;
-      border: none;
-      background: transparent;
+      height: 48px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(0,0,0,.13);
+      background: var(--input, rgba(255,255,255,.95));
+      padding: 0 12px;
       font-size: 14px;
       font-family: inherit;
       color: var(--text, #18213a);
       outline: none;
-      text-align: right;
-      min-width: 80px;
+      min-width: 90px;
       -webkit-appearance: none;
       appearance: none;
-      padding: 0;
+      cursor: pointer;
     }
-    [data-theme="dark"] .od-time-inp { color: #e8e0ff; }
-    .od-sep {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted, #6b7898);
-      flex-shrink: 0;
+    .od-time-inp:focus { border-color: #8b5cf6; }
+    [data-theme="dark"] .od-time-inp {
+      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.07);
+      color: #e8e0ff;
     }
   </style>
 </head>
@@ -1599,8 +1624,8 @@
                     <input id="datePart" type="date"
                       style="position:absolute;inset:0;width:100%;height:100%;opacity:1;color:transparent;background:transparent;border:none;outline:none;cursor:pointer;z-index:2;box-sizing:border-box;"
                       oninput="(function(v){var t=document.getElementById('datePartText');if(!t)return;if(!v){t.textContent='ថ្ងៃ/ខែ/ឆ្នាំ';t.style.color='';return;}var p=v.split('-');t.textContent=p[2]+'/'+p[1]+'/'+p[0].slice(2);t.style.color='var(--text,#18213a)';})(this.value)">
-                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font-size:14px;pointer-events:none;z-index:1;">
-                      <span id="datePartText" style="color:rgba(107,120,152,.45);">ថ្ងៃ/ខែ/ឆ្នាំ</span>
+                    <div class="od-date-overlay">
+                      <span id="datePartText" style="color:rgba(107,120,152,.5);">ថ្ងៃ/ខែ/ឆ្នាំ</span>
                       <span style="font-size:15px;">📅</span>
                     </div>
                   </div>
