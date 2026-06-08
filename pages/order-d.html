@@ -1499,6 +1499,159 @@
       color: #e8e0ff;
     }
 
+    /* ── Invoice Paste Modal ── */
+    #invoiceModal {
+      position: fixed;
+      inset: 0;
+      z-index: 18000;
+      display: flex;
+      align-items: flex-end;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      padding: 0;
+      animation: ivFadeIn .22s ease;
+    }
+    #invoiceModal[hidden] { display: none !important; }
+    @keyframes ivFadeIn { from{opacity:0} to{opacity:1} }
+
+    .iv-sheet {
+      width: 100%;
+      background: var(--card, #fff);
+      border-radius: 22px 22px 0 0;
+      padding: 0 0 env(safe-area-inset-bottom);
+      box-shadow: 0 -8px 40px rgba(0,0,0,.18);
+      animation: ivSlideUp .28s cubic-bezier(.22,.68,0,1.2);
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+    }
+    [data-theme="dark"] .iv-sheet { background: #0e0b1e; }
+    @keyframes ivSlideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+    .iv-handle {
+      width: 40px; height: 4px;
+      border-radius: 2px;
+      background: rgba(0,0,0,.12);
+      margin: 10px auto 0;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .iv-handle { background: rgba(255,255,255,.15); }
+
+    .iv-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 10px;
+      flex-shrink: 0;
+    }
+    .iv-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text, #18213a);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    [data-theme="dark"] .iv-title { color: #e8e0ff; }
+    .iv-close-btn {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(239,68,68,.1);
+      color: #ef4444;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .iv-hint {
+      font-size: 12px;
+      color: var(--muted, #6b7898);
+      padding: 0 18px 10px;
+      line-height: 1.55;
+      flex-shrink: 0;
+    }
+
+    .iv-textarea {
+      flex: 1;
+      min-height: 150px;
+      max-height: 300px;
+      margin: 0 18px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(0,0,0,.12);
+      background: var(--input, rgba(255,255,255,.95));
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text, #18213a);
+      outline: none;
+      resize: none;
+      line-height: 1.5;
+      overflow-y: auto;
+    }
+    .iv-textarea:focus { border-color: #8b5cf6; }
+    [data-theme="dark"] .iv-textarea {
+      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.07);
+      color: #e8e0ff;
+    }
+
+    .iv-preview {
+      margin: 10px 18px 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(124,92,255,.06);
+      border: 1px solid rgba(124,92,255,.15);
+      font-size: 12px;
+      color: var(--muted, #6b7898);
+      line-height: 1.7;
+      display: none;
+      max-height: 120px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .iv-preview { background: rgba(124,92,255,.1); border-color: rgba(124,92,255,.2); }
+    .iv-preview.show { display: block; }
+    .iv-preview b { color: var(--text, #18213a); font-weight: 700; }
+    [data-theme="dark"] .iv-preview b { color: #e8e0ff; }
+
+    .iv-actions {
+      display: flex;
+      gap: 10px;
+      padding: 14px 18px 16px;
+      flex-shrink: 0;
+    }
+    .iv-cancel-btn {
+      flex: 1;
+      height: 46px;
+      border-radius: 13px;
+      border: 1.5px solid rgba(0,0,0,.12);
+      background: transparent;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted, #6b7898);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    [data-theme="dark"] .iv-cancel-btn { border-color: rgba(255,255,255,.12); }
+    .iv-apply-btn {
+      flex: 2;
+      height: 46px;
+      border-radius: 13px;
+      border: none;
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 14px rgba(139,92,246,.35);
+      transition: opacity .15s;
+    }
+    .iv-apply-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .iv-apply-btn:not(:disabled):active { opacity: .82; }
+
     /* ── Validation error state ── */
     @keyframes od-shake {
       0%,100% { transform: translateX(0); }
@@ -2616,10 +2769,238 @@ document.addEventListener('DOMContentLoaded', function(){
 <script src="../assets/js/dashboard-layout.js?v=164"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="../assets/js/share-receipt.js?v=164"></script>
+<!-- ══ Invoice Paste Modal ══ -->
+<div id="invoiceModal" hidden>
+  <div class="iv-sheet">
+    <div class="iv-handle"></div>
+    <div class="iv-head">
+      <span class="iv-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>
+        Paste Receipt → Fill Form
+      </span>
+      <button type="button" class="iv-close-btn" id="ivCloseBtn">✕</button>
+    </div>
+    <p class="iv-hint">📋 Copy text receipt ពីអតិថិជន រួចចុច Paste ខាងក្រោម — ប្រព័ន្ធ​នឹង​បំពេញ Form ដោយស្វ័យប្រវត្តិ។</p>
+    <textarea class="iv-textarea" id="ivTextarea" placeholder="Paste receipt text នៅទីនេះ...&#10;&#10;🧾 វិក័យប័ត្រ    កាលបរិច្ឆេទ: ...&#10;👤 ឈ្មោះ: ...&#10;📞 លេខទូរសព្ទ: ..."></textarea>
+    <div class="iv-preview" id="ivPreview"></div>
+    <div class="iv-actions">
+      <button type="button" class="iv-cancel-btn" id="ivCancelBtn">បោះបង់</button>
+      <button type="button" class="iv-apply-btn" id="ivApplyBtn" disabled>✓ Fill Form</button>
+    </div>
+  </div>
+</div>
+
 <script src="../assets/js/searchable-combo.js?v=164"></script>
 <script src="../assets/js/sw-register.js?v=164"></script>
 
 <script>
+/* ══════════════════════════════════════════════════════
+   ORDER D — Invoice Paste Feature
+══════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  /* ── Parse receipt text → data object ── */
+  function parseReceipt(text) {
+    var d = {};
+    function pick(regex) {
+      var m = text.match(regex);
+      return m ? m[1].trim().replace(/^-$/, '') : '';
+    }
+
+    d.customer    = pick(/👤\s*ឈ្មោះ:\s*(.+)/);
+    d.phone       = pick(/📞\s*លេខទូរស(?:ព|ព)ទ:\s*(.+)/);
+    d.address     = pick(/📍\s*ទីតាំង:\s*(.+)/);
+    d.deliveryName= pick(/🚚\s*អ្នកដឹកជញ្ជូន:\s*(.+)/);
+    d.note        = pick(/📝\s*Note:\s*(.+)/);
+    d.payment     = pick(/💳\s*ការទូទាត់:\s*(.+)/);
+
+    /* Page + CloseBy on same line */
+    var pc = text.match(/📄\s*Page:\s*([^|]+)\s*\|\s*CloseBy:\s*(.+)/);
+    if (pc) { d.page = pc[1].trim().replace(/^-$/,''); d.closeBy = pc[2].trim().replace(/^-$/,''); }
+
+    /* Date + Time from header */
+    var dt = text.match(/កាលបរិច្ឆេទ:\s*(\d{2}\/\d{2}\/\d{4})\s+(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
+    if (dt) { d.dateDisplay = dt[1].trim(); d.timeDisplay = dt[2].trim(); }
+
+    /* Delivery fee */
+    var fee = text.match(/🚛\s*សេវាដឹក:\s*(.*)/);
+    if (fee) {
+      var fs = fee[1].trim();
+      d.deliveryFee = /ហ្វ្រី|free|0/i.test(fs) ? 0 : (parseFloat(fs.replace(/[$,]/g,'')) || 0);
+    }
+
+    return d;
+  }
+
+  /* ── Convert 12h time → HH:MM (input[type=time] value) ── */
+  function to24h(t) {
+    var m = t.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+    if (!m) return t;
+    var h = parseInt(m[1], 10), min = m[2], ap = (m[3]||'').toUpperCase();
+    if (ap === 'PM' && h !== 12) h += 12;
+    if (ap === 'AM' && h === 12) h = 0;
+    return (h < 10 ? '0' : '') + h + ':' + min;
+  }
+
+  /* ── Fill form fields ── */
+  function fillForm(d) {
+    var filled = 0;
+    function setVal(id, val) {
+      if (!val && val !== 0) return;
+      var el = document.getElementById(id);
+      if (el) { el.value = val; el.dispatchEvent(new Event('input', {bubbles:true})); filled++; }
+    }
+
+    setVal('customer',     d.customer);
+    setVal('phone',        d.phone);
+    setVal('addressDetail',d.address);
+    setVal('deliveryInput',d.deliveryName);
+    setVal('deliveryFee',  d.deliveryFee !== undefined ? d.deliveryFee : '');
+    setVal('pagesInput',   d.page);
+    setVal('closeByInput', d.closeBy);
+
+    /* Combo hidden fields */
+    if (d.deliveryName) { var h = document.getElementById('deliveryName'); if (h) h.value = d.deliveryName; }
+    if (d.page)         { var h = document.getElementById('page');         if (h) h.value = d.page; }
+    if (d.closeBy)      { var h = document.getElementById('closeBy');      if (h) h.value = d.closeBy; }
+
+    /* Note */
+    if (d.note && d.note !== '-') setVal('note', d.note);
+
+    /* Payment — set hidden + activate button */
+    if (d.payment) {
+      var ph = document.getElementById('payment');
+      if (ph) { ph.value = d.payment; filled++; }
+      document.querySelectorAll('.pay-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.value === d.payment);
+      });
+    }
+
+    /* Date — convert DD/MM/YYYY → YYYY-MM-DD */
+    if (d.dateDisplay) {
+      var parts = d.dateDisplay.split('/');
+      if (parts.length === 3) {
+        var iso = parts[2] + '-' + parts[1] + '-' + parts[0];
+        var de = document.getElementById('datePart');
+        if (de) {
+          de.value = iso;
+          de.dispatchEvent(new Event('input', {bubbles:true}));
+          filled++;
+        }
+      }
+    }
+
+    /* Time */
+    if (d.timeDisplay) setVal('timePart', to24h(d.timeDisplay));
+
+    return filled;
+  }
+
+  /* ── Build preview text ── */
+  function buildPreview(d) {
+    var rows = [];
+    function row(icon, label, val) { if (val || val === 0) rows.push(icon + ' <b>' + label + '</b>: ' + val); }
+    row('👤','ឈ្មោះ',      d.customer);
+    row('📞','ទូរស័ព្ទ',    d.phone);
+    row('📍','ទីតំណាំ',    d.address);
+    row('🚚','ដឹកជញ្ជូន',   d.deliveryName);
+    row('💳','បង់ប្រាក់',    d.payment);
+    row('📅','ថ្ងៃ',         d.dateDisplay ? d.dateDisplay + ' ' + (d.timeDisplay||'') : '');
+    row('📄','Page',         d.page);
+    row('🤝','CloseBy',      d.closeBy);
+    row('🚛','ថ្លៃដឹក',     d.deliveryFee !== undefined ? '$'+d.deliveryFee : '');
+    return rows.join('<br>');
+  }
+
+  /* ── Modal logic ── */
+  var modal    = document.getElementById('invoiceModal');
+  var textarea = document.getElementById('ivTextarea');
+  var preview  = document.getElementById('ivPreview');
+  var applyBtn = document.getElementById('ivApplyBtn');
+  var closeBtn = document.getElementById('ivCloseBtn');
+  var cancelBtn= document.getElementById('ivCancelBtn');
+
+  var _parsed = null;
+
+  function openModal() {
+    if (!modal) return;
+    textarea.value = '';
+    preview.innerHTML = '';
+    preview.classList.remove('show');
+    applyBtn.disabled = true;
+    _parsed = null;
+    modal.hidden = false;
+    setTimeout(function(){ textarea.focus(); }, 120);
+  }
+
+  function closeModal() { if (modal) modal.hidden = true; }
+
+  function onInput() {
+    var txt = textarea.value.trim();
+    if (!txt) {
+      preview.classList.remove('show');
+      applyBtn.disabled = true;
+      _parsed = null;
+      return;
+    }
+    _parsed = parseReceipt(txt);
+    var prev = buildPreview(_parsed);
+    if (prev) {
+      preview.innerHTML = prev;
+      preview.classList.add('show');
+      applyBtn.disabled = false;
+    } else {
+      preview.innerHTML = '<span style="color:#ef4444">⚠️ មិនរកឃើញទិន្នន័យ — សូម Paste text receipt ត្រឹមត្រូវ</span>';
+      preview.classList.add('show');
+      applyBtn.disabled = true;
+    }
+  }
+
+  function onApply() {
+    if (!_parsed) return;
+    var n = fillForm(_parsed);
+    closeModal();
+    if (window.macUI) macUI.toast('✅ បំពេញ ' + n + ' ចន្លោះដោយជោគជ័យ!', 'success');
+    /* Scroll to top of form */
+    var custSection = document.getElementById('custSection');
+    if (custSection) custSection.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  if (textarea)  textarea.addEventListener('input',  onInput);
+  if (textarea)  textarea.addEventListener('paste',  function(){ setTimeout(onInput, 30); });
+  if (applyBtn)  applyBtn.addEventListener('click',  onApply);
+  if (closeBtn)  closeBtn.addEventListener('click',  closeModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+  /* Close on backdrop click */
+  if (modal) modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+  /* Close on Escape */
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && modal && !modal.hidden) closeModal(); });
+
+  /* ── Wire Invoice button ── */
+  document.addEventListener('DOMContentLoaded', function () {
+    var ivBtn = document.getElementById('invoiceBtn');
+    if (ivBtn) ivBtn.addEventListener('click', openModal);
+
+    /* ── Note button → focus note textarea ── */
+    var noteHeadBtns = document.querySelectorAll('.od-note-label');
+    noteHeadBtns.forEach(function(btn) {
+      btn.style.cursor = 'pointer';
+      btn.addEventListener('click', function () {
+        var noteEl = document.getElementById('note');
+        if (noteEl) { noteEl.focus(); noteEl.scrollIntoView({ behavior:'smooth', block:'center' }); }
+      });
+    });
+  });
+
+  /* Also support late binding if DOMContentLoaded already fired */
+  if (document.readyState !== 'loading') {
+    var ivBtn = document.getElementById('invoiceBtn');
+    if (ivBtn) ivBtn.addEventListener('click', openModal);
+  }
+
+}());
+
 /* ══════════════════════════════════════════════════════
    ORDER D — Form Validation
    Runs BEFORE Save / Copy / Share / Print handlers
