@@ -1385,10 +1385,11 @@
     .od-row-pay {
       flex-direction: column;
       align-items: flex-start;
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 10px;
     }
-    .od-row-pay .payment-opts { width: 100%; padding-bottom: 0; }
+    .od-row-pay .od-lbl { flex: 0 0 auto; }
+    .od-row-pay .payment-opts { width: 100%; padding-bottom: 0; margin-top: 0; }
     .od-row-pay .pay-btn { flex: 1; height: 44px; border-radius: 12px; font-size: 14px; }
 
     /* ── Note row ── */
@@ -1400,6 +1401,7 @@
       border-bottom: none;
       margin-bottom: 0;
     }
+    .od-row-note .od-note-head { flex: 0 0 auto; }
     .od-note-head {
       display: flex;
       align-items: center;
