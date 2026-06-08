@@ -30,6 +30,7 @@
       customer: data.customer || "-",
       phone: data.phone || "-",
       address: data.address || "-",
+      province: data.province || "-",
       deliveryName: data.deliveryName || "-",
       note: data.note || "-",
       page: data.page || "-",
@@ -62,6 +63,7 @@ function buildCopyText(data) {
   lines.push(`👤 ឈ្មោះ:\t${data.customer}`);
   lines.push(`📞 លេខទូរសព្ទ:\t${data.phone}`);
   lines.push(`📍 ទីតាំង:\t${data.address}`);
+  lines.push(`🗺️ ខេត្ត/ក្រុង:\t${data.province}`);
   lines.push(`🚚 អ្នកដឹកជញ្ជូន:\t${data.deliveryName}`);
   lines.push(`📝 Note:\t\t${data.note}`);
   lines.push(separator);

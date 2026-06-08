@@ -2809,8 +2809,9 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     d.customer    = pick(/👤\s*ឈ្មោះ:\s*(.+)/);
-    d.phone       = pick(/📞\s*លេខទូរស(?:ព|ព)ទ:\s*(.+)/);
+    d.phone       = pick(/📞\s*លេខទូរសព្ទ:\s*(.+)/);
     d.address     = pick(/📍\s*ទីតាំង:\s*(.+)/);
+    d.province    = pick(/🗺️?\s*ខេត្ត[^:]*:\s*(.+)/);
     d.deliveryName= pick(/🚚\s*អ្នកដឹកជញ្ជូន:\s*(.+)/);
     d.note        = pick(/📝\s*Note:\s*(.+)/);
     d.payment     = pick(/💳\s*ការទូទាត់:\s*(.+)/);
@@ -2860,6 +2861,12 @@ document.addEventListener('DOMContentLoaded', function(){
     setVal('pagesInput',   d.page);
     setVal('closeByInput', d.closeBy);
 
+    /* Province */
+    if (d.province) {
+      setVal('provinceInput', d.province);
+      var ph = document.getElementById('province'); if (ph) ph.value = d.province;
+    }
+
     /* Combo hidden fields */
     if (d.deliveryName) { var h = document.getElementById('deliveryName'); if (h) h.value = d.deliveryName; }
     if (d.page)         { var h = document.getElementById('page');         if (h) h.value = d.page; }
@@ -2904,6 +2911,7 @@ document.addEventListener('DOMContentLoaded', function(){
     row('👤','ឈ្មោះ',      d.customer);
     row('📞','ទូរស័ព្ទ',    d.phone);
     row('📍','ទីតំណាំ',    d.address);
+    row('🗺️','ខេត្ត/ក្រុង', d.province);
     row('🚚','ដឹកជញ្ជូន',   d.deliveryName);
     row('💳','បង់ប្រាក់',    d.payment);
     row('📅','ថ្ងៃ',         d.dateDisplay ? d.dateDisplay + ' ' + (d.timeDisplay||'') : '');
