@@ -1498,6 +1498,25 @@
       background: rgba(255,255,255,.07);
       color: #e8e0ff;
     }
+
+    /* ── Validation error state ── */
+    @keyframes od-shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-7px); }
+      40%      { transform: translateX(7px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+    .od-field-err {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239,68,68,.18) !important;
+      animation: od-shake .38s ease;
+    }
+    .od-pay-err {
+      outline: 2.5px solid #ef4444;
+      border-radius: 14px;
+      animation: od-shake .38s ease;
+    }
   </style>
 </head>
 <body>
@@ -2599,5 +2618,130 @@ document.addEventListener('DOMContentLoaded', function(){
 <script src="../assets/js/share-receipt.js?v=164"></script>
 <script src="../assets/js/searchable-combo.js?v=164"></script>
 <script src="../assets/js/sw-register.js?v=164"></script>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   ORDER D — Form Validation
+   Runs BEFORE Save / Copy / Share / Print handlers
+══════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  /* ── Required fields ── */
+  var FIELDS = [
+    {
+      label: 'ឈ្មោះអតிថិជន',
+      getVal: function () { return (document.getElementById('customer') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('customer'); }
+    },
+    {
+      label: 'លេខទូរស័ព្ទ',
+      getVal: function () { return (document.getElementById('phone') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('phone'); }
+    },
+    {
+      label: 'ទីតំណាំតំបន',
+      getVal: function () { return (document.getElementById('addressDetail') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('addressDetail'); }
+    },
+    {
+      label: 'ខេត្ត / ក្រុង',
+      getVal: function () { return (document.getElementById('provinceInput') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('provinceInput'); }
+    },
+    {
+      label: 'ដឹកជញ្ជូន',
+      getVal: function () { return (document.getElementById('deliveryInput') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('deliveryInput'); }
+    },
+    {
+      label: 'ថ្ងៃខែឆ្នាំ',
+      getVal: function () { return (document.getElementById('datePart') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('datePart'); },
+      getErrEl: function () { return document.querySelector('.od-date-overlay'); }
+    },
+    {
+      label: 'ម៉ោង',
+      getVal: function () { return (document.getElementById('timePart') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('timePart'); }
+    },
+    {
+      label: 'បង់ប្រាក់',
+      getVal: function () { return (document.getElementById('payment') || {}).value || ''; },
+      getEl:  function () { return null; },
+      getErrEl: function () { return document.getElementById('paymentOptions'); },
+      isPayment: true
+    },
+  ];
+
+  /* ── Flash an error on a single element ── */
+  function flashEl(el, isPayment) {
+    if (!el) return;
+    if (isPayment) {
+      el.classList.add('od-pay-err');
+      setTimeout(function () { el.classList.remove('od-pay-err'); }, 2200);
+    } else {
+      el.classList.add('od-field-err');
+      setTimeout(function () { el.classList.remove('od-field-err'); }, 2200);
+    }
+  }
+
+  /* ── Main validate function ── */
+  function validate() {
+    var errors  = [];
+    var firstEl = null;
+
+    FIELDS.forEach(function (f) {
+      if (f.getVal().trim() !== '') return; /* OK */
+
+      errors.push(f.label);
+
+      /* highlight the visible input / element */
+      var errEl = f.getErrEl ? f.getErrEl() : f.getEl();
+      if (errEl) {
+        flashEl(errEl, f.isPayment);
+        if (!firstEl) firstEl = errEl;
+      }
+    });
+
+    if (errors.length === 0) return true; /* all good */
+
+    /* Scroll to first error */
+    if (firstEl) firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    /* Toast message */
+    var msg = errors.length === 1
+      ? 'សូមបំពេញ: ' + errors[0]
+      : 'សូមបំពេញ ' + errors.length + ' ចន្លោះ: ' + errors.join(' · ');
+
+    if (window.macUI) {
+      macUI.toast(msg, 'warning');
+    }
+    return false;
+  }
+
+  /* ── Hook buttons in capture phase (runs before existing handlers) ── */
+  function hookBtn(id) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function (e) {
+      if (!validate()) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+      }
+    }, true /* capture */);
+  }
+
+  function init() {
+    ['saveBtn', 'copyBtn', 'shareBtn', 'printBtn'].forEach(hookBtn);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+}());
+</script>
 </body>
 </html>
