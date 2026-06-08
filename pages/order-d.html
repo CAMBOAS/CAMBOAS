@@ -2803,33 +2803,49 @@ document.addEventListener('DOMContentLoaded', function(){
   /* ── Parse receipt text → data object ── */
   function parseReceipt(text) {
     var d = {};
-    function pick(regex) {
-      var m = text.match(regex);
-      return m ? m[1].trim().replace(/^-$/, '') : '';
+
+    /* ── Extract value after last colon on a line ── */
+    function afterColon(line) {
+      var idx = line.lastIndexOf(':');
+      return idx < 0 ? '' : line.slice(idx + 1).replace(/^[\t ]+/, '').trim();
     }
 
-    d.customer    = pick(/👤\s*ឈ្មោះ:\s*(.+)/);
-    d.phone       = pick(/📞\s*លេខទូរសព្ទ:\s*(.+)/);
-    d.address     = pick(/📍\s*ទីតាំង:\s*(.+)/);
-    d.province    = pick(/ខេត្ត[^:\n]*:\s*(.+)/);
-    d.deliveryName= pick(/🚚\s*អ្នកដឹកជញ្ជូន:\s*(.+)/);
-    d.note        = pick(/📝\s*Note:\s*(.+)/);
-    d.payment     = pick(/💳\s*ការទូទាត់:\s*(.+)/);
+    /* ── Clean dash placeholder ── */
+    function clean(s) { return (s === '-' || s === '–' || s === '') ? '' : s; }
 
-    /* Page + CloseBy on same line */
-    var pc = text.match(/📄\s*Page:\s*([^|]+)\s*\|\s*CloseBy:\s*(.+)/);
-    if (pc) { d.page = pc[1].trim().replace(/^-$/,''); d.closeBy = pc[2].trim().replace(/^-$/,''); }
+    /* ── Line-by-line: use includes() so Khmer encoding never mismatches ── */
+    var lines = text.split(/\r?\n/);
+    lines.forEach(function(raw) {
+      var line = raw.trim();
+      if (!line || line.replace(/\./g,'') === '') return; /* skip separator */
 
-    /* Date + Time from header */
-    var dt = text.match(/កាលបរិច្ឆេទ:\s*(\d{2}\/\d{2}\/\d{4})\s+(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
+      var val = clean(afterColon(line));
+
+      if      (line.includes('ឈ្មោះ'))        { if (val) d.customer     = val; }
+      else if (line.includes('លេខទូរ'))        { if (val) d.phone        = val; }
+      else if (line.includes('ទីតាំង'))        { if (val) d.address      = val; }
+      else if (line.includes('ខេត្ត'))         { if (val) d.province     = val; }
+      else if (line.includes('ដឹកជញ្ជូន') &&
+               !line.includes('សេវា'))         { if (val) d.deliveryName = val; }
+      else if (line.includes('Note'))          { if (val) d.note         = val; }
+      else if (line.includes('ការទូទាត់'))     { if (val) d.payment      = val; }
+      else if (line.includes('Page') &&
+               line.includes('CloseBy'))       {
+        var pm = line.match(/Page:\s*([^|]+)/);
+        var cm = line.match(/CloseBy:\s*(.+)/);
+        if (pm) d.page    = clean(pm[1].trim());
+        if (cm) d.closeBy = clean(cm[1].trim());
+      }
+      else if (line.includes('សេវាដឹក'))       {
+        var fs = val;
+        d.deliveryFee = (!fs || /ហ្វ្រី|free/i.test(fs))
+          ? 0 : (parseFloat(fs.replace(/[$,]/g,'')) || 0);
+      }
+    });
+
+    /* ── Date + Time from the header line (regex on numbers only) ── */
+    var dt = text.match(/(\d{2}\/\d{2}\/\d{4})\s+(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
     if (dt) { d.dateDisplay = dt[1].trim(); d.timeDisplay = dt[2].trim(); }
-
-    /* Delivery fee */
-    var fee = text.match(/🚛\s*សេវាដឹក:\s*(.*)/);
-    if (fee) {
-      var fs = fee[1].trim();
-      d.deliveryFee = /ហ្វ្រី|free|0/i.test(fs) ? 0 : (parseFloat(fs.replace(/[$,]/g,'')) || 0);
-    }
 
     return d;
   }
