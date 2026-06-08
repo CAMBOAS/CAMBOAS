@@ -1235,8 +1235,83 @@
     }
 
     /* ══════════════════════════════════════════════════════
-       ORDER D — List-style form redesign
+       ORDER D — Customer Block + List-form redesign
     ══════════════════════════════════════════════════════ */
+
+    /* ── Customer block card ── */
+    #custSection {
+      border-radius: 18px !important;
+      border: 1.5px solid rgba(124,92,255,.18) !important;
+      overflow: hidden;
+      box-shadow: 0 6px 28px rgba(124,92,255,.10), 0 1px 4px rgba(0,0,0,.06);
+      margin: 0 12px 8px;
+    }
+    [data-theme="dark"] #custSection {
+      border-color: rgba(124,92,255,.28) !important;
+      box-shadow: 0 6px 28px rgba(0,0,0,.3);
+    }
+
+    /* ── Section header ── */
+    #custHead {
+      padding: 13px 16px !important;
+      background: linear-gradient(135deg, rgba(139,92,246,.07) 0%, rgba(6,182,212,.04) 100%) !important;
+      border-bottom: 1px solid rgba(124,92,255,.1) !important;
+      min-height: auto !important;
+      gap: 12px !important;
+    }
+    [data-theme="dark"] #custHead {
+      background: linear-gradient(135deg, rgba(139,92,246,.14) 0%, rgba(6,182,212,.08) 100%) !important;
+      border-bottom-color: rgba(124,92,255,.18) !important;
+    }
+
+    /* ── Icon badge ── */
+    .od-sect-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 19px;
+      box-shadow: 0 3px 10px rgba(139,92,246,.35);
+    }
+
+    /* ── Title group ── */
+    .od-sect-info { flex: 1; min-width: 0; }
+    .od-sect-info h3 {
+      font-size: 15px !important;
+      font-weight: 800 !important;
+      color: var(--text, #18213a) !important;
+      margin: 0 0 2px !important;
+      letter-spacing: -.01em;
+    }
+    [data-theme="dark"] .od-sect-info h3 { color: #e8e0ff !important; }
+    .od-sect-info span {
+      font-size: 11px;
+      color: var(--muted, #6b7898);
+      font-weight: 500;
+      letter-spacing: .01em;
+    }
+
+    /* ── Chevron pill ── */
+    .od-chevron-pill {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(139,92,246,.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #8b5cf6;
+      transition: transform .28s cubic-bezier(.4,0,.2,1), background .15s;
+      pointer-events: none;
+    }
+    [data-theme="dark"] .od-chevron-pill { background: rgba(139,92,246,.2); color: #c4b5fd; }
+    #custHead.is-open .od-chevron-pill { transform: rotate(180deg); }
+
     #custBody { padding: 0 !important; }
 
     .od-row {
@@ -1424,8 +1499,14 @@
           <!-- ── Section 1: Customer Info ── -->
           <div class="mob-section" id="custSection">
             <div class="mob-sect-head is-open" id="custHead" onclick="mobCollapse(this,'custBody')">
-              <h3>👤 ព័ត៌មានអតិថិជន</h3>
-              <span class="mob-sect-chevron">▾</span>
+              <div class="od-sect-badge">👤</div>
+              <div class="od-sect-info">
+                <h3>ព័ត៌មានអតិថិជន</h3>
+                <span>Customer Information</span>
+              </div>
+              <div class="od-chevron-pill mob-sect-chevron">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
             </div>
             <div class="mob-sect-body" id="custBody">
 
