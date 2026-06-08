@@ -2811,7 +2811,7 @@ document.addEventListener('DOMContentLoaded', function(){
     d.customer    = pick(/👤\s*ឈ្មោះ:\s*(.+)/);
     d.phone       = pick(/📞\s*លេខទូរសព្ទ:\s*(.+)/);
     d.address     = pick(/📍\s*ទីតាំង:\s*(.+)/);
-    d.province    = pick(/🗺️?\s*ខេត្ត[^:]*:\s*(.+)/);
+    d.province    = pick(/ខេត្ត[^:\n]*:\s*(.+)/);
     d.deliveryName= pick(/🚚\s*អ្នកដឹកជញ្ជូន:\s*(.+)/);
     d.note        = pick(/📝\s*Note:\s*(.+)/);
     d.payment     = pick(/💳\s*ការទូទាត់:\s*(.+)/);
