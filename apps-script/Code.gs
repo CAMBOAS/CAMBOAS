@@ -868,10 +868,25 @@ function sendTelegramMessageFromOrder_(orderId, order) {
   function formatDateText(value) {
     if (!value) return '-';
     const text = String(value).trim();
+    // Convert 24H time → 12H AM/PM
+    function to12h(t) {
+      const m = t.match(/(\d{1,2}):(\d{2})/);
+      if (!m) return t;
+      var h = parseInt(m[1], 10), min = m[2];
+      var ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return String(h).padStart(2,'0') + ':' + min + ' ' + ampm;
+    }
+    // YYYY-MM-DD HH:MM → DD/MM/YYYY HH:MM AM/PM
     if (/^\d{4}-\d{2}-\d{2}/.test(text)) {
       const p = text.substring(0,10).split('-');
-      return p[2]+'/'+p[1]+'/'+p[0];
+      const datePart = p[2]+'/'+p[1]+'/'+p[0];
+      const timePart = text.substring(11,16);
+      return timePart ? datePart + ' ' + to12h(timePart) : datePart;
     }
+    // DD/MM/YYYY HH:MM → DD/MM/YYYY HH:MM AM/PM
+    const dtMatch = text.match(/^(\d{2}\/\d{2}\/\d{4})\s+(\d{1,2}:\d{2})/);
+    if (dtMatch) return dtMatch[1] + ' ' + to12h(dtMatch[2]);
     return text;
   }
 

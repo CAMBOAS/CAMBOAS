@@ -133,7 +133,7 @@
     .mob-sect-head.is-open .mob-sect-chevron { transform: rotate(180deg); }
 
     /* Section body */
-    .mob-sect-body { padding: 12px 16px 12px; }
+    .mob-sect-body { padding: 8px 14px 10px; }
     .mob-sect-body.is-hidden { display: none; }
 
     /* ══════════════════════════════════════════════════════
@@ -1297,14 +1297,14 @@
     #custHead.is-open .od-chevron-pill { transform: rotate(180deg); }
 
     /* ── Form body ── */
-    #custBody { padding: 14px 16px 18px !important; }
+    #custBody { padding: 8px 14px 10px !important; }
 
     /* ── Each row: label left + bordered input right ── */
     .od-row {
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
       min-height: auto;
       padding: 0;
       border-bottom: none;
@@ -1324,7 +1324,7 @@
     /* ── Inputs: visible bordered box ── */
     .od-inp {
       flex: 1;
-      height: 48px;
+      height: 44px;
       border-radius: 12px;
       border: 1.5px solid rgba(148,163,184,.22);
       background: var(--input, rgba(255,255,255,.95));
@@ -1855,10 +1855,7 @@
                 <button class="ptab" data-cat="Face">Face</button>
                 <button class="ptab" data-cat="Drink">Drink</button>
               </div>
-              <div class="psearch">
-                <span class="psearch-icon">🔍</span>
-                <input id="pSearch" type="text" placeholder="ស្វែងរក..." oninput="filterProds()" autocomplete="off">
-              </div>
+
               <div class="plist" id="pList"></div>
             </div>
           </div>
