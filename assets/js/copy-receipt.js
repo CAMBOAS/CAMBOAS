@@ -56,7 +56,7 @@ function buildCopyText(data) {
   const separator = "................................................";
 
   // Header
-  lines.push(`🧾 ${data.title}        កាលបរិច្ឆេទ: ${data.date}`);
+  lines.push(`វិក័យប័ត្រ   Date: ${data.date}`);
   lines.push(separator);
 
   // Customer Info
@@ -65,10 +65,10 @@ function buildCopyText(data) {
   lines.push(`📍 ទីតាំង:\t${data.address}`);
   lines.push(`🗺️ ខេត្ត/ក្រុង:\t${data.province}`);
   lines.push(`🚚 អ្នកដឹកជញ្ជូន:\t${data.deliveryName}`);
-  lines.push(`📝 Note:\t\t${data.note}`);
+  lines.push(`📝 Note:\t${data.note}`);
   lines.push(separator);
 
-  // Product Section (FIX: add missing line here)
+  // Product Section
   lines.push("📦 ផលិតផល:");
   lines.push(separator);
 

@@ -2413,7 +2413,10 @@ function buildPayload(){
   var rawVal = (dp && tp) ? dp+'T'+tp : (dp ? dp+'T00:00' : '');
   if(!rawVal) rawVal=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes());
   var dateTime, m=rawVal.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-  dateTime = m ? m[3]+'/'+m[2]+'/'+m[1]+' '+m[4]+':'+m[5] : rawVal;
+  if(m){
+    var h=parseInt(m[4],10), ampm=h>=12?'PM':'AM', h12=h%12||12;
+    dateTime = m[3]+'/'+m[2]+'/'+m[1]+' '+String(h12).padStart(2,'0')+':'+m[5]+' '+ampm;
+  } else { dateTime = rawVal; }
   var rNo = _el('receiptNo');
   return {
     id:Date.now(), createdAt:now.toISOString(),
@@ -2777,7 +2780,7 @@ document.addEventListener('DOMContentLoaded', function(){
       </span>
       <button type="button" class="iv-close-btn" id="ivCloseBtn">✕</button>
     </div>
-    <textarea class="iv-textarea" id="ivTextarea" placeholder="Paste receipt text នៅទីនេះ...&#10;&#10;🧾 វិក័យប័ត្រ    កាលបរិច្ឆេទ: ...&#10;👤 ឈ្មោះ: ...&#10;📞 លេខទូរសព្ទ: ..."></textarea>
+    <textarea class="iv-textarea" id="ivTextarea" placeholder="Paste receipt text នៅទីនេះ...&#10;&#10;🧾 វិក័យប័ត្រ  Date: ...&#10;👤 ឈ្មោះ: ...&#10;📞 លេខទូរសព្ទ: ..."></textarea>
     <div class="iv-preview" id="ivPreview"></div>
     <div class="iv-actions">
       <button type="button" class="iv-cancel-btn" id="ivCancelBtn">បោះបង់</button>
