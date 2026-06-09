@@ -265,6 +265,13 @@
     /* ══════════════════════════════════════════════════════
        PRODUCT PICKER
     ══════════════════════════════════════════════════════ */
+    /* Section body background — light blue tint */
+    #prodBody {
+      background: #f0f6ff;
+      border-radius: 0 0 14px 14px;
+    }
+    [data-theme="dark"] #prodBody { background: rgba(30,22,60,.5); }
+
     /* Category tabs */
     .ptabs {
       display: flex;
@@ -348,7 +355,8 @@
     }
     [data-theme="light"] .prow {
       background: #fff;
-      box-shadow: 0 2px 12px rgba(100,80,200,.07);
+      box-shadow: 0 2px 12px rgba(100,80,200,.1);
+      border: 1px solid rgba(124,92,255,.1);
     }
     [data-theme="dark"] .prow {
       background: rgba(30,22,60,.85);
@@ -382,7 +390,7 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      padding: 11px 10px 0;
+      padding: 11px 10px 10px;
     }
 
     /* Name row — name left, category pill right */
@@ -400,12 +408,26 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      font-size: 13.5px;
-      font-weight: 700;
+      font-size: 14.5px;
+      font-weight: 800;
       color: #18213a;
       line-height: 1.38;
     }
     [data-theme="dark"] .pinfo b { color: #f0eaff; }
+
+    /* Product type badge below name */
+    .ptype-badge {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      background: rgba(0,0,0,.06);
+      color: #6b7898;
+      line-height: 1.8;
+    }
+    [data-theme="dark"] .ptype-badge { background: rgba(255,255,255,.1); color: #a0aabf; }
 
     /* Category pill — top-right of card */
     .pcat-tag {
@@ -425,52 +447,66 @@
     [data-theme="dark"] .pcat-tag { border-color: rgba(124,92,255,.4); }
 
     /* Push controls to bottom */
-    .prow-spacer { flex: 1; }
+    .prow-spacer { flex: 1; min-height: 6px; }
     .prow-div { display: none; }
 
     /* ══════════════════════════════════════════════════════
-       CONTROLS BAR — compact inline strip
+       CONTROLS BAR — 4-box grid redesign
     ══════════════════════════════════════════════════════ */
     .prow-ctrl {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin: 0 -10px;
-      padding: 8px 8px 10px;
-      background: rgba(124,92,255,.04);
-      border-top: 1px solid rgba(124,92,255,.08);
-      overflow: hidden;
-    }
-    [data-theme="dark"] .prow-ctrl {
-      background: rgba(124,92,255,.12);
-      border-top-color: rgba(124,92,255,.22);
+      display: grid;
+      grid-template-columns: 1fr 1fr 52px 50px;
+      gap: 6px;
+      margin: 0;
+      padding: 0 0 10px;
+      background: transparent;
+      border-top: none;
+      overflow: visible;
     }
 
-    /* Price pill */
-    .pctrl-price {
+    /* White box cell (Price / QTY) */
+    .pctrl-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.08);
+      min-height: 56px;
+      padding: 6px 4px 5px;
+      gap: 3px;
+    }
+    [data-theme="dark"] .pctrl-cell {
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.1);
+    }
+
+    /* Value row ($ + number) */
+    .pcell-val {
       display: flex;
       align-items: baseline;
-      gap: 2px;
-      background: rgba(124,92,255,.08);
-      border-radius: 10px;
-      padding: 5px 7px;
-      flex-shrink: 0;
-    }
-    [data-theme="dark"] .pctrl-price { background: rgba(124,92,255,.18); }
-    .pprice-sym {
-      font-size: 11px;
-      font-weight: 800;
-      color: #7c5cff;
+      gap: 1px;
       line-height: 1;
     }
-    [data-theme="dark"] .pprice-sym { color: #c4b5fd; }
+
+    /* $ symbol */
+    .pcell-sym {
+      font-size: 11px;
+      font-weight: 800;
+      color: #18213a;
+      line-height: 1;
+    }
+    [data-theme="dark"] .pcell-sym { color: #e8e0ff; }
+
+    /* Price input */
     .pprice-inp {
-      width: 42px;
-      height: 20px;
+      width: 40px;
+      height: 22px;
       border: none;
       background: transparent;
-      color: #7c5cff;
-      font-size: 16px; /* ≥16px prevents iOS Safari auto-zoom */
+      color: #18213a;
+      font-size: 18px;
       font-weight: 800;
       font-family: inherit;
       text-align: center;
@@ -480,25 +516,15 @@
     }
     .pprice-inp::-webkit-outer-spin-button,
     .pprice-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    [data-theme="dark"] .pprice-inp { color: #c4b5fd; }
+    [data-theme="dark"] .pprice-inp { color: #e8e0ff; }
 
-    /* × separator */
-    .pctrl-x {
-      font-size: 12px;
-      font-weight: 700;
-      color: rgba(124,92,255,.4);
-      flex-shrink: 0;
-      line-height: 1;
-    }
-
-    /* Qty pill */
+    /* QTY input */
     .pqty-inp {
-      width: 38px;
-      height: 34px;
-      background: rgba(124,92,255,.08);
-      border-radius: 10px;
+      width: 36px;
+      height: 22px;
+      background: transparent;
       border: none;
-      color: #7c5cff;
+      color: #18213a;
       font-size: 18px;
       font-weight: 800;
       font-family: inherit;
@@ -506,62 +532,53 @@
       outline: none;
       padding: 0;
       flex-shrink: 0;
+      border-radius: 0;
       -moz-appearance: textfield;
     }
     .pqty-inp::-webkit-outer-spin-button,
     .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    [data-theme="dark"] .pqty-inp { color: #c4b5fd; background: rgba(124,92,255,.18); }
+    [data-theme="dark"] .pqty-inp { color: #e8e0ff; background: transparent; }
 
-    /* Label wrapper above price/qty */
-    .pctrl-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-    .pctrl-lbl {
-      font-size: 9px;
-      font-weight: 700;
-      color: rgba(124,92,255,.6);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
+    /* Cell label (below value) */
+    .pcell-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      color: #9ca3af;
       line-height: 1;
+      letter-spacing: 0.2px;
     }
-    [data-theme="dark"] .pctrl-lbl { color: rgba(196,181,253,.6); }
+    [data-theme="dark"] .pcell-lbl { color: rgba(255,255,255,.36); }
 
-    /* Spacer pushes unit+add to the right */
-    .pctrl-spacer { flex: 1; }
-
-    /* Unit/Add box container */
+    /* Unit/Add shared container */
     .pctrl-box {
-      height: 42px;
-      border-radius: 14px;
+      border-radius: 12px;
       border: none;
-      background: transparent;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
+      min-height: 56px;
     }
 
-    /* ── Unit toggle — gradient button in controls bar ── */
+    /* ── Unit toggle — white box ── */
     .pctrl-box.pctrl-unit-box {
-      flex: 0 0 52px;
-      height: 40px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #7c5cff 0%, #9b73ff 100%);
-      border-color: transparent;
-      box-shadow: 0 3px 10px rgba(124,92,255,.32);
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.08);
+      box-shadow: none;
+    }
+    [data-theme="dark"] .pctrl-box.pctrl-unit-box {
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.1);
     }
     .punit-btn {
       position: absolute;
       inset: 0;
       border: none;
       background: transparent;
-      color: #fff;
-      font-size: 11px;
+      color: #18213a;
+      font-size: 12px;
       font-weight: 800;
       font-family: inherit;
       cursor: pointer;
@@ -571,21 +588,23 @@
       align-items: center;
       justify-content: center;
       letter-spacing: .02em;
-      transition: opacity .12s, transform .1s;
+      transition: background .15s, color .15s, transform .1s;
     }
-    .punit-btn.is-case { background: linear-gradient(135deg,#0ea5e9,#38bdf8); box-shadow: 0 3px 10px rgba(14,165,233,.38); }
-    .punit-btn.is-lay  { background: linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow: 0 3px 10px rgba(245,158,11,.38); }
+    [data-theme="dark"] .punit-btn { color: #e8e0ff; }
+    .punit-btn.is-case { background: rgba(14,165,233,.15); color: #0ea5e9; }
+    .punit-btn.is-lay  { background: rgba(245,158,11,.15); color: #d97706; }
     .punit-btn:active { opacity: .78; transform: scale(.9); }
     .punit-icon { display: none; }
 
-    /* ── ADD button ── */
+    /* ── ADD button — purple gradient ── */
     .pctrl-box.padd-box {
-      flex: 0 0 50px;
-      height: 40px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #7c5cff 0%, #06b6d4 100%);
-      border-color: transparent;
-      box-shadow: 0 3px 12px rgba(124,92,255,.38);
+      background: linear-gradient(145deg, #7c5cff 0%, #a855f7 100%);
+      box-shadow: 0 4px 14px rgba(124,92,255,.45);
+      border: none;
+    }
+    [data-theme="dark"] .pctrl-box.padd-box {
+      background: linear-gradient(145deg, #7c5cff 0%, #a855f7 100%);
+      box-shadow: 0 4px 14px rgba(124,92,255,.35);
     }
     .padd-btn {
       position: absolute;
@@ -593,7 +612,7 @@
       border: none;
       background: transparent;
       color: #fff;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 300;
       font-family: inherit;
       cursor: pointer;
@@ -1180,9 +1199,9 @@
       border-bottom: none;
     }
 
-    /* 3. Product price input — was missing dark override (qty had it, price didn't) */
+    /* 3. Product price input — white text in dark boxes */
     [data-theme="dark"] .pprice-inp {
-      color: #c4b5fd;
+      color: #e8e0ff;
     }
 
     /* 4. Category pill — brighter purple text for dark backgrounds */
@@ -1192,10 +1211,10 @@
       background: rgba(167,139,250,.08);
     }
 
-    /* 5. Product controls bar — more visible border & bg in dark */
+    /* 5. Product controls bar — transparent in dark (boxes handle their own bg) */
     [data-theme="dark"] .prow-ctrl {
-      background: rgba(124,92,255,.12);
-      border-top-color: rgba(124,92,255,.22);
+      background: transparent;
+      border-top: none;
     }
 
     /* 6. Summary box — more visible purple tint in dark */
@@ -2300,28 +2319,26 @@ function renderPList(list){
       +'<div class="pthumb"><img src="'+escHtml(p.img||p.image||'')+'" alt="" onerror="this.style.display=\'none\'"></div>'
       +'<div class="prow-body">'
         +'<div class="prow-info">'
-          +'<div class="pinfo"><b>'+escHtml(p.name)+'</b></div>'
+          +'<div class="pinfo"><b>'+escHtml(p.name)+'</b>'+(p.type?'<span class="ptype-badge">'+escHtml(p.type)+'</span>':'')+'</div>'
           +'<span class="pcat-tag">'+escHtml(p.category)+'</span>'
         +'</div>'
         +'<div class="prow-spacer"></div>'
         +'<div class="prow-ctrl">'
-          /* Price group with label */
-          +'<div class="pctrl-group">'
-            +'<span class="pctrl-lbl">Price</span>'
-            +'<div class="pctrl-price">'
-              +'<span class="pprice-sym">$</span>'
+          /* Price cell */
+          +'<div class="pctrl-cell">'
+            +'<div class="pcell-val">'
+              +'<span class="pcell-sym">$</span>'
               +'<input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()">'
             +'</div>'
+            +'<span class="pcell-lbl">Price</span>'
           +'</div>'
-          /* × separator */
-          +'<span class="pctrl-x">×</span>'
-          /* Qty group with label */
-          +'<div class="pctrl-group">'
-            +'<span class="pctrl-lbl">QTY</span>'
-            +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
+          /* QTY cell */
+          +'<div class="pctrl-cell">'
+            +'<div class="pcell-val">'
+              +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
+            +'</div>'
+            +'<span class="pcell-lbl">QTY</span>'
           +'</div>'
-          /* Spacer */
-          +'<span class="pctrl-spacer"></span>'
           /* Unit toggle */
           +'<div class="pctrl-box pctrl-unit-box">'
             +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button"><span class="punit-lbl">ឈុត</span></button>'
@@ -2347,8 +2364,6 @@ function toggleUnit(btn, e){
   if (lblEl) lblEl.textContent = newUnit; else btn.textContent = newUnit;
   btn.classList.toggle('is-case', newUnit === 'កេស');
   btn.classList.toggle('is-lay',  newUnit === 'លាយ');
-  var qtyLbl = btn.closest('.prow').querySelector('.pctrl-lbl');
-  if (qtyLbl) qtyLbl.textContent = newUnit;
 }
 
 function addFromCard(btn, e){
