@@ -203,6 +203,20 @@
       border-color: rgba(255,255,255,.12);
       color: #e8e0ff;
     }
+    /* date input — keep native text invisible, overlay shows value */
+    #datePart { color: transparent !important; background: transparent !important; }
+    /* date overlay dark mode fix */
+    .no-date-overlay {
+      position:absolute;inset:0;display:flex;align-items:center;
+      height:52px;padding:0 10px;border-radius:10px;
+      border:1.5px solid rgba(124,92,255,.18);
+      background:rgba(255,255,255,.9);
+      font-size:14px;box-sizing:border-box;pointer-events:none;z-index:1;
+    }
+    [data-theme="dark"] .no-date-overlay {
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.12);
+    }
 
     /* Searchable combo inside fg */
     .fg .searchable-select { width: 100%; }
@@ -1346,16 +1360,13 @@
               <!-- Date & Time -->
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
                 <div class="fg">
-                  <label>📅 ថ្ងៃខែឆ្នាំ</label>
+                  <label>ថ្ងៃខែឆ្នាំ</label>
                   <div style="position:relative;width:100%;height:52px;">
-                    <!-- Native input: full size, value always correct, text hidden via color:transparent -->
                     <input id="datePart" type="date"
                       style="position:absolute;inset:0;width:100%;height:100%;opacity:1;color:transparent;background:transparent;border:none;outline:none;cursor:pointer;z-index:2;box-sizing:border-box;"
                       oninput="(function(v){var t=document.getElementById('datePartText');if(!t)return;if(!v){t.textContent='ថ្ងៃ/ខែ/ឆ្នាំ';t.style.color='#aaa';return;}var p=v.split('-');t.textContent=p[2]+'/'+p[1]+'/'+p[0].slice(2);t.style.color='var(--text,#18213a)';})(this.value)">
-                    <!-- Styled overlay (pointer-events:none so clicks pass to native input) -->
-                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 10px;border-radius:10px;border:1.5px solid rgba(124,92,255,.18);background:var(--input,rgba(255,255,255,.9));font-size:14px;box-sizing:border-box;pointer-events:none;z-index:1;">
+                    <div class="no-date-overlay">
                       <span id="datePartText" style="color:#aaa;">ថ្ងៃ/ខែ/ឆ្នាំ</span>
-                      <span style="color:#94a3b8;font-size:16px">📅</span>
                     </div>
                   </div>
                 </div>

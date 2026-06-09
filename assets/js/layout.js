@@ -156,32 +156,6 @@
           <button class="lang-toggle-btn" id="langToggleBtn" title="Switch Language">
             ${getLang() === 'en' ? 'EN' : 'KH'}
           </button>
-          <div class="notify-wrap" style="position:relative">
-            <button class="notify-btn" id="notifyBtn" aria-label="Notifications">
-              ${ic.bell}
-              <span class="notify-count" id="notifyCount" hidden>0</span>
-            </button>
-            <div class="notify-panel" id="notifyPanel" hidden>
-              <div class="notify-head">
-                <div class="notify-head-left">
-                  <strong>Notifications</strong>
-                </div>
-                <div class="notify-head-actions">
-                  <button class="notify-head-btn" id="markAllReadBtn">Mark all read</button>
-                  <button class="notify-head-btn" id="clearAllBtn">Clear all</button>
-                </div>
-              </div>
-              <div class="notify-tabs">
-                <button class="notify-tab active" data-tab="all">All</button>
-                <button class="notify-tab" data-tab="unread">Unread</button>
-                <button class="notify-tab" data-tab="orders">Orders</button>
-              </div>
-              <div class="notify-list" id="notifyList"></div>
-              <div class="notify-footer">
-                <button class="notify-footer-btn">View all notifications →</button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>`;
   }

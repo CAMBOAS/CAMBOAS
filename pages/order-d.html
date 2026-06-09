@@ -203,6 +203,8 @@
       border-color: rgba(255,255,255,.12);
       color: #e8e0ff;
     }
+    /* keep native date input invisible — custom overlay shows the value instead */
+    #datePart { color: transparent !important; background: transparent !important; }
 
     /* Searchable combo inside fg */
     .fg .searchable-select { width: 100%; }
@@ -1266,7 +1268,6 @@
       background: rgba(124,92,255,.12);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
-      font-size: 17px;
     }
     [data-theme="dark"] .od-sect-badge { background: rgba(124,92,255,.22); }
 
@@ -1325,7 +1326,7 @@
       flex: 1;
       height: 48px;
       border-radius: 12px;
-      border: 1.5px solid rgba(0,0,0,.13);
+      border: 1.5px solid rgba(148,163,184,.22);
       background: var(--input, rgba(255,255,255,.95));
       padding: 0 14px;
       font-size: 15px;
@@ -1359,7 +1360,7 @@
     .od-combo .combo-input {
       height: 48px !important;
       border-radius: 12px !important;
-      border: 1.5px solid rgba(0,0,0,.13) !important;
+      border: 1.5px solid rgba(148,163,184,.22) !important;
       background: var(--input, rgba(255,255,255,.95)) !important;
       padding: 0 14px !important;
       font-size: 15px !important;
@@ -1460,7 +1461,7 @@
       justify-content: space-between;
       padding: 0 12px;
       border-radius: 12px;
-      border: 1.5px solid rgba(0,0,0,.13);
+      border: 1.5px solid rgba(148,163,184,.22);
       background: var(--input, rgba(255,255,255,.95));
       font-size: 14px;
       pointer-events: none;
@@ -1480,7 +1481,7 @@
       flex: 1;
       height: 48px;
       border-radius: 12px;
-      border: 1.5px solid rgba(0,0,0,.13);
+      border: 1.5px solid rgba(148,163,184,.22);
       background: var(--input, rgba(255,255,255,.95));
       padding: 0 12px;
       font-size: 14px;
@@ -1682,14 +1683,6 @@
   <main class="main-content" style="padding-left:0;padding-right:0;">
     <div class="shared-topbar" id="sharedHeader"></div>
 
-    <!-- 🚧 DEV BANNER -->
-    <div style="margin:10px 12px 0;padding:10px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(239,68,68,.1));border:1.5px dashed rgba(245,158,11,.5);display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:#b45309;">
-      <span style="font-size:18px;">🚧</span>
-      <div>
-        <div style="font-size:14px;font-weight:800;">Order D — កំពុងអភិវឌ្ឍន៌</div>
-        <div style="font-size:11px;font-weight:600;opacity:.75;margin-top:1px;">Developing · ទំព័រនេះកំពុងត្រូវបានបន្ថែមមុខងារថ្មី</div>
-      </div>
-    </div>
 
     <div class="no-wrap">
       <div class="no-grid">
@@ -1700,7 +1693,12 @@
           <!-- ── Section 1: Customer Info ── -->
           <div class="mob-section" id="custSection">
             <div class="mob-sect-head is-open" id="custHead" onclick="mobCollapse(this,'custBody')">
-              <div class="od-sect-badge">👤</div>
+              <div class="od-sect-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c5cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="4"/>
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+              </div>
               <div class="od-sect-info">
                 <h3>ព័ត៌មានអតិថិជន</h3>
                 <span>Customer Information</span>
@@ -1711,15 +1709,15 @@
             </div>
             <div class="mob-sect-body" id="custBody">
 
-              <!-- ── ឈ្មោះ ── -->
+              <!-- ── ឈ្មោះអតិថិជន ── -->
               <div class="od-row">
-                <span class="od-lbl">ឈ្មោះ</span>
+                <span class="od-lbl">ឈ្មោះអតិថិជន</span>
                 <input id="customer" type="text" class="od-inp" placeholder="Customer..." autocomplete="off">
               </div>
 
-              <!-- ── លេខទូរស័ព្ទ ── -->
+              <!-- ── លេខទូរសព្ទ ── -->
               <div class="od-row">
-                <span class="od-lbl">លេខទូរស័ព្ទ</span>
+                <span class="od-lbl">លេខទូរសព្ទ</span>
                 <div style="flex:1;min-width:0;position:relative;">
                   <input id="phone" type="tel" class="od-inp" placeholder="0xx xxx xxx" style="padding-right:100px;">
                   <span id="carrierBadgeDesktop" style="display:none;position:absolute;right:0;top:50%;transform:translateY(-50%);pointer-events:none;align-items:center;gap:4px;font-size:11px;font-weight:700;">
@@ -1802,7 +1800,6 @@
                       oninput="(function(v){var t=document.getElementById('datePartText');if(!t)return;if(!v){t.textContent='ថ្ងៃ/ខែ/ឆ្នាំ';t.style.color='';return;}var p=v.split('-');t.textContent=p[2]+'/'+p[1]+'/'+p[0].slice(2);t.style.color='var(--text,#18213a)';})(this.value)">
                     <div class="od-date-overlay">
                       <span id="datePartText" style="color:rgba(107,120,152,.5);">ថ្ងៃ/ខែ/ឆ្នាំ</span>
-                      <span style="font-size:15px;">📅</span>
                     </div>
                   </div>
                   <span class="od-sep">ម៉ោង</span>
@@ -2780,7 +2777,6 @@ document.addEventListener('DOMContentLoaded', function(){
       </span>
       <button type="button" class="iv-close-btn" id="ivCloseBtn">✕</button>
     </div>
-    <p class="iv-hint">📋 Copy text receipt ពីអតិថិជន រួចចុច Paste ខាងក្រោម — ប្រព័ន្ធ​នឹង​បំពេញ Form ដោយស្វ័យប្រវត្តិ។</p>
     <textarea class="iv-textarea" id="ivTextarea" placeholder="Paste receipt text នៅទីនេះ...&#10;&#10;🧾 វិក័យប័ត្រ    កាលបរិច្ឆេទ: ...&#10;👤 ឈ្មោះ: ...&#10;📞 លេខទូរសព្ទ: ..."></textarea>
     <div class="iv-preview" id="ivPreview"></div>
     <div class="iv-actions">
@@ -3035,17 +3031,17 @@ document.addEventListener('DOMContentLoaded', function(){
   /* ── Required fields ── */
   var FIELDS = [
     {
-      label: 'ឈ្មោះអតிថិជន',
+      label: 'ឈ្មោះអតិថិជន',
       getVal: function () { return (document.getElementById('customer') || {}).value || ''; },
       getEl:  function () { return document.getElementById('customer'); }
     },
     {
-      label: 'លេខទូរស័ព្ទ',
+      label: 'លេខទូរសព្ទ',
       getVal: function () { return (document.getElementById('phone') || {}).value || ''; },
       getEl:  function () { return document.getElementById('phone'); }
     },
     {
-      label: 'ទីតំណាំតំបន',
+      label: 'ទីតាំងតំបន់',
       getVal: function () { return (document.getElementById('addressDetail') || {}).value || ''; },
       getEl:  function () { return document.getElementById('addressDetail'); }
     },
@@ -3117,7 +3113,7 @@ document.addEventListener('DOMContentLoaded', function(){
     /* Toast message */
     var msg = errors.length === 1
       ? 'សូមបំពេញ: ' + errors[0]
-      : 'សូមបំពេញ ' + errors.length + ' ចន្លោះ: ' + errors.join(' · ');
+      : 'សូមបំពេញ ' + errors.length + ' ចំណុច: ' + errors.join(' · ');
 
     if (window.macUI) {
       macUI.toast(msg, 'warning');
