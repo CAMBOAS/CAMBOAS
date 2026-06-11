@@ -42,10 +42,13 @@
       "Bash(powershell -Command ' *)",
       "Bash(curl -s -X POST \"https://script.google.com/macros/s/AKfycbyLIx9D-3k97BDE_MV7_0nHyQxMmOSULv_x4xbRYiCCepsrAxFYB4d1eu5dfFi0epodNg/exec\" -H \"Content-Type: text/plain;charset=utf-8\" -d \"{\\\\\"action\\\\\":\\\\\"stroke_update\\\\\",\\\\\"originalName\\\\\":\\\\\"test\\\\\",\\\\\"data\\\\\":{\\\\\"product\\\\\":\\\\\"test\\\\\",\\\\\"type\\\\\":\\\\\"test\\\\\",\\\\\"box\\\\\":0,\\\\\"pack\\\\\":0,\\\\\"bottles\\\\\":0,\\\\\"qty\\\\\":0}}\" -L --max-redirs 5)",
       "Bash(del \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\pages\\\\smart-mobile.html\")",
-      "Bash(xargs sed -i \"s|AKfycbyxP7hagbYx1X567BaxIT6T4JYQ-jm7auut3OnNACxdB42e8cbEu8IQOZoEwVeTHI6YUA|AKfycbzbRj2OJ5X2DoWWtVAlU6ghHqeeasd5DIWWa79Bgr9i2JcA0_ILEguTTIYWIMQw1dE2oQ|g\")",
+      "Bash(xargs sed -i \"s|AKfycbyxP7hagbYx1X567BaxIT6T4JYQ-jm7auut3OnNACxdB42e8cbEu8IQOZoEwVeTHI6YUA|AKfycbwL5ToDIE6abtacUi4fZ6W9UsaITOBvy_Np1bH3o-8RRs5uD4EDJ2lLaHroD2gigLNpYA|g\")",
       "Bash(npx vercel *)",
       "PowerShell(Get-Command vercel -ErrorAction SilentlyContinue)",
-      "PowerShell(Get-Command node -ErrorAction SilentlyContinue)"
+      "PowerShell(Get-Command node -ErrorAction SilentlyContinue)",
+      "Bash(curl -s -L \"https://script.google.com/macros/s/AKfycbwL5ToDIE6abtacUi4fZ6W9UsaITOBvy_Np1bH3o-8RRs5uD4EDJ2lLaHroD2gigLNpYA/exec?action=products\")",
+      "PowerShell(Get-ChildItem \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\images\\\\products\" -Recurse -File | ForEach-Object { $_.DirectoryName.Split\\('\\\\'\\)[-1] + '/' + $_.Name })",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(p['id'], '|', p['name'], '|', p['type']\\) for p in d['products']]\")"
     ]
   }
 }
