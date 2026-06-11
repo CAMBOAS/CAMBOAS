@@ -1747,7 +1747,9 @@ document.addEventListener('DOMContentLoaded', init);
     }
     cardList.innerHTML = rows.map(function(o, idx){
       var total = orderTotal(o);
-      var prods = getProds(o).map(function(p){
+      var prodList = getProds(o);
+      var itemCount = prodList.length;
+      var prods = prodList.map(function(p){
         return (p.name||'')+(p.qty>1?' x'+p.qty:'');
       }).join(' / ');
       var th = typeof fmtDisplay==='function' ? fmtDisplay(o.date) : (o.date||'-');
@@ -1777,6 +1779,7 @@ document.addEventListener('DOMContentLoaded', init);
           +'</div>'
         +'</div>'
         +(prods?'<div class="ol-card-prod">'+prods+'</div>':'')
+        +(itemCount>0?'<span class="ol-item-badge">'+itemCount+'</span>':'')
         +'</div>';
     }).join('');
     cardList.querySelectorAll('.ol-card').forEach(function(c){
