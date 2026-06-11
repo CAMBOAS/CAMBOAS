@@ -2069,6 +2069,49 @@ var products = [
   {id:28, name:"ឈុតស្បែកហ្មត់ JELY",              price:22.5, category:"Body", detail:"ឈុតស្បែកហ្មត់ JELY",                                  image:"../images/products/body/ឈុតស្បែកហ្មត់ JELY.png"}
 ];
 
+/* ── Map sheet Type → category tab ── */
+function _mapCategory(type){
+  var t=(type||'').toLowerCase();
+  if(t.includes('hair'))  return 'Hair';
+  if(t.includes('body'))  return 'Body';
+  if(t.includes('face'))  return 'Face';
+  if(t.includes('drink')) return 'Drink';
+  return 'Other';
+}
+
+/* ── Find local fallback image by matching name ── */
+function _localImg(name){
+  var n=(name||'').toLowerCase();
+  var found=products.find(function(p){ return (p.name||'').toLowerCase()===n; });
+  return found ? (found.image||'') : '';
+}
+
+/* ── Load products from Google Sheets (NewOrder tab) ── */
+async function loadProductsFromSheet(){
+  try{
+    var base = window.CamboAPI ? window.CamboAPI.getBase() : window.APPS_SCRIPT_URL;
+    var url  = base + (base.includes('?') ? '&' : '?') + 'action=products&_='+Date.now();
+    var res  = await fetch(url, {redirect:'follow'});
+    var data = await res.json();
+    if(!data.ok || !Array.isArray(data.products) || !data.products.length) return;
+    products = data.products.map(function(p,i){
+      return {
+        id:          p.id || (i+1),
+        name:        p.name || '',
+        price:       p.price || 0,
+        category:    _mapCategory(p.type),
+        detail:      p.description || p.name || '',
+        image:       p.url || _localImg(p.name),
+        sale:        p.sale || 1,
+        box:         p.box  || 0,
+        pack:        p.pack || 0,
+        qty:         p.qty  || 0
+      };
+    });
+    renderPList(getFiltered());
+  }catch(e){ /* keep hardcoded fallback */ }
+}
+
 /* ── Product list helpers ── */
 function _allProducts(){ return (window.__camboProducts && window.__camboProducts.length) ? window.__camboProducts : products; }
 
@@ -2595,6 +2638,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
   renderPList(products);
   calcTotal();
+
+  /* Load live prices + products from Google Sheets (async, refreshes grid when done) */
+  loadProductsFromSheet();
 });
 </script>
 

@@ -92,6 +92,7 @@ function doGet(e) {
     if (action === 'list')          return jsonOutput_({ ok:true, orders: listOrders_() });
     if (action === 'stroke')        return jsonOutput_({ ok:true, stroke: listStroke_() });
     if (action === 'stock_history') return jsonOutput_(listStrokeHistory_(e));
+    if (action === 'products')      return jsonOutput_({ ok:true, products: listProducts_() });
     // ── Debug: test write directly via GET ──
     if (action === 'test_write') {
       const name = String((e && e.parameter && e.parameter.name) || '').trim();
@@ -213,6 +214,35 @@ function deleteOrder_(orderId) {
     if (safe_(ids[i]) === safe_(orderId)) { sheet.deleteRow(i + 2); deleted++; }
   }
   return deleted;
+}
+
+/**
+ * listProducts_ — Read product catalogue from NewOrder sheet
+ * Columns: A=ID, B=Products, C=Type, D=Price, E=Sale, F=Box, G=Pack, H=QTY, I=Description, J=URL
+ */
+function listProducts_() {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('NewOrder');
+  if (!sheet) return [];
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return [];
+  const data = sheet.getRange(2, 1, lastRow - 1, 10).getValues();
+  return data
+    .filter(function(r) { return safe_(r[0]) && safe_(r[1]); })
+    .map(function(r) {
+      return {
+        id:          safe_(r[0]),
+        name:        safe_(r[1]),
+        type:        safe_(r[2]),
+        price:       toNumber_(r[3]),
+        sale:        toNumber_(r[4]),
+        box:         toNumber_(r[5]),
+        pack:        toNumber_(r[6]),
+        qty:         toNumber_(r[7]),
+        description: safe_(r[8]),
+        url:         safe_(r[9])
+      };
+    });
 }
 
 function listOrders_() {
