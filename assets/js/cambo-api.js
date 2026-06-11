@@ -10,12 +10,11 @@
   const APPS_SCRIPT_URL =
     'https://script.google.com/macros/s/AKfycbzk5rPqxQ0bRiOrSHX1xmnrHg3ExFhioFuHMgGZSPr581lr7YwWZSC6p6JO9GL7yda9EA/exec';
 
-  // Use Vercel proxy when running on vercel.app domain
+  // Use Vercel proxy only when running on vercel.app domain
   function isVercel() {
     return typeof location !== 'undefined' &&
-      location.hostname !== 'localhost' &&
-      location.hostname !== '127.0.0.1' &&
-      !location.protocol.startsWith('file');
+      (location.hostname.endsWith('.vercel.app') ||
+       location.hostname === 'vercel.app');
   }
 
   function getBase() {
