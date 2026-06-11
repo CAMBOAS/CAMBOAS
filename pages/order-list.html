@@ -163,16 +163,35 @@
   .ol-btn-purple:hover{background:rgba(139,92,246,.22)!important;border-color:rgba(139,92,246,.5)!important}
   [data-theme="light"] .ol-btn-purple{background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.25);color:#4f46e5}
 
-  /* ── DROPDOWN PANELS — position:fixed so they never overflow viewport ── */
+  /* ── DROPDOWN PANELS ── */
   .ol-dropdown{position:fixed;z-index:9999;border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.35);background:#1e293b;border:1px solid rgba(148,163,200,.2);width:200px;max-width:calc(100vw - 16px);box-sizing:border-box;padding:6px;display:none;overflow:hidden}
   [data-theme="light"] .ol-dropdown{background:#fff;border-color:#e2e8f0;box-shadow:0 8px 32px rgba(15,23,42,.12)}
   .ol-dropdown.open{display:block}
 
-  /* Filter panel: flex so header is fixed, body scrolls */
+  /* Backdrop for mobile bottom sheet */
+  .ol-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;-webkit-tap-highlight-color:transparent}
+  .ol-backdrop.show{display:block}
+
+  /* Filter panel — desktop */
   #olFilterDropdown{width:260px;padding:0;overflow:hidden}
   #olFilterDropdown.open{display:flex;flex-direction:column}
   .ol-fd-head{flex-shrink:0}
   .ol-fd-body{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;min-height:0}
+
+  /* Filter panel — Mobile Bottom Sheet */
+  @media(max-width:768px){
+    #olFilterDropdown.open{
+      left:0!important;right:0!important;bottom:0!important;top:auto!important;
+      width:100%!important;max-width:100%!important;max-height:85vh!important;
+      border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.4);
+      animation:olSlideUp .25s ease;
+    }
+    .ol-fd-handle{display:flex!important}
+    @keyframes olSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  }
+  /* Handle bar (hidden on desktop) */
+  .ol-fd-handle{display:none;justify-content:center;padding:10px 0 4px}
+  .ol-fd-handle span{width:40px;height:4px;border-radius:4px;background:rgba(148,163,184,.35);display:block}
   .ol-fd-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid #f1f5f9}
   [data-theme="dark"] .ol-fd-head{border-bottom-color:rgba(148,163,200,.1)}
   .ol-fd-head strong{font-size:15px;font-weight:700;color:var(--text)}
@@ -624,8 +643,12 @@
 
   <div id="olPrintArea" style="position:fixed;left:-9999px;top:0;z-index:-1;width:1px;height:1px;overflow:hidden"></div>
 
+  <!-- Backdrop for mobile bottom sheet -->
+  <div class="ol-backdrop" id="olBackdrop"></div>
+
   <!-- All dropdowns at body level so position:fixed uses the real viewport -->
   <div class="ol-dropdown" id="olFilterDropdown">
+    <div class="ol-fd-handle"><span></span></div>
     <div class="ol-fd-head">
       <strong>Filter</strong>
       <button class="ol-fd-clear" id="olClearFilter">Clear all</button>

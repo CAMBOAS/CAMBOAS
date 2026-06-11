@@ -170,7 +170,15 @@ function positionDrop(drop, btn){
 
 function closeAllDrops(){
   document.querySelectorAll('.ol-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+  var bd = document.getElementById('olBackdrop');
+  if(bd) bd.classList.remove('show');
 }
+
+// Backdrop click closes all dropdowns
+document.addEventListener('DOMContentLoaded', function(){
+  var bd = document.getElementById('olBackdrop');
+  if(bd) bd.addEventListener('click', closeAllDrops);
+});
 
 document.addEventListener('click', function(e){
   if(!e.target.closest('.ol-dropdown') && !e.target.closest('[id$="Btn"]') && !e.target.closest('[id$="Btn2"]')){
@@ -1497,7 +1505,12 @@ async function init(){
     var d=$id('olFilterDropdown'); if(!d) return;
     var opening = !d.classList.contains('open');
     closeAllDrops();
-    if(opening){ positionDrop(d, e.currentTarget); d.classList.add('open'); }
+    if(opening){
+      var isMobile = window.innerWidth <= 768;
+      if(!isMobile) positionDrop(d, e.currentTarget);
+      d.classList.add('open');
+      var bd=$id('olBackdrop'); if(bd) bd.classList.add('show');
+    }
   });
 
   /* Filter selects */
