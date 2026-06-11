@@ -1134,7 +1134,7 @@ function renderDrawerEdit(o){
           +'<div id="drDateDisplay" onclick="var p=document.getElementById(\'drDate\');p.style.pointerEvents=\'auto\';try{p.showPicker();}catch(e){p.focus();}" '
             +'style="'+inputStyle+';flex:1;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0 8px">'
             +'<span id="drDateText">'+esc(disp)+'</span>'
-            +'<span style="color:#64748b;font-size:13px">📅</span>'
+            +''
           +'</div>'
           +'<input id="drDate" type="datetime-local" value="'+esc(dtVal)+'" style="'+inpHidden+'" '
             +'oninput="var d=document.getElementById(\'drDateText\');if(d&&window.fmtDtDisplay)d.textContent=window.fmtDtDisplay(this.value);">'
