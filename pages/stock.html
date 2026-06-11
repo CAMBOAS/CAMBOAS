@@ -724,7 +724,7 @@ async function loadStroke(){
   document.getElementById('tbody').innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">⏳ កំពុងទាញទិន្នន័យពី Google Sheets...</td></tr>';
   ['sTot','sIn','sLo','sOut'].forEach(function(id){ document.getElementById(id).textContent='...'; });
   try {
-    var res  = await fetch(APPS_SCRIPT_URL+'?action=stroke');
+    var res  = await fetch(APPS_SCRIPT_URL+'?action=stroke&_='+Date.now());
     var data = await res.json();
     if(!data.ok || !Array.isArray(data.stroke)) throw new Error(data.message||'Load failed');
     S = data.stroke.map(function(item,i){
