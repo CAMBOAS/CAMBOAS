@@ -131,12 +131,40 @@ function toDatetimeLocal(s){
 function positionDrop(drop, btn){
   var rect = btn.getBoundingClientRect();
   var vw   = window.innerWidth;
+  var vh   = window.innerHeight;
   var w    = drop.offsetWidth || parseInt(drop.style.width) || 200;
-  // prefer aligning right edge of drop with right edge of btn
+
+  // Horizontal: align right edge, clamp to viewport
   var left = rect.right - w;
-  if(left < 12) left = 12;
-  if(left + w > vw - 12) left = vw - w - 12;
-  drop.style.top  = (rect.bottom + 6) + 'px';
+  if(left < 8) left = 8;
+  if(left + w > vw - 8) left = vw - w - 8;
+
+  var spaceBelow = vh - rect.bottom - 10;
+  var spaceAbove = rect.top - 10;
+
+  // Reset max-height to measure natural height
+  drop.style.maxHeight = '';
+  drop.style.top  = '-9999px';
+  drop.style.left = left + 'px';
+  drop.style.display = 'block';
+  var dropH = drop.scrollHeight;
+  drop.style.display = '';
+  drop.style.top = '';
+
+  if(dropH <= spaceBelow){
+    // Fits below — no constraint needed
+    drop.style.top       = (rect.bottom + 6) + 'px';
+    drop.style.maxHeight = '';
+  } else if(spaceAbove > spaceBelow && spaceAbove > 150){
+    // More space above — flip upward
+    var mh = Math.min(spaceAbove, dropH);
+    drop.style.top       = (rect.top - mh - 6) + 'px';
+    drop.style.maxHeight = mh + 'px';
+  } else {
+    // Use space below, constrain height
+    drop.style.top       = (rect.bottom + 6) + 'px';
+    drop.style.maxHeight = Math.max(spaceBelow, 150) + 'px';
+  }
   drop.style.left = left + 'px';
 }
 
