@@ -251,10 +251,14 @@ function loadList(q){
 function renderForm(){
   var p = _editItem;
   document.getElementById('pmFormTitle').textContent = p ? '✏️ កែប្រែផលិតផល' : '➕ បន្ថែមផលិតផលថ្មី';
-  document.getElementById('pmFName').value   = p ? p.name     : '';
+  document.getElementById('pmFName').value   = p ? p.name          : '';
   document.getElementById('pmFSub').value    = p ? (p.subName||'') : '';
-  document.getElementById('pmFCat').value    = p ? p.category : 'Hair';
-  document.getElementById('pmFPrice').value  = p ? p.price    : '';
+  document.getElementById('pmFCat').value    = p ? p.category      : 'Hair';
+  document.getElementById('pmFPrice').value  = p ? p.price         : '';
+  document.getElementById('pmFSale').value   = p ? (p.sale  || 1)  : 1;
+  document.getElementById('pmFBox').value    = p ? (p.box   || 1)  : 1;
+  document.getElementById('pmFPack').value   = p ? (p.pack  || 0)  : 0;
+  document.getElementById('pmFQty').value    = p ? (p.qty   || 0)  : 0;
   var pv = document.getElementById('pmImgPrev');
   if(p && p.img){
     pv.innerHTML = '<img src="'+p.img+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px">';
@@ -318,12 +322,16 @@ function bindSave(){
     var sub   = (document.getElementById('pmFSub')  .value||'').trim();
     var cat   =  document.getElementById('pmFCat')  .value || 'Hair';
     var price = parseFloat(document.getElementById('pmFPrice').value)||0;
+    var sale  = parseInt(document.getElementById('pmFSale').value)  ||1;
+    var box   = parseInt(document.getElementById('pmFBox').value)   ||1;
+    var pack  = parseInt(document.getElementById('pmFPack').value)  ||0;
+    var qty   = parseInt(document.getElementById('pmFQty').value)   ||0;
 
     if(!name){ alert('⚠️ សូមបញ្ចូលឈ្មោះ!'); return; }
 
     var item = _editItem
-      ? Object.assign({}, _editItem, { name:name, subName:sub, category:cat, price:price, img:_imgB64||_editItem.img })
-      : { id:'cp_'+Date.now(), name:name, subName:sub, category:cat, price:price, img:_imgB64||'', enabled:true };
+      ? Object.assign({}, _editItem, { name:name, subName:sub, category:cat, price:price, sale:sale, box:box, pack:pack, qty:qty, img:_imgB64||_editItem.img })
+      : { id:'cp_'+Date.now(), name:name, subName:sub, category:cat, price:price, sale:sale, box:box, pack:pack, qty:qty, img:_imgB64||'', enabled:true };
 
     var isNew  = !_editItem;
     var origId = _editItem ? String(_editItem.id) : '';
@@ -341,25 +349,22 @@ function bindSave(){
         if (base) {
           var catTypeMap = { Hair:'Hair Care', Body:'Body Care', Face:'Face Care', Drink:'Drinks' };
           if (isNew) {
-            /* Add new product row to Google Sheets */
             fetch(base, {
               method:  'POST',
               headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body:    JSON.stringify({ action:'addProduct', data:{ name:name, type:catTypeMap[cat]||cat, price:price, sale:1, box:1 } }),
+              body:    JSON.stringify({ action:'addProduct', data:{ name:name, type:catTypeMap[cat]||cat, price:price, sale:sale, box:box, pack:pack, qty:qty } }),
               redirect:'follow'
             }).then(function(r){ return r.json(); }).then(function(d){
-              /* Update the local item id with the Sheets-assigned CAMBO-xxx id */
               if(d && d.ok && d.id) {
                 item.id = d.id;
                 dbPut(item, function(){ dbGetAll(function(l){ window.__camboProducts = l; doRenderGrid(); }); });
               }
             }).catch(function(){});
           } else if (origId && /^CAMBO-/i.test(origId)) {
-            /* Update existing Sheets product */
             fetch(base, {
               method:  'POST',
               headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body:    JSON.stringify({ action:'updateProduct', id:origId, data:{ name:name, price:price } }),
+              body:    JSON.stringify({ action:'updateProduct', id:origId, data:{ name:name, price:price, sale:sale, box:box, pack:pack, qty:qty } }),
               redirect:'follow'
             }).catch(function(){});
           }
