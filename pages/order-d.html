@@ -447,6 +447,15 @@
     }
     [data-theme="dark"] .pcat-tag { border-color: rgba(124,92,255,.4); }
 
+    .punit-info {
+      display: block;
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 2px;
+      letter-spacing: .01em;
+    }
+    [data-theme="dark"] .punit-info { color: #64748b; }
+
     /* Push controls to bottom */
     .prow-spacer { flex: 1; min-height: 6px; }
     .prow-div { display: none; }
@@ -2360,12 +2369,19 @@ function getFiltered(){
 function filterProds(){ renderPList(getFiltered()); }
 function renderPList(list){
   _el('pList').innerHTML = list.map(function(p){
-    return '<div class="prow" id="pc_'+p.id+'" data-pid="'+p.id+'">'
+    var basePrice = Number(p.price)||0;
+    var saleCnt   = Number(p.sale)||1;
+    var packCnt   = Number(p.pack)||0;
+    var infoTxt   = packCnt > 0
+      ? '<span class="punit-info">1ឈុត='+saleCnt+'item &nbsp;|&nbsp; 1Box='+packCnt+'ឈុត</span>'
+      : (saleCnt > 1 ? '<span class="punit-info">1ឈុត='+saleCnt+'item</span>' : '');
+    return '<div class="prow" id="pc_'+p.id+'" data-pid="'+p.id+'" data-base-price="'+basePrice+'" data-pack="'+packCnt+'" data-sale="'+saleCnt+'">'
       +'<div class="pthumb"><img src="'+escHtml(p.img||p.image||'')+'" alt="" onerror="this.style.display=\'none\'"></div>'
       +'<div class="prow-body">'
         +'<div class="prow-info">'
           +'<div class="pinfo"><b>'+escHtml(p.name)+'</b>'+(p.type?'<span class="ptype-badge">'+escHtml(p.type)+'</span>':'')+'</div>'
           +'<span class="pcat-tag">'+escHtml(p.category)+'</span>'
+          +infoTxt
         +'</div>'
         +'<div class="prow-spacer"></div>'
         +'<div class="prow-ctrl">'
@@ -2373,7 +2389,7 @@ function renderPList(list){
           +'<div class="pctrl-cell">'
             +'<div class="pcell-val">'
               +'<span class="pcell-sym">$</span>'
-              +'<input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()">'
+              +'<input class="pprice-inp" type="number" value="'+basePrice+'" min="0" step="0.5" onclick="event.stopPropagation()">'
             +'</div>'
             +'<span class="pcell-lbl">Price</span>'
           +'</div>'
@@ -2409,6 +2425,18 @@ function toggleUnit(btn, e){
   if (lblEl) lblEl.textContent = newUnit; else btn.textContent = newUnit;
   btn.classList.toggle('is-case', newUnit === 'កេស');
   btn.classList.toggle('is-lay',  newUnit === 'លាយ');
+
+  /* Auto-update price based on unit */
+  var row       = btn.closest('.prow');
+  var priceInp  = row ? row.querySelector('.pprice-inp') : null;
+  if (!priceInp) return;
+  var base = parseFloat(row.getAttribute('data-base-price')) || 0;
+  var pack = parseInt(row.getAttribute('data-pack'))         || 0;
+  if (newUnit === 'កេស') {
+    priceInp.value = pack > 0 ? (base * pack).toFixed(2) : base.toFixed(2);
+  } else {
+    priceInp.value = base.toFixed(2);
+  }
 }
 
 function addFromCard(btn, e){
