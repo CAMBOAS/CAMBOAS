@@ -795,7 +795,12 @@ function olOpenDrawer(id){
   var saveBtn   = $id('olDrSaveBtn');
   var cancelBtn = $id('olDrCancelBtn');
   if(saveBtn)   saveBtn.style.display   = 'flex';
-  if(cancelBtn) cancelBtn.style.display = 'flex';
+  if(cancelBtn){
+    cancelBtn.style.display    = 'flex';
+    cancelBtn.style.border     = '1.5px solid rgba(239,68,68,.4)';
+    cancelBtn.style.background = 'rgba(239,68,68,.12)';
+    cancelBtn.style.color      = '#f87171';
+  }
 
   var titleEl = $id('olDrTitle');
   if(titleEl) titleEl.textContent = o.customer || 'Order Detail';
