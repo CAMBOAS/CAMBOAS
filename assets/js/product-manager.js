@@ -320,28 +320,42 @@ function bindSave(){
     var price = parseFloat(document.getElementById('pmFPrice').value)||0;
 
     if(!name){ alert('⚠️ សូមបញ្ចូលឈ្មោះ!'); return; }
-    if(!_imgB64 && !_editItem){ alert('⚠️ សូមបញ្ចូលរូប!'); return; }
 
     var item = _editItem
       ? Object.assign({}, _editItem, { name:name, subName:sub, category:cat, price:price, img:_imgB64||_editItem.img })
       : { id:'cp_'+Date.now(), name:name, subName:sub, category:cat, price:price, img:_imgB64||'', enabled:true };
 
+    var isNew  = !_editItem;
+    var origId = _editItem ? String(_editItem.id) : '';
+
     dbPut(item, function(){
       dbGetAll(function(list){
         window.__camboProducts = list;
-        // Refresh grid first
         doRenderGrid();
-        // Then switch to the saved category tab
         setTimeout(function(){
           var tabBtn = document.querySelector('.tab-btn[data-category="'+cat+'"]');
           if(tabBtn) tabBtn.click();
         }, 50);
 
-        /* Sync name + price to Google Sheets for Sheets-sourced products */
-        var origId = _editItem ? String(_editItem.id) : '';
-        if (origId && /^CAMBO-/i.test(origId)) {
-          var base = (window.CamboAPI && window.CamboAPI.getBase) ? window.CamboAPI.getBase() : (window.APPS_SCRIPT_URL || '');
-          if (base) {
+        var base = (window.CamboAPI && window.CamboAPI.getBase) ? window.CamboAPI.getBase() : (window.APPS_SCRIPT_URL || '');
+        if (base) {
+          var catTypeMap = { Hair:'Hair Care', Body:'Body Care', Face:'Face Care', Drink:'Drinks' };
+          if (isNew) {
+            /* Add new product row to Google Sheets */
+            fetch(base, {
+              method:  'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body:    JSON.stringify({ action:'addProduct', data:{ name:name, type:catTypeMap[cat]||cat, price:price, sale:1, box:1 } }),
+              redirect:'follow'
+            }).then(function(r){ return r.json(); }).then(function(d){
+              /* Update the local item id with the Sheets-assigned CAMBO-xxx id */
+              if(d && d.ok && d.id) {
+                item.id = d.id;
+                dbPut(item, function(){ dbGetAll(function(l){ window.__camboProducts = l; doRenderGrid(); }); });
+              }
+            }).catch(function(){});
+          } else if (origId && /^CAMBO-/i.test(origId)) {
+            /* Update existing Sheets product */
             fetch(base, {
               method:  'POST',
               headers: { 'Content-Type': 'text/plain;charset=utf-8' },

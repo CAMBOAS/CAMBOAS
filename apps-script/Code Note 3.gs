@@ -153,6 +153,12 @@ function doPost(e) {
       return jsonOutput_({ ok:true });
     }
 
+    /* Add new product row to NewOrder sheet */
+    if (action === 'addProduct') {
+      const newId = addProduct_(body.data || {});
+      return jsonOutput_({ ok:true, id:newId });
+    }
+
     /* Legacy payload — no action field (from new-order.html submitOrder) */
     if (!action && body && Array.isArray(body.items) && body.items.length) {
       const normalized = normalizeLegacyPayloadToOrder_(body);
@@ -220,6 +226,48 @@ function deleteOrder_(orderId) {
     if (safe_(ids[i]) === safe_(orderId)) { sheet.deleteRow(i + 2); deleted++; }
   }
   return deleted;
+}
+
+/**
+ * addProduct_ — Append a new product row to NewOrder sheet with auto ID
+ */
+function addProduct_(data) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('NewOrder');
+  if (!sheet) throw new Error('NewOrder sheet not found');
+
+  const catPrefix = { 'Drink':'A', 'Drinks':'A', 'Face':'B', 'Face Care':'B',
+                      'Body':'C', 'Body Care':'C', 'Hair':'D', 'Hair Care':'D' };
+  const letter = catPrefix[data.type] || catPrefix[data.category] || 'E';
+  const prefix = 'CAMBO-' + letter + '-';
+
+  const lastRow = sheet.getLastRow();
+  let maxNum = 0;
+  if (lastRow > 1) {
+    const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    ids.forEach(function(r) {
+      const id = String(r[0]);
+      if (id.startsWith(prefix)) {
+        const num = parseInt(id.slice(prefix.length)) || 0;
+        if (num > maxNum) maxNum = num;
+      }
+    });
+  }
+
+  const newId = prefix + String(maxNum + 1).padStart(3, '0');
+  sheet.appendRow([
+    newId,
+    safe_(data.name),
+    safe_(data.type || data.category || ''),
+    toNumber_(data.price) || 0,
+    toNumber_(data.sale)  || 1,
+    toNumber_(data.box)   || 1,
+    toNumber_(data.pack)  || 0,
+    toNumber_(data.qty)   || 0,
+    safe_(data.description || ''),
+    safe_(data.url || '')
+  ]);
+  return newId;
 }
 
 /**
