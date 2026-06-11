@@ -195,6 +195,13 @@
     }
     .ol-fd-handle{display:flex!important}
     @keyframes olSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    #olDatePop.open, #olActDrop.open{
+      left:0!important;right:0!important;bottom:0!important;top:auto!important;
+      width:100%!important;max-width:100%!important;max-height:85vh!important;
+      border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.4);
+      animation:olSlideUp .25s ease;overflow-y:auto;padding:0!important;
+      -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+    }
   }
   /* Handle bar (hidden on desktop) */
   .ol-fd-handle{display:none;justify-content:center;padding:10px 0 4px}
@@ -682,7 +689,9 @@
     </div>
   </div>
 
-  <div class="ol-dropdown" id="olDatePop" style="width:240px;padding:10px">
+  <div class="ol-dropdown" id="olDatePop" style="width:240px">
+    <div class="ol-fd-handle"><span></span></div>
+    <div style="padding:10px">
     <div class="ol-dp-grid">
       <button data-p="today" class="active">Today</button>
       <button data-p="yesterday">Yesterday</button>
@@ -703,9 +712,11 @@
       </div>
       <button class="ol-dp-apply" id="olDApply" style="width:100%;margin-top:2px">OK</button>
     </div>
+    </div>
   </div>
 
   <div class="ol-dropdown" id="olActDrop" style="width:220px">
+    <div class="ol-fd-handle"><span></span></div>
     <div style="padding:8px 12px 4px">
       <div style="font-size:10px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase;margin-bottom:4px">លេខប៉ុង</div>
       <input id="olReceiptNo" type="text" placeholder="បញ្ចូលលេខប៉ុង (optional)"
@@ -740,7 +751,7 @@
   <script src="../assets/js/cambo-api.js?v=160"></script>
   <script src="../assets/js/layout.js?v=158"></script>
   <script src="../assets/js/searchable-combo.js?v=165"></script>
-  <script src="../assets/js/order-list.js?v=174"></script>
+  <script src="../assets/js/order-list.js?v=175"></script>
 <script src="../assets/js/sw-register.js?v=158"></script>
 </body>
 </html>

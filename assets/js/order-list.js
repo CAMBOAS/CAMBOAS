@@ -1539,7 +1539,12 @@ async function init(){
     var d=$id('olDatePop'); if(!d) return;
     var opening = !d.classList.contains('open');
     closeAllDrops();
-    if(opening){ positionDrop(d, e.currentTarget); d.classList.add('open'); }
+    if(opening){
+      var isMobile = window.innerWidth <= 768;
+      if(!isMobile) positionDrop(d, e.currentTarget);
+      d.classList.add('open');
+      var bd=$id('olBackdrop'); if(bd) bd.classList.add('show');
+    }
   });
   document.querySelectorAll('#olDatePop [data-p]').forEach(function(btn){
     btn.addEventListener('click', function(e){
@@ -1565,7 +1570,12 @@ async function init(){
     var d=$id('olActDrop'); if(!d) return;
     var opening = !d.classList.contains('open');
     closeAllDrops();
-    if(opening){ positionDrop(d, e.currentTarget); d.classList.add('open'); }
+    if(opening){
+      var isMobile = window.innerWidth <= 768;
+      if(!isMobile) positionDrop(d, e.currentTarget);
+      d.classList.add('open');
+      var bd=$id('olBackdrop'); if(bd) bd.classList.add('show');
+    }
   });
   $id('olActDrop')?.addEventListener('click', function(e){
     var btn=e.target.closest('[data-a]'); if(!btn) return;
