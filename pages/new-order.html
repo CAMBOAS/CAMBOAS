@@ -133,7 +133,7 @@
     .mob-sect-head.is-open .mob-sect-chevron { transform: rotate(180deg); }
 
     /* Section body */
-    .mob-sect-body { padding: 12px 16px 12px; }
+    .mob-sect-body { padding: 8px 14px 10px; }
     .mob-sect-body.is-hidden { display: none; }
 
     /* ══════════════════════════════════════════════════════
@@ -203,20 +203,8 @@
       border-color: rgba(255,255,255,.12);
       color: #e8e0ff;
     }
-    /* date input — keep native text invisible, overlay shows value */
+    /* keep native date input invisible — custom overlay shows the value instead */
     #datePart { color: transparent !important; background: transparent !important; }
-    /* date overlay dark mode fix */
-    .no-date-overlay {
-      position:absolute;inset:0;display:flex;align-items:center;
-      height:52px;padding:0 10px;border-radius:10px;
-      border:1.5px solid rgba(124,92,255,.18);
-      background:rgba(255,255,255,.9);
-      font-size:14px;box-sizing:border-box;pointer-events:none;z-index:1;
-    }
-    [data-theme="dark"] .no-date-overlay {
-      background: rgba(255,255,255,.07);
-      border-color: rgba(255,255,255,.12);
-    }
 
     /* Searchable combo inside fg */
     .fg .searchable-select { width: 100%; }
@@ -277,6 +265,13 @@
     /* ══════════════════════════════════════════════════════
        PRODUCT PICKER
     ══════════════════════════════════════════════════════ */
+    /* Section body background — light blue tint */
+    #prodBody {
+      background: #f0f6ff;
+      border-radius: 0 0 14px 14px;
+    }
+    [data-theme="dark"] #prodBody { background: rgba(30,22,60,.5); }
+
     /* Category tabs */
     .ptabs {
       display: flex;
@@ -360,7 +355,8 @@
     }
     [data-theme="light"] .prow {
       background: #fff;
-      box-shadow: 0 2px 12px rgba(100,80,200,.07);
+      box-shadow: 0 2px 12px rgba(100,80,200,.1);
+      border: 1px solid rgba(124,92,255,.1);
     }
     [data-theme="dark"] .prow {
       background: rgba(30,22,60,.85);
@@ -394,7 +390,7 @@
       min-width: 0;
       display: flex;
       flex-direction: column;
-      padding: 11px 10px 0;
+      padding: 11px 10px 10px;
     }
 
     /* Name row — name left, category pill right */
@@ -412,12 +408,26 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      font-size: 13.5px;
-      font-weight: 700;
+      font-size: 14.5px;
+      font-weight: 800;
       color: #18213a;
       line-height: 1.38;
     }
     [data-theme="dark"] .pinfo b { color: #f0eaff; }
+
+    /* Product type badge below name */
+    .ptype-badge {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      background: rgba(0,0,0,.06);
+      color: #6b7898;
+      line-height: 1.8;
+    }
+    [data-theme="dark"] .ptype-badge { background: rgba(255,255,255,.1); color: #a0aabf; }
 
     /* Category pill — top-right of card */
     .pcat-tag {
@@ -437,52 +447,66 @@
     [data-theme="dark"] .pcat-tag { border-color: rgba(124,92,255,.4); }
 
     /* Push controls to bottom */
-    .prow-spacer { flex: 1; }
+    .prow-spacer { flex: 1; min-height: 6px; }
     .prow-div { display: none; }
 
     /* ══════════════════════════════════════════════════════
-       CONTROLS BAR — compact inline strip
+       CONTROLS BAR — 4-box grid redesign
     ══════════════════════════════════════════════════════ */
     .prow-ctrl {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin: 0 -10px;
-      padding: 8px 8px 10px;
-      background: rgba(124,92,255,.04);
-      border-top: 1px solid rgba(124,92,255,.08);
-      overflow: hidden;
-    }
-    [data-theme="dark"] .prow-ctrl {
-      background: rgba(124,92,255,.12);
-      border-top-color: rgba(124,92,255,.22);
+      display: grid;
+      grid-template-columns: 1fr 1fr 52px 50px;
+      gap: 6px;
+      margin: 0;
+      padding: 0 0 10px;
+      background: transparent;
+      border-top: none;
+      overflow: visible;
     }
 
-    /* Price pill */
-    .pctrl-price {
+    /* White box cell (Price / QTY) */
+    .pctrl-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.08);
+      min-height: 56px;
+      padding: 6px 4px 5px;
+      gap: 3px;
+    }
+    [data-theme="dark"] .pctrl-cell {
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.1);
+    }
+
+    /* Value row ($ + number) */
+    .pcell-val {
       display: flex;
       align-items: baseline;
-      gap: 2px;
-      background: rgba(124,92,255,.08);
-      border-radius: 10px;
-      padding: 5px 7px;
-      flex-shrink: 0;
-    }
-    [data-theme="dark"] .pctrl-price { background: rgba(124,92,255,.18); }
-    .pprice-sym {
-      font-size: 11px;
-      font-weight: 800;
-      color: #7c5cff;
+      gap: 1px;
       line-height: 1;
     }
-    [data-theme="dark"] .pprice-sym { color: #c4b5fd; }
+
+    /* $ symbol */
+    .pcell-sym {
+      font-size: 11px;
+      font-weight: 800;
+      color: #18213a;
+      line-height: 1;
+    }
+    [data-theme="dark"] .pcell-sym { color: #e8e0ff; }
+
+    /* Price input */
     .pprice-inp {
-      width: 42px;
-      height: 20px;
+      width: 40px;
+      height: 22px;
       border: none;
       background: transparent;
-      color: #7c5cff;
-      font-size: 16px; /* ≥16px prevents iOS Safari auto-zoom */
+      color: #18213a;
+      font-size: 18px;
       font-weight: 800;
       font-family: inherit;
       text-align: center;
@@ -492,25 +516,15 @@
     }
     .pprice-inp::-webkit-outer-spin-button,
     .pprice-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    [data-theme="dark"] .pprice-inp { color: #c4b5fd; }
+    [data-theme="dark"] .pprice-inp { color: #e8e0ff; }
 
-    /* × separator */
-    .pctrl-x {
-      font-size: 12px;
-      font-weight: 700;
-      color: rgba(124,92,255,.4);
-      flex-shrink: 0;
-      line-height: 1;
-    }
-
-    /* Qty pill */
+    /* QTY input */
     .pqty-inp {
-      width: 38px;
-      height: 34px;
-      background: rgba(124,92,255,.08);
-      border-radius: 10px;
+      width: 36px;
+      height: 22px;
+      background: transparent;
       border: none;
-      color: #7c5cff;
+      color: #18213a;
       font-size: 18px;
       font-weight: 800;
       font-family: inherit;
@@ -518,62 +532,53 @@
       outline: none;
       padding: 0;
       flex-shrink: 0;
+      border-radius: 0;
       -moz-appearance: textfield;
     }
     .pqty-inp::-webkit-outer-spin-button,
     .pqty-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    [data-theme="dark"] .pqty-inp { color: #c4b5fd; background: rgba(124,92,255,.18); }
+    [data-theme="dark"] .pqty-inp { color: #e8e0ff; background: transparent; }
 
-    /* Label wrapper above price/qty */
-    .pctrl-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-    .pctrl-lbl {
-      font-size: 9px;
-      font-weight: 700;
-      color: rgba(124,92,255,.6);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
+    /* Cell label (below value) */
+    .pcell-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      color: #9ca3af;
       line-height: 1;
+      letter-spacing: 0.2px;
     }
-    [data-theme="dark"] .pctrl-lbl { color: rgba(196,181,253,.6); }
+    [data-theme="dark"] .pcell-lbl { color: rgba(255,255,255,.36); }
 
-    /* Spacer pushes unit+add to the right */
-    .pctrl-spacer { flex: 1; }
-
-    /* Unit/Add box container */
+    /* Unit/Add shared container */
     .pctrl-box {
-      height: 42px;
-      border-radius: 14px;
+      border-radius: 12px;
       border: none;
-      background: transparent;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
       flex-shrink: 0;
+      min-height: 56px;
     }
 
-    /* ── Unit toggle — gradient button in controls bar ── */
+    /* ── Unit toggle — white box ── */
     .pctrl-box.pctrl-unit-box {
-      flex: 0 0 52px;
-      height: 40px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #7c5cff 0%, #9b73ff 100%);
-      border-color: transparent;
-      box-shadow: 0 3px 10px rgba(124,92,255,.32);
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.08);
+      box-shadow: none;
+    }
+    [data-theme="dark"] .pctrl-box.pctrl-unit-box {
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.1);
     }
     .punit-btn {
       position: absolute;
       inset: 0;
       border: none;
       background: transparent;
-      color: #fff;
-      font-size: 11px;
+      color: #18213a;
+      font-size: 12px;
       font-weight: 800;
       font-family: inherit;
       cursor: pointer;
@@ -583,21 +588,23 @@
       align-items: center;
       justify-content: center;
       letter-spacing: .02em;
-      transition: opacity .12s, transform .1s;
+      transition: background .15s, color .15s, transform .1s;
     }
-    .punit-btn.is-case { background: linear-gradient(135deg,#0ea5e9,#38bdf8); box-shadow: 0 3px 10px rgba(14,165,233,.38); }
-    .punit-btn.is-lay  { background: linear-gradient(135deg,#f59e0b,#fbbf24); box-shadow: 0 3px 10px rgba(245,158,11,.38); }
+    [data-theme="dark"] .punit-btn { color: #e8e0ff; }
+    .punit-btn.is-case { background: rgba(14,165,233,.15); color: #0ea5e9; }
+    .punit-btn.is-lay  { background: rgba(245,158,11,.15); color: #d97706; }
     .punit-btn:active { opacity: .78; transform: scale(.9); }
     .punit-icon { display: none; }
 
-    /* ── ADD button ── */
+    /* ── ADD button — purple gradient ── */
     .pctrl-box.padd-box {
-      flex: 0 0 50px;
-      height: 40px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #7c5cff 0%, #06b6d4 100%);
-      border-color: transparent;
-      box-shadow: 0 3px 12px rgba(124,92,255,.38);
+      background: linear-gradient(145deg, #7c5cff 0%, #a855f7 100%);
+      box-shadow: 0 4px 14px rgba(124,92,255,.45);
+      border: none;
+    }
+    [data-theme="dark"] .pctrl-box.padd-box {
+      background: linear-gradient(145deg, #7c5cff 0%, #a855f7 100%);
+      box-shadow: 0 4px 14px rgba(124,92,255,.35);
     }
     .padd-btn {
       position: absolute;
@@ -605,7 +612,7 @@
       border: none;
       background: transparent;
       color: #fff;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 300;
       font-family: inherit;
       cursor: pointer;
@@ -1192,9 +1199,9 @@
       border-bottom: none;
     }
 
-    /* 3. Product price input — was missing dark override (qty had it, price didn't) */
+    /* 3. Product price input — white text in dark boxes */
     [data-theme="dark"] .pprice-inp {
-      color: #c4b5fd;
+      color: #e8e0ff;
     }
 
     /* 4. Category pill — brighter purple text for dark backgrounds */
@@ -1204,10 +1211,10 @@
       background: rgba(167,139,250,.08);
     }
 
-    /* 5. Product controls bar — more visible border & bg in dark */
+    /* 5. Product controls bar — transparent in dark (boxes handle their own bg) */
     [data-theme="dark"] .prow-ctrl {
-      background: rgba(124,92,255,.12);
-      border-top-color: rgba(124,92,255,.22);
+      background: transparent;
+      border-top: none;
     }
 
     /* 6. Summary box — more visible purple tint in dark */
@@ -1247,6 +1254,442 @@
     [data-theme="dark"] .pthumb {
       background: rgba(124,92,255,.12);
     }
+
+    /* ══════════════════════════════════════════════════════
+       ORDER D — Bordered-Input Form Style
+    ══════════════════════════════════════════════════════ */
+
+    /* ── Section block ── */
+    #custSection {
+      border-radius: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+    }
+
+    /* ── Section header ── */
+    #custHead {
+      padding: 12px 16px !important;
+      background: var(--card, rgba(255,255,255,.95)) !important;
+      border-bottom: 1px solid rgba(0,0,0,.08) !important;
+      min-height: auto !important;
+      gap: 10px !important;
+    }
+    [data-theme="dark"] #custHead {
+      background: rgba(18,14,36,.95) !important;
+      border-bottom-color: rgba(255,255,255,.08) !important;
+    }
+
+    /* ── Icon badge (simple) ── */
+    .od-sect-badge {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background: rgba(124,92,255,.12);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .od-sect-badge { background: rgba(124,92,255,.22); }
+
+    /* ── Title ── */
+    .od-sect-info { flex: 1; min-width: 0; }
+    .od-sect-info h3 {
+      font-size: 15px !important;
+      font-weight: 800 !important;
+      color: var(--text, #18213a) !important;
+      margin: 0 !important;
+    }
+    [data-theme="dark"] .od-sect-info h3 { color: #e8e0ff !important; }
+    .od-sect-info span { display: none; }
+
+    /* ── Chevron ── */
+    .od-chevron-pill {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      background: rgba(0,0,0,.06);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--muted, #6b7898);
+      transition: transform .28s cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
+    }
+    [data-theme="dark"] .od-chevron-pill { background: rgba(255,255,255,.08); color: #a0aabf; }
+    #custHead.is-open .od-chevron-pill { transform: rotate(180deg); }
+
+    /* ── Form body ── */
+    #custBody { padding: 8px 14px 10px !important; }
+
+    /* ── Each row: label left + bordered input right ── */
+    .od-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      min-height: auto;
+      padding: 0;
+      border-bottom: none;
+      position: static;
+    }
+    .od-row:last-child { margin-bottom: 0; }
+
+    .od-lbl {
+      flex: 0 0 88px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text, #18213a);
+      white-space: nowrap;
+    }
+    [data-theme="dark"] .od-lbl { color: #e8e0ff; }
+
+    /* ── Inputs: visible bordered box ── */
+    .od-inp {
+      flex: 1;
+      height: 44px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(148,163,184,.22);
+      background: var(--input, rgba(255,255,255,.95));
+      padding: 0 14px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text, #18213a);
+      outline: none;
+      text-align: left;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    .od-inp:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139,92,246,.12);
+    }
+    .od-inp::placeholder { color: rgba(107,120,152,.5); }
+    [data-theme="dark"] .od-inp {
+      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.07);
+      color: #e8e0ff;
+    }
+    [data-theme="dark"] .od-inp:focus { border-color: #8b5cf6; }
+    .od-inp[type="number"]::-webkit-outer-spin-button,
+    .od-inp[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .od-inp[type="number"] { -moz-appearance: textfield; }
+
+    /* ── Combo: same bordered box ── */
+    .od-combo { flex: 1; min-width: 0; }
+    .od-combo .combo-input {
+      height: 48px !important;
+      border-radius: 12px !important;
+      border: 1.5px solid rgba(148,163,184,.22) !important;
+      background: var(--input, rgba(255,255,255,.95)) !important;
+      padding: 0 14px !important;
+      font-size: 15px !important;
+      font-family: inherit !important;
+      color: var(--text, #18213a) !important;
+      outline: none !important;
+      text-align: left !important;
+      width: 100% !important;
+      box-shadow: none !important;
+      box-sizing: border-box !important;
+    }
+    .od-combo .combo-input:focus {
+      border-color: #8b5cf6 !important;
+      box-shadow: 0 0 0 3px rgba(139,92,246,.12) !important;
+    }
+    [data-theme="dark"] .od-combo .combo-input {
+      border-color: rgba(255,255,255,.12) !important;
+      background: rgba(255,255,255,.07) !important;
+      color: #e8e0ff !important;
+    }
+
+    /* ── Payment row ── */
+    .od-row-pay {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .od-row-pay .od-lbl { flex: 0 0 auto; }
+    .od-row-pay .payment-opts { width: 100%; padding-bottom: 0; margin-top: 0; }
+    .od-row-pay .pay-btn { flex: 1; height: 44px; border-radius: 12px; font-size: 14px; }
+
+    /* ── Note row ── */
+    .od-row-note {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      padding: 0;
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    .od-row-note .od-note-head { flex: 0 0 auto; }
+    .od-note-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .od-note-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text, #18213a);
+      padding: 6px 12px;
+      border: 1.5px solid rgba(0,0,0,.13);
+      border-radius: 10px;
+    }
+    [data-theme="dark"] .od-note-label { color: #e8e0ff; border-color: rgba(255,255,255,.12); }
+    .od-note-invoice {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted, #6b7898);
+      padding: 6px 12px;
+      border: 1.5px solid rgba(0,0,0,.12);
+      border-radius: 10px;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    [data-theme="dark"] .od-note-invoice { border-color: rgba(255,255,255,.1); }
+
+    /* ── Date + Time ── */
+    .od-datetime {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .od-date-wrap {
+      flex: 1;
+      position: relative;
+      height: 48px;
+      min-width: 0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .od-date-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(148,163,184,.22);
+      background: var(--input, rgba(255,255,255,.95));
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    [data-theme="dark"] .od-date-overlay {
+      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.07);
+    }
+    .od-sep {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted, #6b7898);
+      flex-shrink: 0;
+    }
+    .od-time-inp {
+      flex: 1;
+      height: 48px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(148,163,184,.22);
+      background: var(--input, rgba(255,255,255,.95));
+      padding: 0 12px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text, #18213a);
+      outline: none;
+      min-width: 90px;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    .od-time-inp:focus { border-color: #8b5cf6; }
+    [data-theme="dark"] .od-time-inp {
+      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.07);
+      color: #e8e0ff;
+    }
+
+    /* ── Invoice Paste Modal ── */
+    #invoiceModal {
+      position: fixed;
+      inset: 0;
+      z-index: 18000;
+      display: flex;
+      align-items: flex-end;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      padding: 0;
+      animation: ivFadeIn .22s ease;
+    }
+    #invoiceModal[hidden] { display: none !important; }
+    @keyframes ivFadeIn { from{opacity:0} to{opacity:1} }
+
+    .iv-sheet {
+      width: 100%;
+      background: var(--card, #fff);
+      border-radius: 22px 22px 0 0;
+      padding: 0 0 env(safe-area-inset-bottom);
+      box-shadow: 0 -8px 40px rgba(0,0,0,.18);
+      animation: ivSlideUp .28s cubic-bezier(.22,.68,0,1.2);
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+    }
+    [data-theme="dark"] .iv-sheet { background: #0e0b1e; }
+    @keyframes ivSlideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+    .iv-handle {
+      width: 40px; height: 4px;
+      border-radius: 2px;
+      background: rgba(0,0,0,.12);
+      margin: 10px auto 0;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .iv-handle { background: rgba(255,255,255,.15); }
+
+    .iv-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 10px;
+      flex-shrink: 0;
+    }
+    .iv-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text, #18213a);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    [data-theme="dark"] .iv-title { color: #e8e0ff; }
+    .iv-close-btn {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(239,68,68,.1);
+      color: #ef4444;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .iv-hint {
+      font-size: 12px;
+      color: var(--muted, #6b7898);
+      padding: 0 18px 10px;
+      line-height: 1.55;
+      flex-shrink: 0;
+    }
+
+    .iv-textarea {
+      flex: 1;
+      min-height: 150px;
+      max-height: 300px;
+      margin: 0 18px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(0,0,0,.12);
+      background: var(--input, rgba(255,255,255,.95));
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text, #18213a);
+      outline: none;
+      resize: none;
+      line-height: 1.5;
+      overflow-y: auto;
+    }
+    .iv-textarea:focus { border-color: #8b5cf6; }
+    [data-theme="dark"] .iv-textarea {
+      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.07);
+      color: #e8e0ff;
+    }
+
+    .iv-preview {
+      margin: 10px 18px 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(124,92,255,.06);
+      border: 1px solid rgba(124,92,255,.15);
+      font-size: 12px;
+      color: var(--muted, #6b7898);
+      line-height: 1.7;
+      display: none;
+      max-height: 120px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .iv-preview { background: rgba(124,92,255,.1); border-color: rgba(124,92,255,.2); }
+    .iv-preview.show { display: block; }
+    .iv-preview b { color: var(--text, #18213a); font-weight: 700; }
+    [data-theme="dark"] .iv-preview b { color: #e8e0ff; }
+
+    .iv-actions {
+      display: flex;
+      gap: 10px;
+      padding: 14px 18px 16px;
+      flex-shrink: 0;
+    }
+    .iv-cancel-btn {
+      flex: 1;
+      height: 46px;
+      border-radius: 13px;
+      border: 1.5px solid rgba(0,0,0,.12);
+      background: transparent;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted, #6b7898);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    [data-theme="dark"] .iv-cancel-btn { border-color: rgba(255,255,255,.12); }
+    .iv-apply-btn {
+      flex: 2;
+      height: 46px;
+      border-radius: 13px;
+      border: none;
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 14px rgba(139,92,246,.35);
+      transition: opacity .15s;
+    }
+    .iv-apply-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .iv-apply-btn:not(:disabled):active { opacity: .82; }
+
+    /* ── Validation error state ── */
+    @keyframes od-shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-7px); }
+      40%      { transform: translateX(7px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+    .od-field-err {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239,68,68,.18) !important;
+      animation: od-shake .38s ease;
+    }
+    .od-pay-err {
+      outline: 2.5px solid #ef4444;
+      border-radius: 14px;
+      animation: od-shake .38s ease;
+    }
   </style>
 </head>
 <body>
@@ -1258,6 +1701,8 @@
   <aside class="sidebar" id="sharedSidebar"></aside>
   <main class="main-content" style="padding-left:0;padding-right:0;">
     <div class="shared-topbar" id="sharedHeader"></div>
+
+
     <div class="no-wrap">
       <div class="no-grid">
 
@@ -1267,118 +1712,123 @@
           <!-- ── Section 1: Customer Info ── -->
           <div class="mob-section" id="custSection">
             <div class="mob-sect-head is-open" id="custHead" onclick="mobCollapse(this,'custBody')">
-              <h3>👤 ព័ត៌មានអតិថិជន</h3>
-              <span class="mob-sect-chevron">▾</span>
+              <div class="od-sect-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c5cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="4"/>
+                  <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+              </div>
+              <div class="od-sect-info">
+                <h3>ព័ត៌មានអតិថិជន</h3>
+                <span>Customer Information</span>
+              </div>
+              <div class="od-chevron-pill mob-sect-chevron">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
             </div>
             <div class="mob-sect-body" id="custBody">
 
-              <!-- Customer + Phone -->
-              <div class="fgrid">
-                <div class="fg">
-                  <label>ឈ្មោះអតិថិជន</label>
-                  <input id="customer" type="text" placeholder="customer..." autocomplete="off">
-                </div>
-                <div class="fg">
-                  <label>លេខទូរស័ព្ទ</label>
-                  <div style="position:relative;">
-                    <input id="phone" type="tel" placeholder="0xx xxx xxx" style="padding-right:110px;width:100%;">
-                    <!-- Desktop carrier badge -->
-                    <span id="carrierBadgeDesktop" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;align-items:center;gap:4px;font-size:11px;font-weight:700;">
-                      <img id="carrierLogoDesktop" src="" alt="" style="height:16px;width:auto;border-radius:2px;">
-                      <span id="carrierNameDesktop"></span>
-                    </span>
-                    <!-- Mobile carrier badge (inside field, right side) -->
-                    <span id="carrierBadgeMobile">
-                      <img id="carrierLogoMobile" src="" alt="">
-                      <span id="carrierNameMobile"></span>
-                    </span>
-                  </div>
+              <!-- ── ឈ្មោះអតិថិជន ── -->
+              <div class="od-row">
+                <span class="od-lbl">ឈ្មោះអតិថិជន</span>
+                <input id="customer" type="text" class="od-inp" placeholder="Customer..." autocomplete="off">
+              </div>
+
+              <!-- ── លេខទូរសព្ទ ── -->
+              <div class="od-row">
+                <span class="od-lbl">លេខទូរសព្ទ</span>
+                <div style="flex:1;min-width:0;position:relative;">
+                  <input id="phone" type="tel" class="od-inp" placeholder="0xx xxx xxx" style="padding-right:100px;">
+                  <span id="carrierBadgeDesktop" style="display:none;position:absolute;right:0;top:50%;transform:translateY(-50%);pointer-events:none;align-items:center;gap:4px;font-size:11px;font-weight:700;">
+                    <img id="carrierLogoDesktop" src="" alt="" style="height:16px;width:auto;border-radius:2px;">
+                    <span id="carrierNameDesktop"></span>
+                  </span>
+                  <span id="carrierBadgeMobile">
+                    <img id="carrierLogoMobile" src="" alt="">
+                    <span id="carrierNameMobile"></span>
+                  </span>
                 </div>
               </div>
 
-              <!-- Address -->
-              <div class="fgrid full" style="margin-bottom:10px;">
-                <div class="fg">
-                  <label>ទីតាំងតំបន</label>
-                  <input id="addressDetail" type="text" placeholder="ភូមិ / ផ្លូវ / ផ្ទះលេខ..." autocomplete="off">
+              <!-- ── ទីតាំងតំបន់ ── -->
+              <div class="od-row">
+                <span class="od-lbl">ទីតាំងតំបន់</span>
+                <input id="addressDetail" type="text" class="od-inp" placeholder="ភូមិ / ផ្លូវ / ផ្ទះលេខ..." autocomplete="off">
+              </div>
+
+              <!-- ── ខេត្ត/ក្រុង ── -->
+              <div class="od-row">
+                <span class="od-lbl">ខេត្ត/ក្រុង</span>
+                <div class="od-combo searchable-select" id="provinceCombo">
+                  <input type="text" class="combo-input" id="provinceInput" placeholder="ខេត្ត..." autocomplete="off">
+                  <input type="hidden" id="province">
                 </div>
               </div>
 
-              <!-- Province -->
-              <div class="fgrid full" style="margin-bottom:10px;">
-                <div class="fg">
-                  <label>ខេត្ត / ក្រុង</label>
-                  <div class="searchable-select" id="provinceCombo">
-                    <input type="text" class="combo-input" id="provinceInput" placeholder="ខេត្ត..." autocomplete="off">
-                    <input type="hidden" id="province">
-                  </div>
+              <!-- ── ដឹកជញ្ជូន ── -->
+              <div class="od-row">
+                <span class="od-lbl">ដឹកជញ្ជូន</span>
+                <div class="od-combo searchable-select" id="deliveryCombo">
+                  <input type="text" class="combo-input" id="deliveryInput" placeholder="ដឹកជញ្ជូន..." autocomplete="off">
+                  <input type="hidden" id="deliveryName">
                 </div>
               </div>
 
-              <!-- Delivery + Fee -->
-              <div class="fgrid" style="margin-bottom:10px;">
-                <div class="fg">
-                  <label>ដឹកជញ្ជូន</label>
-                  <div class="searchable-select" id="deliveryCombo">
-                    <input type="text" class="combo-input" id="deliveryInput" placeholder="ដឹកជញ្ជូន..." autocomplete="off">
-                    <input type="hidden" id="deliveryName">
-                  </div>
-                </div>
-                <div class="fg">
-                  <label>ថ្លៃដឹក ($)</label>
-                  <input id="deliveryFee" type="number" value="0" min="0" step="0.5" placeholder="0" inputmode="decimal">
+              <!-- ── ថ្លៃដឹក ── -->
+              <div class="od-row">
+                <span class="od-lbl">ថ្លៃដឹក ($)</span>
+                <input id="deliveryFee" type="number" class="od-inp" value="0" min="0" step="0.5" inputmode="decimal">
+              </div>
+
+              <!-- ── Pages ── -->
+              <div class="od-row">
+                <span class="od-lbl">Pages</span>
+                <div class="od-combo searchable-select" id="pagesCombo">
+                  <input type="text" class="combo-input" id="pagesInput" placeholder="Pages..." autocomplete="off">
+                  <input type="hidden" id="page">
                 </div>
               </div>
 
-              <!-- Pages + CloseBy + Status -->
-              <div class="fgrid cols3" style="margin-bottom:10px;">
-                <div class="fg">
-                  <label>Pages</label>
-                  <div class="searchable-select" id="pagesCombo">
-                    <input type="text" class="combo-input" id="pagesInput" placeholder="Pages..." autocomplete="off">
-                    <input type="hidden" id="page">
-                  </div>
-                </div>
-                <div class="fg">
-                  <label>CloseBy</label>
-                  <div class="searchable-select" id="closeByCombo">
-                    <input type="text" class="combo-input" id="closeByInput" placeholder="CloseBy..." autocomplete="off">
-                    <input type="hidden" id="closeBy">
-                  </div>
-                </div>
-                <div class="fg">
-                  <label>Status</label>
-                  <select id="status">
-                    <option value="Pending">Pending</option>
-                    <option value="Confirmed">Confirmed</option>
-                    <option value="Done">Done</option>
-                    <option value="Cancel">Cancel</option>
-                  </select>
+              <!-- ── CloseBy ── -->
+              <div class="od-row">
+                <span class="od-lbl">CloseBy</span>
+                <div class="od-combo searchable-select" id="closeByCombo">
+                  <input type="text" class="combo-input" id="closeByInput" placeholder="CloseBy..." autocomplete="off">
+                  <input type="hidden" id="closeBy">
                 </div>
               </div>
 
-              <!-- Date & Time -->
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                <div class="fg">
-                  <label>ថ្ងៃខែឆ្នាំ</label>
-                  <div style="position:relative;width:100%;height:52px;">
+              <!-- ── Status ── -->
+              <div class="od-row">
+                <span class="od-lbl">Status</span>
+                <select id="status" class="od-inp" style="cursor:pointer;">
+                  <option value="Pending">Pending</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Done">Done</option>
+                  <option value="Cancel">Cancel</option>
+                </select>
+              </div>
+
+              <!-- ── ថ្ងៃខែឆ្នាំ + ម៉ោង (inline) ── -->
+              <div class="od-row">
+                <span class="od-lbl">ថ្ងៃខែឆ្នាំ</span>
+                <div class="od-datetime">
+                  <div class="od-date-wrap">
                     <input id="datePart" type="date"
                       style="position:absolute;inset:0;width:100%;height:100%;opacity:1;color:transparent;background:transparent;border:none;outline:none;cursor:pointer;z-index:2;box-sizing:border-box;"
-                      oninput="(function(v){var t=document.getElementById('datePartText');if(!t)return;if(!v){t.textContent='ថ្ងៃ/ខែ/ឆ្នាំ';t.style.color='#aaa';return;}var p=v.split('-');t.textContent=p[2]+'/'+p[1]+'/'+p[0].slice(2);t.style.color='var(--text,#18213a)';})(this.value)">
-                    <div class="no-date-overlay">
-                      <span id="datePartText" style="color:#aaa;">ថ្ងៃ/ខែ/ឆ្នាំ</span>
+                      oninput="(function(v){var t=document.getElementById('datePartText');if(!t)return;if(!v){t.textContent='ថ្ងៃ/ខែ/ឆ្នាំ';t.style.color='';return;}var p=v.split('-');t.textContent=p[2]+'/'+p[1]+'/'+p[0].slice(2);t.style.color='var(--text,#18213a)';})(this.value)">
+                    <div class="od-date-overlay">
+                      <span id="datePartText" style="color:rgba(107,120,152,.5);">ថ្ងៃ/ខែ/ឆ្នាំ</span>
                     </div>
                   </div>
-                </div>
-                <div class="fg">
-                  <label>⏰ ម៉ោង</label>
-                  <input id="timePart" type="time" style="width:100%;">
+                  <span class="od-sep">ម៉ោង</span>
+                  <input id="timePart" type="time" class="od-time-inp">
                 </div>
               </div>
 
-              <!-- Payment -->
-              <div class="fg" style="margin-bottom:4px;">
-                <label>បង់ប្រាក់</label>
+              <!-- ── បង់ប្រាក់ ── -->
+              <div class="od-row od-row-pay">
+                <span class="od-lbl">បង់ប្រាក់</span>
                 <div class="payment-opts" id="paymentOptions">
                   <button type="button" class="pay-btn" data-value="AC">AC</button>
                   <button type="button" class="pay-btn" data-value="ABA">ABA</button>
@@ -1389,10 +1839,19 @@
                 <input type="hidden" id="payment" value="">
               </div>
 
-              <!-- Note — merged into customer section -->
-              <div class="fg" style="margin-top:6px;">
-                <label>📝 Note</label>
-                <textarea id="note" placeholder="..."></textarea>
+              <!-- ── Note ── -->
+              <div class="od-row od-row-note">
+                <div class="od-note-head">
+                  <span class="od-note-label">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                    Note
+                  </span>
+                  <button type="button" class="od-note-invoice" id="invoiceBtn" title="Invoice">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>
+                    Invoice
+                  </button>
+                </div>
+                <textarea id="note" class="" style="width:100%;min-height:72px;border:none;background:transparent;font-size:15px;font-family:inherit;color:var(--text,#18213a);outline:none;resize:none;padding:0;line-height:1.55;" placeholder="..."></textarea>
               </div>
 
             </div><!-- /custBody -->
@@ -1415,10 +1874,7 @@
                 <button class="ptab" data-cat="Face">Face</button>
                 <button class="ptab" data-cat="Drink">Drink</button>
               </div>
-              <div class="psearch">
-                <span class="psearch-icon">🔍</span>
-                <input id="pSearch" type="text" placeholder="ស្វែងរក..." oninput="filterProds()" autocomplete="off">
-              </div>
+
               <div class="plist" id="pList"></div>
             </div>
           </div>
@@ -1863,28 +2319,26 @@ function renderPList(list){
       +'<div class="pthumb"><img src="'+escHtml(p.img||p.image||'')+'" alt="" onerror="this.style.display=\'none\'"></div>'
       +'<div class="prow-body">'
         +'<div class="prow-info">'
-          +'<div class="pinfo"><b>'+escHtml(p.name)+'</b></div>'
+          +'<div class="pinfo"><b>'+escHtml(p.name)+'</b>'+(p.type?'<span class="ptype-badge">'+escHtml(p.type)+'</span>':'')+'</div>'
           +'<span class="pcat-tag">'+escHtml(p.category)+'</span>'
         +'</div>'
         +'<div class="prow-spacer"></div>'
         +'<div class="prow-ctrl">'
-          /* Price group with label */
-          +'<div class="pctrl-group">'
-            +'<span class="pctrl-lbl">Price</span>'
-            +'<div class="pctrl-price">'
-              +'<span class="pprice-sym">$</span>'
+          /* Price cell */
+          +'<div class="pctrl-cell">'
+            +'<div class="pcell-val">'
+              +'<span class="pcell-sym">$</span>'
               +'<input class="pprice-inp" type="number" value="'+Number(p.price)+'" min="0" step="0.5" onclick="event.stopPropagation()">'
             +'</div>'
+            +'<span class="pcell-lbl">Price</span>'
           +'</div>'
-          /* × separator */
-          +'<span class="pctrl-x">×</span>'
-          /* Qty group with label */
-          +'<div class="pctrl-group">'
-            +'<span class="pctrl-lbl">QTY</span>'
-            +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
+          /* QTY cell */
+          +'<div class="pctrl-cell">'
+            +'<div class="pcell-val">'
+              +'<input class="pqty-inp" type="number" value="1" min="1" max="999" onclick="event.stopPropagation()">'
+            +'</div>'
+            +'<span class="pcell-lbl">QTY</span>'
           +'</div>'
-          /* Spacer */
-          +'<span class="pctrl-spacer"></span>'
           /* Unit toggle */
           +'<div class="pctrl-box pctrl-unit-box">'
             +'<button class="punit-btn" onclick="toggleUnit(this,event)" type="button"><span class="punit-lbl">ឈុត</span></button>'
@@ -1910,8 +2364,6 @@ function toggleUnit(btn, e){
   if (lblEl) lblEl.textContent = newUnit; else btn.textContent = newUnit;
   btn.classList.toggle('is-case', newUnit === 'កេស');
   btn.classList.toggle('is-lay',  newUnit === 'លាយ');
-  var qtyLbl = btn.closest('.prow').querySelector('.pctrl-lbl');
-  if (qtyLbl) qtyLbl.textContent = newUnit;
 }
 
 function addFromCard(btn, e){
@@ -1973,7 +2425,10 @@ function buildPayload(){
   var rawVal = (dp && tp) ? dp+'T'+tp : (dp ? dp+'T00:00' : '');
   if(!rawVal) rawVal=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes());
   var dateTime, m=rawVal.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-  dateTime = m ? m[3]+'/'+m[2]+'/'+m[1]+' '+m[4]+':'+m[5] : rawVal;
+  if(m){
+    var h=parseInt(m[4],10), ampm=h>=12?'PM':'AM', h12=h%12||12;
+    dateTime = m[3]+'/'+m[2]+'/'+m[1]+' '+String(h12).padStart(2,'0')+':'+m[5]+' '+ampm;
+  } else { dateTime = rawVal; }
   var rNo = _el('receiptNo');
   return {
     id:Date.now(), createdAt:now.toISOString(),
@@ -2326,7 +2781,383 @@ document.addEventListener('DOMContentLoaded', function(){
 <script src="../assets/js/dashboard-layout.js?v=164"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="../assets/js/share-receipt.js?v=164"></script>
+<!-- ══ Invoice Paste Modal ══ -->
+<div id="invoiceModal" hidden>
+  <div class="iv-sheet">
+    <div class="iv-handle"></div>
+    <div class="iv-head">
+      <span class="iv-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>
+        Paste Receipt → Fill Form
+      </span>
+      <button type="button" class="iv-close-btn" id="ivCloseBtn">✕</button>
+    </div>
+    <textarea class="iv-textarea" id="ivTextarea" placeholder="Paste receipt text នៅទីនេះ...&#10;&#10;🧾 វិក័យប័ត្រ  Date: ...&#10;👤 ឈ្មោះ: ...&#10;📞 លេខទូរសព្ទ: ..."></textarea>
+    <div class="iv-preview" id="ivPreview"></div>
+    <div class="iv-actions">
+      <button type="button" class="iv-cancel-btn" id="ivCancelBtn">បោះបង់</button>
+      <button type="button" class="iv-apply-btn" id="ivApplyBtn" disabled>✓ Fill Form</button>
+    </div>
+  </div>
+</div>
+
 <script src="../assets/js/searchable-combo.js?v=164"></script>
 <script src="../assets/js/sw-register.js?v=164"></script>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   ORDER D — Invoice Paste Feature
+══════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  /* ── Parse receipt text → data object ── */
+  function parseReceipt(text) {
+    var d = {};
+
+    /* ── Extract value after last colon on a line ── */
+    function afterColon(line) {
+      var idx = line.lastIndexOf(':');
+      return idx < 0 ? '' : line.slice(idx + 1).replace(/^[\t ]+/, '').trim();
+    }
+
+    /* ── Clean dash placeholder ── */
+    function clean(s) { return (s === '-' || s === '–' || s === '') ? '' : s; }
+
+    /* ── Line-by-line: use includes() so Khmer encoding never mismatches ── */
+    var lines = text.split(/\r?\n/);
+    lines.forEach(function(raw) {
+      var line = raw.trim();
+      if (!line || line.replace(/\./g,'') === '') return; /* skip separator */
+
+      var val = clean(afterColon(line));
+
+      if      (line.includes('ឈ្មោះ'))        { if (val) d.customer     = val; }
+      else if (line.includes('លេខទូរ'))        { if (val) d.phone        = val; }
+      else if (line.includes('ទីតាំង'))        { if (val) d.address      = val; }
+      else if (line.includes('ខេត្ត'))         { if (val) d.province     = val; }
+      else if (line.includes('ដឹកជញ្ជូន') &&
+               !line.includes('សេវា'))         { if (val) d.deliveryName = val; }
+      else if (line.includes('Note'))          { if (val) d.note         = val; }
+      else if (line.includes('ការទូទាត់'))     { if (val) d.payment      = val; }
+      else if (line.includes('Page') &&
+               line.includes('CloseBy'))       {
+        var pm = line.match(/Page:\s*([^|]+)/);
+        var cm = line.match(/CloseBy:\s*(.+)/);
+        if (pm) d.page    = clean(pm[1].trim());
+        if (cm) d.closeBy = clean(cm[1].trim());
+      }
+      else if (line.includes('សេវាដឹក'))       {
+        var fs = val;
+        d.deliveryFee = (!fs || /ហ្វ្រី|free/i.test(fs))
+          ? 0 : (parseFloat(fs.replace(/[$,]/g,'')) || 0);
+      }
+    });
+
+    /* ── Date + Time from the header line (regex on numbers only) ── */
+    var dt = text.match(/(\d{2}\/\d{2}\/\d{4})\s+(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
+    if (dt) { d.dateDisplay = dt[1].trim(); d.timeDisplay = dt[2].trim(); }
+
+    return d;
+  }
+
+  /* ── Convert 12h time → HH:MM (input[type=time] value) ── */
+  function to24h(t) {
+    var m = t.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+    if (!m) return t;
+    var h = parseInt(m[1], 10), min = m[2], ap = (m[3]||'').toUpperCase();
+    if (ap === 'PM' && h !== 12) h += 12;
+    if (ap === 'AM' && h === 12) h = 0;
+    return (h < 10 ? '0' : '') + h + ':' + min;
+  }
+
+  /* ── Fill form fields ── */
+  function fillForm(d) {
+    var filled = 0;
+    function setVal(id, val) {
+      if (!val && val !== 0) return;
+      var el = document.getElementById(id);
+      if (el) { el.value = val; el.dispatchEvent(new Event('input', {bubbles:true})); filled++; }
+    }
+
+    setVal('customer',     d.customer);
+    setVal('phone',        d.phone);
+    setVal('addressDetail',d.address);
+    setVal('deliveryInput',d.deliveryName);
+    setVal('deliveryFee',  d.deliveryFee !== undefined ? d.deliveryFee : '');
+    setVal('pagesInput',   d.page);
+    setVal('closeByInput', d.closeBy);
+
+    /* Province */
+    if (d.province) {
+      setVal('provinceInput', d.province);
+      var ph = document.getElementById('province'); if (ph) ph.value = d.province;
+    }
+
+    /* Combo hidden fields */
+    if (d.deliveryName) { var h = document.getElementById('deliveryName'); if (h) h.value = d.deliveryName; }
+    if (d.page)         { var h = document.getElementById('page');         if (h) h.value = d.page; }
+    if (d.closeBy)      { var h = document.getElementById('closeBy');      if (h) h.value = d.closeBy; }
+
+    /* Note */
+    if (d.note && d.note !== '-') setVal('note', d.note);
+
+    /* Payment — set hidden + activate button */
+    if (d.payment) {
+      var ph = document.getElementById('payment');
+      if (ph) { ph.value = d.payment; filled++; }
+      document.querySelectorAll('.pay-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.value === d.payment);
+      });
+    }
+
+    /* Date — convert DD/MM/YYYY → YYYY-MM-DD */
+    if (d.dateDisplay) {
+      var parts = d.dateDisplay.split('/');
+      if (parts.length === 3) {
+        var iso = parts[2] + '-' + parts[1] + '-' + parts[0];
+        var de = document.getElementById('datePart');
+        if (de) {
+          de.value = iso;
+          de.dispatchEvent(new Event('input', {bubbles:true}));
+          filled++;
+        }
+      }
+    }
+
+    /* Time */
+    if (d.timeDisplay) setVal('timePart', to24h(d.timeDisplay));
+
+    return filled;
+  }
+
+  /* ── Build preview text ── */
+  function buildPreview(d) {
+    var rows = [];
+    function row(icon, label, val) { if (val || val === 0) rows.push(icon + ' <b>' + label + '</b>: ' + val); }
+    row('👤','ឈ្មោះ',      d.customer);
+    row('📞','ទូរស័ព្ទ',    d.phone);
+    row('📍','ទីតំណាំ',    d.address);
+    row('🗺️','ខេត្ត/ក្រុង', d.province);
+    row('🚚','ដឹកជញ្ជូន',   d.deliveryName);
+    row('💳','បង់ប្រាក់',    d.payment);
+    row('📅','ថ្ងៃ',         d.dateDisplay ? d.dateDisplay + ' ' + (d.timeDisplay||'') : '');
+    row('📄','Page',         d.page);
+    row('🤝','CloseBy',      d.closeBy);
+    row('🚛','ថ្លៃដឹក',     d.deliveryFee !== undefined ? '$'+d.deliveryFee : '');
+    return rows.join('<br>');
+  }
+
+  /* ── Modal logic ── */
+  var modal    = document.getElementById('invoiceModal');
+  var textarea = document.getElementById('ivTextarea');
+  var preview  = document.getElementById('ivPreview');
+  var applyBtn = document.getElementById('ivApplyBtn');
+  var closeBtn = document.getElementById('ivCloseBtn');
+  var cancelBtn= document.getElementById('ivCancelBtn');
+
+  var _parsed = null;
+
+  function openModal() {
+    if (!modal) return;
+    textarea.value = '';
+    preview.innerHTML = '';
+    preview.classList.remove('show');
+    applyBtn.disabled = true;
+    _parsed = null;
+    modal.hidden = false;
+    setTimeout(function(){ textarea.focus(); }, 120);
+  }
+
+  function closeModal() { if (modal) modal.hidden = true; }
+
+  function onInput() {
+    var txt = textarea.value.trim();
+    if (!txt) {
+      preview.classList.remove('show');
+      applyBtn.disabled = true;
+      _parsed = null;
+      return;
+    }
+    _parsed = parseReceipt(txt);
+    var prev = buildPreview(_parsed);
+    if (prev) {
+      preview.innerHTML = prev;
+      preview.classList.add('show');
+      applyBtn.disabled = false;
+    } else {
+      preview.innerHTML = '<span style="color:#ef4444">⚠️ មិនរកឃើញទិន្នន័យ — សូម Paste text receipt ត្រឹមត្រូវ</span>';
+      preview.classList.add('show');
+      applyBtn.disabled = true;
+    }
+  }
+
+  function onApply() {
+    if (!_parsed) return;
+    var n = fillForm(_parsed);
+    closeModal();
+    if (window.macUI) macUI.toast('✅ បំពេញ ' + n + ' ចន្លោះដោយជោគជ័យ!', 'success');
+    /* Scroll to top of form */
+    var custSection = document.getElementById('custSection');
+    if (custSection) custSection.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  if (textarea)  textarea.addEventListener('input',  onInput);
+  if (textarea)  textarea.addEventListener('paste',  function(){ setTimeout(onInput, 30); });
+  if (applyBtn)  applyBtn.addEventListener('click',  onApply);
+  if (closeBtn)  closeBtn.addEventListener('click',  closeModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+  /* Close on backdrop click */
+  if (modal) modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+  /* Close on Escape */
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && modal && !modal.hidden) closeModal(); });
+
+  /* ── Wire Invoice button ── */
+  document.addEventListener('DOMContentLoaded', function () {
+    var ivBtn = document.getElementById('invoiceBtn');
+    if (ivBtn) ivBtn.addEventListener('click', openModal);
+
+    /* ── Note button → focus note textarea ── */
+    var noteHeadBtns = document.querySelectorAll('.od-note-label');
+    noteHeadBtns.forEach(function(btn) {
+      btn.style.cursor = 'pointer';
+      btn.addEventListener('click', function () {
+        var noteEl = document.getElementById('note');
+        if (noteEl) { noteEl.focus(); noteEl.scrollIntoView({ behavior:'smooth', block:'center' }); }
+      });
+    });
+  });
+
+  /* Also support late binding if DOMContentLoaded already fired */
+  if (document.readyState !== 'loading') {
+    var ivBtn = document.getElementById('invoiceBtn');
+    if (ivBtn) ivBtn.addEventListener('click', openModal);
+  }
+
+}());
+
+/* ══════════════════════════════════════════════════════
+   ORDER D — Form Validation
+   Runs BEFORE Save / Copy / Share / Print handlers
+══════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  /* ── Required fields ── */
+  var FIELDS = [
+    {
+      label: 'ឈ្មោះអតិថិជន',
+      getVal: function () { return (document.getElementById('customer') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('customer'); }
+    },
+    {
+      label: 'លេខទូរសព្ទ',
+      getVal: function () { return (document.getElementById('phone') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('phone'); }
+    },
+    {
+      label: 'ទីតាំងតំបន់',
+      getVal: function () { return (document.getElementById('addressDetail') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('addressDetail'); }
+    },
+    {
+      label: 'ខេត្ត / ក្រុង',
+      getVal: function () { return (document.getElementById('provinceInput') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('provinceInput'); }
+    },
+    {
+      label: 'ដឹកជញ្ជូន',
+      getVal: function () { return (document.getElementById('deliveryInput') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('deliveryInput'); }
+    },
+    {
+      label: 'ថ្ងៃខែឆ្នាំ',
+      getVal: function () { return (document.getElementById('datePart') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('datePart'); },
+      getErrEl: function () { return document.querySelector('.od-date-overlay'); }
+    },
+    {
+      label: 'ម៉ោង',
+      getVal: function () { return (document.getElementById('timePart') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('timePart'); }
+    },
+    {
+      label: 'បង់ប្រាក់',
+      getVal: function () { return (document.getElementById('payment') || {}).value || ''; },
+      getEl:  function () { return null; },
+      getErrEl: function () { return document.getElementById('paymentOptions'); },
+      isPayment: true
+    },
+  ];
+
+  /* ── Flash an error on a single element ── */
+  function flashEl(el, isPayment) {
+    if (!el) return;
+    if (isPayment) {
+      el.classList.add('od-pay-err');
+      setTimeout(function () { el.classList.remove('od-pay-err'); }, 2200);
+    } else {
+      el.classList.add('od-field-err');
+      setTimeout(function () { el.classList.remove('od-field-err'); }, 2200);
+    }
+  }
+
+  /* ── Main validate function ── */
+  function validate() {
+    var errors  = [];
+    var firstEl = null;
+
+    FIELDS.forEach(function (f) {
+      if (f.getVal().trim() !== '') return; /* OK */
+
+      errors.push(f.label);
+
+      /* highlight the visible input / element */
+      var errEl = f.getErrEl ? f.getErrEl() : f.getEl();
+      if (errEl) {
+        flashEl(errEl, f.isPayment);
+        if (!firstEl) firstEl = errEl;
+      }
+    });
+
+    if (errors.length === 0) return true; /* all good */
+
+    /* Scroll to first error */
+    if (firstEl) firstEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    /* Toast message */
+    var msg = errors.length === 1
+      ? 'សូមបំពេញ: ' + errors[0]
+      : 'សូមបំពេញ ' + errors.length + ' ចំណុច: ' + errors.join(' · ');
+
+    if (window.macUI) {
+      macUI.toast(msg, 'warning');
+    }
+    return false;
+  }
+
+  /* ── Hook buttons in capture phase (runs before existing handlers) ── */
+  function hookBtn(id) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', function (e) {
+      if (!validate()) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+      }
+    }, true /* capture */);
+  }
+
+  function init() {
+    ['saveBtn', 'copyBtn', 'shareBtn', 'printBtn'].forEach(hookBtn);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+}());
+</script>
 </body>
 </html>
