@@ -2370,18 +2370,13 @@ function filterProds(){ renderPList(getFiltered()); }
 function renderPList(list){
   _el('pList').innerHTML = list.map(function(p){
     var basePrice = Number(p.price)||0;
-    var saleCnt   = Number(p.sale)||1;
     var packCnt   = Number(p.pack)||0;
-    var infoTxt   = packCnt > 0
-      ? '<span class="punit-info">1ឈុត='+saleCnt+'item &nbsp;|&nbsp; 1Box='+packCnt+'ឈុត</span>'
-      : (saleCnt > 1 ? '<span class="punit-info">1ឈុត='+saleCnt+'item</span>' : '');
-    return '<div class="prow" id="pc_'+p.id+'" data-pid="'+p.id+'" data-base-price="'+basePrice+'" data-pack="'+packCnt+'" data-sale="'+saleCnt+'">'
+    return '<div class="prow" id="pc_'+p.id+'" data-pid="'+p.id+'" data-base-price="'+basePrice+'" data-pack="'+packCnt+'" data-sale="'+(Number(p.sale)||1)+'">'
       +'<div class="pthumb"><img src="'+escHtml(p.img||p.image||'')+'" alt="" onerror="this.style.display=\'none\'"></div>'
       +'<div class="prow-body">'
         +'<div class="prow-info">'
           +'<div class="pinfo"><b>'+escHtml(p.name)+'</b>'+(p.type?'<span class="ptype-badge">'+escHtml(p.type)+'</span>':'')+'</div>'
           +'<span class="pcat-tag">'+escHtml(p.category)+'</span>'
-          +infoTxt
         +'</div>'
         +'<div class="prow-spacer"></div>'
         +'<div class="prow-ctrl">'
