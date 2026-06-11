@@ -797,7 +797,8 @@ function olOpenDrawer(id){
   if(saveBtn)   saveBtn.style.display   = 'flex';
   if(cancelBtn) cancelBtn.style.display = 'flex';
 
-  $id('olDrTitle').textContent = o.customer || 'Order Detail';
+  var titleEl = $id('olDrTitle');
+  if(titleEl) titleEl.textContent = o.customer || 'Order Detail';
   renderDrawerEdit(o);
 
   // Lock background scroll (mobile: position:fixed trick)
@@ -841,7 +842,7 @@ function olToggleEdit(){
   var editBtn = $id('olDrEditBtn');
   // Footer always stays visible — only Save/Cancel toggle
   if(foot) foot.style.display = 'flex';
-  if(editBtn) editBtn.textContent = _editMode ? '👁 View' : '✏️ Edit';
+  if(editBtn) editBtn.style.display = _editMode ? 'none' : 'flex';
   _editMode ? renderDrawerEdit(o) : renderDrawerView(o);
   // Show/hide save+cancel in footer
   var saveBtn   = $id('olDrSaveBtn');
