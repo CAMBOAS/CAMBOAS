@@ -142,13 +142,16 @@ function positionDrop(drop, btn){
   var spaceBelow = vh - rect.bottom - 10;
   var spaceAbove = rect.top - 10;
 
-  // Reset max-height to measure natural height
+  // Reset max-height and measure natural height using correct display type
   drop.style.maxHeight = '';
   drop.style.top  = '-9999px';
   drop.style.left = left + 'px';
-  drop.style.display = 'block';
+  var needFlex = (drop.id === 'olFilterDropdown');
+  drop.style.display = needFlex ? 'flex' : 'block';
+  if(needFlex) drop.style.flexDirection = 'column';
   var dropH = drop.scrollHeight;
   drop.style.display = '';
+  drop.style.flexDirection = '';
   drop.style.top = '';
 
   if(dropH <= spaceBelow){
@@ -1509,7 +1512,7 @@ async function init(){
       var isMobile = window.innerWidth <= 768;
       if(!isMobile) positionDrop(d, e.currentTarget);
       d.classList.add('open');
-      var bd=$id('olBackdrop'); if(bd) bd.classList.add('show');
+      if(isMobile){ var bd=$id('olBackdrop'); if(bd) bd.classList.add('show'); }
     }
   });
 
@@ -1543,7 +1546,7 @@ async function init(){
       var isMobile = window.innerWidth <= 768;
       if(!isMobile) positionDrop(d, e.currentTarget);
       d.classList.add('open');
-      var bd=$id('olBackdrop'); if(bd) bd.classList.add('show');
+      if(isMobile){ var bd=$id('olBackdrop'); if(bd) bd.classList.add('show'); }
     }
   });
   document.querySelectorAll('#olDatePop [data-p]').forEach(function(btn){
@@ -1574,7 +1577,7 @@ async function init(){
       var isMobile = window.innerWidth <= 768;
       if(!isMobile) positionDrop(d, e.currentTarget);
       d.classList.add('open');
-      var bd=$id('olBackdrop'); if(bd) bd.classList.add('show');
+      if(isMobile){ var bd=$id('olBackdrop'); if(bd) bd.classList.add('show'); }
     }
   });
   $id('olActDrop')?.addEventListener('click', function(e){
