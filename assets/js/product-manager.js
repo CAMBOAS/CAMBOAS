@@ -336,6 +336,21 @@ function bindSave(){
           var tabBtn = document.querySelector('.tab-btn[data-category="'+cat+'"]');
           if(tabBtn) tabBtn.click();
         }, 50);
+
+        /* Sync name + price to Google Sheets for Sheets-sourced products */
+        var origId = _editItem ? String(_editItem.id) : '';
+        if (origId && /^CAMBO-/i.test(origId)) {
+          var base = (window.CamboAPI && window.CamboAPI.getBase) ? window.CamboAPI.getBase() : (window.APPS_SCRIPT_URL || '');
+          if (base) {
+            fetch(base, {
+              method:  'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body:    JSON.stringify({ action:'updateProduct', id:origId, data:{ name:name, price:price } }),
+              redirect:'follow'
+            }).catch(function(){});
+          }
+        }
+
         _editItem = null;
         _imgB64   = null;
         showTab('list');

@@ -147,6 +147,12 @@ function doPost(e) {
       return jsonOutput_({ ok:true });
     }
 
+    /* Update product name / price in NewOrder sheet */
+    if (action === 'updateProduct') {
+      updateProduct_(body.id, body.data || {});
+      return jsonOutput_({ ok:true });
+    }
+
     /* Legacy payload — no action field (from new-order.html submitOrder) */
     if (!action && body && Array.isArray(body.items) && body.items.length) {
       const normalized = normalizeLegacyPayloadToOrder_(body);
@@ -220,6 +226,27 @@ function deleteOrder_(orderId) {
  * listProducts_ — Read product catalogue from NewOrder sheet
  * Columns: A=ID, B=Products, C=Type, D=Price, E=Sale, F=Box, G=Pack, H=QTY, I=Description, J=URL
  */
+/**
+ * updateProduct_ — Update Name and/or Price in NewOrder sheet by ID
+ * Columns: A=ID, B=Products(name), D=Price
+ */
+function updateProduct_(id, data) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('NewOrder');
+  if (!sheet) throw new Error('NewOrder sheet not found');
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return;
+  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  for (let i = 0; i < ids.length; i++) {
+    if (String(ids[i][0]).trim() === String(id).trim()) {
+      const row = i + 2;
+      if (data.name  !== undefined && data.name  !== '') sheet.getRange(row, 2).setValue(data.name);
+      if (data.price !== undefined && data.price !== '') sheet.getRange(row, 4).setValue(Number(data.price));
+      return;
+    }
+  }
+}
+
 function listProducts_() {
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName('NewOrder');
