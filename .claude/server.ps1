@@ -56,6 +56,7 @@ try {
       $filePath = Join-Path $filePath 'index.html'
     }
 
+    $res.SendChunked = $false
     if (Test-Path $filePath -PathType Leaf) {
       $ext  = [System.IO.Path]::GetExtension($filePath).ToLower()
       $type = if ($mime.ContainsKey($ext)) { $mime[$ext] } else { 'application/octet-stream' }
@@ -63,21 +64,20 @@ try {
 
       $res.StatusCode      = 200
       $res.ContentType     = $type
-      $res.ContentLength64 = $bytes.Length
-      $res.OutputStream.Write($bytes, 0, $bytes.Length)
-
+      $res.ContentLength64 = $bytes.LongLength
+      try { $res.OutputStream.Write($bytes, 0, $bytes.Length) } catch {}
       Write-Host "  200  $($req.Url.PathAndQuery)"
     } else {
       $body  = [System.Text.Encoding]::UTF8.GetBytes("404 Not Found: $urlPath")
       $res.StatusCode      = 404
       $res.ContentType     = 'text/plain'
-      $res.ContentLength64 = $body.Length
-      $res.OutputStream.Write($body, 0, $body.Length)
-
+      $res.ContentLength64 = $body.LongLength
+      try { $res.OutputStream.Write($body, 0, $body.Length) } catch {}
       Write-Host "  404  $($req.Url.PathAndQuery)"
     }
 
-    $res.Close()
+    try { $res.OutputStream.Flush() } catch {}
+    try { $res.Close() } catch {}
   }
 } finally {
   $listener.Stop()

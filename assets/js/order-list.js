@@ -1432,7 +1432,12 @@ async function init(){
   render();
 
   /* Search */
-  $id('olSearch')?.addEventListener('input', function(e){ _q=e.target.value.trim().toLowerCase(); render(); });
+  $id('olSearch')?.addEventListener('input', function(e){
+    _q=e.target.value.trim().toLowerCase();
+    var clr=$id('olSearchClear');
+    if(clr) clr.classList.toggle('show', e.target.value.length>0);
+    render();
+  });
 
   /* Select all */
   $id('olChkAll')?.addEventListener('change', function(e){
@@ -1695,17 +1700,30 @@ document.addEventListener('DOMContentLoaded', init);
         return (p.name||'')+(p.qty>1?' x'+p.qty:'');
       }).join(' / ');
       var th = typeof fmtDisplay==='function' ? fmtDisplay(o.date) : (o.date||'-');
+      var closeBy  = o.closeBy||o.closeby||'-';
+      var page     = o.page||o.pages||'-';
+      var province = o.province||'-';
+      var addrDetail = o.addressDetail||o.address||'-';
+      var delivery = o.deliveryName||o.delivery||'-';
+      var phone    = o.phone||'-';
       return '<div class="ol-card" data-id="'+o.id+'">'
         +'<div class="ol-card-top">'
           +'<span class="ol-card-num">#'+(idx+1)+'</span>'
           +'<span class="ol-card-name">'+(o.customer||'—')+'</span>'
+          +'<span class="ol-card-phone">'+phone+'</span>'
           +'<span class="ol-card-total">$'+total.toFixed(2)+'</span>'
         +'</div>'
-        +'<div class="ol-card-meta">'
-          +'<span>'+th+'</span>'
-          +'<span>'+(o.phone||'-')+'</span>'
-          +'<span>'+(o.province||'-')+'</span>'
-          +'<span>'+(o.page||o.pages||'-')+'</span>'
+        +'<div class="ol-card-info">'
+          +'<div class="ol-info-left">'
+            +'<span class="ol-info-date">'+th+'</span>'
+            +'<span class="ol-info-deli">'+delivery+'</span>'
+          +'</div>'
+          +'<div class="ol-info-cols">'
+            +'<span class="ol-info-cell">'+addrDetail+'</span>'
+            +'<span class="ol-info-cell">'+province+'</span>'
+            +'<span class="ol-info-cell">'+page+'</span>'
+            +'<span class="ol-info-cell">'+closeBy+'</span>'
+          +'</div>'
         +'</div>'
         +(prods?'<div class="ol-card-prod">'+prods+'</div>':'')
         +'</div>';

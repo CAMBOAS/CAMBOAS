@@ -140,18 +140,22 @@
   .ol-s-blue .ol-stat-n{color:#7dd3fc}
   [data-theme="light"] .ol-s-blue .ol-stat-n{color:#4f46e5}
 
-  .ol-toolbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;margin-bottom:14px;border-radius:16px;flex-wrap:wrap;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(148,163,200,.1)}
+  .ol-toolbar{display:flex;flex-direction:column;gap:6px;padding:8px 12px;margin-bottom:10px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(148,163,200,.1)}
   [data-theme="light"] .ol-toolbar{background:#fff;border-color:rgba(148,163,184,.15)}
-  .ol-tl{display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap}
-  .ol-tr{display:flex;align-items:center;gap:8px;flex-shrink:0;position:relative}
+  .ol-tl{display:flex;align-items:center;gap:6px;flex:1;flex-wrap:wrap}
+  .ol-tr{display:flex;align-items:center;gap:6px;flex-shrink:0;position:relative}
 
-  .ol-search-wrap{display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:10px;border:1px solid rgba(148,163,200,.16);background:rgba(255,255,255,.06);height:38px;flex:1;min-width:200px}
+  .ol-search-wrap{display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:10px;border:1px solid rgba(148,163,200,.16);background:rgba(255,255,255,.06);height:36px;width:100%;box-sizing:border-box}
   [data-theme="light"] .ol-search-wrap{background:#f8fafc;border-color:rgba(148,163,184,.2)}
-  .ol-search-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:inherit;width:100%}
+  .ol-search-wrap input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:inherit;flex:1}
   .ol-search-wrap input::placeholder{color:var(--muted);opacity:.6}
+  .ol-search-clear{background:none;border:none;color:var(--muted,#94a3b8);cursor:pointer;padding:2px 4px;font-size:14px;flex-shrink:0;opacity:.6;display:none;line-height:1}
+  .ol-search-clear.show{display:block}
+  .ol-btns-row{display:flex;gap:6px}
+  .ol-btn3{flex:1;display:flex;align-items:center;justify-content:center;gap:5px}
 
   /* ── BUTTONS ── */
-  .ol-btn{height:38px;padding:0 16px;border-radius:10px;border:1px solid rgba(148,163,200,.18);background:rgba(255,255,255,.06);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .14s}
+  .ol-btn{height:34px;padding:0 12px;border-radius:10px;border:1px solid rgba(148,163,200,.18);background:rgba(255,255,255,.06);color:var(--text);font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .14s}
   .ol-btn:hover{background:rgba(255,255,255,.12);border-color:rgba(148,163,200,.3)}
   [data-theme="light"] .ol-btn{background:#fff;border-color:rgba(148,163,184,.2);color:#1e293b}
   [data-theme="light"] .ol-btn:hover{background:#f1f5f9}
@@ -307,15 +311,23 @@
     transition:border-color .15s, box-shadow .15s;
   }
   .ol-card:hover { border-color:rgba(139,92,246,.4); box-shadow:0 4px 20px rgba(139,92,246,.1); }
-  .ol-card-top  { display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; gap:8px; }
-  .ol-card-num  { font-size:10px; color:#8b5cf6; font-weight:700; background:rgba(139,92,246,.12); border-radius:5px; padding:1px 6px; flex-shrink:0; }
-  .ol-card-name { font-size:14px; font-weight:700; flex:1; }
-  .ol-card-total{ font-size:14px; font-weight:800; color:#8b5cf6; flex-shrink:0; }
-  .ol-card-meta { display:grid; grid-template-columns:1fr 1fr; gap:3px 8px; font-size:11.5px; color:var(--muted,#94a3b8); margin-bottom:6px; }
+  .ol-card-top  { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+  .ol-card-num  { font-size:10px; color:#8b5cf6; font-weight:700; background:rgba(139,92,246,.12); border-radius:5px; padding:2px 6px; flex-shrink:0; }
+  .ol-card-name { font-size:14px; font-weight:700; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ol-card-phone{ font-size:12px; font-weight:600; color:#3b82f6; flex:1; text-align:center; white-space:nowrap; }
+  .ol-card-total{ font-size:14px; font-weight:800; color:#ef4444; flex-shrink:0; }
+  .ol-card-info { display:flex; align-items:stretch; gap:0; font-size:11.5px; color:var(--muted,#94a3b8); margin-bottom:6px; }
+  .ol-info-left { display:flex; flex-direction:column; justify-content:space-between; gap:3px; padding-right:10px; margin-right:10px; border-right:1px solid rgba(148,163,184,.2); flex-shrink:0; }
+  .ol-info-date { font-size:11px; white-space:nowrap; }
+  .ol-info-deli { font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:90px; }
+  .ol-info-cols { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:3px 8px; }
+  .ol-info-cell { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ol-info-cols span:nth-child(2n) { text-align:right; }
   .ol-card-prod { font-size:12px; padding-top:6px; border-top:1px solid rgba(148,163,184,.1); line-height:1.7; color:var(--text,#f1f5f9); }
   [data-theme="light"] .ol-card { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06); }
   [data-theme="light"] .ol-card-name { color:#0f172a; }
-  [data-theme="light"] .ol-card-meta { color:#64748b; }
+  [data-theme="light"] .ol-card-info { color:#64748b; }
+  [data-theme="light"] .ol-card-phone { color:#2563eb; }
   .ol-table{
     width:100%;
     border-collapse:collapse;
@@ -476,27 +488,29 @@
 
     <!-- Toolbar -->
     <div class="ol-toolbar">
-      <div class="ol-tl">
-        <!-- Search — same width as first stat card -->
-        <div class="ol-search-wrap" style="max-width:220px;min-width:180px;flex:0 0 auto">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input id="olSearch" type="text" placeholder="ស្វែងរក...">
-        </div>
-        <!-- Filter button -->
-        <button class="ol-btn" id="olFilterBtn" style="position:relative">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:5px"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>Filter
+      <!-- Search full width -->
+      <div class="ol-search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;opacity:.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input id="olSearch" type="text" placeholder="ស្វែងរក...">
+        <button class="ol-search-clear" id="olSearchClear" onclick="var i=document.getElementById('olSearch');i.value='';this.classList.remove('show');i.dispatchEvent(new Event('input'))">✕</button>
+      </div>
+      <!-- 3 equal buttons -->
+      <div class="ol-btns-row">
+        <span class="ol-sel" id="olSel" style="display:none">Selected: <b id="olSelCnt">0</b></span>
+        <span class="ol-date-chip" id="olDateChip"></span>
+        <button class="ol-btn ol-btn3" id="olDateBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Today
+        </button>
+        <button class="ol-btn ol-btn3 ol-btn-purple" id="olActBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Actions ▾
+        </button>
+        <button class="ol-btn ol-btn3" id="olFilterBtn" style="position:relative">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          Filter
           <span class="ol-filter-dot" id="olFilterDot"></span>
         </button>
-      </div>
-
-      <div class="ol-tr">
-        <!-- Selected badge -->
-        <span class="ol-sel" id="olSel">Selected: <b id="olSelCnt">0</b></span>
-        <!-- Date button -->
-        <button class="ol-btn" id="olDateBtn">Today</button>
-        <span class="ol-date-chip" id="olDateChip"></span>
-        <!-- Actions button -->
-        <button class="ol-btn ol-btn-purple" id="olActBtn">Actions ▾</button>
       </div>
     </div>
 
