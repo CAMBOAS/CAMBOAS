@@ -205,6 +205,7 @@
     }
     /* keep native date input invisible — custom overlay shows the value instead */
     #datePart { color: transparent !important; background: transparent !important; }
+    #datePart::-webkit-calendar-picker-indicator { margin-right: 6px; opacity: 0.45; cursor: pointer; }
 
     /* Searchable combo inside fg */
     .fg .searchable-select { width: 100%; }

@@ -14,6 +14,7 @@
       'pages/analytics.html':     { title: t('វិភាគទិន្នន័យ','Analytics'),       subtitle: t('វិភាគស៊ីជម្រៅលើអាជីវកម្មរបស់អ្នក','Deep dive into your business metrics') },
       'pages/orders-details.html':{ title: t('Smart Orders','Smart Orders'),     subtitle: t('បង្កើតបញ្ជាទិញបានលឿន និងឆ្លាតវៃ','Create orders quickly and smartly') },
       'pages/order-list.html':    { title: t('បញ្ជីបញ្ជាទិញ','Order List'),      subtitle: t('មើល និងគ្រប់គ្រងបញ្ជាទិញទាំងអស់','View and manage all orders in one place') },
+      'pages/order-d.html':        { title: t('Order D 🚧','Order D 🚧'),          subtitle: t('កំពុងអភិវឌ្ឍន៌ — Developing','Under active development') },
       'pages/new-order.html':     { title: t('បញ្ជាទិញថ្មី','New Order'),        subtitle: t('បង្កើតបញ្ជាទិញថ្មី','Create a new order') },
       'pages/customers.html':     { title: t('អតិថិជន','Customers'),             subtitle: t('គ្រប់គ្រងបញ្ជីអតិថិជន','Manage your customer base') },
       'pages/products.html':      { title: t('ផលិតផល','Products'),               subtitle: t('រក្សាទុក និងគ្រប់គ្រងផលិតផល','Browse and manage products') },
@@ -91,6 +92,7 @@
         <ul class="sb-list">
           ${link('index.html',                ic.dashboard, t('ផ្ទាំងគ្រប់គ្រង','Dashboard'))}
           ${link('pages/analytics.html',      ic.analytics, t('វិភាគទិន្នន័យ','Analytics'))}
+          ${link('pages/order-d.html',         ic.orderd,    t('Order D 🚧','Order D 🚧'))}
           ${link('pages/new-order.html',      ic.neworder,  t('បញ្ជាទិញថ្មី','New Order'))}
           ${link('pages/orders-details.html', ic.orders,    t('Smart Orders','Smart Orders'))}
           ${link('pages/order-list.html',     ic.orderlist, t('បញ្ជីបញ្ជាទិញ','Order List'))}
