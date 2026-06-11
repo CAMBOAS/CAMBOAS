@@ -2088,12 +2088,35 @@ function _mapCategory(type){
   return 'Other';
 }
 
-/* ── Find local fallback image by matching name ── */
-function _localImg(name){
-  var n=(name||'').toLowerCase();
-  var found=products.find(function(p){ return (p.name||'').toLowerCase()===n; });
-  return found ? (found.image||'') : '';
-}
+/* ── ID → local image mapping (Sheet IDs mapped to exact filenames) ── */
+var _idToImg = {
+  'CAMBO-A-001':'../images/products/drink/ហ្វៃប័រផាសសិន CCR.png',
+  'CAMBO-A-002':'../images/products/drink/កាហ្វេសម្រក CCR.png',
+  'CAMBO-A-003':'../images/products/drink/ឈុតសម្រកទ្វេដង CCR.png',
+  'CAMBO-B-001':'../images/products/face/សាប៊ូដុសមុខ JELY Gluta.png',
+  'CAMBO-B-002':'../images/products/face/សាប៊ូដុសមុខ យិនសិន CCR.png',
+  'CAMBO-B-004':'../images/products/face/ម៉ាស់បិទមុខ 6D CCR.png',
+  'CAMBO-B-005':'../images/products/face/BB Cream.png',
+  'CAMBO-B-006':'../images/products/face/SUNSCREEN CCR.png',
+  'CAMBO-B-007':'../images/products/face/ថ្នាំដុសធ្មេញ CCR.png',
+  'CAMBO-B-008':'../images/products/face/ឈុតមុខស្អាត JELY.png',
+  'CAMBO-B-009':'../images/products/face/CC SERUM JELY.png',
+  'CAMBO-C-001':'../images/products/body/សាប៊ូដុសខ្លួនមាសក្លិនទឹកអប់អូតែលផ្កាយ 5.png',
+  'CAMBO-C-002':'../images/products/body/សាប៊ូដុសខ្លួនកុលាប.png',
+  'CAMBO-C-003':'../images/products/body/សាប៊ូកក់សក់និងដុសខ្លួនក្មេង CCR.png',
+  'CAMBO-C-004':'../images/products/body/ឡេលាបខ្លួន JELY BODY LOTION.png',
+  'CAMBO-C-005':'../images/products/body/ឡេលាបខ្លួន Gluta SUDO.png',
+  'CAMBO-C-006':'../images/products/body/សេរ៉ូមលាបខ្លួន JELY BODY ESSENCE VC WHITENGING.png',
+  'CAMBO-C-007':'../images/products/body/ទឹកអនាម័យស្រ្ដី JELY.png',
+  'CAMBO-C-008':'../images/products/body/ស្រ្ពៃក្លៀក និងឡេកលៀត.png',
+  'CAMBO-C-009':'../images/products/body/ឈុតស្បែកហ្មត់ JELY.png',
+  'CAMBO-D-001':'../images/products/hair/សាប៊ូកក់សក់ និងស្បាសក់ JELY.png',
+  'CAMBO-D-002':'../images/products/hair/សាប៊ូកក់សក់ និងម៉ាសសក់ CCR.png',
+  'CAMBO-D-003':'../images/products/hair/សក់និងម៉ាស 5in1.png',
+  'CAMBO-D-004':'../images/products/hair/សក់និងម៉ាស Premium CCR.png',
+  'CAMBO-D-005':'../images/products/hair/ស្រ្ពៃបាញ់សក់.png',
+  'CAMBO-D-006':'../images/products/hair/ប្រេងលាបសក់ CCR.png'
+};
 
 /* ── Load products from Google Sheets (NewOrder tab) ── */
 async function loadProductsFromSheet(){
@@ -2110,7 +2133,7 @@ async function loadProductsFromSheet(){
         price:       p.price || 0,
         category:    _mapCategory(p.type),
         detail:      p.description || p.name || '',
-        image:       p.url || _localImg(p.name),
+        image:       p.url || _idToImg[p.id] || '',
         sale:        p.sale || 1,
         box:         p.box  || 0,
         pack:        p.pack || 0,
@@ -2372,7 +2395,7 @@ function renderPList(list){
     var basePrice = Number(p.price)||0;
     var packCnt   = Number(p.pack)||0;
     return '<div class="prow" id="pc_'+p.id+'" data-pid="'+p.id+'" data-base-price="'+basePrice+'" data-pack="'+packCnt+'" data-sale="'+(Number(p.sale)||1)+'">'
-      +'<div class="pthumb"><img src="'+escHtml(p.img||p.image||'')+'" alt="" onerror="this.style.display=\'none\'"></div>'
+      +(p.img||p.image ? '<div class="pthumb"><img src="'+escHtml(p.img||p.image||'')+'" alt="" onerror="this.closest(\'.pthumb\').style.display=\'none\'"></div>' : '')
       +'<div class="prow-body">'
         +'<div class="prow-info">'
           +'<div class="pinfo"><b>'+escHtml(p.name)+'</b>'+(p.type?'<span class="ptype-badge">'+escHtml(p.type)+'</span>':'')+'</div>'
