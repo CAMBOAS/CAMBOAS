@@ -47,16 +47,13 @@ function dbDelete(id, cb){
 }
 
 /* ══════════════ INIT FROM DEFAULTS ══════════════ */
-// Queue defaults if called before DB ready
 var _pendingDefaults = null;
 
 window.pmInitProducts = function(defaults){
   _pendingDefaults = defaults;
-  // Will be processed in DOMContentLoaded after DB opens
   _doInit(defaults);
 };
 
-// Manual migration trigger - call window.pmForceMigrate() in console
 window.pmForceMigrate = function(){
   if(_pendingDefaults){
     console.log('[PM] Force migrating...');
@@ -71,14 +68,12 @@ function _doInit(defaults){
     var savedIds = (saved||[]).map(function(p){ return String(p.id); });
     var defaultIds = (defaults||[]).map(function(d){ return String(d.id); });
     console.log('[PM] DB has', savedIds.length, 'products. Defaults:', defaultIds.length);
-    // Find new defaults that aren't in DB yet (migration)
     var missing = (defaults||[]).filter(function(d){ return savedIds.indexOf(String(d.id)) === -1; });
     if(missing.length > 0){
       console.log('[PM] Migrating', missing.length, 'new products:', missing.map(function(m){return m.name;}));
     }
 
     if(saved && saved.length > 0 && missing.length === 0){
-      // Already initialized — but sync img/price from defaults in case they changed
       var defaultMap = {};
       (defaults||[]).forEach(function(d){ defaultMap[String(d.id)] = d; });
       var syncDone = 0, syncNeeded = 0;
@@ -95,22 +90,30 @@ function _doInit(defaults){
           if(priceChanged) updated.price = newPrice;
           dbPut(updated, function(){
             if(++syncDone === syncNeeded){
-              dbGetAll(function(list){ window.__camboProducts = list; doRenderGrid(); });
+              // Only set __camboProducts from IndexedDB if Sheets hasn't loaded yet
+              if(!window.__camboProducts || !window.__camboProducts.length){
+                dbGetAll(function(list){ window.__camboProducts = list; doRenderGrid(); });
+              } else {
+                doRenderGrid();
+              }
             }
           });
         }
       });
       if(syncNeeded === 0){
-        window.__camboProducts = saved;
+        if(!window.__camboProducts || !window.__camboProducts.length){
+          window.__camboProducts = saved;
+        }
         doRenderGrid();
       }
       return;
     }
 
-    // Choose what to insert: missing (existing DB) OR all defaults (empty DB)
     var toInsert = (saved && saved.length > 0) ? missing : (defaults||[]);
     if(toInsert.length === 0){
-      window.__camboProducts = saved || [];
+      if(!window.__camboProducts || !window.__camboProducts.length){
+        window.__camboProducts = saved || [];
+      }
       doRenderGrid();
       return;
     }
@@ -126,10 +129,14 @@ function _doInit(defaults){
         enabled:  true
       }, function(){
         if(++done === total){
-          dbGetAll(function(list){
-            window.__camboProducts = list;
+          if(!window.__camboProducts || !window.__camboProducts.length){
+            dbGetAll(function(list){
+              window.__camboProducts = list;
+              doRenderGrid();
+            });
+          } else {
             doRenderGrid();
-          });
+          }
         }
       });
     });
@@ -141,7 +148,6 @@ function doRenderGrid(){
   if(typeof window.renderProductGrid === 'function'){
     window.renderProductGrid();
   } else {
-    // renderProductGrid not ready yet — retry after short delay
     setTimeout(function(){
       if(typeof window.renderProductGrid === 'function') window.renderProductGrid();
     }, 100);
@@ -149,15 +155,13 @@ function doRenderGrid(){
 }
 
 function reloadAndRefresh(afterCb){
-  dbGetAll(function(list){
-    window.__camboProducts = list;
-    doRenderGrid();
-    if(afterCb) afterCb(list);
-  });
+  // Preserve Sheets products in window.__camboProducts — don't override with IndexedDB
+  doRenderGrid();
+  if(afterCb) afterCb(window.__camboProducts || []);
 }
 
 /* ══════════════ MODAL ══════════════ */
-var _editItem = null; // null = add mode, object = edit mode
+var _editItem = null;
 var _imgB64   = null;
 
 function openModal(){
@@ -184,65 +188,122 @@ function showTab(tab){
   if(tab === 'form') renderForm();
 }
 
+/* ══════════════ NORMALIZE product format ══════════════ */
+function _pmNorm(p){
+  return {
+    id:       String(p.id || ''),
+    name:     p.name || '',
+    subName:  p.subName || p.detail || '',
+    category: p.category || '',
+    price:    p.price || 0,
+    sale:     p.sale || 1,
+    box:      p.box || 0,
+    pack:     p.pack || 0,
+    qty:      p.qty || 0,
+    img:      p.img || p.image || '',
+    enabled:  p.enabled !== false
+  };
+}
+
 /* ══════════════ LIST ══════════════ */
 function loadList(q){
   var el = document.getElementById('pmItems');
   if(!el) return;
-  dbGetAll(function(list){
-    window.__camboProducts = list;
-    var term = (q||'').trim().toLowerCase();
-    var fl   = term ? list.filter(function(p){ return p.name.toLowerCase().includes(term); }) : list;
-    if(!fl.length){
-      el.innerHTML = '<p class="pm-empty">'+(term ? 'រកមិនឃើញ' : 'គ្មានផលិតផល')+'</p>';
-      return;
-    }
-    el.innerHTML = fl.map(function(p){
-      var on = p.enabled !== false;
-      return '<div class="pmi" data-id="'+esc(p.id)+'">' +
-        (p.img
-          ? '<img class="pmi-img" src="'+p.img+'" onerror="this.outerHTML=\'<div class=pmi-noimg>📦</div>\'">'
-          : '<div class="pmi-noimg">📦</div>') +
-        '<div class="pmi-info">' +
-          '<span class="pmi-name">'+esc(p.name)+'</span>' +
-          '<span class="pmi-meta">'+esc(p.category)+' · $'+parseFloat(p.price||0).toFixed(2)+'</span>' +
-        '</div>' +
-        '<div class="pmi-acts">' +
-          '<button class="pmi-btn pmi-edit" data-id="'+esc(p.id)+'" title="កែ">✏️</button>' +
-          '<button class="pmi-btn '+(on?'pmi-eye':'pmi-eye pmi-eye-off')+'" data-id="'+esc(p.id)+'" title="'+(on?'បិទ':'បើក')+'">'+(on?'👁':'🚫')+'</button>' +
-          '<button class="pmi-btn pmi-del" data-id="'+esc(p.id)+'" title="លុប">🗑️</button>' +
-        '</div>' +
-      '</div>';
-    }).join('');
+  var sheetProds = window.__camboProducts;
+  if(sheetProds && sheetProds.length){
+    _renderPMList(el, sheetProds.map(_pmNorm), q);
+  } else {
+    dbGetAll(function(list){ _renderPMList(el, list, q); });
+  }
+}
 
-    // Bind buttons
-    el.querySelectorAll('.pmi-edit').forEach(function(b){
-      b.addEventListener('click', function(){
-        var id = b.dataset.id;
-        var p  = list.find(function(x){ return String(x.id)===String(id); });
-        if(!p) return;
-        _editItem = p;
-        _imgB64   = p.img || null;
-        showTab('form');
+function _renderPMList(el, list, q){
+  var term = (q||'').trim().toLowerCase();
+  var fl   = term ? list.filter(function(p){ return p.name.toLowerCase().includes(term); }) : list;
+  if(!fl.length){
+    el.innerHTML = '<p class="pm-empty">'+(term ? 'រកមិនឃើញ' : 'គ្មានផលិតផល')+'</p>';
+    return;
+  }
+  el.innerHTML = fl.map(function(p){
+    var on = p.enabled !== false;
+    return '<div class="pmi" data-id="'+esc(p.id)+'">' +
+      (p.img
+        ? '<img class="pmi-img" src="'+p.img+'" onerror="this.outerHTML=\'<div class=pmi-noimg>📦</div>\'">'
+        : '<div class="pmi-noimg">📦</div>') +
+      '<div class="pmi-info">' +
+        '<span class="pmi-name">'+esc(p.name)+'</span>' +
+        '<span class="pmi-meta">'+esc(p.category)+' · $'+parseFloat(p.price||0).toFixed(2)+'</span>' +
+      '</div>' +
+      '<div class="pmi-acts">' +
+        '<button class="pmi-btn pmi-edit" data-id="'+esc(p.id)+'" title="កែ">✏️</button>' +
+        '<button class="pmi-btn '+(on?'pmi-eye':'pmi-eye pmi-eye-off')+'" data-id="'+esc(p.id)+'" title="'+(on?'បិទ':'បើក')+'">'+(on?'👁':'🚫')+'</button>' +
+        '<button class="pmi-btn pmi-del" data-id="'+esc(p.id)+'" title="លុប">🗑️</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Edit button
+  el.querySelectorAll('.pmi-edit').forEach(function(b){
+    b.addEventListener('click', function(){
+      var id = b.dataset.id;
+      var p  = fl.find(function(x){ return String(x.id)===String(id); });
+      if(!p) return;
+      _editItem = p;
+      _imgB64   = p.img || null;
+      showTab('form');
+    });
+  });
+
+  // Toggle visible
+  el.querySelectorAll('.pmi-eye').forEach(function(b){
+    b.addEventListener('click', function(){
+      var id = b.dataset.id;
+      var p  = fl.find(function(x){ return String(x.id)===String(id); });
+      if(!p) return;
+      p.enabled = !(p.enabled !== false);
+      if(window.__camboProducts){
+        for(var i=0;i<window.__camboProducts.length;i++){
+          if(String(window.__camboProducts[i].id)===String(id)){
+            window.__camboProducts[i].enabled = p.enabled; break;
+          }
+        }
+      }
+      dbPut(p, function(){
+        doRenderGrid();
+        loadList(document.getElementById('pmSearch').value);
       });
     });
-    el.querySelectorAll('.pmi-eye').forEach(function(b){
-      b.addEventListener('click', function(){
-        var id = b.dataset.id;
-        var p  = list.find(function(x){ return String(x.id)===String(id); });
-        if(!p) return;
-        p.enabled = !(p.enabled !== false);
-        dbPut(p, function(){ reloadAndRefresh(function(){ loadList(document.getElementById('pmSearch').value); }); });
+  });
+
+  // Delete button
+  el.querySelectorAll('.pmi-del').forEach(function(b){
+    b.addEventListener('click', async function(){
+      var id = b.dataset.id;
+      var p  = fl.find(function(x){ return String(x.id)===String(id); });
+      if(!p) return;
+      var ok = await macUI.confirm('លុប "'+p.name+'" ? មិនអាចត្រឡប់ក្រោយ!', 'លុបផលិតផល', true);
+      if(!ok) return;
+
+      // Remove from window.__camboProducts
+      if(window.__camboProducts && window.__camboProducts.length){
+        window.__camboProducts = window.__camboProducts.filter(function(x){ return String(x.id) !== String(id); });
+      }
+
+      dbDelete(String(id), function(){
+        doRenderGrid();
+        loadList(document.getElementById('pmSearch').value);
       });
-    });
-    el.querySelectorAll('.pmi-del').forEach(function(b){
-      b.addEventListener('click', async function(){
-        var id = b.dataset.id;
-        var p  = list.find(function(x){ return String(x.id)===String(id); });
-        if(!p) return;
-        var ok = await macUI.confirm('លុប "'+p.name+'" ? មិនអាចត្រឡប់ក្រោយ!', 'លុបផលិតផល', true);
-        if(!ok) return;
-        dbDelete(String(id), function(){ reloadAndRefresh(function(){ loadList(document.getElementById('pmSearch').value); }); });
-      });
+
+      // Sync delete to Sheets for CAMBO-xxx products
+      var base = (window.CamboAPI && window.CamboAPI.getBase) ? window.CamboAPI.getBase() : (window.APPS_SCRIPT_URL || '');
+      if(base && /^CAMBO-/i.test(String(id))){
+        fetch(base, {
+          method:  'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body:    JSON.stringify({ action:'deleteProduct', id:String(id) }),
+          redirect:'follow'
+        }).catch(function(){});
+      }
     });
   });
 }
@@ -329,51 +390,69 @@ function bindSave(){
 
     if(!name){ alert('⚠️ សូមបញ្ចូលឈ្មោះ!'); return; }
 
+    var isNew  = !_editItem;
+    var origId = _editItem ? String(_editItem.id) : '';
+
     var item = _editItem
       ? Object.assign({}, _editItem, { name:name, subName:sub, category:cat, price:price, sale:sale, box:box, pack:pack, qty:qty, img:_imgB64||_editItem.img })
       : { id:'cp_'+Date.now(), name:name, subName:sub, category:cat, price:price, sale:sale, box:box, pack:pack, qty:qty, img:_imgB64||'', enabled:true };
 
-    var isNew  = !_editItem;
-    var origId = _editItem ? String(_editItem.id) : '';
-
-    dbPut(item, function(){
-      dbGetAll(function(list){
-        window.__camboProducts = list;
-        doRenderGrid();
-        setTimeout(function(){
-          var tabBtn = document.querySelector('.tab-btn[data-category="'+cat+'"]');
-          if(tabBtn) tabBtn.click();
-        }, 50);
-
-        var base = (window.CamboAPI && window.CamboAPI.getBase) ? window.CamboAPI.getBase() : (window.APPS_SCRIPT_URL || '');
-        if (base) {
-          var catTypeMap = { Hair:'Hair Care', Body:'Body Care', Face:'Face Care', Drink:'Drinks' };
-          if (isNew) {
-            fetch(base, {
-              method:  'POST',
-              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body:    JSON.stringify({ action:'addProduct', data:{ name:name, type:catTypeMap[cat]||cat, price:price, sale:sale, box:box, pack:pack, qty:qty } }),
-              redirect:'follow'
-            }).then(function(r){ return r.json(); }).then(function(d){
-              if(d && d.ok && d.id) {
-                item.id = d.id;
-                dbPut(item, function(){ dbGetAll(function(l){ window.__camboProducts = l; doRenderGrid(); }); });
-              }
-            }).catch(function(){});
-          } else if (origId && /^CAMBO-/i.test(origId)) {
-            fetch(base, {
-              method:  'POST',
-              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body:    JSON.stringify({ action:'updateProduct', id:origId, data:{ name:name, price:price, sale:sale, box:box, pack:pack, qty:qty } }),
-              redirect:'follow'
-            }).catch(function(){});
+    // Update window.__camboProducts in-place (edit) or append (new)
+    if(window.__camboProducts && window.__camboProducts.length){
+      if(!isNew){
+        for(var i=0;i<window.__camboProducts.length;i++){
+          if(String(window.__camboProducts[i].id) === origId){
+            window.__camboProducts[i] = Object.assign({}, window.__camboProducts[i], {
+              name:name, price:price, sale:sale, box:box, pack:pack, qty:qty,
+              img: _imgB64 || window.__camboProducts[i].img || window.__camboProducts[i].image || ''
+            });
+            break;
           }
         }
+      }
+      // New products get appended after Sheets returns CAMBO-xxx ID
+    }
 
-        _editItem = null;
-        _imgB64   = null;
-        showTab('list');
-      });
+    dbPut(item, function(){
+      doRenderGrid();
+      setTimeout(function(){
+        var tabBtn = document.querySelector('.tab-btn[data-category="'+cat+'"]');
+        if(tabBtn) tabBtn.click();
+      }, 50);
+
+      var base = (window.CamboAPI && window.CamboAPI.getBase) ? window.CamboAPI.getBase() : (window.APPS_SCRIPT_URL || '');
+      if(base){
+        var catTypeMap = { Hair:'Hair Care', Body:'Body Care', Face:'Face Care', Drink:'Drinks' };
+        if(isNew){
+          fetch(base, {
+            method:  'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body:    JSON.stringify({ action:'addProduct', data:{ name:name, type:catTypeMap[cat]||cat, price:price, sale:sale, box:box, pack:pack, qty:qty } }),
+            redirect:'follow'
+          }).then(function(r){ return r.json(); }).then(function(d){
+            if(d && d.ok && d.id){
+              item.id = d.id;
+              dbPut(item, function(){});
+              // Add to window.__camboProducts with the new CAMBO-xxx ID
+              if(window.__camboProducts){
+                window.__camboProducts.push(Object.assign({}, item));
+              }
+              doRenderGrid();
+            }
+          }).catch(function(){});
+        } else if(origId && /^CAMBO-/i.test(origId)){
+          fetch(base, {
+            method:  'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body:    JSON.stringify({ action:'updateProduct', id:origId, data:{ name:name, price:price, sale:sale, box:box, pack:pack, qty:qty } }),
+            redirect:'follow'
+          }).catch(function(){});
+        }
+      }
+
+      _editItem = null;
+      _imgB64   = null;
+      showTab('list');
     });
   });
 }

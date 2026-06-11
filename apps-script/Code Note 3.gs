@@ -159,6 +159,12 @@ function doPost(e) {
       return jsonOutput_({ ok:true, id:newId });
     }
 
+    /* Delete a product row from NewOrder sheet by ID */
+    if (action === 'deleteProduct') {
+      deleteProduct_(body.id);
+      return jsonOutput_({ ok:true });
+    }
+
     /* Legacy payload — no action field (from new-order.html submitOrder) */
     if (!action && body && Array.isArray(body.items) && body.items.length) {
       const normalized = normalizeLegacyPayloadToOrder_(body);
@@ -290,6 +296,25 @@ function updateProduct_(id, data) {
       if (data.box   !== undefined) sheet.getRange(row, 6).setValue(Number(data.box)   || 1);
       if (data.pack  !== undefined) sheet.getRange(row, 7).setValue(Number(data.pack)  || 0);
       if (data.qty   !== undefined) sheet.getRange(row, 8).setValue(Number(data.qty)   || 0);
+      return;
+    }
+  }
+}
+
+/**
+ * deleteProduct_ — Delete a product row from NewOrder sheet by ID
+ */
+function deleteProduct_(id) {
+  if (!id) return;
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('NewOrder');
+  if (!sheet) throw new Error('NewOrder sheet not found');
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return;
+  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  for (let i = ids.length - 1; i >= 0; i--) {
+    if (String(ids[i][0]).trim() === String(id).trim()) {
+      sheet.deleteRow(i + 2);
       return;
     }
   }
