@@ -2030,7 +2030,7 @@
 <div id="printArea" style="display:none;"></div>
 
 <script>
-window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk5rPqxQ0bRiOrSHX1xmnrHg3ExFhioFuHMgGZSPr581lr7YwWZSC6p6JO9GL7yda9EA/exec";
+window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbRj2OJ5X2DoWWtVAlU6ghHqeeasd5DIWWa79Bgr9i2JcA0_ILEguTTIYWIMQw1dE2oQ/exec";
 
 var KHR_RATE = (function(){
   try { var r = Number(localStorage.getItem('cambo_khr_rate')); return r > 0 ? r : 4100; } catch(e) { return 4100; }
@@ -2068,6 +2068,48 @@ var products = [
   {id:27, name:"ឈុតសម្រកទ្វេដង CCR",              price:42,  category:"Drink", detail:"ឈុតសម្រកទ្វេដង CCR",                                image:"../images/products/drink/SlimSetX2_CCR.png"},
   {id:28, name:"ឈុតស្បែកហ្មត់ JELY",              price:22.5, category:"Body", detail:"ឈុតស្បែកហ្មត់ JELY",                                  image:"../images/products/body/ឈុតស្បែកហ្មត់ JELY.png"}
 ];
+
+/* ── Category mapper for Sheet data ── */
+function _mapCategory(type){
+  var t=(type||'').toLowerCase();
+  if(t.includes('hair'))  return 'Hair';
+  if(t.includes('body'))  return 'Body';
+  if(t.includes('face'))  return 'Face';
+  if(t.includes('drink')) return 'Drink';
+  return 'Other';
+}
+function _localImg(name){
+  var n=(name||'').toLowerCase();
+  var found=products.find(function(p){ return (p.name||'').toLowerCase()===n; });
+  return found ? (found.image||'') : '';
+}
+
+/* ── Load live products from Google Sheets (NewOrder tab) ── */
+async function loadProductsFromSheet(){
+  try{
+    var base = window.CamboAPI ? window.CamboAPI.getBase() : window.APPS_SCRIPT_URL;
+    var url  = base + (base.includes('?') ? '&' : '?') + 'action=products&_='+Date.now();
+    var res  = await fetch(url, {redirect:'follow'});
+    var data = await res.json();
+    if(!data.ok || !Array.isArray(data.products) || !data.products.length) return;
+    products = data.products.map(function(p,i){
+      return {
+        id:          p.id || (i+1),
+        name:        p.name || '',
+        price:       p.price || 0,
+        category:    _mapCategory(p.type),
+        detail:      p.description || p.name || '',
+        image:       p.url || _localImg(p.name),
+        sale:        p.sale || 1,
+        box:         p.box  || 0,
+        pack:        p.pack || 0,
+        qty:         p.qty  || 0
+      };
+    });
+    window.__camboProducts = null; // let _allProducts() return fresh sheet data
+    renderPList(getFiltered());
+  }catch(e){ /* keep hardcoded fallback */ }
+}
 
 /* ── Product list helpers ── */
 function _allProducts(){ return (window.__camboProducts && window.__camboProducts.length) ? window.__camboProducts : products; }
@@ -2595,6 +2637,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
   renderPList(products);
   calcTotal();
+
+  /* Load live prices + products from Google Sheets (async, refreshes grid when done) */
+  loadProductsFromSheet();
 });
 </script>
 
