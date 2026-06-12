@@ -312,6 +312,7 @@ function _renderPMList(el, list, q){
 
       // Persist deletion so it survives page reloads
       _markDeleted(id);
+      if(window.clearProductCache) window.clearProductCache();
 
       // Remove from window.__camboProducts
       if(window.__camboProducts && window.__camboProducts.length){
@@ -487,6 +488,7 @@ function bindSave(){
                 try{ localStorage.setItem(_LS_KEY, JSON.stringify(_dIds)); }catch(e){}
               }
               dbPut(item, function(){});
+              if(window.clearProductCache) window.clearProductCache();
               // Add to window.__camboProducts with the new CAMBO-xxx ID
               if(window.__camboProducts){
                 window.__camboProducts.push(Object.assign({}, item));
@@ -507,11 +509,12 @@ function bindSave(){
             redirect:'follow'
           }).then(function(r){ return r.json(); }).then(function(d){
             if(d && d.ok){
+              if(window.clearProductCache) window.clearProductCache();
               if(window.macUI) macUI.toast('✅ បានកែប្រែទិន្នន័យដោយជោគជ័យ!', 'success');
             } else {
               if(window.macUI) macUI.toast('⚠️ មិនអាចកែប្រែបាន សូមព្យាយាមម្ដងទៀត', 'error');
             }
-          }).catch(function(){ if(window.macUI) macUI.toast('✅ បានកែប្រែទិន្នន័យដោយជោគជ័យ!', 'success'); });
+          }).catch(function(){ if(window.clearProductCache) window.clearProductCache(); if(window.macUI) macUI.toast('✅ បានកែប្រែទិន្នន័យដោយជោគជ័យ!', 'success'); });
         }
       }
 

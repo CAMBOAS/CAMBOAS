@@ -2136,30 +2136,29 @@ var _idToImg = {
   'CAMBO-D-006':'../images/products/hair/ប្រេងលាបសក់ CCR.png'
 };
 
+/* ── Product cache (sessionStorage, 5-min TTL) ── */
+var _PCACHE = 'cambo_prod_cache';
+function _getPCache(){ try{ var c=JSON.parse(sessionStorage.getItem(_PCACHE)||'null'); return (c&&c.ts&&Date.now()-c.ts<300000)?c.data:null; }catch(e){ return null; } }
+function _setPCache(d){ try{ sessionStorage.setItem(_PCACHE,JSON.stringify({ts:Date.now(),data:d})); }catch(e){} }
+window.clearProductCache = function(){ try{ sessionStorage.removeItem(_PCACHE); }catch(e){} };
+
 /* ── Load live products from Google Sheets (NewOrder tab) ── */
 async function loadProductsFromSheet(){
+  function _mapProds(raw){ return raw.map(function(p,i){ return { id:p.id||(i+1), name:p.name||'', price:p.price||0, category:_mapCategory(p.type), detail:p.description||p.name||'', image:p.url||_idToImg[p.id]||'', sale:p.sale||1, box:p.box||0, pack:p.pack||0, qty:p.qty||0 }; }); }
+  function _apply(list){ products=list; window.__camboProducts=window.pmFilterDeleted?window.pmFilterDeleted(products):products; renderPList(getFiltered()); }
   try{
+    // Show cached data immediately — no waiting
+    var cached = _getPCache();
+    if(cached && cached.length){ _apply(cached); }
+    // Fetch fresh from source in background
     var base = window.CamboAPI ? window.CamboAPI.getBase() : window.APPS_SCRIPT_URL;
     var url  = base + (base.includes('?') ? '&' : '?') + 'action=products&_='+Date.now();
     var res  = await fetch(url, {redirect:'follow'});
     var data = await res.json();
     if(!data.ok || !Array.isArray(data.products) || !data.products.length) return;
-    products = data.products.map(function(p,i){
-      return {
-        id:          p.id || (i+1),
-        name:        p.name || '',
-        price:       p.price || 0,
-        category:    _mapCategory(p.type),
-        detail:      p.description || p.name || '',
-        image:       p.url || _idToImg[p.id] || '',
-        sale:        p.sale || 1,
-        box:         p.box  || 0,
-        pack:        p.pack || 0,
-        qty:         p.qty  || 0
-      };
-    });
-    window.__camboProducts = window.pmFilterDeleted ? window.pmFilterDeleted(products) : products;
-    renderPList(getFiltered());
+    var mapped = _mapProds(data.products);
+    _setPCache(mapped);
+    _apply(mapped);
   }catch(e){ /* keep hardcoded fallback */ }
 }
 
