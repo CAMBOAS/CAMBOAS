@@ -452,6 +452,7 @@ function bindSave(){
 
     dbPut(item, function(){
       doRenderGrid();
+      if(window.renderProductGrid) window.renderProductGrid();
       setTimeout(function(){
         var tabBtn = document.querySelector('.tab-btn[data-category="'+cat+'"]');
         if(tabBtn) tabBtn.click();
@@ -475,6 +476,7 @@ function bindSave(){
                 window.__camboProducts.push(Object.assign({}, item));
               }
               doRenderGrid();
+              if(window.renderProductGrid) window.renderProductGrid();
             }
           }).catch(function(){});
         } else if(origId && /^CAMBO-/i.test(origId)){
