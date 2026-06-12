@@ -2355,15 +2355,14 @@ body.sb-collapsed .main-content {
 
 /* ════════════════════════════════════════════════
    SHARED — Product Manager Row Action Buttons
-   (pmi-edit / pmi-eye / pmi-del) — iPhone icon style
+   (pmi-edit / pmi-del) — SVG icon style
    ════════════════════════════════════════════════ */
 .pmi-btn {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 9px;
   border: none;
   cursor: pointer;
-  font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2373,28 +2372,14 @@ body.sb-collapsed .main-content {
 }
 .pmi-btn:active { opacity: .75; transform: scale(.88); }
 
-/* Edit — orange (Maps / Keynote style) */
+/* Edit — orange */
 .pmi-edit {
   background: linear-gradient(145deg, #ffa040, #e0620a);
   box-shadow: 0 2px 7px rgba(255,160,64,.40);
 }
 .pmi-edit:hover { opacity: .88; }
 
-/* Eye / Toggle — green (Find My style) */
-.pmi-eye {
-  background: linear-gradient(145deg, #30d158, #25a244);
-  box-shadow: 0 2px 7px rgba(48,209,88,.38);
-}
-.pmi-eye:hover { opacity: .88; }
-
-/* Eye OFF — grey muted */
-.pmi-eye-off {
-  background: linear-gradient(145deg, #8e99b0, #5e6a80) !important;
-  box-shadow: 0 2px 6px rgba(94,106,128,.28) !important;
-  opacity: .75;
-}
-
-/* Delete — red (iOS destructive style) */
+/* Delete — red */
 .pmi-del {
   background: linear-gradient(145deg, #ff453a, #d32f2f);
   box-shadow: 0 2px 7px rgba(255,69,58,.38);

@@ -259,9 +259,8 @@ function _renderPMList(el, list, q){
         '<span class="pmi-meta">'+esc(p.category)+' · $'+parseFloat(p.price||0).toFixed(2)+'</span>' +
       '</div>' +
       '<div class="pmi-acts">' +
-        '<button class="pmi-btn pmi-edit" data-id="'+esc(p.id)+'" title="កែ">✏️</button>' +
-        '<button class="pmi-btn '+(on?'pmi-eye':'pmi-eye pmi-eye-off')+'" data-id="'+esc(p.id)+'" title="'+(on?'បិទ':'បើក')+'">'+(on?'👁':'🚫')+'</button>' +
-        '<button class="pmi-btn pmi-del" data-id="'+esc(p.id)+'" title="លុប">🗑️</button>' +
+        '<button class="pmi-btn pmi-edit" data-id="'+esc(p.id)+'" title="កែ"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>' +
+        '<button class="pmi-btn pmi-del" data-id="'+esc(p.id)+'" title="លុប"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -275,27 +274,6 @@ function _renderPMList(el, list, q){
       _editItem = p;
       _imgB64   = p.img || null;
       showTab('form');
-    });
-  });
-
-  // Toggle visible
-  el.querySelectorAll('.pmi-eye').forEach(function(b){
-    b.addEventListener('click', function(){
-      var id = b.dataset.id;
-      var p  = fl.find(function(x){ return String(x.id)===String(id); });
-      if(!p) return;
-      p.enabled = !(p.enabled !== false);
-      if(window.__camboProducts){
-        for(var i=0;i<window.__camboProducts.length;i++){
-          if(String(window.__camboProducts[i].id)===String(id)){
-            window.__camboProducts[i].enabled = p.enabled; break;
-          }
-        }
-      }
-      dbPut(p, function(){
-        doRenderGrid();
-        loadList(document.getElementById('pmSearch').value);
-      });
     });
   });
 
