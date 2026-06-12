@@ -439,19 +439,19 @@ function deductStroke_(products, orderId) {
       let newBox, newPack, newBott;
 
       if (unit === 'កេស') {
-        // ដក BOX
+        // ដក BOX + ដក PACK (qty × ppb) ផ្ទាល់ — រក្សា pack ដែលនៅសេសសល់
         newBox  = Math.max(0, curBox  - qty);
-        newPack = newBox * ppb;
+        newPack = Math.max(0, curPack - qty * ppb);
         newBott = newPack * bpp;
 
       } else if (unit === 'លាយ') {
-        // ដក BOTTLES
+        // ដក BOTTLES ផ្ទាល់
         newBott = Math.max(0, curBott - qty);
         newPack = bpp > 0 ? Math.floor(newBott / bpp) : 0;
         newBox  = ppb > 0 ? Math.floor(newPack  / ppb) : 0;
 
       } else {
-        // ឈុត (default) — ដក PACK
+        // ឈុត (default) — ដក PACK ផ្ទាល់ (1 ឈុត = 1 pack)
         newPack = Math.max(0, curPack - qty);
         newBox  = ppb > 0 ? Math.floor(newPack / ppb) : 0;
         newBott = newPack * bpp;
