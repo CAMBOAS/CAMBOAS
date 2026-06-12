@@ -227,6 +227,8 @@ function _pmNorm(p){
   };
 }
 
+var _pmActiveCat = 'All';
+
 /* ══════════════ LIST ══════════════ */
 function loadList(q){
   var el = document.getElementById('pmItems');
@@ -241,9 +243,20 @@ function loadList(q){
   }
 }
 
+function _catMatch(cat, active){
+  if(active === 'All') return true;
+  var c = (cat||'').toLowerCase();
+  if(active === 'Drink') return c.startsWith('drink');
+  if(active === 'Face')  return c.startsWith('face');
+  if(active === 'Body')  return c.startsWith('body');
+  if(active === 'Hair')  return c.startsWith('hair');
+  return true;
+}
+
 function _renderPMList(el, list, q){
   var term = (q||'').trim().toLowerCase();
-  var fl   = term ? list.filter(function(p){ return p.name.toLowerCase().includes(term); }) : list;
+  var fl = _pmActiveCat !== 'All' ? list.filter(function(p){ return _catMatch(p.category, _pmActiveCat); }) : list;
+  fl = term ? fl.filter(function(p){ return p.name.toLowerCase().includes(term); }) : fl;
   if(!fl.length){
     el.innerHTML = '<p class="pm-empty">'+(term ? 'រកមិនឃើញ' : 'គ្មានផលិតផល')+'</p>';
     return;
@@ -512,7 +525,6 @@ document.addEventListener('DOMContentLoaded', function(){
   var closeBtn = document.getElementById('pmCloseBtn');
   var modal    = document.getElementById('pmModal');
   var search   = document.getElementById('pmSearch');
-  var addBtn   = document.getElementById('pmAddBtn');
 
   if(openBtn)  openBtn.addEventListener('click', function(e){ e.stopPropagation(); openModal(); });
   if(closeBtn) closeBtn.addEventListener('click', closeModal);
@@ -520,7 +532,15 @@ document.addEventListener('DOMContentLoaded', function(){
   document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
 
   if(search) search.addEventListener('input', function(){ loadList(search.value); });
-  if(addBtn) addBtn.addEventListener('click', function(){ _editItem=null; _imgB64=null; showTab('form'); });
+
+  document.querySelectorAll('.pm5-cat').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.pm5-cat').forEach(function(b){ b.classList.remove('pm5-cat-on'); });
+      btn.classList.add('pm5-cat-on');
+      _pmActiveCat = btn.dataset.cat || 'All';
+      loadList(search ? search.value : '');
+    });
+  });
 
   document.querySelectorAll('.pmT').forEach(function(b){
     b.addEventListener('click', function(){ showTab(b.dataset.tab); });
