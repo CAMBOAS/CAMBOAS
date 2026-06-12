@@ -960,6 +960,12 @@ function formatDateOnly_(value) {
 }
 
 function toNumber_(value) { const n = Number(value); return isNaN(n) ? 0 : n; }
+
+/* ════════════════════════════════════════
+   PUBLIC WRAPPERS — visible in Apps Script dropdown
+   ════════════════════════════════════════ */
+function migrateStockAddIdColumn() { migrateStockAddIdColumn_(); }
+function syncStockIds()            { syncStockIds_(); }
 function safe_(value) { return value == null ? '' : String(value).trim(); }
 
 /**
