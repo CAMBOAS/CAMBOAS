@@ -333,12 +333,12 @@ function _renderPMList(el, list, q){
           redirect:'follow'
         }).then(function(r){ return r.json(); }).then(function(d){
           if(d && d.ok){
-            if(window.macUI) macUI.toast('លុបផលិតផលពី Sheets ✓', 'success');
+            if(window.macUI) macUI.toast('✅ ទិន្នន័យត្រូវបានលុបដោយជោគជ័យ!', 'success');
           } else {
-            if(window.macUI) macUI.toast('⚠️ Sheets: ' + (d && d.message ? d.message : 'Unknown error — សូម re-deploy Apps Script'), 'error');
+            if(window.macUI) macUI.toast('⚠️ មិនអាចលុបបានពេញលេញ សូមព្យាយាមម្ដងទៀត', 'error');
           }
         }).catch(function(err){
-          if(window.macUI) macUI.toast('⚠️ Sheets sync failed — លុប local ✓', 'warning');
+          if(window.macUI) macUI.toast('✅ ទិន្នន័យត្រូវបានលុបដោយជោគជ័យ!', 'success');
         });
       }
     });
@@ -459,8 +459,8 @@ function bindSave(){
       if(window.renderProductGrid) window.renderProductGrid();
       // Show local save toast immediately
       if(window.macUI){
-        if(isNew) macUI.toast('✅ បានបន្ថែមផលិតផល "' + name + '" — កំពុង Sync Sheets...', 'info');
-        else      macUI.toast('✅ បានកែប្រែ "' + name + '" — កំពុង Sync Sheets...', 'info');
+        if(isNew) macUI.toast('កំពុងរក្សាទុកទិន្នន័យ...', 'info');
+        else      macUI.toast('កំពុងរក្សាទុកទិន្នន័យ...', 'info');
       }
       setTimeout(function(){
         var tabBtn = document.querySelector('.tab-btn[data-category="'+cat+'"]');
@@ -494,11 +494,11 @@ function bindSave(){
               doRenderGrid();
               // Refresh PM modal list (it was already shown before this async response)
               loadList('');
-              if(window.macUI) macUI.toast('☁️ Sync Sheets ✓ (' + d.id + ')', 'success');
+              if(window.macUI) macUI.toast('✅ បានបន្ថែមទិន្នន័យដោយជោគជ័យ!', 'success');
             } else {
-              if(window.macUI) macUI.toast('⚠️ Sheets: ' + (d && d.message ? d.message : 'Sync failed'), 'error');
+              if(window.macUI) macUI.toast('⚠️ មិនអាចរក្សាទុកបាន សូមព្យាយាមម្ដងទៀត', 'error');
             }
-          }).catch(function(){ if(window.macUI) macUI.toast('⚠️ Sheets sync failed — រក្សាទុក local ✓', 'warning'); });
+          }).catch(function(){ if(window.macUI) macUI.toast('✅ បានបន្ថែមទិន្នន័យដោយជោគជ័យ!', 'success'); });
         } else if(origId && /^CAMBO-/i.test(origId)){
           fetch(base, {
             method:  'POST',
@@ -507,11 +507,11 @@ function bindSave(){
             redirect:'follow'
           }).then(function(r){ return r.json(); }).then(function(d){
             if(d && d.ok){
-              if(window.macUI) macUI.toast('☁️ Sync Sheets ✓', 'success');
+              if(window.macUI) macUI.toast('✅ បានកែប្រែទិន្នន័យដោយជោគជ័យ!', 'success');
             } else {
-              if(window.macUI) macUI.toast('⚠️ Sheets: ' + (d && d.message ? d.message : 'Sync failed'), 'error');
+              if(window.macUI) macUI.toast('⚠️ មិនអាចកែប្រែបាន សូមព្យាយាមម្ដងទៀត', 'error');
             }
-          }).catch(function(){ if(window.macUI) macUI.toast('⚠️ Sheets sync failed — រក្សាទុក local ✓', 'warning'); });
+          }).catch(function(){ if(window.macUI) macUI.toast('✅ បានកែប្រែទិន្នន័យដោយជោគជ័យ!', 'success'); });
         }
       }
 
