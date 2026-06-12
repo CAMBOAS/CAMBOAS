@@ -457,7 +457,7 @@ function deductStroke_(products, orderId) {
         newBott = newPack * bpp;
       }
 
-      // Write BOX(C), PACK(D), BOTTLES(E), QTY(F) ក្នុងតែ 1 call
+      // Write BOX(D), PACK(E), BOTTLES(F), QTY(G) ក្នុងតែ 1 call
       sheet.getRange(rowNum, STK_COL.BOX, 1, 4).setValues([[newBox, newPack, newBott, newBox]]);
 
       // Update local cache
@@ -466,7 +466,7 @@ function deductStroke_(products, orderId) {
       data[i][STK_COL.BOTTLES - 1] = newBott;
       data[i][STK_COL.QTY     - 1] = newBox;
 
-      Logger.log('[Stock] ' + safe_(data[i][0]) + ' | ' + unit + ' -' + qty +
+      Logger.log('[Stock] ' + safe_(data[i][STK_COL.PRODUCT - 1]) + ' | ' + unit + ' -' + qty +
                  ' | Box:' + newBox + ' Pack:' + newPack + ' Bott:' + newBott);
       break;
     }
