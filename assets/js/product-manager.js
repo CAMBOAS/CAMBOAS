@@ -470,13 +470,21 @@ function bindSave(){
           }).then(function(r){ return r.json(); }).then(function(d){
             if(d && d.ok && d.id){
               item.id = d.id;
+              // If this CAMBO-xxx ID was previously marked deleted (ID reuse), un-delete it
+              var _dIds = _getDeletedIds();
+              var _dIdx = _dIds.indexOf(String(d.id));
+              if(_dIdx > -1){
+                _dIds.splice(_dIdx, 1);
+                try{ localStorage.setItem(_LS_KEY, JSON.stringify(_dIds)); }catch(e){}
+              }
               dbPut(item, function(){});
               // Add to window.__camboProducts with the new CAMBO-xxx ID
               if(window.__camboProducts){
                 window.__camboProducts.push(Object.assign({}, item));
               }
               doRenderGrid();
-              if(window.renderProductGrid) window.renderProductGrid();
+              // Refresh PM modal list (it was already shown before this async response)
+              loadList('');
             }
           }).catch(function(){});
         } else if(origId && /^CAMBO-/i.test(origId)){
