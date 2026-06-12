@@ -46,6 +46,19 @@ function dbDelete(id, cb){
   });
 }
 
+/* ══════════════ DELETED IDs (localStorage) ══════════════ */
+var _LS_KEY = 'cambo_pm_deleted';
+
+function _getDeletedIds(){
+  try{ return JSON.parse(localStorage.getItem(_LS_KEY)||'[]'); }catch(e){ return []; }
+}
+function _markDeleted(id){
+  var ids = _getDeletedIds();
+  var sid = String(id);
+  if(ids.indexOf(sid)===-1){ ids.push(sid); }
+  try{ localStorage.setItem(_LS_KEY, JSON.stringify(ids)); }catch(e){}
+}
+
 /* ══════════════ INIT FROM DEFAULTS ══════════════ */
 var _pendingDefaults = null;
 
@@ -65,10 +78,13 @@ window.pmForceMigrate = function(){
 
 function _doInit(defaults){
   dbGetAll(function(saved){
+    var deletedIds = _getDeletedIds();
     var savedIds = (saved||[]).map(function(p){ return String(p.id); });
     var defaultIds = (defaults||[]).map(function(d){ return String(d.id); });
     console.log('[PM] DB has', savedIds.length, 'products. Defaults:', defaultIds.length);
-    var missing = (defaults||[]).filter(function(d){ return savedIds.indexOf(String(d.id)) === -1; });
+    var missing = (defaults||[]).filter(function(d){
+      return savedIds.indexOf(String(d.id)) === -1 && deletedIds.indexOf(String(d.id)) === -1;
+    });
     if(missing.length > 0){
       console.log('[PM] Migrating', missing.length, 'new products:', missing.map(function(m){return m.name;}));
     }
@@ -143,6 +159,12 @@ function _doInit(defaults){
   });
 }
 
+/* Expose helper so loadProductsFromSheet can filter deleted IDs */
+window.pmFilterDeleted = function(arr){
+  var ids = _getDeletedIds();
+  return ids.length ? arr.filter(function(p){ return ids.indexOf(String(p.id))===-1; }) : arr;
+};
+
 /* ══════════════ REFRESH GRID ══════════════ */
 function doRenderGrid(){
   if(typeof window.renderProductGrid === 'function'){
@@ -209,11 +231,13 @@ function _pmNorm(p){
 function loadList(q){
   var el = document.getElementById('pmItems');
   if(!el) return;
+  var deletedIds = _getDeletedIds();
+  function _notDeleted(p){ return deletedIds.indexOf(String(p.id)) === -1; }
   var sheetProds = window.__camboProducts;
   if(sheetProds && sheetProds.length){
-    _renderPMList(el, sheetProds.map(_pmNorm), q);
+    _renderPMList(el, sheetProds.filter(_notDeleted).map(_pmNorm), q);
   } else {
-    dbGetAll(function(list){ _renderPMList(el, list, q); });
+    dbGetAll(function(list){ _renderPMList(el, list.filter(_notDeleted), q); });
   }
 }
 
@@ -281,8 +305,13 @@ function _renderPMList(el, list, q){
       var id = b.dataset.id;
       var p  = fl.find(function(x){ return String(x.id)===String(id); });
       if(!p) return;
-      var ok = await macUI.confirm('លុប "'+p.name+'" ? មិនអាចត្រឡប់ក្រោយ!', 'លុបផលិតផល', true);
+      var ok = window.macUI
+        ? await macUI.confirm('លុប "'+p.name+'" ? មិនអាចត្រឡប់ក្រោយ!', 'លុបផលិតផល', true)
+        : confirm('លុប "'+p.name+'" ?');
       if(!ok) return;
+
+      // Persist deletion so it survives page reloads
+      _markDeleted(id);
 
       // Remove from window.__camboProducts
       if(window.__camboProducts && window.__camboProducts.length){
@@ -302,7 +331,15 @@ function _renderPMList(el, list, q){
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body:    JSON.stringify({ action:'deleteProduct', id:String(id) }),
           redirect:'follow'
-        }).catch(function(){});
+        }).then(function(r){ return r.json(); }).then(function(d){
+          if(d && d.ok){
+            if(window.macUI) macUI.toast('លុបផលិតផលពី Sheets ✓', 'success');
+          } else {
+            if(window.macUI) macUI.toast('⚠️ Sheets: ' + (d && d.message ? d.message : 'Unknown error — សូម re-deploy Apps Script'), 'error');
+          }
+        }).catch(function(err){
+          if(window.macUI) macUI.toast('⚠️ Sheets sync failed — លុប local ✓', 'warning');
+        });
       }
     });
   });

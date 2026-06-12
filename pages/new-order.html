@@ -2058,7 +2058,7 @@
 <div id="printArea" style="display:none;"></div>
 
 <script>
-window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwL5ToDIE6abtacUi4fZ6W9UsaITOBvy_Np1bH3o-8RRs5uD4EDJ2lLaHroD2gigLNpYA/exec";
+window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2Brycxu8oTTsboVk2rBlep7rRtzvhIS4YClPj2mGjbA1yvVBaK3Im4pYeV9SsOiMCwg/exec";
 
 var KHR_RATE = (function(){
   try { var r = Number(localStorage.getItem('cambo_khr_rate')); return r > 0 ? r : 4100; } catch(e) { return 4100; }
@@ -2158,7 +2158,7 @@ async function loadProductsFromSheet(){
         qty:         p.qty  || 0
       };
     });
-    window.__camboProducts = products; // expose Sheets products for PM modal
+    window.__camboProducts = window.pmFilterDeleted ? window.pmFilterDeleted(products) : products;
     renderPList(getFiltered());
   }catch(e){ /* keep hardcoded fallback */ }
 }
@@ -2883,13 +2883,13 @@ document.addEventListener('DOMContentLoaded', function(){
 }());
 </script>
 
+<script src="../assets/js/cambo-api.js?v=159"></script>
+<script src="../assets/js/layout.js?v=164"></script>
 <script src="../assets/js/product-manager.js?v=165"></script>
 <script src="../assets/js/printer-receipt.js?v=164"></script>
 <script src="../assets/js/copy-receipt.js?v=164"></script>
 <script src="../assets/js/phone-carrier.js?v=164"></script>
 <script src="../assets/js/order-plust.js?v=164"></script>
-<script src="../assets/js/cambo-api.js?v=159"></script>
-  <script src="../assets/js/layout.js?v=164"></script>
 <script src="../assets/js/dashboard-layout.js?v=164"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="../assets/js/share-receipt.js?v=164"></script>
