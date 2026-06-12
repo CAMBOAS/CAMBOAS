@@ -73,8 +73,8 @@ const HEADER = [
   'Number','Product','QTY','Unit','Price','Discount','Subtotal','GrandTotal'
 ];
 
-/* ── Stroke sheet columns (1-based) ── */
-const STK_COL = { PRODUCT:1, TYPE:2, BOX:3, PACK:4, BOTTLES:5, QTY:6 };
+/* ── Stroke sheet columns (1-based) — ID column added as first column ── */
+const STK_COL = { ID:1, PRODUCT:2, TYPE:3, BOX:4, PACK:5, BOTTLES:6, QTY:7 };
 
 /* ── StrokeHistory columns (daily snapshot) ── */
 const HIST_HEADER = [
@@ -413,7 +413,7 @@ function deductStroke_(products, orderId) {
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return;
 
-  const data = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
+  const data = sheet.getRange(2, 1, lastRow - 1, 7).getValues();
 
   products.forEach(function(item) {
     const orderName = normalizeForMatch_(safe_(item.name || item.product));
@@ -485,22 +485,22 @@ function backupStrokeHistory_() {
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return;
 
-  const data = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
+  const data = sheet.getRange(2, 1, lastRow - 1, 7).getValues();
   const now  = Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd HH:mm:ss');
 
   const histSheet = ensureStrokeHistorySheet_();
 
   const rows = data
-    .filter(function(row) { return !!safe_(row[0]); })
+    .filter(function(row) { return !!safe_(row[STK_COL.PRODUCT - 1]); })
     .map(function(row) {
       return [
         now,
-        safe_(row[0]),      // Product
-        safe_(row[1]),      // Type
-        toNumber_(row[2]),  // Box
-        toNumber_(row[3]),  // Pack
-        toNumber_(row[4]),  // Bottles
-        toNumber_(row[5])   // QTY
+        safe_(row[STK_COL.PRODUCT  - 1]),  // Product (col B)
+        safe_(row[STK_COL.TYPE     - 1]),  // Type    (col C)
+        toNumber_(row[STK_COL.BOX  - 1]),  // Box
+        toNumber_(row[STK_COL.PACK - 1]),  // Pack
+        toNumber_(row[STK_COL.BOTTLES-1]), // Bottles
+        toNumber_(row[STK_COL.QTY  - 1])   // QTY
       ];
     });
 
@@ -527,7 +527,7 @@ function sendLowStockAlert_() {
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return;
 
-  const data    = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
+  const data    = sheet.getRange(2, 1, lastRow - 1, 7).getValues();
   const now     = Utilities.formatDate(new Date(), TZ, 'HH:mm');
   const dateStr = Utilities.formatDate(new Date(), TZ, 'dd/MM/yyyy');
 
@@ -592,7 +592,7 @@ function strokeUpdate_(originalName, data) {
   if (!sheet) throw new Error('Stroke sheet not found');
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) throw new Error('No data in Stroke sheet');
-  const names = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat();
+  const names = sheet.getRange(2, STK_COL.PRODUCT, lastRow - 1, 1).getValues().flat();
   const normOrig = normalizeForMatch_(safe_(originalName));
 
   // Pass 1: exact match
@@ -615,7 +615,10 @@ function strokeUpdate_(originalName, data) {
 
 function _writeStrokeRow_(sheet, rowNum, originalName, data) {
   const box = toNumber_(data.box != null ? data.box : data.qty);
-  sheet.getRange(rowNum, 1, 1, 6).setValues([[
+  const existingId = safe_(sheet.getRange(rowNum, STK_COL.ID).getValue());
+  const id = existingId || findProductIdByName_(safe_(data.product || originalName)) || '';
+  sheet.getRange(rowNum, 1, 1, 7).setValues([[
+    id,
     safe_(data.product || originalName),
     safe_(data.type   || ''),
     box,
@@ -630,13 +633,15 @@ function strokeAdd_(data) {
   let sheet = ss.getSheetByName(STROKE_SHEET);
   if (!sheet) {
     sheet = ss.insertSheet(STROKE_SHEET);
-    sheet.getRange(1, 1, 1, 6).setValues([['Products','Types','Box','Pack','Bottles','QTY']]);
+    sheet.getRange(1, 1, 1, 7).setValues([['ID','Products','Types','Box','Pack','Bottles','QTY']]);
     sheet.setFrozenRows(1);
   }
-  const box = toNumber_(data.box || data.qty);
-  sheet.getRange(sheet.getLastRow() + 1, 1, 1, 6).setValues([[
-    safe_(data.product || data.name || ''),
-    safe_(data.type    || data.cat  || ''),
+  const box  = toNumber_(data.box || data.qty);
+  const name = safe_(data.product || data.name || '');
+  const id   = findProductIdByName_(name) || '';
+  sheet.getRange(sheet.getLastRow() + 1, 1, 1, 7).setValues([[
+    id, name,
+    safe_(data.type || data.cat || ''),
     box,
     toNumber_(data.pack),
     toNumber_(data.bottles),
@@ -650,7 +655,7 @@ function strokeDelete_(name) {
   if (!sheet) return;
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return;
-  const names = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat();
+  const names = sheet.getRange(2, STK_COL.PRODUCT, lastRow - 1, 1).getValues().flat();
   for (let i = names.length - 1; i >= 0; i--) {
     if (safe_(names[i]) === safe_(name)) sheet.deleteRow(i + 2);
   }
@@ -662,12 +667,16 @@ function listStroke_() {
   if (!sheet) return [];
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return [];
-  const data = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
+  const data = sheet.getRange(2, 1, lastRow - 1, 7).getValues();
   return data.map(function(row) {
     return {
-      product: safe_(row[0]), type: safe_(row[1]),
-      box: toNumber_(row[2]), pack: toNumber_(row[3]),
-      bottles: toNumber_(row[4]), qty: toNumber_(row[5])
+      id:      safe_(row[STK_COL.ID      - 1]),
+      product: safe_(row[STK_COL.PRODUCT - 1]),
+      type:    safe_(row[STK_COL.TYPE    - 1]),
+      box:     toNumber_(row[STK_COL.BOX     - 1]),
+      pack:    toNumber_(row[STK_COL.PACK    - 1]),
+      bottles: toNumber_(row[STK_COL.BOTTLES - 1]),
+      qty:     toNumber_(row[STK_COL.QTY     - 1])
     };
   }).filter(function(r) { return !!r.product; });
 }
@@ -954,6 +963,103 @@ function toNumber_(value) { const n = Number(value); return isNaN(n) ? 0 : n; }
 function safe_(value) { return value == null ? '' : String(value).trim(); }
 
 /**
+ * findProductIdByName_ — ស្វែងរក ID ពី NewOrder sheet ដោយ match ឈ្មោះ
+ */
+function findProductIdByName_(name) {
+  if (!name) return '';
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('NewOrder');
+  if (!sheet) return '';
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return '';
+  const data     = sheet.getRange(2, 1, lastRow - 1, 2).getValues(); // A=ID, B=Name
+  const normName = normalizeForMatch_(name);
+  for (let i = 0; i < data.length; i++) {
+    if (stockMatch_(normalizeForMatch_(safe_(data[i][1])), normName)) {
+      return safe_(data[i][0]);
+    }
+  }
+  return '';
+}
+
+/**
+ * migrateStockAddIdColumn_ — Run ONCE to insert ID column (A) into Stock sheet
+ * and fill IDs by matching product names with NewOrder sheet.
+ *
+ * ▶ Steps:
+ *   1. Insert new column A in Stock sheet
+ *   2. Set header "ID" in A1
+ *   3. Match each product name → NewOrder → fill ID
+ *
+ * ⚠️ Run this function ONCE manually from Apps Script editor!
+ */
+function migrateStockAddIdColumn_() {
+  const ss         = SpreadsheetApp.getActiveSpreadsheet();
+  const stockSheet = ss.getSheetByName(STROKE_SHEET);
+  if (!stockSheet) { Logger.log('❌ Stock sheet not found'); return; }
+
+  // Check if ID column already exists (avoid double-migration)
+  const firstHeader = safe_(stockSheet.getRange(1, 1).getValue());
+  if (firstHeader === 'ID') {
+    Logger.log('✅ ID column already exists — running syncStockIds_ instead');
+    syncStockIds_();
+    return;
+  }
+
+  // Insert column A → shifts existing A→B, B→C, etc.
+  stockSheet.insertColumnBefore(1);
+  stockSheet.getRange(1, 1).setValue('ID');
+  Logger.log('✅ Inserted ID column in Stock sheet');
+
+  // Now sync IDs
+  syncStockIds_();
+}
+
+/**
+ * syncStockIds_ — Match each Stock row to NewOrder by name and fill ID column.
+ * Safe to run multiple times — skips rows that already have an ID.
+ */
+function syncStockIds_() {
+  const ss          = SpreadsheetApp.getActiveSpreadsheet();
+  const stockSheet  = ss.getSheetByName(STROKE_SHEET);
+  const noSheet     = ss.getSheetByName('NewOrder');
+  if (!stockSheet)  { Logger.log('❌ Stock sheet not found');    return; }
+  if (!noSheet)     { Logger.log('❌ NewOrder sheet not found'); return; }
+
+  const stockLastRow = stockSheet.getLastRow();
+  const noLastRow    = noSheet.getLastRow();
+  if (stockLastRow <= 1 || noLastRow <= 1) { Logger.log('No data to sync'); return; }
+
+  // Read NewOrder: col A=ID, col B=Name
+  const noData = noSheet.getRange(2, 1, noLastRow - 1, 2).getValues();
+
+  // Read Stock: col A=ID, col B=Products
+  const stockData = stockSheet.getRange(2, 1, stockLastRow - 1, 2).getValues();
+
+  let updated = 0, skipped = 0, notFound = 0;
+  for (let i = 0; i < stockData.length; i++) {
+    const currentId  = safe_(stockData[i][0]); // col A = ID
+    const stockName  = safe_(stockData[i][1]); // col B = Products
+    if (currentId) { skipped++; continue; }    // already has ID
+
+    const normStock = normalizeForMatch_(stockName);
+    let matched = false;
+    for (let j = 0; j < noData.length; j++) {
+      if (stockMatch_(normalizeForMatch_(safe_(noData[j][1])), normStock)) {
+        stockSheet.getRange(i + 2, 1).setValue(safe_(noData[j][0]));
+        Logger.log('✅ ' + stockName + ' → ' + safe_(noData[j][0]));
+        updated++;
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) { Logger.log('⚠️ No match: ' + stockName); notFound++; }
+  }
+  Logger.log('════ syncStockIds_ done ════');
+  Logger.log('Updated: ' + updated + ' | Skipped (had ID): ' + skipped + ' | Not found: ' + notFound);
+}
+
+/**
  * testWrite_ — Run this ONCE manually to authorize Apps Script to write to Sheet
  * Apps Script Editor → Select "testWrite_" → ▶ Run → Allow permissions
  */
@@ -971,9 +1077,9 @@ function testWrite_() {
 
     const lastRow = sheet.getLastRow();
     if (lastRow > 1) {
-      const rows = sheet.getRange(2, 1, Math.min(3, lastRow - 1), 6).getValues();
+      const rows = sheet.getRange(2, 1, Math.min(3, lastRow - 1), 7).getValues();
       rows.forEach(function(r, i) {
-        Logger.log('Row ' + (i+2) + ': ' + r[0] + ' | Box:' + r[2] + ' Pack:' + r[3]);
+        Logger.log('Row ' + (i+2) + ': ID:' + r[0] + ' | ' + r[1] + ' | Box:' + r[3] + ' Pack:' + r[4]);
       });
     }
     Logger.log('✅ Authorization OK — Stock save will work now!');
