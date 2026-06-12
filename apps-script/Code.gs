@@ -76,9 +76,9 @@ const HEADER = [
 /* ── Stroke sheet columns (1-based) — ID column added as first column ── */
 const STK_COL = { ID:1, PRODUCT:2, TYPE:3, BOX:4, PACK:5, BOTTLES:6, QTY:7 };
 
-/* ── StrokeHistory columns (daily snapshot) ── */
+/* ── StrokeHistory columns (daily snapshot) — ID is last for backward compat ── */
 const HIST_HEADER = [
-  'DateTime','Product','Type','Box','Pack','Bottles','QTY'
+  'DateTime','Product','Type','Box','Pack','Bottles','QTY','ID'
 ];
 
 
@@ -396,12 +396,12 @@ function listOrders_() {
 /**
  * deductStroke_ — កាត់ស្តុកដោយស្វ័យប្រវត្តិ បន្ទាប់ពី order save
  *
- * Stroke columns (1-based): PRODUCT=1, TYPE=2, BOX=3, PACK=4, BOTTLES=5, QTY=6
+ * Stroke columns (1-based): ID=1, PRODUCT=2, TYPE=3, BOX=4, PACK=5, BOTTLES=6, QTY=7
  *
  * Unit rules:
- *   ឈុត (default) → ដក PACK (col 4) → recalc BOX & BOTTLES & QTY
- *   កេស           → ដក BOX  (col 3) → recalc PACK & BOTTLES & QTY
- *   លាយ           → ដក BOTTLES (col 5) → recalc PACK & BOX & QTY
+ *   ឈុត (default) → ដក PACK ផ្ទាល់ → recalc BOX & BOTTLES & QTY
+ *   កេស           → ដក BOX + ដក PACK (qty×ppb) ផ្ទាល់ → recalc BOTTLES & QTY
+ *   លាយ           → ដក BOTTLES ផ្ទាល់ → recalc PACK & BOX & QTY
  */
 function deductStroke_(products, orderId) {
   if (!products || !products.length) return;
@@ -495,12 +495,13 @@ function backupStrokeHistory_() {
     .map(function(row) {
       return [
         now,
-        safe_(row[STK_COL.PRODUCT  - 1]),  // Product (col B)
-        safe_(row[STK_COL.TYPE     - 1]),  // Type    (col C)
-        toNumber_(row[STK_COL.BOX  - 1]),  // Box
-        toNumber_(row[STK_COL.PACK - 1]),  // Pack
-        toNumber_(row[STK_COL.BOTTLES-1]), // Bottles
-        toNumber_(row[STK_COL.QTY  - 1])   // QTY
+        safe_(row[STK_COL.PRODUCT  - 1]),  // col B — Product name
+        safe_(row[STK_COL.TYPE     - 1]),  // col C — Type
+        toNumber_(row[STK_COL.BOX  - 1]),  // col D — Box
+        toNumber_(row[STK_COL.PACK - 1]),  // col E — Pack
+        toNumber_(row[STK_COL.BOTTLES-1]), // col F — Bottles
+        toNumber_(row[STK_COL.QTY  - 1]),  // col G — QTY
+        safe_(row[STK_COL.ID       - 1])   // col H — ID (last, backward-compatible)
       ];
     });
 
@@ -697,8 +698,9 @@ function listStrokeHistory_(e) {
   const lastRow = sh.getLastRow();
   if (lastRow <= 1) return { ok:true, history:[] };
 
-  // Read all rows (skip header row 1)
-  const data = sh.getRange(2, 1, lastRow - 1, 7).getValues();
+  // Read all rows (skip header row 1) — 8 cols: DateTime,Product,Type,Box,Pack,Bottles,QTY,ID
+  // Old rows have 7 cols (no ID in col H) — handled gracefully: r[7] → ''
+  const data = sh.getRange(2, 1, lastRow - 1, 8).getValues();
 
   const history = [];
   data.forEach(function(r) {
@@ -729,12 +731,13 @@ function listStrokeHistory_(e) {
 
     history.push({
       date:    ds,
-      product: safe_(r[1]),      // Column B = Product
-      type:    safe_(r[2]),      // Column C = Type
-      box:     toNumber_(r[3]),  // Column D = Box
-      pack:    toNumber_(r[4]),  // Column E = Pack
-      bottles: toNumber_(r[5]),  // Column F = Bottles
-      qty:     toNumber_(r[6])   // Column G = QTY
+      product: safe_(r[1]),      // col B = Product
+      type:    safe_(r[2]),      // col C = Type
+      box:     toNumber_(r[3]),  // col D = Box
+      pack:    toNumber_(r[4]),  // col E = Pack
+      bottles: toNumber_(r[5]),  // col F = Bottles
+      qty:     toNumber_(r[6]),  // col G = QTY
+      id:      safe_(r[7])       // col H = ID (empty for rows recorded before ID migration)
     });
   });
 
@@ -751,6 +754,12 @@ function ensureStrokeHistorySheet_() {
   } else if (sheet.getLastRow() === 0) {
     sheet.getRange(1, 1, 1, HIST_HEADER.length).setValues([HIST_HEADER]);
     sheet.setFrozenRows(1);
+  } else {
+    // Update header if old 7-col format (no ID column yet)
+    const existingCols = sheet.getRange(1, 1, 1, HIST_HEADER.length).getValues()[0];
+    if (!existingCols[HIST_HEADER.length - 1]) {
+      sheet.getRange(1, 1, 1, HIST_HEADER.length).setValues([HIST_HEADER]);
+    }
   }
   return sheet;
 }
