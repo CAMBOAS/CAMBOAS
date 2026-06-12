@@ -425,7 +425,11 @@ function bindSave(){
     var pack  = parseInt(document.getElementById('pmFPack').value)  ||0;
     var qty   = parseInt(document.getElementById('pmFQty').value)   ||0;
 
-    if(!name){ alert('⚠️ សូមបញ្ចូលឈ្មោះ!'); return; }
+    if(!name){
+      if(window.macUI) macUI.toast('⚠️ សូមបញ្ចូលឈ្មោះផលិតផល!', 'error');
+      else alert('⚠️ សូមបញ្ចូលឈ្មោះ!');
+      return;
+    }
 
     var isNew  = !_editItem;
     var origId = _editItem ? String(_editItem.id) : '';
@@ -453,6 +457,11 @@ function bindSave(){
     dbPut(item, function(){
       doRenderGrid();
       if(window.renderProductGrid) window.renderProductGrid();
+      // Show local save toast immediately
+      if(window.macUI){
+        if(isNew) macUI.toast('✅ បានបន្ថែមផលិតផល "' + name + '" — កំពុង Sync Sheets...', 'info');
+        else      macUI.toast('✅ បានកែប្រែ "' + name + '" — កំពុង Sync Sheets...', 'info');
+      }
       setTimeout(function(){
         var tabBtn = document.querySelector('.tab-btn[data-category="'+cat+'"]');
         if(tabBtn) tabBtn.click();
@@ -485,15 +494,24 @@ function bindSave(){
               doRenderGrid();
               // Refresh PM modal list (it was already shown before this async response)
               loadList('');
+              if(window.macUI) macUI.toast('☁️ Sync Sheets ✓ (' + d.id + ')', 'success');
+            } else {
+              if(window.macUI) macUI.toast('⚠️ Sheets: ' + (d && d.message ? d.message : 'Sync failed'), 'error');
             }
-          }).catch(function(){});
+          }).catch(function(){ if(window.macUI) macUI.toast('⚠️ Sheets sync failed — រក្សាទុក local ✓', 'warning'); });
         } else if(origId && /^CAMBO-/i.test(origId)){
           fetch(base, {
             method:  'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body:    JSON.stringify({ action:'updateProduct', id:origId, data:{ name:name, price:price, sale:sale, box:box, pack:pack, qty:qty } }),
             redirect:'follow'
-          }).catch(function(){});
+          }).then(function(r){ return r.json(); }).then(function(d){
+            if(d && d.ok){
+              if(window.macUI) macUI.toast('☁️ Sync Sheets ✓', 'success');
+            } else {
+              if(window.macUI) macUI.toast('⚠️ Sheets: ' + (d && d.message ? d.message : 'Sync failed'), 'error');
+            }
+          }).catch(function(){ if(window.macUI) macUI.toast('⚠️ Sheets sync failed — រក្សាទុក local ✓', 'warning'); });
         }
       }
 
