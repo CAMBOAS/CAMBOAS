@@ -1,4 +1,4 @@
-﻿{
+{
   "permissions": {
     "allow": [
       "Bash(git add *)",
@@ -48,7 +48,21 @@
       "PowerShell(Get-Command node -ErrorAction SilentlyContinue)",
       "Bash(curl -s -L \"https://script.google.com/macros/s/AKfycbwL5ToDIE6abtacUi4fZ6W9UsaITOBvy_Np1bH3o-8RRs5uD4EDJ2lLaHroD2gigLNpYA/exec?action=products\")",
       "PowerShell(Get-ChildItem \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\images\\\\products\" -Recurse -File | ForEach-Object { $_.DirectoryName.Split\\('\\\\'\\)[-1] + '/' + $_.Name })",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(p['id'], '|', p['name'], '|', p['type']\\) for p in d['products']]\")"
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(p['id'], '|', p['name'], '|', p['type']\\) for p in d['products']]\")",
+      "Bash(curl -s -L -X POST \"https://script.google.com/macros/s/AKfycbwL5ToDIE6abtacUi4fZ6W9UsaITOBvy_Np1bH3o-8RRs5uD4EDJ2lLaHroD2gigLNpYA/exec\" -H \"Content-Type: text/plain;charset=utf-8\" -d '{\"action\":\"addProduct\",\"data\":{\"name\":\"Test Product\",\"type\":\"Hair Care\",\"price\":15,\"sale\":1,\"box\":1}}')",
+      "Bash(powershell -Command \"\\(Get-Content pages/order-d.html\\) -replace 'product-manager\\\\.js\\\\?v=164', 'product-manager.js?v=165' | Set-Content pages/order-d.html -Encoding utf8; \\(Get-Content pages/new-order.html\\) -replace 'product-manager\\\\.js\\\\?v=164', 'product-manager.js?v=165' | Set-Content pages/new-order.html -Encoding utf8\")",
+      "PowerShell(npm list -g @google/clasp 2>$null)",
+      "PowerShell(if \\(-not $?\\) { \"NOT_INSTALLED\" })",
+      "PowerShell(Get-Command node -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source; if \\(Test-Path \"C:\\\\Program Files\\\\nodejs\\\\node.exe\"\\) { \"Found at: C:\\\\Program Files\\\\nodejs\\\\\" } elseif \\(Test-Path \"$env:APPDATA\\\\npm\\\\node.exe\"\\) { \"Found at AppData\" } else { \"Node.js not found in common paths\" })",
+      "PowerShell(& \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" root -g | ForEach-Object { Join-Path $_ \"@google/clasp/src/index.js\" } | ForEach-Object { if \\(Test-Path $_\\) { \"clasp installed OK\" } })",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; clasp --version)",
+      "PowerShell($npmGlobal = & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" root -g; $claspPath = Join-Path \\(Split-Path $npmGlobal\\) \"clasp.cmd\"; if \\(Test-Path $claspPath\\) { \"Found: $claspPath\"; & $claspPath --version } else { \"clasp.cmd not found at $claspPath\" })",
+      "Bash(clasp --version)",
+      "Bash(Get-ChildItem \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\apps-script\")",
+      "Bash(Select-Object Name)",
+      "Bash(npm --version)",
+      "mcp__visualize__read_me",
+      "mcp__visualize__show_widget"
     ]
   }
 }

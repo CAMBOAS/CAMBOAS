@@ -1,6 +1,6 @@
 ﻿
 (function(){
-  const DIRECT_URL = 'https://script.google.com/macros/s/AKfycbx2Brycxu8oTTsboVk2rBlep7rRtzvhIS4YClPj2mGjbA1yvVBaK3Im4pYeV9SsOiMCwg/exec';
+  const DIRECT_URL = 'https://script.google.com/macros/s/AKfycbzCMeZ_UUUQX2t2ITwS-ucyyn8HMFST0s-Kqyho_b5Gf5VlKN6xDOjlxY6-J8x4nYyQFg/exec';
   function normalizeLooseText(value){ return String(value ?? '').replace(/\s+/g,' ').trim(); }
   function fixPhone(value){
     var ph = normalizeLooseText(value);
