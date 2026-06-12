@@ -966,6 +966,103 @@ function toNumber_(value) { const n = Number(value); return isNaN(n) ? 0 : n; }
    ════════════════════════════════════════ */
 function migrateStockAddIdColumn() { migrateStockAddIdColumn_(); }
 function syncStockIds()            { syncStockIds_(); }
+
+/**
+ * fixStockIds — Re-match all Stock IDs using TYPE-AWARE matching.
+ * Clears all existing IDs and re-matches by: Type category first → then name fuzzy match.
+ * Run this to fix wrong IDs caused by cross-category fuzzy mismatches.
+ */
+function fixStockIds() {
+  const ss         = SpreadsheetApp.getActiveSpreadsheet();
+  const stockSheet = ss.getSheetByName(STROKE_SHEET);
+  const noSheet    = ss.getSheetByName('NewOrder');
+  if (!stockSheet || !noSheet) { Logger.log('❌ Sheet not found'); return; }
+
+  const stockLast = stockSheet.getLastRow();
+  const noLast    = noSheet.getLastRow();
+  if (stockLast <= 1 || noLast <= 1) { Logger.log('No data'); return; }
+
+  // Map Type strings → category letter
+  const typeToLetter = {
+    'drinks':'A','drink':'A',
+    'face care':'B','face':'B',
+    'body care':'C','body':'C',
+    'hair care':'D','hair':'D'
+  };
+
+  // Read NewOrder: col A=ID, B=Name, C=Type
+  const noData = noSheet.getRange(2, 1, noLast - 1, 3).getValues();
+
+  // Build category buckets from NewOrder
+  const buckets = { A:[], B:[], C:[], D:[], E:[] };
+  noData.forEach(function(r) {
+    const id   = safe_(r[0]);
+    const name = safe_(r[1]);
+    const type = safe_(r[2]).toLowerCase();
+    if (!id || !name) return;
+    const letter = typeToLetter[type] || 'E';
+    buckets[letter].push({ id:id, norm:normalizeForMatch_(name) });
+  });
+
+  // Read Stock: col A=ID, B=Products(name), C=Types
+  const stockData = stockSheet.getRange(2, 1, stockLast - 1, 3).getValues();
+
+  let updated = 0, notFound = 0;
+  for (let i = 0; i < stockData.length; i++) {
+    const stockName = safe_(stockData[i][1]);  // col B
+    const stockType = safe_(stockData[i][2]).toLowerCase(); // col C
+    if (!stockName) continue;
+
+    // Clear existing ID first
+    stockSheet.getRange(i + 2, 1).setValue('');
+
+    const letter  = typeToLetter[stockType] || 'E';
+    const bucket  = buckets[letter];
+    const normStk = normalizeForMatch_(stockName);
+
+    // 1) Exact match within category
+    let matched = '';
+    for (let j = 0; j < bucket.length; j++) {
+      if (bucket[j].norm === normStk) { matched = bucket[j].id; break; }
+    }
+
+    // 2) Contains match within category
+    if (!matched) {
+      for (let j = 0; j < bucket.length; j++) {
+        if (normStk.includes(bucket[j].norm) || bucket[j].norm.includes(normStk)) {
+          matched = bucket[j].id; break;
+        }
+      }
+    }
+
+    // 3) 70% overlap within category
+    if (!matched) {
+      for (let j = 0; j < bucket.length; j++) {
+        const shorter = normStk.length < bucket[j].norm.length ? normStk : bucket[j].norm;
+        const longer  = normStk.length < bucket[j].norm.length ? bucket[j].norm : normStk;
+        let hits = 0;
+        for (let k = 0; k < shorter.length; k++) {
+          if (longer.includes(shorter[k])) hits++;
+        }
+        if (shorter.length > 0 && hits / shorter.length >= 0.75) {
+          matched = bucket[j].id; break;
+        }
+      }
+    }
+
+    if (matched) {
+      stockSheet.getRange(i + 2, 1).setValue(matched);
+      Logger.log('✅ [' + stockType + '] ' + stockName + ' → ' + matched);
+      updated++;
+    } else {
+      Logger.log('⚠️ No match [' + stockType + ']: ' + stockName);
+      notFound++;
+    }
+  }
+
+  Logger.log('════ fixStockIds done ════');
+  Logger.log('Updated: ' + updated + ' | Not found: ' + notFound);
+}
 function safe_(value) { return value == null ? '' : String(value).trim(); }
 
 /**
