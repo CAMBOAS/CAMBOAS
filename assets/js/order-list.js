@@ -206,7 +206,8 @@ async function loadOrders(){
 }
 function fixPhone(v){
   var ph = String(v||'').trim();
-  if(ph && /^[1-9]\d{7,9}$/.test(ph)) ph = '0' + ph;
+  // Cambodian numbers: 7–10 digits without leading 0 → add 0 prefix
+  if(ph && /^[1-9]\d{6,9}$/.test(ph)) ph = '0' + ph;
   return ph;
 }
 function normalizeOrders(arr){
@@ -1666,7 +1667,6 @@ async function init(){
     if(a==='reportdelivery') reportDelivery();
     if(a==='markdel')   markStatus('Delivered');
     if(a==='markpend')  markStatus('Pending');
-    if(a==='syncsheet'){  $id('olActDrop')?.classList.remove('open'); refreshFromSheet(); return; }
     $id('olActDrop')?.classList.remove('open');
   });
 
