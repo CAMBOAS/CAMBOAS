@@ -393,13 +393,19 @@ function updateStats(rows){
   var agentMap = {};
   rows.forEach(function(o){
     var a = (o.closeBy||o.closeby||'').trim();
-    if(a) agentMap[a] = (agentMap[a]||0) + 1;
+    if(!a) return;
+    if(!agentMap[a]) agentMap[a] = { count:0, rev:0 };
+    agentMap[a].count++;
+    agentMap[a].rev += orderTotal(o);
   });
   var topAgent = '—', topAgentCount = '';
   Object.keys(agentMap).forEach(function(a){
-    if(topAgent==='—' || agentMap[a]>agentMap[topAgent]) topAgent=a;
+    if(topAgent==='—' || agentMap[a].count > agentMap[topAgent].count) topAgent = a;
   });
-  if(topAgent!=='—') topAgentCount = agentMap[topAgent]+' orders';
+  if(topAgent !== '—'){
+    var d = agentMap[topAgent];
+    topAgentCount = d.count + ' orders · $' + d.rev.toFixed(2);
+  }
 
   // Latest customer from filtered rows (respects date/search filter)
   var latestCust = '—', latestPhone = '', latestTotal = '';
