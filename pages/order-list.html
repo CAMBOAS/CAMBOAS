@@ -556,7 +556,11 @@
     <div class="ol-stats">
       <div class="ol-stat ol-s-blue"><div class="ol-stat-n" id="olRevenue">$0</div><div class="ol-stat-l">Revenue</div></div>
       <div class="ol-stat"><div class="ol-stat-n" id="olTotal">0</div><div class="ol-stat-l">Total Orders</div></div>
-      <div class="ol-stat ol-s-warn"><div class="ol-stat-n" id="olPending">0</div><div class="ol-stat-l">Pending</div></div>
+      <div class="ol-stat ol-s-warn" style="gap:2px" title="Top Agent">
+        <div class="ol-stat-n ol-stat-cust" id="olTopAgent">—</div>
+        <div id="olTopAgentCount" style="font-size:11px;color:var(--muted);font-weight:500"></div>
+        <div class="ol-stat-l">Top Agent</div>
+      </div>
       <div class="ol-stat ol-s-green" title="Latest Customer" style="gap:2px">
         <div class="ol-stat-n ol-stat-cust" id="olLatestCust">—</div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">

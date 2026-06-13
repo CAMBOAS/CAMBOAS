@@ -386,9 +386,20 @@ function getFiltered(){
 /* ── stats ── */
 function updateStats(rows){
   // Stats based on FILTERED rows (not all orders)
-  var t    = rows.length;
-  var pend = rows.filter(function(o){ return (o.status||o.orderStatus||'').toLowerCase()==='pending'; }).length;
-  var rev  = rows.reduce(function(s,o){ return s+orderTotal(o); }, 0);
+  var t   = rows.length;
+  var rev = rows.reduce(function(s,o){ return s+orderTotal(o); }, 0);
+
+  // Top Agent — closeBy with most orders in filtered rows
+  var agentMap = {};
+  rows.forEach(function(o){
+    var a = (o.closeBy||o.closeby||'').trim();
+    if(a) agentMap[a] = (agentMap[a]||0) + 1;
+  });
+  var topAgent = '—', topAgentCount = '';
+  Object.keys(agentMap).forEach(function(a){
+    if(topAgent==='—' || agentMap[a]>agentMap[topAgent]) topAgent=a;
+  });
+  if(topAgent!=='—') topAgentCount = agentMap[topAgent]+' orders';
 
   // Latest customer from filtered rows (respects date/search filter)
   var latestCust = '—', latestPhone = '', latestTotal = '';
@@ -403,10 +414,11 @@ function updateStats(rows){
   }
 
   $id('olTotal').textContent      = t;
-  $id('olPending').textContent    = pend;
-  $id('olLatestCust').textContent = latestCust;
   $id('olRevenue').textContent    = '$'+rev.toFixed(2);
   $id('olFooter').textContent     = 'Showing '+rows.length+' of '+_orders.length+' records';
+  var ta = $id('olTopAgent');      if(ta) ta.textContent = topAgent;
+  var tc = $id('olTopAgentCount'); if(tc) tc.textContent = topAgentCount;
+  $id('olLatestCust').textContent = latestCust;
   var ph = $id('olLatestPhone'); if(ph) ph.textContent = latestPhone;
   var lt = $id('olLatestTotal'); if(lt) lt.textContent = latestTotal;
 }
