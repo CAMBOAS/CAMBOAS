@@ -157,15 +157,24 @@ function exportDeliveryReport(){
     (active==='All'||d.st===active)&&
     (!df||d.date===df)
   );
-  if(!src.length){alert('⚠️ មិនមានទិន្នន័យ');return;}
+  if(!src.length){_dvToast('មិនមានទិន្នន័យ','#fbbf24');return;}
   const delivTitle = active!=='All' ? active : 'ភ្នំពេញ';
   if(typeof window.CamboDeliveryReport==='undefined'){
-    alert('❌ CamboDeliveryReport not loaded'); return;
+    _dvToast('CamboDeliveryReport not loaded','#f87171'); return;
   }
   window.CamboDeliveryReport.exportRows(src, {
     exchangeRate: 4100,
     title: delivTitle
   });
+}
+</script>
+<script>
+function _dvToast(msg,color){
+  var t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:9999;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;color:#fff;box-shadow:0 4px 20px rgba(0,0,0,.3);background:'+(color||'#1e293b')+';transition:opacity .3s';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove();},300);},3000);
 }
 </script>
 <script src="../assets/js/sw-register.js?v=158"></script>

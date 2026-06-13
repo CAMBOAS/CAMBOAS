@@ -375,7 +375,7 @@ function bindUpload(){
   if(!zone || !fi) return;
 
   function handleFile(f){
-    if(!f || !f.type.startsWith('image/')){ alert('Image files only!'); return; }
+    if(!f || !f.type.startsWith('image/')){ if(window.toast) window.toast('Image files only!','warn'); return; }
     var rd = new FileReader();
     rd.onload = function(e){
       var img = new Image();
@@ -419,7 +419,7 @@ function bindSave(){
 
     if(!name){
       if(window.macUI) macUI.toast('⚠️ សូមបញ្ចូលឈ្មោះផលិតផល!', 'error');
-      else alert('⚠️ សូមបញ្ចូលឈ្មោះ!');
+      else if(window.toast) window.toast('សូមបញ្ចូលឈ្មោះផលិតផល!', 'warn');
       return;
     }
 

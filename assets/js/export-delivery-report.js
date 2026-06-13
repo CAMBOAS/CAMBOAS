@@ -3,6 +3,7 @@
  * Cambo Mini — Report Delivery (A4 Landscape)
  * window.CamboDeliveryReport.exportRows(rows, options)
  */
+function _fallbackToast(msg,color){if(window._fallbackToast._active)return;var t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:9999;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;color:#fff;background:'+(color||'#1e293b')+';box-shadow:0 4px 20px rgba(0,0,0,.3);transition:opacity .3s';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove();},300);},3000);}
 (function () {
   'use strict';
   var DEFAULT_RATE = 4100;
@@ -153,13 +154,14 @@
 
   function exportRows(rows, options) {
     if (!Array.isArray(rows) || !rows.length) {
-      window.toast ? window.toast('មិនមានទិន្នន័យ','error') : alert('⚠️ មិនមានទិន្នន័យ');
+      window.toast ? window.toast('មិនមានទិន្នន័យ','error') : _fallbackToast('មិនមានទិន្នន័យ','#fbbf24');
       return;
     }
     var html = buildTemplate(rows, options);
     var w = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
     if (!w) {
-      alert('⚠️ Please allow popups for this site.');
+      if(window.toast) window.toast('Please allow popups for this site','warn');
+      else if(window._dvToast) window._dvToast('Please allow popups for this site','#fbbf24');
       return;
     }
     w.document.open();

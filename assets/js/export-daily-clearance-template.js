@@ -1,4 +1,6 @@
-﻿(function () {
+﻿function _fallbackToast(msg,color){var t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:9999;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;color:#fff;background:'+(color||'#1e293b')+';box-shadow:0 4px 20px rgba(0,0,0,.3);transition:opacity .3s';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove();},300);},3000);}
+
+(function () {
   const DEFAULT_RATE = 4100;
 
   function escapeHtml(text) {
@@ -181,7 +183,7 @@
   function exportRows(rows, options = {}) {
     if (!Array.isArray(rows) || !rows.length) {
       if (window.toast) window.toast('មិនមានទិន្នន័យសម្រាប់ Export ទេ។', 'error');
-      else alert('មិនមានទិន្នន័យសម្រាប់ Export ទេ។');
+      else _fallbackToast('មិនមានទិន្នន័យសម្រាប់ Export ទេ។', '#fbbf24');
       return;
     }
 

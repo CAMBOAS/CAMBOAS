@@ -587,8 +587,8 @@ function exportCSV(){
 
 function printTable(){
   var src = getFiltered();
-  if(!src.length){ alert('⚠️ គ្មានទិន្នន័យ'); return; }
-  if(typeof ReceiptPrinter === 'undefined'){ alert('❌ ReceiptPrinter not loaded'); return; }
+  if(!src.length){ _olShowToast('គ្មានទិន្នន័យ', '#fbbf24'); return; }
+  if(typeof ReceiptPrinter === 'undefined'){ _olShowToast('ReceiptPrinter not loaded', '#f87171'); return; }
 
   var receiptNo = ($id('olReceiptNo')?.value||'').trim();
   var qrOn      = _qrOn;
@@ -638,8 +638,8 @@ function printTable(){
 
 function printSelected(){
   var src = getSrc();
-  if(!src.length){ alert('⚠️ សូមជ្រើសរើស order មុន'); return; }
-  if(typeof ReceiptPrinter === 'undefined'){ alert('❌ ReceiptPrinter not loaded'); return; }
+  if(!src.length){ _olShowToast('សូមជ្រើសរើស order មុន', '#fbbf24'); return; }
+  if(typeof ReceiptPrinter === 'undefined'){ _olShowToast('ReceiptPrinter not loaded', '#f87171'); return; }
 
   var receiptNo = ($id('olReceiptNo')?.value||'').trim();
   var qrOn      = _qrOn;
@@ -688,7 +688,7 @@ function printSelected(){
 }
 
 function markStatus(status){
-  if(_sel.size===0){ alert('Please select orders first'); return; }
+  if(_sel.size===0){ _olShowToast('សូមជ្រើសរើស order មុន', '#fbbf24'); return; }
   _sel.forEach(function(id){ var o=_orders.find(function(x){return String(x.id)===id;}); if(o){o.status=status;o.orderStatus=status;} });
   render();
 }
@@ -696,8 +696,8 @@ function markStatus(status){
 /* ── Share IMG (using ShareReceipt.js) ── */
 function shareImg(){
   var src = getSrc();
-  if(!src.length){ alert('⚠️ សូមជ្រើសរើស order មុន'); return; }
-  if(typeof ShareReceipt === 'undefined'){ alert('❌ ShareReceipt not loaded'); return; }
+  if(!src.length){ _olShowToast('សូមជ្រើសរើស order មុន', '#fbbf24'); return; }
+  if(typeof ShareReceipt === 'undefined'){ _olShowToast('ShareReceipt not loaded', '#f87171'); return; }
 
   var o = src[0]; // share first selected order
   var prods = getProds(o);
@@ -756,13 +756,13 @@ function shareImg(){
   };
 
   if(typeof html2canvas !== 'function'){
-    alert('❌ html2canvas មិនទាន់ load ទេ។ សូម Reload ទំព័រហើយព្យាយាមម្តងទៀត។');
+    _olShowToast('html2canvas មិនទាន់ load — Reload ហើយព្យាយាមម្តងទៀត', '#f87171');
     return;
   }
 
   var target = document.getElementById('olPrintArea');
   if(!target){
-    alert('❌ Print area មិនមានទេ (olPrintArea)');
+    _olShowToast('Print area មិនមានទេ', '#f87171');
     return;
   }
 
@@ -786,7 +786,7 @@ function shareImg(){
     setTimeout(function(){ t.remove(); }, 2500);
   }).catch(function(err){
     toast.remove();
-    alert('❌ Share មានបញ្ហា:\n' + (err && err.message ? err.message : String(err)));
+    _olShowToast('Share មានបញ្ហា: ' + (err && err.message ? err.message : String(err)), '#f87171');
   });
 }
 
@@ -939,7 +939,7 @@ function _olShowToast(msg, color){
 async function olSaveEdit(){
   // Guard: must have an open order
   var o = _orders.find(function(x){ return String(x.id) === String(_drawerOrderId); });
-  if(!o){ alert('⚠️ Order រកមិនឃើញ'); return; }
+  if(!o){ _olShowToast('Order រកមិនឃើញ', '#fbbf24'); return; }
 
   // Confirm before saving
   var ok = window.macUI
@@ -1033,7 +1033,7 @@ async function olSaveEdit(){
 
   } catch(err){
     console.error('olSaveEdit error:', err);
-    alert('❌ Save មានបញ្ហា: '+(err && err.message ? err.message : String(err)));
+    _olShowToast('Save មានបញ្ហា: '+(err && err.message ? err.message : String(err)), '#f87171');
   }
 }
 
@@ -1286,9 +1286,9 @@ window.olDrToggleQr = function(){
 /* ── Drawer Delete ── */
 window.olDeleteOrder = async function(){
   try {
-    if(!_drawerOrderId){ alert('⚠️ គ្មាន Order ត្រូវបានជ្រើស'); return; }
+    if(!_drawerOrderId){ _olShowToast('គ្មាន Order ត្រូវបានជ្រើស', '#fbbf24'); return; }
     var o = _orders.find(function(x){ return String(x.id)===_drawerOrderId; });
-    if(!o){ alert('⚠️ Order រកមិនឃើញ'); return; }
+    if(!o){ _olShowToast('Order រកមិនឃើញ', '#fbbf24'); return; }
 
     /* ── Confirm dialog: macUI if available, else native browser ── */
     var ok = window.macUI
@@ -1324,7 +1324,7 @@ window.olDeleteOrder = async function(){
 
   } catch(err) {
     console.error('olDeleteOrder error:', err);
-    alert('❌ Delete មានបញ្ហា: ' + (err.message || String(err)));
+    _olShowToast('Delete មានបញ្ហា: ' + (err.message || String(err)), '#f87171');
   }
 };
 
@@ -1683,9 +1683,9 @@ async function init(){
 /* ── Report Delivery ── */
 function reportDelivery(){
   var src = getSrc();
-  if(!src.length){ alert('⚠️ មិនមានទិន្នន័យ'); return; }
+  if(!src.length){ _olShowToast('មិនមានទិន្នន័យ', '#fbbf24'); return; }
   if(typeof window.CamboDeliveryReport === 'undefined'){
-    alert('\u274c CamboDeliveryReport not loaded'); return;
+    _olShowToast('CamboDeliveryReport not loaded', '#f87171'); return;
   }
   var rows = src.map(function(o){
     var prods = getProds(o).map(function(p){
