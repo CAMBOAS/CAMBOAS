@@ -391,10 +391,15 @@ function updateStats(rows){
   var rev  = rows.reduce(function(s,o){ return s+orderTotal(o); }, 0);
 
   // Latest customer from filtered rows (respects date/search filter)
-  var latestCust = '—';
+  var latestCust = '—', latestPhone = '', latestTotal = '';
   for (var i = 0; i < rows.length; i++) {
     var cn = (rows[i].customer || '').trim();
-    if (cn) { latestCust = cn; break; }
+    if (cn) {
+      latestCust  = cn;
+      latestPhone = (rows[i].phone || '').trim();
+      latestTotal = '$' + orderTotal(rows[i]).toFixed(2);
+      break;
+    }
   }
 
   $id('olTotal').textContent      = t;
@@ -402,6 +407,8 @@ function updateStats(rows){
   $id('olLatestCust').textContent = latestCust;
   $id('olRevenue').textContent    = '$'+rev.toFixed(2);
   $id('olFooter').textContent     = 'Showing '+rows.length+' of '+_orders.length+' records';
+  var ph = $id('olLatestPhone'); if(ph) ph.textContent = latestPhone;
+  var lt = $id('olLatestTotal'); if(lt) lt.textContent = latestTotal;
 }
 
 /* ── render ── */
