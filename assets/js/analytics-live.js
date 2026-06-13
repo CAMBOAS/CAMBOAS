@@ -126,20 +126,27 @@ function renderAnalytics(rows){
   const pages = {};
   filtered.forEach(o => {
     const key = (o.page || '').trim() || '—';
-    pages[key] = (pages[key] || 0) + CamboOrdersData.calcOrderTotal(o);
+    if (!pages[key]) pages[key] = { revenue: 0, orders: 0 };
+    pages[key].revenue += CamboOrdersData.calcOrderTotal(o);
+    pages[key].orders  += 1;
   });
-  const topPages = Object.entries(pages).sort((a, b) => b[1] - a[1]).slice(0, 7);
-  const maxRev = topPages[0]?.[1] || 1;
-  setMiniList('topPagesList', topPages, ([name, total], i) => {
-    const pct = Math.round((total / maxRev) * 100);
+  const topPages = Object.entries(pages).sort((a, b) => b[1].revenue - a[1].revenue).slice(0, 7);
+  const maxRev = topPages[0]?.[1].revenue || 1;
+  setMiniList('topPagesList', topPages, ([name, info], i) => {
+    const pct    = Math.round((info.revenue / maxRev) * 100);
+    const avg    = info.orders ? CamboOrdersData.formatMoney(info.revenue / info.orders) : '$0';
     return `<div class="ml-item">
       <div class="ml-rank ${rankCls(i)}">${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</div>
       <div class="ml-info">
         <div class="ml-name" title="${name}">${name}</div>
-        <div class="ml-sub">Revenue</div>
+        <div class="ml-sub" style="display:flex;align-items:center;gap:8px">
+          <span>📦 ${info.orders.toLocaleString()} orders</span>
+          <span style="opacity:.55">·</span>
+          <span style="color:#a78bfa">avg ${avg}</span>
+        </div>
         <div class="ml-bar-wrap"><div class="ml-bar" style="width:${pct}%"></div></div>
       </div>
-      <div class="ml-amt">${CamboOrdersData.formatMoney(total)}</div>
+      <div class="ml-amt">${CamboOrdersData.formatMoney(info.revenue)}</div>
     </div>`;
   });
 
