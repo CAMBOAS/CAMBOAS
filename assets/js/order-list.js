@@ -387,14 +387,20 @@ function updateStats(rows){
   // Stats based on FILTERED rows (not all orders)
   var t    = rows.length;
   var pend = rows.filter(function(o){ return (o.status||o.orderStatus||'').toLowerCase()==='pending'; }).length;
-  var del  = rows.filter(function(o){ return (o.status||o.orderStatus||'').toLowerCase()==='delivered'; }).length;
   var rev  = rows.reduce(function(s,o){ return s+orderTotal(o); }, 0);
 
-  $id('olTotal').textContent    = t;
-  $id('olPending').textContent  = pend;
-  $id('olDelivered').textContent= del;
-  $id('olRevenue').textContent  = '$'+rev.toFixed(2);
-  $id('olFooter').textContent   = 'Showing '+rows.length+' of '+_orders.length+' records';
+  // Latest customer from filtered rows (respects date/search filter)
+  var latestCust = '—';
+  for (var i = 0; i < rows.length; i++) {
+    var cn = (rows[i].customer || '').trim();
+    if (cn) { latestCust = cn; break; }
+  }
+
+  $id('olTotal').textContent      = t;
+  $id('olPending').textContent    = pend;
+  $id('olLatestCust').textContent = latestCust;
+  $id('olRevenue').textContent    = '$'+rev.toFixed(2);
+  $id('olFooter').textContent     = 'Showing '+rows.length+' of '+_orders.length+' records';
 }
 
 /* ── render ── */
@@ -521,7 +527,54 @@ async function refreshFromSheet(){
   _orders = await loadOrders();
   populateFilterOptions();
   render();
+  hideBadge();
   if(window.macUI) macUI.toast('✅ Refreshed from Google Sheet', 'success');
+}
+
+/* ── Auto-refresh (silent background poll every 30s) ── */
+var _autoRefreshTimer = null;
+var _knownIds = new Set();
+
+function buildKnownIds(orders){
+  var s = new Set();
+  orders.forEach(function(o){ if(o.id) s.add(String(o.id)); });
+  return s;
+}
+
+function hideBadge(){
+  var b = $id('olNewBadge'); if(b) b.classList.remove('show');
+  var dot = $id('olSyncDot'); if(dot) dot.classList.remove('active');
+}
+
+window.olDismissNewBadge = function(){
+  hideBadge();
+  var btn = $id('olSyncBtn');
+  if(btn){ btn.classList.add('spinning'); setTimeout(function(){ btn.classList.remove('spinning'); }, 700); }
+  refreshFromSheet();
+};
+
+async function silentPoll(){
+  /* skip poll while drawer is open — avoid disrupting user mid-edit */
+  if(document.body.classList.contains('drawer-open')) return;
+  try {
+    var fresh = await loadOrders();
+    if(!fresh || !fresh.length) return;
+    var newOnes = fresh.filter(function(o){ return o.id && !_knownIds.has(String(o.id)); });
+    if(newOnes.length > 0){
+      var badge = $id('olNewBadge');
+      var text  = $id('olNewBadgeText');
+      if(text) text.textContent = '🔔 ' + newOnes.length + ' order ថ្មី — ចុចដើម្បីបង្ហាញ';
+      if(badge) badge.classList.add('show');
+      // pulse the sync dot in toolbar
+      var dot = $id('olSyncDot'); if(dot) dot.classList.add('active');
+    }
+  } catch(e){ /* silent fail */ }
+}
+
+function startAutoRefresh(){
+  _knownIds = buildKnownIds(_orders);
+  if(_autoRefreshTimer) clearInterval(_autoRefreshTimer);
+  _autoRefreshTimer = setInterval(silentPoll, 30000);
 }
 
 function exportCSV(){
@@ -1475,6 +1528,13 @@ async function init(){
   // Auto-populate filter dropdowns from loaded data
   populateFilterOptions();
   render();
+
+  /* show date-desc sort arrow on initial load */
+  var initArr = document.getElementById('arr-date');
+  if(initArr) initArr.className = 'ol-arr desc';
+
+  /* start background auto-refresh */
+  startAutoRefresh();
 
   /* Search */
   $id('olSearch')?.addEventListener('input', function(e){

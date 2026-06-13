@@ -119,23 +119,31 @@
   .ml-amt{font-size:13px;font-weight:800;color:#7dd3fc;flex-shrink:0;white-space:nowrap}
   [data-theme="light"] .ml-amt{color:#4f46e5}
 
-  /* ── Status / Priority breakdown ── */
-  .sb-section{display:grid;gap:10px}
-  .sb-row{display:grid;gap:5px}
-  .sb-head{display:flex;justify-content:space-between;align-items:center;font-size:13px}
-  .sb-label{font-weight:700;color:var(--text)}
-  .sb-count{font-size:12px;color:var(--muted)}
-  .sb-track{height:8px;border-radius:999px;background:rgba(148,163,184,.14);overflow:hidden}
-  .sb-fill{height:100%;border-radius:999px;transition:width .6s ease}
-  .sb-pending .sb-fill{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
-  .sb-confirmed .sb-fill{background:linear-gradient(90deg,#06b6d4,#22d3ee)}
-  .sb-delivered .sb-fill{background:linear-gradient(90deg,#10b981,#34d399)}
-  .sb-cancel .sb-fill{background:linear-gradient(90deg,#ef4444,#fca5a5)}
-  .sb-high .sb-fill{background:linear-gradient(90deg,#ef4444,#fca5a5)}
-  .sb-medium .sb-fill{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
-  .sb-low .sb-fill{background:linear-gradient(90deg,#10b981,#34d399)}
-  .sb-divider{height:1px;background:rgba(148,163,184,.1);margin:8px 0}
-  .sb-section-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  /* ── Customer Health (RFM) ── */
+  .rfm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .rfm-seg{border-radius:12px;padding:10px 12px;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:4px;transition:transform .14s,box-shadow .14s;cursor:default}
+  .rfm-seg:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
+  .rfm-seg-top{display:flex;align-items:center;gap:6px}
+  .rfm-icon{font-size:16px;line-height:1}
+  .rfm-label{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+  .rfm-count{font-size:22px;font-weight:900;line-height:1.1}
+  .rfm-desc{font-size:10px;color:var(--muted);line-height:1.4}
+  .rfm-vip{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(251,191,36,.06))}
+  .rfm-vip .rfm-label{color:#f59e0b}
+  .rfm-vip .rfm-count{color:#fbbf24}
+  .rfm-regular{background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(52,211,153,.05))}
+  .rfm-regular .rfm-label{color:#10b981}
+  .rfm-regular .rfm-count{color:#34d399}
+  .rfm-atrisk{background:linear-gradient(135deg,rgba(249,115,22,.12),rgba(251,146,60,.06))}
+  .rfm-atrisk .rfm-label{color:#f97316}
+  .rfm-atrisk .rfm-count{color:#fb923c}
+  .rfm-lost{background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(252,165,165,.05))}
+  .rfm-lost .rfm-label{color:#ef4444}
+  .rfm-lost .rfm-count{color:#fca5a5}
+  .rfm-bar-row{display:flex;height:6px;border-radius:999px;overflow:hidden;gap:2px;margin-top:4px}
+  .rfm-bar-seg{border-radius:999px;transition:width .6s ease}
+  .rfm-total-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);margin-top:2px}
+  [data-theme="light"] .rfm-count{filter:brightness(.8)}
 
   @media(max-width:1100px){.an-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.an-grid{grid-template-columns:1fr}}
   @media(max-width:600px){
@@ -262,14 +270,15 @@
         </article>
         <article class="glass-card an-card">
           <div class="an-card-head">
-            <h3>Status &amp; Priority</h3>
-            <p>ស្ថានភាព និងអាទិភាព</p>
+            <h3>Customer Health</h3>
+            <p>ស្ថានភាព customer របស់អ្នក</p>
           </div>
-          <div class="sb-section-lbl">Order Status</div>
-          <div class="sb-section" id="statusBreakdown"></div>
-          <div class="sb-divider"></div>
-          <div class="sb-section-lbl">Priority</div>
-          <div class="sb-section" id="priorityBreakdown"></div>
+          <div class="rfm-grid" id="rfmSegments"></div>
+          <div class="rfm-bar-row" id="rfmBar"></div>
+          <div class="rfm-total-row">
+            <span>Total unique customers</span>
+            <span id="rfmTotal" style="font-weight:700;color:var(--text)">—</span>
+          </div>
         </article>
       </section>
 

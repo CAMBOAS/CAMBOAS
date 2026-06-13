@@ -150,20 +150,59 @@ function renderAnalytics(rows){
     </div>`;
   });
 
-  /* ── Status ── */
-  const statuses = { Pending: 0, Confirmed: 0, Delivered: 0, Cancel: 0 };
-  filtered.forEach(o => {
-    const k = statuses[o.status] !== undefined ? o.status : 'Pending';
-    statuses[k] += 1;
+  /* ── Customer Health (RFM) — use full dataset for recency ── */
+  const rfmPage = document.getElementById('analyticsPage')?.value || '';
+  const rfmRows = rfmPage ? rows.filter(r => r.page === rfmPage) : rows;
+  const custMap = {};
+  rfmRows.forEach(o => {
+    const name = (o.customer || '').trim() || '—';
+    const d = o.date ? new Date(o.date) : null;
+    if (!custMap[name]) custMap[name] = { lastDate: null, firstDate: null, orders: 0, revenue: 0 };
+    custMap[name].orders++;
+    custMap[name].revenue += CamboOrdersData.calcOrderTotal(o);
+    if (d) {
+      if (!custMap[name].lastDate  || d > custMap[name].lastDate)  custMap[name].lastDate  = d;
+      if (!custMap[name].firstDate || d < custMap[name].firstDate) custMap[name].firstDate = d;
+    }
   });
-  setProgressList('statusBreakdown', statuses,
-    ['sb-pending', 'sb-confirmed', 'sb-delivered', 'sb-cancel']);
-
-  /* ── Priority ── */
-  const priorities = { High: 0, Medium: 0, Low: 0 };
-  filtered.forEach(o => { priorities[o.priority || 'Medium'] += 1; });
-  setProgressList('priorityBreakdown', priorities,
-    ['sb-high', 'sb-medium', 'sb-low']);
+  /* dynamic thresholds based on actual data span */
+  const allDates = Object.values(custMap).map(c => c.lastDate).filter(Boolean);
+  const latestDate  = allDates.reduce((a, b) => a > b ? a : b, allDates[0] || new Date());
+  const earliestDate = allDates.reduce((a, b) => a < b ? a : b, allDates[0] || new Date());
+  const spanDays = Math.max(1, Math.floor((latestDate - earliestDate) / 86400000));
+  const recentThreshold  = Math.max(3, Math.round(spanDays * 0.25));
+  const atriskThreshold  = Math.max(6, Math.round(spanDays * 0.60));
+  const rfm = { vip: 0, regular: 0, atrisk: 0, lost: 0 };
+  Object.values(custMap).forEach(c => {
+    const days = c.lastDate ? Math.floor((latestDate - c.lastDate) / 86400000) : 999;
+    if (days <= recentThreshold && c.orders >= 2) rfm.vip++;
+    else if (days <= recentThreshold)              rfm.regular++;
+    else if (days <= atriskThreshold)              rfm.atrisk++;
+    else                                           rfm.lost++;
+  });
+  const rfmTotal = rfm.vip + rfm.regular + rfm.atrisk + rfm.lost;
+  const segs = [
+    { key:'vip',     cls:'rfm-vip',     icon:'👑', label:'VIP',      count:rfm.vip,     desc:'ទិញញឹក · ទើបទិញ' },
+    { key:'regular', cls:'rfm-regular', icon:'🟢', label:'Regular',  count:rfm.regular, desc:'active · ≤ 30 ថ្ងៃ' },
+    { key:'atrisk',  cls:'rfm-atrisk',  icon:'⚠️', label:'At-Risk',  count:rfm.atrisk,  desc:`${recentThreshold+1}-${atriskThreshold} ថ្ងៃ · ត្រូវ call!` },
+    { key:'lost',    cls:'rfm-lost',    icon:'💀', label:'Lost',     count:rfm.lost,    desc:`${atriskThreshold+1}+ ថ្ងៃ · win-back` },
+  ];
+  const segWrap = document.getElementById('rfmSegments');
+  if (segWrap) segWrap.innerHTML = segs.map(s => `
+    <div class="rfm-seg ${s.cls}">
+      <div class="rfm-seg-top"><span class="rfm-icon">${s.icon}</span><span class="rfm-label">${s.label}</span></div>
+      <div class="rfm-count">${s.count.toLocaleString()}</div>
+      <div class="rfm-desc">${s.desc}</div>
+    </div>`).join('');
+  const barWrap = document.getElementById('rfmBar');
+  if (barWrap && rfmTotal) {
+    const colors = ['#f59e0b','#10b981','#f97316','#ef4444'];
+    barWrap.innerHTML = segs.map((s, i) =>
+      `<div class="rfm-bar-seg" style="width:${Math.round(s.count/rfmTotal*100)}%;background:${colors[i]}"></div>`
+    ).join('');
+  }
+  const rfmTotalEl = document.getElementById('rfmTotal');
+  if (rfmTotalEl) rfmTotalEl.textContent = rfmTotal.toLocaleString();
 }
 
 async function initAnalytics(){
