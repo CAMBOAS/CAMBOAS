@@ -687,11 +687,6 @@ function printSelected(){
   ReceiptPrinter.printBatch(allData);
 }
 
-function markStatus(status){
-  if(_sel.size===0){ _olShowToast('សូមជ្រើសរើស order មុន', '#fbbf24'); return; }
-  _sel.forEach(function(id){ var o=_orders.find(function(x){return String(x.id)===id;}); if(o){o.status=status;o.orderStatus=status;} });
-  render();
-}
 
 /* ── Share IMG (using ShareReceipt.js) ── */
 function shareImg(){
@@ -1665,8 +1660,6 @@ async function init(){
     if(a==='printall') printTable();
     if(a==='printsel') printSelected();
     if(a==='reportdelivery') reportDelivery();
-    if(a==='markdel')   markStatus('Delivered');
-    if(a==='markpend')  markStatus('Pending');
     $id('olActDrop')?.classList.remove('open');
   });
 
