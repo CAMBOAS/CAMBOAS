@@ -528,7 +528,6 @@ async function refreshFromSheet(){
   populateFilterOptions();
   render();
   hideBadge();
-  if(window.macUI) macUI.toast('✅ Refreshed from Google Sheet', 'success');
 }
 
 /* ── Auto-refresh (silent background poll every 30s) ── */
