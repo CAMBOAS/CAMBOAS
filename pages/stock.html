@@ -746,7 +746,7 @@ function getDefaultRatio(name){
 
 /* ── Load from Google Sheets ── */
 async function loadStroke(){
-  document.getElementById('tbody').innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">⏳ កំពុងទាញទិន្នន័យពី Google Sheets...</td></tr>';
+  document.getElementById('tbody').innerHTML='<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">⏳ កំពុងទាញទិន្នន័យ...</td></tr>';
   ['sTot','sIn','sLo','sOut'].forEach(function(id){ document.getElementById(id).textContent='...'; });
   try {
     var res  = await fetch(APPS_SCRIPT_URL+'?action=stroke&_='+Date.now());
@@ -785,7 +785,7 @@ async function loadStroke(){
     var cached=null;
     try{ cached=JSON.parse(localStorage.getItem('cambo_stock_v2')||'null'); }catch(_){}
     if(cached && cached.length){ S=cached.map(function(p){ return Object.assign({},p,{img:p.img||getLocalImg(p.name)||''}); }); rt(); notify('⚠️ Offline — showing cached data',false); }
-    else { document.getElementById('tbody').innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:#fca5a5">❌ ទាញទិន្នន័យបរាជ័យ — '+err.message+'<br><small style="color:var(--muted)">សូម Enter ទិន្នន័យនៅ Google Sheets Stroke sheet ជាមុន</small></td></tr>';
+    else { document.getElementById('tbody').innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px;color:#fca5a5">❌ ទាញទិន្នន័យបរាជ័យ — '+err.message+'</td></tr>';
       ['sTot','sIn','sLo','sOut'].forEach(function(id){ document.getElementById(id).textContent='0'; }); }
   }
 }
