@@ -416,14 +416,18 @@ function deductStroke_(products, orderId) {
   const data = sheet.getRange(2, 1, lastRow - 1, 7).getValues();
 
   products.forEach(function(item) {
-    const orderName = normalizeForMatch_(safe_(item.name || item.product));
-    const qty       = toNumber_(item.qty);
-    const unit      = safe_(item.unit || 'ឈុត');
-    if (!qty || !orderName) return;
+    const orderName   = normalizeForMatch_(safe_(item.name || item.product));
+    const orderProdId = safe_(item.productId);
+    const qty         = toNumber_(item.qty);
+    const unit        = safe_(item.unit || 'ឈុត');
+    if (!qty || (!orderName && !orderProdId)) return;
 
     for (let i = 0; i < data.length; i++) {
+      const stockId   = safe_(data[i][STK_COL.ID      - 1]); // col A
       const stockName = normalizeForMatch_(safe_(data[i][STK_COL.PRODUCT - 1]));
-      if (!stockMatch_(orderName, stockName)) continue;
+      // Match by ID first (exact, reliable) — fall back to fuzzy name only if no ID
+      const idMatch   = orderProdId && stockId && orderProdId === stockId;
+      if (!idMatch && !stockMatch_(orderName, stockName)) continue;
 
       const rowNum = i + 2; // 1-based sheet row
 
