@@ -451,10 +451,11 @@ function deductStroke_(products, orderId) {
         newBox  = ppb > 0 ? Math.floor(newPack  / ppb) : 0;
 
       } else {
-        // ឈុត (default) — 1 ឈុត = 1 pack; sale = ចំនួន bottle ក្នុង 1 ឈុត
+        // ឈុត — 1 ឈuot = 1 pack; sale = bottles per ឈuot (from NewOrder sheet col E)
         const salePerUnit = toNumber_(item.sale) || bpp;
+        const ppbFinal    = toNumber_(item.packPerBox) || ppb; // prefer explicit over derived
         newPack = Math.max(0, curPack - qty);
-        newBox  = Math.max(0, curBox - (ppb > 0 ? Math.floor(qty / ppb) : 0));
+        newBox  = Math.max(0, curBox - (ppbFinal > 0 ? Math.floor(qty / ppbFinal) : 0));
         newBott = Math.max(0, curBott - qty * salePerUnit);
       }
 
