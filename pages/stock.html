@@ -93,11 +93,40 @@
     }
     .edit-field select:focus{outline:none;border-color:#8b5cf6}
     .edit-field select option{background:#1a1a2e;color:#f1f5f9}
-    .edit-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
+    .edit-actions{display:flex;gap:10px;justify-content:space-between;margin-top:4px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)}
     .ebtn{min-height:40px;padding:0 24px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:opacity .15s}
     .ebtn-save{background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff}
     .ebtn-cancel{background:rgba(255,255,255,.06);color:#94a3b8;border:1.5px solid rgba(255,255,255,.1)}
     .ebtn-save:hover{opacity:.88} .ebtn-cancel:hover{background:rgba(255,255,255,.1);color:#f1f5f9}
+
+    /* ── Confirm Dialog ── */
+    .confirm-overlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(6px)}
+    .confirm-overlay.open{display:flex}
+    .confirm-box{background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px 30px 24px;max-width:340px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.5);text-align:center}
+    .confirm-icon{display:flex;justify-content:center;margin-bottom:14px}
+    .confirm-title{font-size:15px;font-weight:800;color:var(--fg);margin-bottom:6px}
+    .confirm-msg{font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:22px}
+    .confirm-btns{display:flex;gap:10px;justify-content:center}
+    .cbtn{min-height:38px;padding:0 22px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:opacity .15s,background .15s}
+    .cbtn-yes{background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff}
+    .cbtn-no{background:rgba(255,255,255,.06);color:#94a3b8;border:1.5px solid rgba(255,255,255,.1)}
+    .cbtn-yes:hover{opacity:.88} .cbtn-no:hover{background:rgba(255,255,255,.1);color:#f1f5f9}
+    [data-theme="light"] .confirm-box{background:#fff;border-color:rgba(148,163,184,.2);box-shadow:0 24px 60px rgba(0,0,0,.15)}
+    [data-theme="light"] .cbtn-no{background:#f1f5f9;color:#475569;border-color:rgba(148,163,184,.22)}
+    [data-theme="light"] .cbtn-no:hover{background:#e2e8f0;color:#0f172a}
+
+    /* ── Default Multiplier Cards ── */
+    .def-eq{display:flex;align-items:center;gap:8px}
+    .def-card{flex:1;border-radius:12px;padding:10px 8px;text-align:center;cursor:text;transition:border-color .18s,box-shadow .18s}
+    .def-card:hover{box-shadow:0 0 0 3px rgba(255,255,255,.06)}
+    .def-card-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+    .def-card-inp{width:100%;background:transparent;border:none;outline:none;text-align:center;font-size:22px;font-weight:800;padding:0;font-family:inherit;line-height:1}
+    .def-card-inp::-webkit-inner-spin-button,.def-card-inp::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+    .def-sep{font-size:15px;color:rgba(148,163,184,.35);font-weight:400;flex-shrink:0;user-select:none}
+    .def-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+    .def-hdr-line{flex:1;height:1px}
+    [data-theme="light"] .def-card:hover{box-shadow:0 0 0 3px rgba(0,0,0,.06)}
+    [data-theme="light"] .def-sep{color:rgba(100,116,139,.3)}
 
     /* Light mode — modal overrides */
     [data-theme="light"] .edit-overlay{background:rgba(15,23,42,.45)}
@@ -384,12 +413,25 @@
   </main>
 </div>
 
+<!-- Confirm Dialog -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon"></div>
+    <div class="confirm-title" id="confirmTitle"></div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-btns">
+      <button class="cbtn cbtn-no"  id="confirmNo"></button>
+      <button class="cbtn cbtn-yes" id="confirmYes"></button>
+    </div>
+  </div>
+</div>
+
 <!-- Edit Product Modal -->
 <div class="edit-overlay" id="editOverlay" onclick="closeEdit(event)">
   <div class="edit-modal">
     <h3 style="display:flex;align-items:center;gap:12px">
       <img id="eModalImg" src="" style="width:48px;height:48px;border-radius:11px;object-fit:cover;border:1px solid rgba(255,255,255,.12);display:none;flex-shrink:0">
-      <span>✏️ កែប្រែផលិតផល</span>
+      <span style="display:flex;align-items:center;gap:7px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>កែប្រែផលិតផល</span>
     </h3>
     <div class="stock-indicator" id="editStockIndicator"></div>
     <div class="edit-grid">
@@ -400,12 +442,45 @@
       <div class="edit-field full">
         <label>ប្រភេទ (Types)</label>
         <select id="eCat">
-          <option value="Face Care">😊 Face Care</option>
-          <option value="Body Care">🧴 Body Care</option>
-          <option value="Hair Care">💆 Hair Care</option>
-          <option value="Drink">☕ Drink</option>
+          <option value="Face Care">Face Care</option>
+          <option value="Body Care">Body Care</option>
+          <option value="Hair Care">Hair Care</option>
+          <option value="Drink">Drink</option>
           <option value="-">— Other</option>
         </select>
+      </div>
+      <!-- Default Multipliers — equation card style -->
+      <div class="edit-field full">
+        <div class="def-hdr">
+          <span style="font-size:10px;font-weight:700;color:#f59e0b;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap">⚙ Default / Box</span>
+          <div class="def-hdr-line" style="background:rgba(245,158,11,.22)"></div>
+          <span style="font-size:9px;color:var(--muted);white-space:nowrap">Sheet H · I · J</span>
+        </div>
+        <div class="def-eq">
+          <!-- BOX (readonly) -->
+          <div class="def-card" style="background:rgba(139,92,246,.1);border:1.5px solid rgba(139,92,246,.22)" onclick="this.querySelector('input').select()">
+            <div class="def-card-label" style="color:#a78bfa">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>BOX
+            </div>
+            <input class="def-card-inp" type="number" id="eDefBox" value="1" min="1" readonly style="color:#c4b5fd;cursor:default">
+          </div>
+          <div class="def-sep">=</div>
+          <!-- PACK -->
+          <div class="def-card" style="background:rgba(6,182,212,.1);border:1.5px solid rgba(6,182,212,.22)" onclick="this.querySelector('input').focus()">
+            <div class="def-card-label" style="color:#67e8f9">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>PACK
+            </div>
+            <input class="def-card-inp" type="number" id="eDefPack" min="0" placeholder="—" style="color:#22d3ee">
+          </div>
+          <div class="def-sep">=</div>
+          <!-- BOTTLE -->
+          <div class="def-card" style="background:rgba(16,185,129,.1);border:1.5px solid rgba(16,185,129,.22)" onclick="this.querySelector('input').focus()">
+            <div class="def-card-label" style="color:#6ee7b7">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M8 2h8"/><path d="M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.788a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.789V2"/><path d="M7 15a6.472 6.472 0 0 1 5 0 6.472 6.472 0 0 0 5 0"/></svg>BOTTLE
+            </div>
+            <input class="def-card-inp" type="number" id="eDefBott" min="0" placeholder="—" style="color:#34d399">
+          </div>
+        </div>
       </div>
       <div class="edit-field">
         <label>កេស (BOX)</label>
@@ -439,12 +514,12 @@
         </div>
       </div>
       <div class="edit-field full" id="eDelWrap" style="margin-top:4px">
-        <button class="ebtn" onclick="deleteProduct()" style="background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25);width:100%">🗑 លុបផលិតផលនេះ</button>
+        <button class="ebtn" onclick="deleteProduct()" style="background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25);width:100%;display:inline-flex;align-items:center;justify-content:center;gap:7px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>លុបផលិតផលនេះ</button>
       </div>
     </div>
     <div class="edit-actions">
-      <button class="ebtn ebtn-cancel" onclick="closeEdit()">បោះបង់</button>
-      <button class="ebtn ebtn-save" onclick="saveEdit()">💾 រក្សាទុក</button>
+      <button class="ebtn ebtn-cancel" onclick="closeEdit()" style="display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>បោះបង់</button>
+      <button class="ebtn ebtn-save" onclick="saveEdit()" style="display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>រក្សាទុក</button>
     </div>
   </div>
 </div>
@@ -452,7 +527,7 @@
 <!-- Add Product Modal -->
 <div class="edit-overlay" id="addOverlay" onclick="closeAdd(event)">
   <div class="edit-modal">
-    <h3>➕ បន្ថែមផលិតផលថ្មី</h3>
+    <h3 style="display:flex;align-items:center;gap:8px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>បន្ថែមផលិតផលថ្មី</h3>
     <div class="edit-grid">
       <div class="edit-field full">
         <label>ឈ្មោះផលិតផល</label>
@@ -461,12 +536,45 @@
       <div class="edit-field full">
         <label>ប្រភេទ (Types)</label>
         <select id="aCat">
-          <option value="Face Care">😊 Face Care</option>
-          <option value="Body Care">🧴 Body Care</option>
-          <option value="Hair Care">💆 Hair Care</option>
-          <option value="Drink">☕ Drink</option>
+          <option value="Face Care">Face Care</option>
+          <option value="Body Care">Body Care</option>
+          <option value="Hair Care">Hair Care</option>
+          <option value="Drink">Drink</option>
           <option value="-">— Other</option>
         </select>
+      </div>
+      <!-- Default Multipliers — equation card style -->
+      <div class="edit-field full">
+        <div class="def-hdr">
+          <span style="font-size:10px;font-weight:700;color:#f59e0b;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap">⚙ Default / Box</span>
+          <div class="def-hdr-line" style="background:rgba(245,158,11,.22)"></div>
+          <span style="font-size:9px;color:var(--muted);white-space:nowrap">Sheet H · I · J</span>
+        </div>
+        <div class="def-eq">
+          <!-- BOX (readonly) -->
+          <div class="def-card" style="background:rgba(139,92,246,.1);border:1.5px solid rgba(139,92,246,.22)" onclick="this.querySelector('input').select()">
+            <div class="def-card-label" style="color:#a78bfa">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>BOX
+            </div>
+            <input class="def-card-inp" type="number" id="aDefBox" value="1" min="1" readonly style="color:#c4b5fd;cursor:default">
+          </div>
+          <div class="def-sep">=</div>
+          <!-- PACK -->
+          <div class="def-card" style="background:rgba(6,182,212,.1);border:1.5px solid rgba(6,182,212,.22)" onclick="this.querySelector('input').focus()">
+            <div class="def-card-label" style="color:#67e8f9">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>PACK
+            </div>
+            <input class="def-card-inp" type="number" id="aDefPack" min="0" value="0" placeholder="—" style="color:#22d3ee">
+          </div>
+          <div class="def-sep">=</div>
+          <!-- BOTTLE -->
+          <div class="def-card" style="background:rgba(16,185,129,.1);border:1.5px solid rgba(16,185,129,.22)" onclick="this.querySelector('input').focus()">
+            <div class="def-card-label" style="color:#6ee7b7">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:3px"><path d="M8 2h8"/><path d="M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.788a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.789V2"/><path d="M7 15a6.472 6.472 0 0 1 5 0 6.472 6.472 0 0 0 5 0"/></svg>BOTTLE
+            </div>
+            <input class="def-card-inp" type="number" id="aDefBott" min="0" value="0" placeholder="—" style="color:#34d399">
+          </div>
+        </div>
       </div>
       <div class="edit-field">
         <label>កេស (BOX)</label>
@@ -498,8 +606,8 @@
       </div>
     </div>
     <div class="edit-actions">
-      <button class="ebtn ebtn-cancel" onclick="closeAdd()">បោះបង់</button>
-      <button class="ebtn ebtn-save" onclick="saveAdd()">➕ បន្ថែម</button>
+      <button class="ebtn ebtn-cancel" onclick="closeAdd()" style="display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>បោះបង់</button>
+      <button class="ebtn ebtn-save" onclick="saveAdd()" style="display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>បន្ថែម</button>
     </div>
   </div>
 </div>
@@ -757,25 +865,22 @@ async function loadStroke(){
       var box  = parseInt(item.box)||0;
       var pack = parseInt(item.pack)||0;
       var bott = parseInt(item.bottles)||0;
-      // ── Resolve packPerBox (3-source priority) ──────────────────────
-      // 1. Explicit field saved by saveEdit (most reliable)
-      // 2. DEFAULT_RATIOS lookup table (spreadsheet base values)
-      // 3. Derive from pack÷box (works when stock > 0 and box = base unit)
-      var ppb = parseInt(item.packPerBox)||0;
+      // ── Resolve packPerBox (priority: Sheet defPack → DEFAULT_RATIOS → derive) ──
+      var defPack = parseInt(item.defPack)||0;
+      var defBott = parseInt(item.defBott)||0;
+      var ppb = defPack;
       if(!ppb){ var _dr=getDefaultRatio(item.product||''); if(_dr) ppb=_dr.ppb; }
       if(!ppb && box>0 && pack>0) ppb=Math.round(pack/box);
 
-      // ── Resolve bottPerPack (3-source priority) ──────────────────────
-      // 1. Ratio text from Sheets e.g. "1 ឈុត = 3 ដបប្រអប់"
-      // 2. DEFAULT_RATIOS lookup
-      // 3. Derive from bott÷pack
-      var bpp=0, ratioText=String(item.ratio||item.pack2||'');
-      if(ratioText){ var m=ratioText.match(/=\s*(\d+)/); if(m) bpp=parseInt(m[1]); }
+      // ── Resolve bottPerPack: from defBott/defPack → DEFAULT_RATIOS → derive ──
+      var bpp = (defPack>0 && defBott>0) ? Math.round(defBott/defPack) : 0;
       if(!bpp){ var _dr2=getDefaultRatio(item.product||''); if(_dr2) bpp=_dr2.bpp; }
+      if(!bpp){ var ratioText=String(item.ratio||''); var m=ratioText.match(/=\s*(\d+)/); if(m) bpp=parseInt(m[1]); }
       if(!bpp && pack>0 && bott>0) bpp=Math.round(bott/pack);
       return { id:i+1, name:item.product||'', cat:item.type||'-',
                box:box, pack:pack, bottles:bott, qty:qty,
                packPerBox:ppb, bottPerPack:bpp,
+               defBox:parseInt(item.defBox)||1, defPack:defPack, defBott:defBott,
                img:_imgCache[item.product]||'' };
     });
     _sCurrent = S.slice(); // backup for "All Time" restore
@@ -983,43 +1088,99 @@ function matchesDateFilter(p){
   return true;
 }
 
+/* ── Confirm Dialog ── */
+var _svgConfirmSave='<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
+var _svgConfirmWarn='<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+function showConfirm(title, msg, iconHtml, onYes, yesLabel, noLabel){
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent   = msg;
+  document.getElementById('confirmIcon').innerHTML    = iconHtml||'';
+  document.getElementById('confirmYes').textContent   = yesLabel||'យល់ព្រម';
+  document.getElementById('confirmNo').textContent    = noLabel ||'ទេ';
+  document.getElementById('confirmYes').onclick=function(){
+    document.getElementById('confirmOverlay').classList.remove('open');
+    onYes();
+  };
+  document.getElementById('confirmNo').onclick=function(){
+    document.getElementById('confirmOverlay').classList.remove('open');
+  };
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
 /* ── Edit Modal ── */
 var _editId=null, _editDirty=false;
 var _ePpb=0, _eBpp=0; // ratio vars: packPerBox, bottPerPack
+var _eOrigBox=0, _eOrigPack=0, _eOrigBott=0; // original stock values for delta calculation
 function openEdit(id){
   var p=S.find(function(x){ return x.id===id; });
   if(!p) return;
   _editId=id;
+  // Store original stock values — used for delta calculation when BOX changes
+  _eOrigBox  = p.box     || 0;
+  _eOrigPack = p.pack    || 0;
+  _eOrigBott = p.bottles || 0;
   document.getElementById('eN').value    =p.name;
   document.getElementById('eCat').value  =p.cat;
-  document.getElementById('eBox').value  =p.box||0;
-  document.getElementById('ePack').value =p.pack||0;
-  document.getElementById('eBott').value =p.bottles||0;
-  document.getElementById('eQty').value  =p.box||0;
-  // Resolve ratios: stored → DEFAULT_RATIOS → derive from current stock
-  _ePpb=p.packPerBox||(p.box>0&&p.pack>0     ? Math.round(p.pack/p.box)     : 0);
-  _eBpp=p.bottPerPack||(p.pack>0&&p.bottles>0 ? Math.round(p.bottles/p.pack) : 0);
+  document.getElementById('eBox').value  =_eOrigBox;
+  document.getElementById('ePack').value =_eOrigPack;
+  document.getElementById('eBott').value =_eOrigBott;
+  document.getElementById('eQty').value  =_eOrigBox;
+  // Resolve ratios: defPack (Sheet H,I,J) → stored packPerBox → DEFAULT_RATIOS → derive
+  _ePpb=p.defPack||p.packPerBox||(p.box>0&&p.pack>0 ? Math.round(p.pack/p.box) : 0);
+  _eBpp=(p.defPack>0&&p.defBott>0) ? Math.round(p.defBott/p.defPack)
+       : p.bottPerPack||(p.pack>0&&p.bottles>0 ? Math.round(p.bottles/p.pack) : 0);
   if(!_ePpb||!_eBpp){ var _defR=getDefaultRatio(p.name);
     if(_defR){ if(!_ePpb) _ePpb=_defR.ppb; if(!_eBpp) _eBpp=_defR.bpp; } }
+  // Populate Default Multiplier fields — use Sheet values if set, else fall back to resolved ratios
+  // defBott (bottles/box) = _ePpb × _eBpp when not yet stored in Sheet
+  var _dPack = p.defPack || _ePpb;
+  var _dBott = p.defBott || (_ePpb>0&&_eBpp>0 ? _ePpb*_eBpp : 0);
+  document.getElementById('eDefBox').value  = p.defBox||1;
+  document.getElementById('eDefPack').value = _dPack||0;
+  document.getElementById('eDefBott').value = _dBott||0;
   // Populate editable ratio fields
   document.getElementById('ePackPerBox').value  = _ePpb||0;
   document.getElementById('eBottPerPack').value = _eBpp||0;
-  // Central recalculate: BOX × ratio → PACK → BOTT
+  // Delta recalculate: ស្តុកចាស់ + (BOX ថ្មី − BOX ចាស់) × មេគុណ
+  // ឧ: Pack_ថ្មី = Pack_ចាស់ + delta × packPerBox
   function recalcEdit(){
     var box=parseInt(document.getElementById('eBox').value)||0;
     var ppb=parseInt(document.getElementById('ePackPerBox').value)||0;
     var bpp=parseInt(document.getElementById('eBottPerPack').value)||0;
+    var db =parseInt(document.getElementById('eDefBott').value)||0;
     _ePpb=ppb; _eBpp=bpp;
     document.getElementById('eQty').value=box;
+    var delta=box-_eOrigBox; // ចំនួន box ដែលថែម (អាចជាអវិជ្ជមាន ប្រសិនលុប)
     if(ppb){
-      var pack=box*ppb;
-      document.getElementById('ePack').value=pack;
-      if(bpp) document.getElementById('eBott').value=pack*bpp;
+      var newPack=Math.max(0, _eOrigPack + delta*ppb);
+      document.getElementById('ePack').value=newPack;
+      // defBott = bottles per box → ប្រើដោយផ្ទាល់ប្រសិនមាន, បើអត់ → pack × bottPerPack
+      var newBott= db>0
+        ? Math.max(0, _eOrigBott + delta*db)
+        : (bpp ? Math.max(0, _eOrigBott + delta*ppb*bpp) : _eOrigBott);
+      document.getElementById('eBott').value=newBott;
     }
   }
+  // When DefPack changes → sync to PackPerBox and recalc
+  document.getElementById('eDefPack').oninput = function(){
+    var dp=parseInt(this.value)||0;
+    document.getElementById('ePackPerBox').value=dp;
+    var db=parseInt(document.getElementById('eDefBott').value)||0;
+    if(dp>0&&db>0){ var bpp2=Math.round(db/dp); _eBpp=bpp2; document.getElementById('eBottPerPack').value=bpp2; }
+    recalcEdit();
+  };
+  // When DefBott changes → recompute bottPerPack, recalc BOTT via delta
+  document.getElementById('eDefBott').oninput = function(){
+    var db=parseInt(this.value)||0;
+    var dp=parseInt(document.getElementById('eDefPack').value)||0;
+    if(dp>0&&db>0){ var bpp2=Math.round(db/dp); _eBpp=bpp2; document.getElementById('eBottPerPack').value=bpp2; }
+    var box=parseInt(document.getElementById('eBox').value)||0;
+    var delta=box-_eOrigBox;
+    document.getElementById('eBott').value=Math.max(0, _eOrigBott + delta*db);
+  };
   document.getElementById('eBox').oninput        = recalcEdit;
   document.getElementById('ePackPerBox').oninput = recalcEdit;
-  // BottPerPack changes only recalc BOTT from current PACK (don't touch PACK)
+  // BottPerPack — recalc BOTT ពី PACK បច្ចុប្បន្ន (PACK រួមមាន delta ហើយ)
   document.getElementById('eBottPerPack').oninput = function(){
     var pack=parseInt(document.getElementById('ePack').value)||0;
     var bpp=parseInt(this.value)||0;
@@ -1047,23 +1208,46 @@ function openEdit(id){
   var s=gs(p);
   var stBg   =s==='ok'?'rgba(16,185,129,.12)':s==='low'?'rgba(245,158,11,.12)':'rgba(239,68,68,.12)';
   var stColor=s==='ok'?'#86efac':s==='low'?'#fde68a':'#fca5a5';
-  var stLabel=s==='ok'?'✅ In Stock':s==='low'?'⚠️ Low Stock':'🔴 Out of Stock';
+  var _svgOk ='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+  var _svgLow='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+  var _svgOut='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+  var stIcon =s==='ok'?_svgOk:s==='low'?_svgLow:_svgOut;
+  var stText =s==='ok'?'In Stock':s==='low'?'Low Stock':'Out of Stock';
   document.getElementById('editStockIndicator').innerHTML=
-    '<span style="color:'+stColor+';font-weight:700">'+stLabel+'</span>'+
+    '<span style="color:'+stColor+';font-weight:700;display:inline-flex;align-items:center;gap:6px">'+stIcon+stText+'</span>'+
     '<span style="color:var(--muted);font-size:12px;margin-left:8px">BOX: '+p.box+'</span>';
   document.getElementById('editStockIndicator').style.background=stBg;
   _editDirty=false;
+  // Wrap all input/change handlers so any user edit marks form as dirty
+  ['eN','eBox','ePackPerBox','eBottPerPack','eDefPack','eDefBott','eImg'].forEach(function(fid){
+    var el=document.getElementById(fid); if(!el) return;
+    var orig=el.oninput;
+    el.oninput=function(ev){ _editDirty=true; if(orig) orig.call(this,ev); };
+  });
+  document.getElementById('eCat').onchange=function(){ _editDirty=true; };
   document.getElementById('editOverlay').classList.add('open');
 }
 
 function closeEdit(e){
   if(e && e.target!==document.getElementById('editOverlay')) return;
-  document.getElementById('editOverlay').classList.remove('open');
-  _editId=null; _editDirty=false;
+  if(_editDirty){
+    showConfirm(
+      'បោះបង់ការផ្លាស់ប្ដូរ?',
+      'ការផ្លាស់ប្ដូរដែលអ្នកបានធ្វើនឹងមិនត្រូវបានរក្សាទុក។',
+      _svgConfirmWarn,
+      function(){
+        document.getElementById('editOverlay').classList.remove('open');
+        _editId=null; _editDirty=false;
+      },
+      'បោះបង់', 'ត្រឡប់ក្រោយ'
+    );
+  } else {
+    document.getElementById('editOverlay').classList.remove('open');
+    _editId=null; _editDirty=false;
+  }
 }
 
-async function saveEdit(){
-  if(!_editId) return;
+async function _doSaveEdit(){
   var p=S.find(function(x){ return x.id===_editId; });
   if(!p) return;
   var origName=p.name;
@@ -1075,6 +1259,9 @@ async function saveEdit(){
   p.qty        =p.box;
   p.packPerBox =parseInt(document.getElementById('ePackPerBox').value)||_ePpb;
   p.bottPerPack=parseInt(document.getElementById('eBottPerPack').value)||_eBpp;
+  p.defBox     =parseInt(document.getElementById('eDefBox').value)||1;
+  p.defPack    =parseInt(document.getElementById('eDefPack').value)||0;
+  p.defBott    =parseInt(document.getElementById('eDefBott').value)||0;
   p.img        =document.getElementById('eImg').value.trim();
   p.lastUpdated=new Date().toISOString();
   _imgCache[p.name]=p.img; saveImgCache();
@@ -1093,7 +1280,8 @@ async function saveEdit(){
         action:'stroke_update',
         originalName:origName,
         data:{product:p.name,type:p.cat,box:p.box,pack:p.pack,bottles:p.bottles,qty:p.qty,
-              packPerBox:p.packPerBox,ratio:ratioText}
+              packPerBox:p.packPerBox,ratio:ratioText,
+              defBox:p.defBox,defPack:p.defPack,defBott:p.defBott}
       })
     });
     var r=await res.json();
@@ -1102,6 +1290,17 @@ async function saveEdit(){
   } catch(e){
     notify('⚠️ Network error — saved locally only', false);
   }
+}
+
+function saveEdit(){
+  if(!_editId) return;
+  showConfirm(
+    'រក្សាទុកការផ្លាស់ប្ដូរ?',
+    'ប្រាកដជាចង់រក្សាទុកទិន្នន័យដែលបានផ្លាស់ប្ដូរ?',
+    _svgConfirmSave,
+    function(){ _doSaveEdit(); },
+    'រក្សាទុក', 'ទេ'
+  );
 }
 
 async function deleteProduct(){
@@ -1122,44 +1321,92 @@ async function deleteProduct(){
 }
 
 /* ── Add Modal ── */
+var _addDirty=false;
 function openAddModal(){
   ['aN','aImg'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('aCat').selectedIndex=0;
-  ['aBox','aPackPerBox','aPack','aBottPerPack','aBott','aQty'].forEach(function(id){ document.getElementById(id).value=0; });
-  // Auto-calc when BOX changes
-  document.getElementById('aBox').oninput=function(){
-    var box=parseInt(this.value)||0;
+  document.getElementById('aDefBox').value=1;
+  ['aDefPack','aDefBott','aBox','aPackPerBox','aPack','aBottPerPack','aBott','aQty'].forEach(function(id){ document.getElementById(id).value=0; });
+  function aRecalc(){
+    var box=parseInt(document.getElementById('aBox').value)||0;
     var ppb=parseInt(document.getElementById('aPackPerBox').value)||0;
     var bpp=parseInt(document.getElementById('aBottPerPack').value)||0;
     document.getElementById('aQty').value=box;
     if(ppb){var pack=box*ppb; document.getElementById('aPack').value=pack;
       if(bpp) document.getElementById('aBott').value=pack*bpp;}
+  }
+  // When DefPack changes → sync to PackPerBox and recalc
+  document.getElementById('aDefPack').oninput=function(){
+    var dp=parseInt(this.value)||0;
+    document.getElementById('aPackPerBox').value=dp;
+    var db=parseInt(document.getElementById('aDefBott').value)||0;
+    if(dp>0&&db>0) document.getElementById('aBottPerPack').value=Math.round(db/dp);
+    aRecalc();
   };
-  // Auto-calc when ratio fields change
-  document.getElementById('aPackPerBox').oninput=function(){
-    var box=parseInt(document.getElementById('aBox').value)||0;
-    var ppb=parseInt(this.value)||0;
+  // When DefBott changes → recompute bottPerPack
+  document.getElementById('aDefBott').oninput=function(){
+    var db=parseInt(this.value)||0;
+    var dp=parseInt(document.getElementById('aDefPack').value)||0;
+    if(dp>0&&db>0){ document.getElementById('aBottPerPack').value=Math.round(db/dp); }
+    var pack=parseInt(document.getElementById('aPack').value)||0;
     var bpp=parseInt(document.getElementById('aBottPerPack').value)||0;
-    if(ppb){var pack=box*ppb; document.getElementById('aPack').value=pack;
-      if(bpp) document.getElementById('aBott').value=pack*bpp;}
+    if(bpp&&pack) document.getElementById('aBott').value=pack*bpp;
   };
+  document.getElementById('aBox').oninput=aRecalc;
+  document.getElementById('aPackPerBox').oninput=aRecalc;
   document.getElementById('aBottPerPack').oninput=function(){
     var pack=parseInt(document.getElementById('aPack').value)||0;
     var bpp=parseInt(this.value)||0;
     if(bpp) document.getElementById('aBott').value=pack*bpp;
   };
+  _addDirty=false;
+  // Wrap all input/change handlers so any user edit marks form as dirty
+  ['aN','aBox','aPackPerBox','aBottPerPack','aDefPack','aDefBott','aImg'].forEach(function(fid){
+    var el=document.getElementById(fid); if(!el) return;
+    var orig=el.oninput;
+    el.oninput=function(ev){ _addDirty=true; if(orig) orig.call(this,ev); };
+  });
+  document.getElementById('aCat').onchange=function(){ _addDirty=true; };
   document.getElementById('addOverlay').classList.add('open');
 }
 function closeAdd(e){
   if(e && e.target!==document.getElementById('addOverlay')) return;
-  document.getElementById('addOverlay').classList.remove('open');
+  if(_addDirty){
+    showConfirm(
+      'បោះបង់?',
+      'ទិន្នន័យដែលអ្នកបានបញ្ចូលនឹងត្រូវបានលុបចោល។',
+      _svgConfirmWarn,
+      function(){
+        document.getElementById('addOverlay').classList.remove('open');
+        _addDirty=false;
+      },
+      'បោះបង់', 'ត្រឡប់ក្រោយ'
+    );
+  } else {
+    document.getElementById('addOverlay').classList.remove('open');
+    _addDirty=false;
+  }
 }
-async function saveAdd(){
+function saveAdd(){
+  var name=document.getElementById('aN').value.trim();
+  if(!name){ notify('⚠️ សូមបញ្ចូលឈ្មោះផលិតផល',false); return; }
+  showConfirm(
+    'បន្ថែមផលិតផលថ្មី?',
+    'ប្រាកដជាចង់បន្ថែម "'+name+'" ចូល Stroke sheet?',
+    _svgConfirmSave,
+    function(){ _doSaveAdd(); },
+    'បន្ថែម', 'ទេ'
+  );
+}
+async function _doSaveAdd(){
   var name=document.getElementById('aN').value.trim();
   if(!name){ notify('⚠️ សូមបញ្ចូលឈ្មោះផលិតផល',false); return; }
   var aBox    =parseInt(document.getElementById('aBox').value)||0;
   var aPpb    =parseInt(document.getElementById('aPackPerBox').value)||0;
   var aBpp    =parseInt(document.getElementById('aBottPerPack').value)||0;
+  var aDefBox =parseInt(document.getElementById('aDefBox').value)||1;
+  var aDefPack=parseInt(document.getElementById('aDefPack').value)||0;
+  var aDefBott=parseInt(document.getElementById('aDefBott').value)||0;
   var aRatio  =aBpp?'1 ឈុត = '+aBpp+' ដបប្រអប់':'';
   var d={
     product:name, type:document.getElementById('aCat').value.trim()||'-',
@@ -1167,13 +1414,16 @@ async function saveAdd(){
     pack:parseInt(document.getElementById('aPack').value)||0,
     bottles:parseInt(document.getElementById('aBott').value)||0,
     qty:aBox, packPerBox:aPpb, ratio:aRatio,
+    defBox:aDefBox, defPack:aDefPack, defBott:aDefBott,
     img:document.getElementById('aImg').value.trim()
   };
   var newId=(S.length?Math.max.apply(null,S.map(function(x){return x.id;}))+1:1);
   S.push({id:newId,name:d.product,cat:d.type,box:d.box,pack:d.pack,bottles:d.bottles,qty:d.qty,
-          packPerBox:aPpb,bottPerPack:aBpp,img:d.img,lastUpdated:new Date().toISOString()});
+          packPerBox:aPpb,bottPerPack:aBpp,defBox:aDefBox,defPack:aDefPack,defBott:aDefBott,
+          img:d.img,lastUpdated:new Date().toISOString()});
   if(d.img){ _imgCache[d.product]=d.img; saveImgCache(); }
   document.getElementById('addOverlay').classList.remove('open');
+  _addDirty=false;
   rt(); saveStock();
   notify('⏳ កំពុងបន្ថែម...', true);
   try {

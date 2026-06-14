@@ -74,7 +74,7 @@ const HEADER = [
 ];
 
 /* ── Stroke sheet columns (1-based) — ID column added as first column ── */
-const STK_COL = { ID:1, PRODUCT:2, TYPE:3, BOX:4, PACK:5, BOTTLES:6, QTY:7 };
+const STK_COL = { ID:1, PRODUCT:2, TYPE:3, BOX:4, PACK:5, BOTTLES:6, QTY:7, DEF_BOX:8, DEF_PACK:9, DEF_BOTT:10 };
 
 /* ── StrokeHistory columns (daily snapshot) — ID is last for backward compat ── */
 const HIST_HEADER = [
@@ -618,14 +618,22 @@ function _writeStrokeRow_(sheet, rowNum, originalName, data) {
   const box = toNumber_(data.box != null ? data.box : data.qty);
   const existingId = safe_(sheet.getRange(rowNum, STK_COL.ID).getValue());
   const id = existingId || findProductIdByName_(safe_(data.product || originalName)) || '';
-  sheet.getRange(rowNum, 1, 1, 7).setValues([[
+  // Read existing default values so we don't overwrite when not provided
+  const existingDefaults = sheet.getRange(rowNum, STK_COL.DEF_BOX, 1, 3).getValues()[0];
+  const defBox  = data.defBox  != null ? toNumber_(data.defBox)  : toNumber_(existingDefaults[0]) || 1;
+  const defPack = data.defPack != null ? toNumber_(data.defPack) : toNumber_(existingDefaults[1]);
+  const defBott = data.defBott != null ? toNumber_(data.defBott) : toNumber_(existingDefaults[2]);
+  sheet.getRange(rowNum, 1, 1, 10).setValues([[
     id,
     safe_(data.product || originalName),
     safe_(data.type   || ''),
     box,
     toNumber_(data.pack),
     toNumber_(data.bottles),
-    box   // QTY = BOX
+    box,   // QTY = BOX
+    defBox,
+    defPack,
+    defBott
   ]]);
 }
 
@@ -634,19 +642,22 @@ function strokeAdd_(data) {
   let sheet = ss.getSheetByName(STROKE_SHEET);
   if (!sheet) {
     sheet = ss.insertSheet(STROKE_SHEET);
-    sheet.getRange(1, 1, 1, 7).setValues([['ID','Products','Types','Box','Pack','Bottles','QTY']]);
+    sheet.getRange(1, 1, 1, 10).setValues([['ID','Products','Types','Box','Pack','Bottles','QTY','DefaultBox','DefaultPack','DefaultBottle']]);
     sheet.setFrozenRows(1);
   }
   const box  = toNumber_(data.box || data.qty);
   const name = safe_(data.product || data.name || '');
   const id   = findProductIdByName_(name) || '';
-  sheet.getRange(sheet.getLastRow() + 1, 1, 1, 7).setValues([[
+  sheet.getRange(sheet.getLastRow() + 1, 1, 1, 10).setValues([[
     id, name,
     safe_(data.type || data.cat || ''),
     box,
     toNumber_(data.pack),
     toNumber_(data.bottles),
-    box
+    box,
+    toNumber_(data.defBox) || 1,
+    toNumber_(data.defPack),
+    toNumber_(data.defBott)
   ]]);
 }
 
@@ -668,16 +679,20 @@ function listStroke_() {
   if (!sheet) return [];
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return [];
-  const data = sheet.getRange(2, 1, lastRow - 1, 7).getValues();
+  const numCols = Math.max(sheet.getLastColumn(), 10);
+  const data = sheet.getRange(2, 1, lastRow - 1, numCols).getValues();
   return data.map(function(row) {
     return {
-      id:      safe_(row[STK_COL.ID      - 1]),
-      product: safe_(row[STK_COL.PRODUCT - 1]),
-      type:    safe_(row[STK_COL.TYPE    - 1]),
-      box:     toNumber_(row[STK_COL.BOX     - 1]),
-      pack:    toNumber_(row[STK_COL.PACK    - 1]),
-      bottles: toNumber_(row[STK_COL.BOTTLES - 1]),
-      qty:     toNumber_(row[STK_COL.QTY     - 1])
+      id:      safe_(row[STK_COL.ID       - 1]),
+      product: safe_(row[STK_COL.PRODUCT  - 1]),
+      type:    safe_(row[STK_COL.TYPE     - 1]),
+      box:     toNumber_(row[STK_COL.BOX      - 1]),
+      pack:    toNumber_(row[STK_COL.PACK     - 1]),
+      bottles: toNumber_(row[STK_COL.BOTTLES  - 1]),
+      qty:     toNumber_(row[STK_COL.QTY      - 1]),
+      defBox:  toNumber_(row[STK_COL.DEF_BOX  - 1]) || 1,
+      defPack: toNumber_(row[STK_COL.DEF_PACK - 1]),
+      defBott: toNumber_(row[STK_COL.DEF_BOTT - 1])
     };
   }).filter(function(r) { return !!r.product; });
 }
