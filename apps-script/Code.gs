@@ -917,7 +917,10 @@ function normalizeLegacyPayloadToOrder_(payload) {
       const price    = toNumber_(item.price);
       const discount = toNumber_(item.discount);
       return {
-        name:     safe_(item.name || item.product),
+        name:       safe_(item.name || item.product),
+        productId:  safe_(item.productId),   // needed for exact ID match in deductStroke_
+        sale:       toNumber_(item.sale),     // bottles per ឈុត
+        packPerBox: toNumber_(item.packPerBox), // packs per box (box deduction threshold)
         qty, price, discount,
         unit:     safe_(item.unit || 'ឈុត'),
         subtotal: (item.subtotal != null && item.subtotal !== '')
