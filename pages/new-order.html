@@ -2406,7 +2406,7 @@ function addToCart(id){
   if(!p) return;
   var ex = items.find(function(x){ return String(x.productId)===String(id); });
   if(ex){ ex.qty++; ex.subtotal = Math.max(0, ex.qty*ex.price - ex.discount); toast('🛒 '+p.name+' ×'+ex.qty+' ឈុត','success'); }
-  else { items.push({rowId:Date.now()+Math.random(), productId:String(p.id), name:p.name, qty:1, price:p.price, discount:0, subtotal:p.price, unit:'ឈុត'}); toast('✅ បានបន្ថែម '+p.name,'success'); }
+  else { items.push({rowId:Date.now()+Math.random(), productId:String(p.id), name:p.name, qty:1, price:p.price, discount:0, subtotal:p.price, sale:Number(p.sale)||1, unit:'ឈុត'}); toast('✅ បានបន្ថែម '+p.name,'success'); }
   /* Auto-open cart on first add */
   var cHead = _el('cartHead'), cBody = _el('cartBody');
   if(cHead && cBody && !cHead.classList.contains('is-open')){
@@ -2509,7 +2509,7 @@ function addFromCard(btn, e){
   var dispName = unit === 'ឈុត' ? p.name : p.name + ' (' + unit + ')';
   var ex = items.find(function(x){ return x.productId===String(pid) && x.unit===unit && x.price===customPrice; });
   if(ex){ ex.qty += qty; ex.subtotal = Math.max(0, ex.qty*ex.price - ex.discount); toast('🛒 '+dispName+' ×'+ex.qty+' '+unit,'success'); }
-  else { items.push({rowId:Date.now()+Math.random(), productId:String(pid), name:dispName, qty:qty, price:customPrice, discount:0, subtotal:customPrice*qty, unit:unit}); toast('✅ បានបន្ថែម '+dispName+' ×'+qty+' '+unit,'success'); }
+  else { items.push({rowId:Date.now()+Math.random(), productId:String(pid), name:dispName, qty:qty, price:customPrice, discount:0, subtotal:customPrice*qty, sale:Number(p.sale)||1, unit:unit}); toast('✅ បានបន្ថែម '+dispName+' ×'+qty+' '+unit,'success'); }
   row.querySelector('.pqty-inp').value = 1;
   var cHead = _el('cartHead'), cBody = _el('cartBody');
   if(cHead && cBody && !cHead.classList.contains('is-open')){

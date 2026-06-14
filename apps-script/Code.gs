@@ -451,10 +451,11 @@ function deductStroke_(products, orderId) {
         newBox  = ppb > 0 ? Math.floor(newPack  / ppb) : 0;
 
       } else {
-        // ឈុត (default) — ដក PACK ផ្ទាល់ (1 ឈុត = 1 pack)
+        // ឈុត (default) — 1 ឈុត = 1 pack; sale = ចំនួន bottle ក្នុង 1 ឈុត
+        const salePerUnit = toNumber_(item.sale) || bpp;
         newPack = Math.max(0, curPack - qty);
-        newBox  = ppb > 0 ? Math.floor(newPack / ppb) : 0;
-        newBott = newPack * bpp;
+        newBox  = Math.max(0, curBox - (ppb > 0 ? Math.floor(qty / ppb) : 0));
+        newBott = Math.max(0, curBott - qty * salePerUnit);
       }
 
       // Write BOX(D), PACK(E), BOTTLES(F), QTY(G) ក្នុងតែ 1 call
