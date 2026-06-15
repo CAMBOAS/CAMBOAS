@@ -1897,6 +1897,11 @@ document.addEventListener('DOMContentLoaded', init);
 
 /* ── Responsive: Mobile Card View ── */
 (function(){
+  var _dtTimer = null;
+  var _dtId    = null;
+  var _dtTime  = 0;
+  var DT_MS    = 300; // double-tap window ms
+
   var _renderCards = function(rows){
     var cardList = document.getElementById('olCardList');
     if(!cardList) return;
@@ -1952,18 +1957,47 @@ document.addEventListener('DOMContentLoaded', init);
         +(itemCount>0?'<span class="ol-item-badge">'+itemCount+'</span>':'')
         +'</div>';
     }).join('');
+
     cardList.querySelectorAll('.ol-card').forEach(function(c){
       c.addEventListener('click', function(){
-        if(window._cardSelMode){
-          var id = String(this.dataset.id);
+        var id   = String(this.dataset.id);
+        var card = this;
+        var now  = Date.now();
+        var isDouble = (_dtId === id && now - _dtTime < DT_MS);
+
+        /* reset double-tap tracker */
+        clearTimeout(_dtTimer);
+        _dtId   = id;
+        _dtTime = now;
+
+        if(isDouble){
+          /* ── Double-tap: toggle selection ── */
+          _dtId = null; // reset so next tap starts fresh
           var sel = window._olSel;
-          if(sel){
-            if(sel.has(id)){ sel.delete(id); this.classList.remove('ol-card-sel'); }
-            else            { sel.add(id);    this.classList.add('ol-card-sel');    }
+          if(sel && sel.has(id)){
+            /* deselect */
+            sel.delete(id);
+            card.classList.remove('ol-card-sel');
+            if(typeof window.olUpdateCardSelBar==='function') window.olUpdateCardSelBar();
+            /* auto-exit if nothing left selected */
+            if(sel.size === 0 && window._cardSelMode){
+              if(typeof window.olExitCardSel==='function') window.olExitCardSel();
+            }
+          } else {
+            /* select — enter select mode on first selection */
+            if(!window._cardSelMode){
+              if(typeof window.olEnterCardSel==='function') window.olEnterCardSel();
+            }
+            if(sel){ sel.add(id); }
+            card.classList.add('ol-card-sel');
+            if(typeof window.olUpdateCardSelBar==='function') window.olUpdateCardSelBar();
           }
-          if(typeof window.olUpdateCardSelBar==='function') window.olUpdateCardSelBar();
         } else {
-          if(typeof window.olOpenDrawer==='function') window.olOpenDrawer(this.dataset.id);
+          /* ── Single-tap: open drawer after delay (cancel if double-tap arrives) ── */
+          _dtTimer = setTimeout(function(){
+            _dtId = null;
+            if(typeof window.olOpenDrawer==='function') window.olOpenDrawer(id);
+          }, DT_MS);
         }
       });
     });
