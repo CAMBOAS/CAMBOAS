@@ -1524,8 +1524,17 @@ function normalizeDeliveryName(raw){
 }
 
 function populateFilterOptions(){
-  // Province, Delivery, Pages, CloseBy are now populated from SaleInfor via loadSaleInforFilters()
-  // This function is kept for any future order-data-derived logic
+  // Province: 2 groups derived from actual order data
+  var provEl = $id('olProvince');
+  if(provEl){
+    var cur = provEl.value;
+    var hasPP    = _orders.some(function(o){ return (o.province||'').trim()==='រាជធានីភ្នំពេញ'; });
+    var hasOther = _orders.some(function(o){ var p=(o.province||'').trim(); return p && p!=='រាជធានីភ្នំពេញ'; });
+    var opts = '<option value="">All</option>';
+    if(hasPP)    opts += '<option'+(cur==='រាជធានីភ្នំពេញ'?' selected':'')+'>រាជធានីភ្នំពេញ</option>';
+    if(hasOther) opts += '<option'+(cur==='ខេត្ត'?' selected':'')+'>ខេត្ត</option>';
+    provEl.innerHTML = opts;
+  }
 }
 
 /* ── Load filter options from SaleInfor sheet ── */
@@ -1542,10 +1551,10 @@ function loadSaleInforFilters(){
   }
 
   function applyData(d){
-    if(d.closeby   && d.closeby.length)   fillSelect('olCloseBy',  d.closeby);
-    if(d.delivery  && d.delivery.length)  fillSelect('olDelivery', d.delivery);
-    if(d.provinces && d.provinces.length) fillSelect('olProvince', d.provinces);
-    if(d.pages     && d.pages.length)     fillSelect('olPages',    d.pages);
+    if(d.closeby  && d.closeby.length)  fillSelect('olCloseBy',  d.closeby);
+    if(d.delivery && d.delivery.length) fillSelect('olDelivery', d.delivery);
+    if(d.pages    && d.pages.length)    fillSelect('olPages',    d.pages);
+    // Province is NOT loaded from SaleInfor — it uses 2 groups (ភ្នំពេញ / ខេត្ត) from order data
   }
 
   // Apply cached data immediately (no flicker)
