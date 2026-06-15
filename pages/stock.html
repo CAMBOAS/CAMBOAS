@@ -182,32 +182,68 @@
     @media(min-width:641px){
       .stock-cards-wrap { display:none !important; }
     }
-    .sk-card {
-      display:flex;flex-direction:column;gap:8px;
-      padding:12px 14px;border-radius:16px;
-      background:rgba(255,255,255,.045);
-      border:1px solid rgba(148,163,200,.1);
-      cursor:pointer;transition:background .15s;
+    /* ── Mobile: Premier League table-style stock list ── */
+    .stock-cards-wrap {
+      display:flex;flex-direction:column;gap:0;
+      border-radius:14px;overflow:hidden;
+      border:1px solid rgba(148,163,200,.12);
+      margin-top:6px;
+    }
+    [data-theme="light"] .stock-cards-wrap { border-color:rgba(148,163,184,.2);box-shadow:0 2px 12px rgba(0,0,0,.06); }
+
+    /* Header row */
+    .sk-header {
+      display:grid;
+      grid-template-columns:26px 1fr 42px 42px 46px;
+      padding:7px 10px 7px 0;
+      border-bottom:1px solid rgba(148,163,200,.12);
+      background:rgba(148,163,200,.06);
+      align-items:center;
+    }
+    [data-theme="light"] .sk-header { background:rgba(148,163,184,.07);border-bottom-color:rgba(148,163,184,.15); }
+    .sk-hcell {
+      font-size:9.5px;font-weight:800;
+      text-transform:uppercase;letter-spacing:.07em;
+      color:var(--muted);text-align:right;padding-right:2px;
+    }
+    .sk-hcell:nth-child(2) { text-align:left;padding-right:0; }
+
+    /* Each product row */
+    .sk-row {
+      display:grid;
+      grid-template-columns:26px 1fr 42px 42px 46px;
+      padding:8px 10px 8px 0;
+      align-items:center;
+      border-bottom:1px solid rgba(148,163,200,.06);
+      cursor:pointer;transition:background .12s;
       border-left:3px solid transparent;
     }
-    .sk-card.st-out { border-left-color:#ef4444; }
-    .sk-card.st-low { border-left-color:#f59e0b; }
-    .sk-card.st-ok  { border-left-color:#10b981; }
-    .sk-card:active { background:rgba(139,92,246,.1); }
-    [data-theme="light"] .sk-card { background:#fff;border-color:rgba(148,163,184,.18);box-shadow:0 2px 8px rgba(0,0,0,.05); }
-    .sk-img { width:68px;height:68px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1px solid rgba(148,163,200,.15); }
-    .sk-img-ph { width:68px;height:68px;border-radius:12px;flex-shrink:0;background:rgba(148,163,200,.1);display:flex;align-items:center;justify-content:center;font-size:26px; }
-    .sk-body { flex:1;min-width:0; }
-    .sk-name { font-size:13.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px; }
+    .sk-row:last-child { border-bottom:none; }
+    .sk-row.st-ok  { border-left-color:#10b981; }
+    .sk-row.st-low { border-left-color:#f59e0b; }
+    .sk-row.st-out { border-left-color:#ef4444; }
+    .sk-row:active { background:rgba(139,92,246,.08); }
+    [data-theme="light"] .sk-row { border-bottom-color:rgba(148,163,184,.1); }
+    [data-theme="light"] .sk-row:active { background:rgba(139,92,246,.05); }
+
+    /* Rank cell */
+    .sk-rank { font-size:11px;font-weight:700;color:var(--muted);text-align:center; }
+
+    /* Product info cell */
+    .sk-info { display:flex;align-items:center;gap:8px;min-width:0; }
+    .sk-img { width:36px;height:36px;border-radius:9px;object-fit:cover;flex-shrink:0;border:1px solid rgba(148,163,200,.15); }
+    .sk-img-ph { width:36px;height:36px;border-radius:9px;flex-shrink:0;background:rgba(148,163,200,.1);display:flex;align-items:center;justify-content:center;font-size:16px; }
+    .sk-info-text { flex:1;min-width:0; }
+    .sk-name { font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;margin-bottom:2px; }
     [data-theme="light"] .sk-name { color:#0f172a; }
-    .sk-meta { display:flex;align-items:center;gap:6px;margin-bottom:0; }
-    .sk-nums { display:flex;gap:6px; }
-    .sk-n { display:flex;flex-direction:column;align-items:center;flex:1;padding:6px 4px;border-radius:9px;background:rgba(148,163,200,.08); }
-    .sk-n b { font-size:15px;font-weight:800;color:var(--text);line-height:1.2; }
-    .sk-n small { font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:1px; }
-    [data-theme="light"] .sk-n { background:rgba(148,163,184,.1); }
-    [data-theme="light"] .sk-n b { color:#0f172a; }
-    .stock-cards-wrap { display:flex;flex-direction:column;gap:10px;padding-top:4px; }
+    .sk-cat { display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;background:rgba(6,182,212,.12);color:#22d3ee;border:1px solid rgba(6,182,212,.18); }
+    [data-theme="light"] .sk-cat { background:rgba(6,182,212,.09);color:#0891b2;border-color:rgba(6,182,212,.2); }
+
+    /* Stat number cells */
+    .sk-stat { text-align:right;font-size:12.5px;font-weight:700;color:var(--text);padding-right:2px; }
+    [data-theme="light"] .sk-stat { color:#1e293b; }
+    .sk-stat-hi { text-align:right;font-size:14px;font-weight:800;color:#a78bfa;padding-right:2px; }
+    [data-theme="light"] .sk-stat-hi { color:#7c3aed; }
 
     /* ── Stock Inventory header row ── */
     .sp-head { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px; }
@@ -929,32 +965,25 @@ function rt(){
     if(!list.length){
       cardsEl.innerHTML='<div style="text-align:center;padding:32px 16px;color:var(--muted);font-size:14px">គ្មានទិន្នន័យ</div>';
     } else {
-      cardsEl.innerHTML=list.map(function(p,i){
+      var header = '<div class="sk-header">'
+        +'<div class="sk-hcell">#</div>'
+        +'<div class="sk-hcell">ផលិតផល</div>'
+        +'<div class="sk-hcell">ករស</div>'
+        +'<div class="sk-hcell">ឈុត</div>'
+        +'<div class="sk-hcell">ដប</div>'
+      +'</div>';
+      cardsEl.innerHTML=header+list.map(function(p,i){
         var s=gs(p);
-        // Reuse buildImgHtml but wrap with card sizing
-        var imgEl = buildImgHtml(p).replace('width:38px;height:38px;border-radius:9px','width:64px;height:64px;border-radius:10px')
-                                   .replace('width:38px;height:38px;border-radius:9px','width:64px;height:64px;border-radius:10px');
+        var imgEl = buildImgHtml(p);
         var boxNum  = (p.box     !== undefined && p.box     !== null && p.box     !== '') ? p.box     : '-';
         var packNum = (p.pack    !== undefined && p.pack    !== null && p.pack    !== '') ? p.pack    : '-';
         var bottNum = (p.bottles !== undefined && p.bottles !== null && p.bottles !== '') ? p.bottles : '-';
-        return '<div class="sk-card st-'+s+'" onclick="openEdit('+p.id+')">'
-          // ── Row 1: image + info ──
-          +'<div style="display:flex;gap:10px;align-items:flex-start">'
-            +'<div style="flex-shrink:0">'+ imgEl +'</div>'
-            +'<div class="sk-body">'
-              +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px">'
-                +'<div class="sk-name">'+p.name+'</div>'
-                +'<span class="pill '+pc(s)+'" style="white-space:nowrap;font-size:10px;flex-shrink:0">'+pl(s)+'</span>'
-              +'</div>'
-              +'<div class="sk-meta" style="margin-top:4px"><span class="pill p-b" style="font-size:10px">'+p.cat+'</span></div>'
-            +'</div>'
-          +'</div>'
-          // ── Row 2: 3 equal boxes full width ──
-          +'<div class="sk-nums">'
-            +'<div class="sk-n"><b>'+boxNum+'</b><small>កេស</small></div>'
-            +'<div class="sk-n"><b>'+packNum+'</b><small>ឈុត</small></div>'
-            +'<div class="sk-n"><b>'+bottNum+'</b><small>ដប</small></div>'
-          +'</div>'
+        return '<div class="sk-row st-'+s+'" onclick="openEdit('+p.id+')">'
+          +'<div class="sk-rank">'+(i+1)+'</div>'
+          +'<div class="sk-info">'+imgEl+'<div class="sk-info-text"><div class="sk-name">'+p.name+'</div><span class="sk-cat">'+p.cat+'</span></div></div>'
+          +'<div class="sk-stat">'+boxNum+'</div>'
+          +'<div class="sk-stat">'+packNum+'</div>'
+          +'<div class="sk-stat-hi">'+bottNum+'</div>'
         +'</div>';
       }).join('');
     }
