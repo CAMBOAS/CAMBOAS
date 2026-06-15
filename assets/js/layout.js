@@ -100,12 +100,12 @@
         <div class="sb-divider sb-divider-sm"></div>
         <div class="sb-section-label">${t('ការគ្រប់គ្រង','Management')}</div>
         <ul class="sb-list">
+          ${link('pages/commission.html', ic.commission,t('កម្រៃជើងសារ','Commission'))}
           ${link('pages/customers.html',  ic.customers, t('អតិថិជន','Customers'))}
           ${link('pages/products.html',   ic.products,  t('ផលិតផល','Products'))}
           ${link('pages/stock.html',      ic.stock,     t('ស្តុក','Stock'))}
           ${link('pages/delivery.html',   ic.delivery,  t('ដឹកជញ្ជូន','Delivery'))}
           ${link('pages/packaging.html',  ic.packaging, t('វេចខ្ចប់','Packaging'))}
-          ${link('pages/commission.html', ic.commission,t('កម្រៃជើងសារ','Commission'))}
         </ul>
         <div class="sb-divider sb-divider-sm"></div>
         <div class="sb-section-label">${t('ប្រព័ន្ធ','System')}</div>
