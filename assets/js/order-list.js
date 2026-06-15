@@ -1858,21 +1858,19 @@ window.olDrCopyText = function(){
 window.olEnterCardSel = function(){
   window._cardSelMode = true;
   document.body.classList.add('ol-sel-mode');
-  var bar = document.getElementById('olCardSelBar');
-  if(bar) bar.classList.add('show');
   window.olUpdateCardSelBar();
 };
 window.olExitCardSel = function(){
   window._cardSelMode = false;
   _sel.clear();
   document.body.classList.remove('ol-sel-mode');
-  var bar = document.getElementById('olCardSelBar');
-  if(bar) bar.classList.remove('show');
+  var cnt = document.getElementById('olMobSelCnt');
+  if(cnt) cnt.textContent = '';
   document.querySelectorAll('#olCardList .ol-card.ol-card-sel').forEach(function(c){ c.classList.remove('ol-card-sel'); });
 };
 window.olUpdateCardSelBar = function(){
-  var cnt = document.getElementById('olCardSelCnt');
-  if(cnt) cnt.textContent = _sel.size + ' ជ្រើស';
+  var cnt = document.getElementById('olMobSelCnt');
+  if(cnt) cnt.textContent = _sel.size ? _sel.size : '';
 };
 window.olCardSelAll = function(){
   getFiltered().forEach(function(o){
@@ -1882,14 +1880,6 @@ window.olCardSelAll = function(){
     if(c) c.classList.add('ol-card-sel');
   });
   window.olUpdateCardSelBar();
-};
-window.olCardSelPrint = function(){
-  if(!_sel.size){ _olShowToast('សូមជ្រើសរើស order មុន', '#fbbf24'); return; }
-  printSelected();
-};
-window.olCardSelShare = function(){
-  if(!_sel.size){ _olShowToast('សូមជ្រើសរើស order មុន', '#fbbf24'); return; }
-  shareImg();
 };
 
 document.addEventListener('DOMContentLoaded', init);
