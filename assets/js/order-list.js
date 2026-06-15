@@ -1531,8 +1531,8 @@ function populateFilterOptions(){
     var hasPP    = _orders.some(function(o){ return (o.province||'').trim()==='រាជធានីភ្នំពេញ'; });
     var hasOther = _orders.some(function(o){ var p=(o.province||'').trim(); return p && p!=='រាជធានីភ្នំពេញ'; });
     var opts = '<option value="">All</option>';
-    if(hasPP)    opts += '<option'+(cur==='រាជធានីភ្នំពេញ'?' selected':'')+'>រាជធានីភ្នំពេញ</option>';
-    if(hasOther) opts += '<option'+(cur==='ខេត្ត'?' selected':'')+'>ខេត្ត</option>';
+    if(hasPP)    opts += '<option value="រាជធានីភ្នំពេញ"'+(cur==='រាជធានីភ្នំពេញ'?' selected':'')+'>អ៊ីវ៉ាន់ ភ្នំពេញ</option>';
+    if(hasOther) opts += '<option value="ខេត្ត"'+(cur==='ខេត្ត'?' selected':'')+'>អ៊ីវ៉ាន់ ខេត្ត</option>';
     provEl.innerHTML = opts;
   }
 }
