@@ -6,6 +6,8 @@ var SCRIPT_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
 /* localStorage cache removed — always fetch direct from Google Sheet */
 
 var _orders = [], _sel = new Set();
+window._olSel = _sel;
+window._cardSelMode = false;
 var _qrOn = true; // QR Code toggle state
 var _sort = {col:'date', dir:'desc'};
 var _q = '', _f = {};
@@ -1718,6 +1720,7 @@ async function init(){
       }
       return; // don't close panel
     }
+    if(a==='cardselect') { if(typeof window.olEnterCardSel==='function') window.olEnterCardSel(); }
     if(a==='shareimg') shareImg();
     if(a==='export')   exportCSV();
     if(a==='printall') printTable();
@@ -1851,12 +1854,49 @@ window.olDrCopyText = function(){
   }
 };
 
+/* ── Card multi-select API (mobile) ── */
+window.olEnterCardSel = function(){
+  window._cardSelMode = true;
+  document.body.classList.add('ol-sel-mode');
+  var bar = document.getElementById('olCardSelBar');
+  if(bar) bar.classList.add('show');
+  window.olUpdateCardSelBar();
+};
+window.olExitCardSel = function(){
+  window._cardSelMode = false;
+  _sel.clear();
+  document.body.classList.remove('ol-sel-mode');
+  var bar = document.getElementById('olCardSelBar');
+  if(bar) bar.classList.remove('show');
+  document.querySelectorAll('#olCardList .ol-card.ol-card-sel').forEach(function(c){ c.classList.remove('ol-card-sel'); });
+};
+window.olUpdateCardSelBar = function(){
+  var cnt = document.getElementById('olCardSelCnt');
+  if(cnt) cnt.textContent = _sel.size + ' ជ្រើស';
+};
+window.olCardSelAll = function(){
+  getFiltered().forEach(function(o){
+    var id = String(o.id);
+    _sel.add(id);
+    var c = document.querySelector('#olCardList .ol-card[data-id="'+id+'"]');
+    if(c) c.classList.add('ol-card-sel');
+  });
+  window.olUpdateCardSelBar();
+};
+window.olCardSelPrint = function(){
+  if(!_sel.size){ _olShowToast('សូមជ្រើសរើស order មុន', '#fbbf24'); return; }
+  printSelected();
+};
+window.olCardSelShare = function(){
+  if(!_sel.size){ _olShowToast('សូមជ្រើសរើស order មុន', '#fbbf24'); return; }
+  shareImg();
+};
+
 document.addEventListener('DOMContentLoaded', init);
 })();
 
 /* ── Responsive: Mobile Card View ── */
 (function(){
-  var _origRender = window._olRenderCards;
   var _renderCards = function(rows){
     var cardList = document.getElementById('olCardList');
     if(!cardList) return;
@@ -1869,6 +1909,8 @@ document.addEventListener('DOMContentLoaded', init);
       cardList.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#94a3b8;font-size:14px">'+emptyCard+'</div>';
       return;
     }
+    var selMode = !!window._cardSelMode;
+    var olSel   = window._olSel;
     cardList.innerHTML = rows.map(function(o, idx){
       var total = orderTotal(o);
       var prodList = getProds(o);
@@ -1877,13 +1919,17 @@ document.addEventListener('DOMContentLoaded', init);
         return (p.name||'')+(p.qty>1?' x'+p.qty:'');
       }).join(' / ');
       var th = typeof fmtDisplay==='function' ? fmtDisplay(o.date) : (o.date||'-');
-      var closeBy  = o.closeBy||o.closeby||'-';
-      var page     = o.page||o.pages||'-';
-      var province = o.province||'-';
+      var closeBy    = o.closeBy||o.closeby||'-';
+      var page       = o.page||o.pages||'-';
+      var province   = o.province||'-';
       var addrDetail = o.addressDetail||o.address||'-';
-      var delivery = o.deliveryName||o.delivery||'-';
-      var phone    = o.phone||'-';
-      return '<div class="ol-card" data-id="'+o.id+'">'
+      var delivery   = o.deliveryName||o.delivery||'-';
+      var phone      = o.phone||'-';
+      var isSel = selMode && olSel && olSel.has(String(o.id));
+      return '<div class="ol-card'+(isSel?' ol-card-sel':'')+'" data-id="'+o.id+'">'
+        +'<span class="ol-card-sel-ring">'
+          +'<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,6.5 4.5,9.5 10.5,2.5"/></svg>'
+        +'</span>'
         +'<div class="ol-card-top">'
           +'<span class="ol-card-num">#'+(idx+1)+'</span>'
           +'<span class="ol-card-name">'+(o.customer||'—')+'</span>'
@@ -1907,7 +1953,19 @@ document.addEventListener('DOMContentLoaded', init);
         +'</div>';
     }).join('');
     cardList.querySelectorAll('.ol-card').forEach(function(c){
-      c.addEventListener('click',function(){ if(typeof window.olOpenDrawer==='function') window.olOpenDrawer(this.dataset.id); });
+      c.addEventListener('click', function(){
+        if(window._cardSelMode){
+          var id = String(this.dataset.id);
+          var sel = window._olSel;
+          if(sel){
+            if(sel.has(id)){ sel.delete(id); this.classList.remove('ol-card-sel'); }
+            else            { sel.add(id);    this.classList.add('ol-card-sel');    }
+          }
+          if(typeof window.olUpdateCardSelBar==='function') window.olUpdateCardSelBar();
+        } else {
+          if(typeof window.olOpenDrawer==='function') window.olOpenDrawer(this.dataset.id);
+        }
+      });
     });
   };
   window._olRenderCards = _renderCards;
