@@ -255,9 +255,29 @@
     .sk-stat-hi { text-align:right;font-size:14px;font-weight:800;color:#a78bfa;padding-right:2px; }
     [data-theme="light"] .sk-stat-hi { color:#7c3aed; }
 
-    /* ── Stock Inventory header row ── */
-    .sp-head { display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px; }
-    .sp-head .sp-title { margin:0; }
+    /* ── Stock Inventory combined header+tools row ── */
+    .sp-combined { display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px;justify-content:space-between; }
+    .sp-combined .sp-title { flex-shrink:0;margin:0; }
+    .sp-combined .tools { width:100%;margin-bottom:0; }
+    .sp-actions { display:flex;gap:6px;align-items:center;flex-shrink:0; }
+
+    /* Mobile: hide desktop-only Add/Reload in actions */
+    .sp-desk-add, .sp-desk-reload { display:none; }
+
+    /* Desktop (≥641px): collapse everything into 1 row */
+    @media(min-width:641px){
+      .sp-combined { flex-wrap:nowrap;gap:10px; }
+      .sp-combined .sp-title { order:1;white-space:nowrap; }
+      .sp-combined .tools { order:2;flex-shrink:0;margin-bottom:0;flex-wrap:nowrap;gap:6px;width:auto; }
+      .sp-combined .tools input { width:200px;flex:none; }
+      .sp-combined .tools > div { flex-shrink:0;width:auto !important; }
+      .sp-combined .tools > div select { min-width:90px; }
+      .sp-combined .sp-actions { order:3;margin-left:auto; }
+      /* hide mobile-only buttons, show desktop ones */
+      .sp-mob-add, .sp-mob-reload { display:none !important; }
+      .sp-desk-add { display:inline-flex;align-items:center;font-size:12px;padding:0 10px;white-space:nowrap; }
+      .sp-desk-reload { display:inline-flex;align-items:center;padding:0 8px; }
+    }
 
     /* ── Actions button ── */
     .sk-act-btn {
@@ -421,10 +441,29 @@
       </div>
       <div class="slayout">
         <article class="glass-card sp">
-          <!-- Header row: title + buttons -->
-          <div class="sp-head">
+          <!-- Combined header + tools row -->
+          <div class="sp-combined">
             <h3 class="sp-title">Stock Inventory</h3>
-            <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+            <div class="tools">
+              <input type="text" id="srch" placeholder="ស្វែងរក..." oninput="rt()">
+              <div style="display:flex;gap:8px;width:100%">
+                <select id="flt" onchange="rt()" style="flex:1">
+                  <option value="">All</option>
+                  <option value="ok">In Stock</option>
+                  <option value="low">Low Stock</option>
+                  <option value="out">Out of Stock</option>
+                </select>
+                <select id="fltCat" onchange="rt()" style="flex:1">
+                  <option value="">Type</option>
+                </select>
+              </div>
+              <!-- Add + Reload only visible on mobile inside tools -->
+              <button class="add-btn sp-mob-add" onclick="openAddModal()">+ បន្ថែមផលិតផល</button>
+              <button class="reload-btn sp-mob-reload" onclick="loadStroke()" title="Reload from Google Sheets">↻ Reload</button>
+            </div>
+            <div class="sp-actions">
+              <button class="add-btn sp-desk-add" onclick="openAddModal()" title="បន្ថែមផលិតផល">+ Add</button>
+              <button class="reload-btn sp-desk-reload" onclick="loadStroke()" title="Reload from Google Sheets">↻</button>
               <button class="sk-date-btn" id="skDateBtn" onclick="skTogglePop(event)">
                 📅 <span id="skDateLabel">ថ្ងៃនេះ</span> ▾
               </button>
@@ -432,23 +471,6 @@
                 ⚡ Actions ▾
               </button>
             </div>
-          </div>
-
-          <div class="tools">
-            <input type="text" id="srch" placeholder="ស្វែងរក..." oninput="rt()">
-            <div style="display:flex;gap:8px;width:100%">
-              <select id="flt" onchange="rt()" style="flex:1">
-                <option value="">All</option>
-                <option value="ok">In Stock</option>
-                <option value="low">Low Stock</option>
-                <option value="out">Out of Stock</option>
-              </select>
-              <select id="fltCat" onchange="rt()" style="flex:1">
-                <option value="">ប្រភេទ (Type)</option>
-              </select>
-            </div>
-            <button class="add-btn" onclick="openAddModal()">+ បន្ថែមផលិតផល</button>
-            <button class="reload-btn" onclick="loadStroke()" title="Reload from Google Sheets">↻ Reload</button>
           </div>
           <!-- Desktop table -->
           <div class="stock-table-wrap">
