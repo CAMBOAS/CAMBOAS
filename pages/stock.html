@@ -444,7 +444,7 @@
                 <option value="out">Out of Stock</option>
               </select>
               <select id="fltCat" onchange="rt()" style="flex:1">
-                <option value="">ប្រភេទទាំងអស់</option>
+                <option value="">ប្រភេទ (Type)</option>
               </select>
             </div>
             <button class="add-btn" onclick="openAddModal()">+ បន្ថែមផលិតផល</button>
@@ -1015,7 +1015,7 @@ function buildCatFilter(){
   var cats=[];
   S.forEach(function(p){ if(p.cat&&cats.indexOf(p.cat)<0) cats.push(p.cat); });
   cats.sort();
-  sel.innerHTML='<option value="">ប្រភេទទាំងអស់</option>'+cats.map(function(c){
+  sel.innerHTML='<option value="">ប្រភេទ (Type)</option>'+cats.map(function(c){
     return '<option value="'+c+'"'+(c===cur?' selected':'')+'>'+c+'</option>';
   }).join('');
 }
