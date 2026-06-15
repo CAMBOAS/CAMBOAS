@@ -167,13 +167,13 @@
 }
 .ol-table {
   width:100%; border-collapse:separate; border-spacing:0;
-  min-width:1000px; font-size:13px;
+  min-width:720px; font-size:13px;
 }
 
 /* Sticky header */
 .ol-table thead th {
   position:sticky; top:0; z-index:10;
-  padding:12px 14px;
+  padding:10px 10px;
   background:rgba(9,15,35,.97);
   border-bottom:1px solid rgba(148,163,200,.12);
   font-size:11px; font-weight:800; letter-spacing:.06em;
@@ -198,7 +198,7 @@
 
 /* Table rows */
 .ol-table tbody td {
-  padding:11px 14px;
+  padding:10px 10px;
   border-bottom:1px solid rgba(148,163,200,.07);
   color:var(--text); vertical-align:middle;
 }
