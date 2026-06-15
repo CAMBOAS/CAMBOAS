@@ -427,15 +427,14 @@
   }
   /* ── Mobile card multi-select ── */
   .ol-card-sel-ring {
-    position:absolute; top:50%; left:10px; transform:translateY(-50%);
-    width:22px; height:22px; border-radius:50%;
+    width:20px; height:20px; border-radius:50%; flex-shrink:0;
     border:2px solid rgba(148,163,200,.3); background:transparent;
     display:none; align-items:center; justify-content:center;
     box-sizing:border-box; transition:border-color .15s, background .15s; pointer-events:none;
   }
   .ol-card-sel-ring svg { opacity:0; transition:opacity .1s; }
   body.ol-sel-mode .ol-card-sel-ring { display:flex; }
-  body.ol-sel-mode .ol-card { padding-left:40px; }
+  body.ol-sel-mode .ol-card-num { display:none; }
   .ol-card.ol-card-sel { border-color:rgba(139,92,246,.55) !important; background:rgba(139,92,246,.08) !important; }
   [data-theme="light"] .ol-card.ol-card-sel { background:rgba(139,92,246,.06) !important; }
   .ol-card.ol-card-sel .ol-card-sel-ring { border-color:#8b5cf6; background:#8b5cf6; }
@@ -838,7 +837,7 @@
   <script src="../assets/js/cambo-api.js?v=160"></script>
   <script src="../assets/js/layout.js?v=158"></script>
   <script src="../assets/js/searchable-combo.js?v=165"></script>
-  <script src="../assets/js/order-list.js?v=183"></script>
+  <script src="../assets/js/order-list.js?v=184"></script>
 <script src="../assets/js/sw-register.js?v=158"></script>
 </body>
 </html>

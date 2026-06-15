@@ -1922,10 +1922,10 @@ document.addEventListener('DOMContentLoaded', init);
       var phone      = o.phone||'-';
       var isSel = selMode && olSel && olSel.has(String(o.id));
       return '<div class="ol-card'+(isSel?' ol-card-sel':'')+'" data-id="'+o.id+'">'
-        +'<span class="ol-card-sel-ring">'
-          +'<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,6.5 4.5,9.5 10.5,2.5"/></svg>'
-        +'</span>'
         +'<div class="ol-card-top">'
+          +'<span class="ol-card-sel-ring">'
+            +'<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,6.5 4.5,9.5 10.5,2.5"/></svg>'
+          +'</span>'
           +'<span class="ol-card-num">#'+(idx+1)+'</span>'
           +'<span class="ol-card-name">'+(o.customer||'—')+'</span>'
           +'<span class="ol-card-phone">'+phone+'</span>'
