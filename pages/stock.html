@@ -436,12 +436,17 @@
 
           <div class="tools">
             <input type="text" id="srch" placeholder="ស្វែងរក..." oninput="rt()">
-            <select id="flt" onchange="rt()">
-              <option value="">All</option>
-              <option value="ok">In Stock</option>
-              <option value="low">Low Stock</option>
-              <option value="out">Out of Stock</option>
-            </select>
+            <div style="display:flex;gap:8px;width:100%">
+              <select id="flt" onchange="rt()" style="flex:1">
+                <option value="">All</option>
+                <option value="ok">In Stock</option>
+                <option value="low">Low Stock</option>
+                <option value="out">Out of Stock</option>
+              </select>
+              <select id="fltCat" onchange="rt()" style="flex:1">
+                <option value="">ប្រភេទទាំងអស់</option>
+              </select>
+            </div>
             <button class="add-btn" onclick="openAddModal()">+ បន្ថែមផលិតផល</button>
             <button class="reload-btn" onclick="loadStroke()" title="Reload from Google Sheets">↻ Reload</button>
           </div>
@@ -945,9 +950,11 @@ async function loadStroke(){
 function rt(){
   var q=document.getElementById('srch').value.toLowerCase();
   var f=document.getElementById('flt').value;
+  var fc=document.getElementById('fltCat').value;
   var ORDER={out:0,low:1,ok:2};
-  var list=S.filter(function(p){ return(!q||p.name.toLowerCase().includes(q))&&(!f||gs(p)===f); })
-            .sort(function(a,b){ return ORDER[gs(a)]-ORDER[gs(b)]; });
+  var list=S.filter(function(p){
+    return(!q||p.name.toLowerCase().includes(q))&&(!f||gs(p)===f)&&(!fc||(p.cat||'')=== fc);
+  }).sort(function(a,b){ return ORDER[gs(a)]-ORDER[gs(b)]; });
 
   // ── Desktop table ──
   if(!list.length){
@@ -1001,11 +1008,24 @@ function rt(){
   us();
 }
 
+function buildCatFilter(){
+  var sel=document.getElementById('fltCat');
+  if(!sel) return;
+  var cur=sel.value;
+  var cats=[];
+  S.forEach(function(p){ if(p.cat&&cats.indexOf(p.cat)<0) cats.push(p.cat); });
+  cats.sort();
+  sel.innerHTML='<option value="">ប្រភេទទាំងអស់</option>'+cats.map(function(c){
+    return '<option value="'+c+'"'+(c===cur?' selected':'')+'>'+c+'</option>';
+  }).join('');
+}
+
 function us(){
   document.getElementById('sTot').textContent=S.length;
   document.getElementById('sIn').textContent=S.filter(function(p){ return gs(p)==='ok'; }).length;
   document.getElementById('sLo').textContent=S.filter(function(p){ return gs(p)==='low'; }).length;
   document.getElementById('sOut').textContent=S.filter(function(p){ return gs(p)==='out'; }).length;
+  buildCatFilter();
 }
 
 function saveStock(){ try{ localStorage.setItem('cambo_stock_v2',JSON.stringify(S)); }catch(e){} }
