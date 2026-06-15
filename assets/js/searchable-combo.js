@@ -150,7 +150,7 @@ function makeCombo(wrap, dataList, title) {
   /* Desktop inline dropdown */
   var box = document.createElement('div');
   box.className = 'sc-box';
-  box.style.cssText = 'display:none;position:fixed;z-index:99999;background:var(--sc-bg,#1a2035);border:1px solid rgba(148,163,200,.2);border-radius:12px;box-shadow:0 12px 36px rgba(0,0,0,.45);overflow-y:auto;max-height:220px;padding:4px;';
+  box.style.cssText = 'display:none;position:fixed;z-index:99999;background:var(--sc-bg,#1a2035);border:1px solid var(--sc-border,rgba(148,163,200,.2));border-radius:12px;box-shadow:var(--sc-shadow,0 12px 36px rgba(0,0,0,.45));overflow-y:auto;max-height:220px;padding:4px;';
   document.body.appendChild(box);
 
   var currentList = dataList.slice();
@@ -163,7 +163,7 @@ function makeCombo(wrap, dataList, title) {
     var filtered = term ? currentList.filter(function(v){ return v.toLowerCase().indexOf(term) >= 0; }) : currentList;
     if (filtered.length === 0) {
       var nm = document.createElement('div');
-      nm.style.cssText = 'padding:10px 12px;font-size:12px;color:var(--muted,#8fb6d9);text-align:center;';
+      nm.style.cssText = 'padding:10px 12px;font-size:12px;color:var(--muted,#8a9bbf);text-align:center;';
       nm.textContent = '"'+(q||'')+'" — មិនមានក្នុងបញ្ជី';
       box.appendChild(nm);
       return;
