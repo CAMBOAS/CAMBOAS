@@ -2665,14 +2665,55 @@ document.addEventListener('DOMContentLoaded', function(){
     if(_el('timePart')) _el('timePart').value=pad(n.getHours())+':'+pad(n.getMinutes());
   })();
 
-  /* Payment buttons */
-  _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      playPop();
-      _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){b.classList.remove('active');});
-      btn.classList.add('active'); _el('payment').value=btn.dataset.value||'';
-    });
+  /* Payment buttons — event delegation so dynamic buttons work too */
+  _el('paymentOptions').addEventListener('click', function(e){
+    var btn = e.target.closest('.pay-btn');
+    if (!btn) return;
+    playPop();
+    _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active'); _el('payment').value = btn.dataset.value || '';
   });
+
+  /* ── Load SaleInfor lists from Google Sheet ── */
+  (function loadSaleInfor(){
+    var base = (window.CamboAPI && window.CamboAPI.getBase) ? window.CamboAPI.getBase()
+             : 'https://script.google.com/macros/s/AKfycbzCMeZ_UUUQX2t2ITwS-ucyyn8HMFST0s-Kqyho_b5Gf5VlKN6xDOjlxY6-J8x4nYyQFg/exec';
+    var CACHE_KEY = 'cambo_saleinfor_v1';
+
+    function applyData(d) {
+      var c = window.SearchableCombo && window.SearchableCombo.combos;
+      if (c) {
+        if (c.province && d.provinces && d.provinces.length) c.province.update(d.provinces);
+        if (c.delivery && d.delivery  && d.delivery.length)  c.delivery.update(d.delivery);
+        if (c.pages    && d.pages     && d.pages.length)     c.pages.update(d.pages);
+        if (c.closeby  && d.closeby   && d.closeby.length)   c.closeby.update(d.closeby);
+      }
+      if (d.payment && d.payment.length) {
+        var cur = (_el('payment') && _el('payment').value) || '';
+        _el('paymentOptions').innerHTML = d.payment.map(function(v){
+          return '<button type="button" class="pay-btn'+(v===cur?' active':'')+'" data-value="'+v+'">'+v+'</button>';
+        }).join('');
+        if (cur) _el('payment').value = cur;
+      }
+    }
+
+    /* Apply cached data immediately (no flicker) */
+    try {
+      var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      if (cached) applyData(cached);
+    } catch(_) {}
+
+    /* Fetch fresh in background */
+    fetch(base + (base.includes('?') ? '&' : '?') + 'action=saleinfor&_=' + Date.now(), { redirect:'follow' })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (res.ok && res.saleinfor) {
+          applyData(res.saleinfor);
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify(res.saleinfor)); } catch(_) {}
+        }
+      })
+      .catch(function(){});
+  })();
 
   /* Category tabs */
   _el('categoryTabs').querySelectorAll('.ptab').forEach(function(btn){

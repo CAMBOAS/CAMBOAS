@@ -93,6 +93,7 @@ function doGet(e) {
     if (action === 'stroke')        return jsonOutput_({ ok:true, stroke: listStroke_() });
     if (action === 'stock_history') return jsonOutput_(listStrokeHistory_(e));
     if (action === 'products')      return jsonOutput_({ ok:true, products: listProducts_() });
+    if (action === 'saleinfor')     return jsonOutput_({ ok:true, saleinfor: listSaleInfor_() });
     // ── Debug: test write directly via GET ──
     if (action === 'test_write') {
       const name = String((e && e.parameter && e.parameter.name) || '').trim();
@@ -323,6 +324,28 @@ function deleteProduct_(id) {
       return;
     }
   }
+}
+
+/**
+ * listSaleInfor_ — Read dropdown reference data from SaleInfor sheet
+ * Columns: A=Province, B=Delivery, C=Pages, D=CloseBy, E=Payment
+ */
+function listSaleInfor_() {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('SaleInfor');
+  if (!sheet) return { provinces:[], delivery:[], pages:[], closeby:[], payment:[] };
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return { provinces:[], delivery:[], pages:[], closeby:[], payment:[] };
+  const data = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+  const provinces = [], delivery = [], pages = [], closeby = [], payment = [];
+  data.forEach(function(row) {
+    if (safe_(row[0])) provinces.push(safe_(row[0]));
+    if (safe_(row[1])) delivery.push(safe_(row[1]));
+    if (safe_(row[2])) pages.push(safe_(row[2]));
+    if (safe_(row[3])) closeby.push(safe_(row[3]));
+    if (safe_(row[4])) payment.push(safe_(row[4]));
+  });
+  return { provinces, delivery, pages, closeby, payment };
 }
 
 function listProducts_() {

@@ -259,6 +259,13 @@ function makeCombo(wrap, dataList, title) {
 
   window.addEventListener('scroll', function(){ if(shown) rePos(); }, {passive:true, capture:true});
   window.addEventListener('resize', function(){ if(shown) rePos(); }, {passive:true});
+
+  /* Return handle so callers can update the list after init */
+  return {
+    update: function(newList) {
+      currentList = newList.slice();
+    }
+  };
 }
 
 /* ── Expose API for external use (e.g. Order List drawer) ── */
@@ -267,22 +274,27 @@ window.SearchableCombo = {
   PROVINCES : PROVINCES,
   PAGES     : PAGES,
   CLOSEBY   : CLOSEBY,
-  DELIVERY  : DELIVERY
+  DELIVERY  : DELIVERY,
+  combos    : {}
 };
 
 /* ── Init on DOM ready ── */
 document.addEventListener('DOMContentLoaded', function(){
+  var combos = {};
+
   var pagesWrap = document.getElementById('pagesCombo');
-  if (pagesWrap) makeCombo(pagesWrap, PAGES, 'Pages');
+  if (pagesWrap) combos.pages = makeCombo(pagesWrap, PAGES, 'Pages');
 
   var closeByWrap = document.getElementById('closeByCombo');
-  if (closeByWrap) makeCombo(closeByWrap, CLOSEBY, 'CloseBy');
+  if (closeByWrap) combos.closeby = makeCombo(closeByWrap, CLOSEBY, 'CloseBy');
 
   var provWrap = document.getElementById('provinceCombo');
-  if (provWrap) makeCombo(provWrap, PROVINCES, 'ខេត្ត / ក្រុង');
+  if (provWrap) combos.province = makeCombo(provWrap, PROVINCES, 'ខេត្ត / ក្រុង');
 
   var delivWrap = document.getElementById('deliveryCombo');
-  if (delivWrap) makeCombo(delivWrap, DELIVERY, 'ដឹកជញ្ជូន');
+  if (delivWrap) combos.delivery = makeCombo(delivWrap, DELIVERY, 'ដឹកជញ្ជូន');
+
+  window.SearchableCombo.combos = combos;
 });
 
 })();
