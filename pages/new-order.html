@@ -3253,6 +3253,16 @@ document.addEventListener('DOMContentLoaded', function(){
       getEl:  function () { return document.getElementById('deliveryInput'); }
     },
     {
+      label: 'Pages',
+      getVal: function () { return (document.getElementById('page') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('pagesInput'); }
+    },
+    {
+      label: 'CloseBy',
+      getVal: function () { return (document.getElementById('closeBy') || {}).value || ''; },
+      getEl:  function () { return document.getElementById('closeByInput'); }
+    },
+    {
       label: 'ថ្ងៃខែឆ្នាំ',
       getVal: function () { return (document.getElementById('datePart') || {}).value || ''; },
       getEl:  function () { return document.getElementById('datePart'); },
