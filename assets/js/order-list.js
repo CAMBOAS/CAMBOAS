@@ -1524,19 +1524,47 @@ function normalizeDeliveryName(raw){
 }
 
 function populateFilterOptions(){
-  // Province: only 2 groups
-  var provEl = $id('olProvince');
-  if(provEl){
-    var cur = provEl.value;
-    var hasPP = _orders.some(function(o){ return (o.province||'').trim()==='រាជធានីភ្នំពេញ'; });
-    var hasOther = _orders.some(function(o){ var p=(o.province||'').trim(); return p && p!=='រាជធានីភ្នំពេញ'; });
-    var opts = '<option value="">All</option>';
-    if(hasPP)    opts += '<option'+(cur==='រាជធានីភ្នំពេញ'?' selected':'')+'>រាជធានីភ្នំពេញ</option>';
-    if(hasOther) opts += '<option'+(cur==='ខេត្ត'?' selected':'')+'>ខេត្ត</option>';
-    provEl.innerHTML = opts;
+  // Province, Delivery, Pages, CloseBy are now populated from SaleInfor via loadSaleInforFilters()
+  // This function is kept for any future order-data-derived logic
+}
+
+/* ── Load filter options from SaleInfor sheet ── */
+function loadSaleInforFilters(){
+  var CACHE_KEY = 'cambo_saleinfor_v1'; // shared cache with new-order.html
+
+  function fillSelect(id, list){
+    var el = $id(id);
+    if(!el || !list || !list.length) return;
+    var cur = el.value;
+    el.innerHTML = '<option value="">All</option>' +
+      list.map(function(v){ return '<option'+(v===cur?' selected':'')+'>'+v+'</option>'; }).join('');
+    el.value = cur; // restore selection
   }
-  // Delivery: keep static HTML options (J&T, DRSB, វិរៈ ប៊ុនថាំ, ភ្នំពេញ តាធំ, ភ្នំពេញ តាតូច, ដឹកខ្លួនឯង)
-  // Do NOT overwrite — HTML already has correct options
+
+  function applyData(d){
+    if(d.closeby   && d.closeby.length)   fillSelect('olCloseBy',  d.closeby);
+    if(d.delivery  && d.delivery.length)  fillSelect('olDelivery', d.delivery);
+    if(d.provinces && d.provinces.length) fillSelect('olProvince', d.provinces);
+    if(d.pages     && d.pages.length)     fillSelect('olPages',    d.pages);
+  }
+
+  // Apply cached data immediately (no flicker)
+  try {
+    var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if(cached) applyData(cached);
+  } catch(_){}
+
+  // Fetch fresh in background
+  var url = SCRIPT_URL + (SCRIPT_URL.includes('?') ? '&' : '?') + 'action=saleinfor&_=' + Date.now();
+  fetch(url, {redirect:'follow'})
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(res.ok && res.saleinfor){
+        applyData(res.saleinfor);
+        try{ localStorage.setItem(CACHE_KEY, JSON.stringify(res.saleinfor)); }catch(_){}
+      }
+    })
+    .catch(function(){});
 }
 
 async function init(){
@@ -1547,6 +1575,7 @@ async function init(){
   _orders = await loadOrders();
   // Auto-populate filter dropdowns from loaded data
   populateFilterOptions();
+  loadSaleInforFilters();
   render();
 
   /* show date-desc sort arrow on initial load */
