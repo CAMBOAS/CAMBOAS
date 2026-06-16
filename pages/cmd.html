@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
-  <title>Commission - CAMBO MINI</title>
+  <title>CMD - CAMBO MINI</title>
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -393,7 +393,7 @@
 <script>
 (function(){
   /* ══ SETTINGS ══ */
-  const CK = 'commission_settings_v2';
+  const CK = 'cmd_settings_v2';
   function loadS(){ try{return JSON.parse(localStorage.getItem(CK)||'{}')}catch{return{}} }
   function saveS(s){ localStorage.setItem(CK,JSON.stringify(s)) }
 
@@ -404,6 +404,40 @@
   var _view='agents';
   var _selAgent=null;
   var _selOrder=null;
+  var _stockData=[],_stockMap={};
+
+  /* ══ STOCK HELPERS (unit-aware item counting) ══ */
+  function _nm(s){return String(s||'').toLowerCase().replace(/\s+/g,'').replace(/[()（）]/g,'');}
+  function _sfz(a,b){
+    if(!a||!b)return false;if(a===b||a.includes(b)||b.includes(a))return true;
+    var sh=a.length<b.length?a:b,lo=a.length<b.length?b:a,m=0;
+    for(var i=0;i<sh.length;i++)if(lo.includes(sh[i]))m++;
+    return sh.length>0&&m/sh.length>=0.70;
+  }
+  function _lkStock(name){
+    var n=_nm(name),ks=Object.keys(_stockMap);
+    if(_stockMap[n])return _stockMap[n];
+    for(var i=0;i<ks.length;i++)if(_sfz(n,ks[i]))return _stockMap[ks[i]];
+    return null;
+  }
+  function _buildStockMap(){
+    _stockMap={};
+    _stockData.forEach(function(s){if(s.product)_stockMap[_nm(s.product)]=s;});
+  }
+  async function _fetchCMDOrders(limit){
+    try{
+      var data=await CamboAPI.get({action:'list',limit:String(limit)});
+      // Use raw API response — preserves unit field per product (not stripped by orders-data.js)
+      return Array.isArray(data&&data.orders)?data.orders
+            :Array.isArray(data&&data.data&&data.data.orders)?data.data.orders:[];
+    }catch(e){console.warn('_fetchCMDOrders',e);return[];}
+  }
+  async function _fetchCMDStock(){
+    try{
+      var data=await CamboAPI.get({action:'stroke'});
+      return Array.isArray(data&&data.stroke)?data.stroke:[];
+    }catch(e){console.warn('_fetchCMDStock',e);return[];}
+  }
 
   /* ══ HELPERS ══ */
   function toDate(o){
@@ -520,8 +554,13 @@
   };
 
   function agentItems(a){
+    // Unit-aware: 'កេស' × defPack from Stock lookup, otherwise qty × 1
     return a.orders.reduce(function(s,o){
-      return s+(Array.isArray(o.products)?o.products.reduce(function(ss,p){return ss+(+p.qty||1);},0):0);
+      return s+(Array.isArray(o.products)?o.products.reduce(function(ss,p){
+        var u=String(p.unit||'ឈុត').trim(),q=+p.qty||1;
+        if(u==='កេស'){var stk=_lkStock(p.name||p.product||'');return ss+q*(stk&&stk.defPack?stk.defPack:1);}
+        return ss+q;
+      },0):0);
     },0);
   }
   function calcComm(a){
@@ -608,7 +647,7 @@
 
     document.getElementById('panelContent').innerHTML=
       '<div class="cm-tbl-wrap"><table class="cm-tbl">'
-      +'<thead><tr><th>CloseBy</th><th>Orders</th><th>Items</th><th>Sales</th><th>Rate ៛</th><th>Commission</th></tr></thead>'
+      +'<thead><tr><th>CloseBy</th><th>Orders</th><th title="Unit-aware: កេស × DefPack = ឈុត">Items ✦</th><th>Sales</th><th>Rate ៛</th><th>Commission</th></tr></thead>'
       +'<tbody>'+rows+'</tbody></table></div>';
     renderKPI();
   };
@@ -622,6 +661,7 @@
     h+=ag.orders.map(function(o,i){
       var prods=Array.isArray(o.products)?o.products:[];
       var qty=prods.reduce(function(s,p){return s+(+p.qty||1);},0);
+      var smartQty=prods.reduce(function(s,p){var u=String(p.unit||'ឈុត').trim(),q=+p.qty||1;if(u==='កេស'){var stk=_lkStock(p.name||p.product||'');return s+q*(stk&&stk.defPack?stk.defPack:1);}return s+q;},0);
       var enc=encodeURIComponent(ag.name);
       return '<div class="cm-order-card" onclick="navTo(\'products\',\''+enc+'\','+i+')">'
         +'<div class="cm-order-row">'
@@ -630,7 +670,7 @@
         +'</div>'
         +'<div class="cm-order-meta">'
         +'<span class="cm-chip">📅 '+fmtD(o)+'</span>'
-        +'<span class="cm-chip">📦 '+qty+' ឈុត</span>'
+        +'<span class="cm-chip">📦 '+(smartQty!==qty?qty+'→'+smartQty:qty)+' ឈុត</span>'
         +(o.phone?'<span class="cm-chip">📞 '+o.phone+'</span>':'')
         +(o.payment?'<span class="cm-chip">'+o.payment+'</span>':'')
         +(o.receiptNo?'<span class="cm-chip">#'+o.receiptNo+'</span>':'')
@@ -656,9 +696,20 @@
     } else {
       h+=prods.map(function(p){
         var sub=((+p.qty||1)*(+p.price||0))-(+p.discount||0);
+        var pu=String(p.unit||'ឈុត').trim(),pq=+p.qty||1;
+        var qtyLabel;
+        if(pu==='កេស'){
+          var stk=_lkStock(p.name||p.product||'');
+          var dp=stk&&stk.defPack?stk.defPack:1;
+          qtyLabel=pq+' <b style="color:#f59e0b">កេស</b> <span style="color:var(--muted)">→ '+(pq*dp)+' ឈុត</span>';
+        } else if(pu==='លាយ'){
+          qtyLabel=pq+' <b style="color:#a78bfa">លាយ</b>';
+        } else {
+          qtyLabel=pq+' <b style="color:var(--ok,#4ade80)">ឈុត</b>';
+        }
         return '<div class="cm-prod-row">'
           +'<span class="cm-prod-name">'+(p.name||p.product||'-')+'</span>'
-          +'<span class="cm-prod-qty">×'+(p.qty||1)+' ឈុត</span>'
+          +'<span class="cm-prod-qty">×'+qtyLabel+'</span>'
           +'<span class="cm-prod-price">$'+(+p.price||0)+'</span>'
           +'<span class="cm-prod-sub">$'+$m(sub)+'</span>'
           +'</div>';
@@ -885,8 +936,13 @@
   /* ══ LOAD DATA ══ */
   window.loadData=async function(){
     document.getElementById('panelContent').innerHTML='<div class="no-data">⏳ កំពុងទាញទិន្នន័យ...</div>';
-    try{ if(window.CamboOrdersData) _all=await CamboOrdersData.fetchOrders(5000); }
-    catch(e){ console.warn('Commission fetch error',e); }
+    try{
+      // Fetch orders (unit preserved) + Stock (defPack) in parallel
+      var res=await Promise.all([_fetchCMDOrders(5000),_fetchCMDStock()]);
+      _all=res[0];
+      _stockData=res[1];
+      _buildStockMap();
+    }catch(e){console.warn('CMD load error',e);}
     applyFilter();
   };
 

@@ -20,6 +20,7 @@
       'pages/stock.html':         { title: t('ស្តុក','Stock'),                    subtitle: t('តាមដានស្តុក និងការផ្លាស់ប្ដូរ','Track inventory levels and stock movements') },
       'pages/delivery.html':      { title: t('ដឹកជញ្ជូន','Delivery'),            subtitle: t('គ្រប់គ្រងការដឹកជញ្ជូន','Manage delivery and shipping') },
       'pages/commission.html':    { title: t('កម្រៃជើងសារ','Commission'),         subtitle: t('កម្រៃអ្នកលក់ និងតារាងចំណាត់ថ្នាក់','Agent commission and leaderboard') },
+      'pages/cmd.html':           { title: t('CMD','CMD'),                        subtitle: t('Commission Developing','Commission Developing') },
       'pages/packaging.html':     { title: t('វេចខ្ចប់','Packaging'),             subtitle: t('វេចខ្ចប់ និងរៀបចំការដឹកជញ្ជូន','Packaging and delivery preparation') },
       'pages/settings.html':      { title: t('ការកំណត់','Settings'),              subtitle: t('រៀបចំ Workspace របស់អ្នក','Configure your workspace') },
       'login.html':               { title: t('ចូលប្រើ','Login'),                  subtitle: '' },
@@ -40,6 +41,7 @@
     delivery:   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
     packaging:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16v-2"/><polyline points="7.5 4.21 12 6.81 16.5 4.21"/><polyline points="7.5 19.79 7.5 14.6 3 12"/><polyline points="21 12 16.5 14.6 16.5 19.79"/><line x1="12" y1="22" x2="12" y2="12.01"/></svg>',
     commission: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    cmd:        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
     settings:   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
     logout:     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
     moon:       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
@@ -98,6 +100,7 @@
         <div class="sb-section-label">${t('ការគ្រប់គ្រង','Management')}</div>
         <ul class="sb-list">
           ${link('pages/commission.html', ic.commission,t('កម្រៃជើងសារ','Commission'))}
+          ${link('pages/cmd.html',        ic.cmd,       t('CMD','CMD'))}
           ${link('pages/customers.html',  ic.customers, t('អតិថិជន','Customers'))}
           ${link('pages/products.html',   ic.products,  t('ផលិតផល','Products'))}
           ${link('pages/stock.html',      ic.stock,     t('ស្តុក','Stock'))}
