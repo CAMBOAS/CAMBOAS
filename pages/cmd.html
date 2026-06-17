@@ -497,36 +497,63 @@
   async function _fetchCMDOrders(limit){
     try{
       // Fetch normalized orders (correct count/aggregation, same as Commission)
-      // AND raw rows (has unit field that normalizeOrder strips) — both in parallel.
+      // AND raw orders (has unit+productId that normalizeOrder strips) — both in parallel.
       var pair=await Promise.all([
         CamboOrdersData.fetchOrders(limit),
         CamboAPI.get({action:'list',limit:String(limit)})
       ]);
       var orders=pair[0]||[];
-      // Build productName → unit map from raw flat rows
       var rawData=pair[1],rawRows=[];
       if(Array.isArray(rawData&&rawData.orders)) rawRows=rawData.orders;
       else if(Array.isArray(rawData&&rawData.data&&rawData.data.orders)) rawRows=rawData.data.orders;
       else if(Array.isArray(rawData&&rawData.rows)) rawRows=rawData.rows;
       else if(Array.isArray(rawData&&rawData.data)) rawRows=rawData.data;
-      // Build _unitMap: keyed by both Stock ID ("id:CAMBO-A-001") AND normalized name
-      // This way lookup works whether SaleOrder has ProductID or only product name
+
+      // Build _unitMap (name/ID → unit) AND _pidMap (orderId → {name → productId})
+      // listOrders_ returns NESTED orders (products:[]), NOT flat rows — handle both formats.
       _unitMap={};
+      var _pidMap={};
       rawRows.forEach(function(r){
-        var nm=_nm(r.product||r.Product||r.productName||r.ProductName||r.name||r.Name||'');
-        var ut=String(r.unit||r.Unit||'').trim();
-        var pid=String(r.productId||r.ProductID||r.ProductId||r.product_id||'').trim();
-        if(ut){
-          if(nm&&!_unitMap[nm]) _unitMap[nm]=ut;           // name key (fuzzy fallback)
-          if(pid&&!_unitMap['id:'+pid]) _unitMap['id:'+pid]=ut; // ID key (exact, preferred)
+        var oid=String(r.id||r.orderId||r.OrderID||'').trim();
+        var prods=Array.isArray(r.products)?r.products:null;
+        if(prods){
+          // Nested order format (Apps Script listOrders_ output)
+          if(oid) _pidMap[oid]=_pidMap[oid]||{};
+          prods.forEach(function(p){
+            var nm=_nm(p.name||p.product||'');
+            var ut=String(p.unit||'').trim();
+            var pid=String(p.productId||p.ProductID||p.product_id||'').trim();
+            if(ut){
+              if(nm&&!_unitMap[nm]) _unitMap[nm]=ut;
+              if(pid&&!_unitMap['id:'+pid]) _unitMap['id:'+pid]=ut;
+            }
+            if(oid&&nm&&pid) _pidMap[oid][nm]=pid;
+          });
+        } else {
+          // Flat row format (fallback)
+          var nm=_nm(r.product||r.Product||r.productName||r.ProductName||r.name||r.Name||'');
+          var ut=String(r.unit||r.Unit||'').trim();
+          var pid=String(r.productId||r.ProductID||r.ProductId||r.product_id||'').trim();
+          if(ut){
+            if(nm&&!_unitMap[nm]) _unitMap[nm]=ut;
+            if(pid&&!_unitMap['id:'+pid]) _unitMap['id:'+pid]=ut;
+          }
+          if(oid&&nm&&pid){_pidMap[oid]=_pidMap[oid]||{};_pidMap[oid][nm]=pid;}
         }
       });
-      // Attach unit back — prefer ProductID exact match, fall back to fuzzy name
+
+      // Attach unit AND productId back to normalized orders (normalizeOrder strips both)
       orders.forEach(function(o){
+        var oid=String(o.id||'').trim();
+        var oidMap=_pidMap[oid]||{};
         (o.products||[]).forEach(function(p){
+          var pnm=_nm(String(p.name||''));
+          // Restore productId — use _pidMap exact orderId+name match
+          if(!p.productId){var pid=oidMap[pnm]||'';if(pid)p.productId=pid;}
+          // Restore unit — prefer ID key, fall back to name fuzzy
           if(!p.unit){
-            var pid=String(p.productId||p.ProductID||p.ProductId||p.product_id||'').trim();
-            p.unit=(pid&&_unitMap['id:'+pid])||_lkUnit(String(p.name||''));
+            var pid=String(p.productId||'').trim();
+            p.unit=(pid&&_unitMap['id:'+pid])||_lkUnit(pnm);
           }
         });
       });
