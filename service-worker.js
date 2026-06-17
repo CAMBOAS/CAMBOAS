@@ -18,7 +18,6 @@ const STATIC_ASSETS = [
   '/pages/analytics.html',
   '/pages/products.html',
   '/pages/packaging.html',
-  '/pages/commission.html',
   '/pages/settings.html',
   '/pages/new-order.html',
   '/pages/orders-details.html',

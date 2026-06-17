@@ -62,7 +62,19 @@
       "Bash(Select-Object Name)",
       "Bash(npm --version)",
       "mcp__visualize__read_me",
-      "mcp__visualize__show_widget"
+      "mcp__visualize__show_widget",
+      "Bash(Get-ChildItem -Path \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\" -Recurse -Force)",
+      "Bash(Select-Object -First 50)",
+      "Bash(Format-Table FullName)",
+      "Bash(python -c ' *)",
+      "Bash(node -e ' *)",
+      "Bash(clasp push *)",
+      "Bash(clasp deployments *)",
+      "Bash(clasp deploy *)",
+      "Bash(clasp status *)",
+      "Bash(git rm *)",
+      "Bash(del \"pages\\\\commission.html\")",
+      "Bash(Remove-Item \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\pages\\\\commission.html\" -Force)"
     ]
   }
 }
