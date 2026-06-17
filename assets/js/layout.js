@@ -99,8 +99,7 @@
         <div class="sb-divider sb-divider-sm"></div>
         <div class="sb-section-label">${t('ការគ្រប់គ្រង','Management')}</div>
         <ul class="sb-list">
-          ${link('pages/commission.html', ic.commission,t('កម្រៃជើងសារ','Commission'))}
-          ${link('pages/cmd.html',        ic.cmd,       t('CMD','CMD'))}
+          ${link('pages/cmd.html', ic.cmd, t('CMD','CMD'))}
           ${link('pages/customers.html',  ic.customers, t('អតិថិជន','Customers'))}
           ${link('pages/products.html',   ic.products,  t('ផលិតផល','Products'))}
           ${link('pages/stock.html',      ic.stock,     t('ស្តុក','Stock'))}
