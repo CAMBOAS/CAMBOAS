@@ -65,12 +65,13 @@ const TELEGRAM_CHAT_ID    = '-1003800250508';
 const TZ                  = 'Asia/Phnom_Penh';
 const LOW_STOCK_THRESHOLD = 4;
 
-/* ── SaleOrder columns (21 cols) ── */
+/* ── SaleOrder columns (22 cols) ── */
 const HEADER = [
   'DateTime','OrderID','Page','CloseBy','Status',
   'Customer','Phone','Province','Detail Address',
   'DeliveryName','DeliveryFee','Payment','Note',
-  'Number','Product','QTY','Unit','Price','Discount','Subtotal','GrandTotal'
+  'Number','Product','QTY','Unit','Price','Discount','Subtotal','GrandTotal',
+  'ProductID'   // col 22 — auto-filled from NewOrder ID on save
 ];
 
 /* ── Stroke sheet columns (1-based) — ID column added as first column ── */
@@ -395,13 +396,14 @@ function listOrders_() {
       };
     }
     const item = {
-      number  : toNumber_(row[13]),
-      name    : safe_(row[14]), product: safe_(row[14]),
-      qty     : toNumber_(row[15]),
-      unit    : safe_(row[16]),
-      price   : toNumber_(row[17]),
-      discount: toNumber_(row[18]),
-      subtotal: toNumber_(row[19])
+      number   : toNumber_(row[13]),
+      name     : safe_(row[14]), product: safe_(row[14]),
+      qty      : toNumber_(row[15]),
+      unit     : safe_(row[16]),
+      price    : toNumber_(row[17]),
+      discount : toNumber_(row[18]),
+      subtotal : toNumber_(row[19]),
+      productId: safe_(row[21])   // col 22 — auto-filled ProductID
     };
     groups[orderId].products.push(item);
     groups[orderId].items.push(item);
@@ -892,6 +894,9 @@ function orderToRows_(orderId, order) {
     ? toNumber_(order.grandTotal)
     : calcGrandTotal_(products, deliveryFee);
 
+  // Load NewOrder [ID, Name] pairs ONCE for ProductID auto-lookup
+  const noCache = _loadNoCache_();
+
   return products.map((line, idx) => {
     const qty      = toNumber_(line.qty);
     const price    = toNumber_(line.price);
@@ -900,6 +905,8 @@ function orderToRows_(orderId, order) {
     const subtotal = (line.subtotal != null && line.subtotal !== '')
       ? toNumber_(line.subtotal)
       : Math.max(0, qty * price - discount);
+    // Use productId from payload if present, else auto-lookup from NewOrder by name
+    const productId = safe_(line.productId) || _lookupIdFromCache_(noCache, safe_(line.name || line.product));
 
     return [
       dateTime, orderId,
@@ -911,9 +918,32 @@ function orderToRows_(orderId, order) {
       idx + 1,
       safe_(line.name || line.product),
       qty, unit, price, discount, subtotal,
-      idx === 0 ? grandTotal : 0   // GrandTotal on first row only
+      idx === 0 ? grandTotal : 0,  // GrandTotal on first row only
+      productId                    // ProductID auto-filled from NewOrder (col 22)
     ];
   });
+}
+
+// Load all [ID, Name] rows from NewOrder sheet — read once, not per product
+function _loadNoCache_() {
+  try {
+    const ss    = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName('NewOrder');
+    if (!sheet) return [];
+    const lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return [];
+    return sheet.getRange(2, 1, lastRow - 1, 2).getValues(); // col A = ID, col B = Name
+  } catch(e) { return []; }
+}
+
+// Find ProductID from pre-loaded NewOrder cache by fuzzy name match
+function _lookupIdFromCache_(cache, name) {
+  if (!name || !cache.length) return '';
+  const norm = normalizeForMatch_(name);
+  for (let i = 0; i < cache.length; i++) {
+    if (stockMatch_(normalizeForMatch_(safe_(cache[i][1])), norm)) return safe_(cache[i][0]);
+  }
+  return '';
 }
 
 function normalizeLegacyPayloadToOrder_(payload) {

@@ -519,9 +519,15 @@
     renderAgents(); renderKPI(); renderTop(); updateSummary();
   };
 
+  function _isDoublePack(name){
+    return String(name||'').replace(/\s+/g,' ').trim()==='ឈុតសម្រកទ្វេដង CCR';
+  }
   function agentItems(a){
     return a.orders.reduce(function(s,o){
-      return s+(Array.isArray(o.products)?o.products.reduce(function(ss,p){return ss+(+p.qty||1);},0):0);
+      return s+(Array.isArray(o.products)?o.products.reduce(function(ss,p){
+        var q=+p.qty||1;
+        return ss+(_isDoublePack(String(p.name||p.product||''))?q*2:q);
+      },0):0);
     },0);
   }
   function calcComm(a){
@@ -621,7 +627,8 @@
     var h='<div style="margin-bottom:10px;font-size:12px;color:var(--muted)">'+ag.orders.length+' orders · ចុចអតិថិជន ដើម្បីមើលផលិតផល</div>';
     h+=ag.orders.map(function(o,i){
       var prods=Array.isArray(o.products)?o.products:[];
-      var qty=prods.reduce(function(s,p){return s+(+p.qty||1);},0);
+      var rawQty=prods.reduce(function(s,p){return s+(+p.qty||1);},0);
+      var adjQty=prods.reduce(function(s,p){var q=+p.qty||1;return s+(_isDoublePack(String(p.name||p.product||''))?q*2:q);},0);
       var enc=encodeURIComponent(ag.name);
       return '<div class="cm-order-card" onclick="navTo(\'products\',\''+enc+'\','+i+')">'
         +'<div class="cm-order-row">'
@@ -630,7 +637,7 @@
         +'</div>'
         +'<div class="cm-order-meta">'
         +'<span class="cm-chip">📅 '+fmtD(o)+'</span>'
-        +'<span class="cm-chip">📦 '+qty+' ឈុត</span>'
+        +'<span class="cm-chip">📦 '+(adjQty!==rawQty?rawQty+'→'+adjQty:rawQty)+' ឈុត</span>'
         +(o.phone?'<span class="cm-chip">📞 '+o.phone+'</span>':'')
         +(o.payment?'<span class="cm-chip">'+o.payment+'</span>':'')
         +(o.receiptNo?'<span class="cm-chip">#'+o.receiptNo+'</span>':'')

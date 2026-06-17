@@ -404,7 +404,7 @@
   var _view='agents';
   var _selAgent=null;
   var _selOrder=null;
-  var _stockData=[],_stockMap={};
+  var _stockData=[],_stockMap={},_unitMap={};
 
   /* ══ STOCK HELPERS (unit-aware item counting) ══ */
   function _nm(s){return String(s||'').toLowerCase().replace(/\s+/g,'').replace(/[()（）]/g,'');}
@@ -414,22 +414,123 @@
     for(var i=0;i<sh.length;i++)if(lo.includes(sh[i]))m++;
     return sh.length>0&&m/sh.length>=0.70;
   }
-  function _lkStock(name){
-    var n=_nm(name),ks=Object.keys(_stockMap);
-    if(_stockMap[n])return _stockMap[n];
-    for(var i=0;i<ks.length;i++)if(_sfz(n,ks[i]))return _stockMap[ks[i]];
+  // Look up stock by Stock ID (exact) first, then product name (fuzzy)
+  function _lkStock(nameOrId){
+    // Try Stock ID exact match (e.g. "CAMBO-A-001") — 100% accurate
+    var idKey='id:'+String(nameOrId||'').trim().toUpperCase();
+    if(_stockMap[idKey]) return _stockMap[idKey];
+    var idKeyRaw='id:'+String(nameOrId||'').trim();
+    if(_stockMap[idKeyRaw]) return _stockMap[idKeyRaw];
+    // Fallback: fuzzy product name match
+    var n=_nm(nameOrId),ks=Object.keys(_stockMap);
+    if(_stockMap[n]) return _stockMap[n];
+    for(var i=0;i<ks.length;i++) if(!ks[i].startsWith('id:')&&_sfz(n,ks[i])) return _stockMap[ks[i]];
     return null;
+  }
+  // Lookup unit ('កេស'/'លាយ'/'ឈុត') by product name — exact _nm() match first, then fuzzy _sfz()
+  function _lkUnit(name){
+    var n=_nm(name),ks=Object.keys(_unitMap);
+    if(_unitMap[n]) return _unitMap[n];
+    for(var i=0;i<ks.length;i++) if(_sfz(n,ks[i])) return _unitMap[ks[i]];
+    return '';
   }
   function _buildStockMap(){
     _stockMap={};
-    _stockData.forEach(function(s){if(s.product)_stockMap[_nm(s.product)]=s;});
+    _stockData.forEach(function(s){
+      // Index by Stock ID (e.g. "CAMBO-A-001") for exact lookup when SaleOrder has ProductID
+      var sid=String(s.ID||s.id||s.Id||'').trim();
+      if(sid) _stockMap['id:'+sid]=s;
+      // Also index by normalized product name as fallback (fuzzy lookup via _lkStock)
+      var pName=s.Products||s.product||s.Product||s.name||s.Name||'';
+      if(pName) _stockMap[_nm(pName)]=s;
+    });
   }
+  // Read DefaultPack from stock item — handles "DefaultPack", "defPack", "defaultPack" variants
+  function _defPack(stk){
+    if(!stk) return 1;
+    var dp=+(stk.DefaultPack||stk.defaultPack||stk.defPack||stk.Pack||stk.pack||1);
+    return dp>0?dp:1;
+  }
+  /* Group flat API rows into order objects — preserves 'unit' per product.
+     CamboOrdersData.normalizeOrder strips unit, so CMD uses its own aggregation. */
+  function _aggregateCMDOrders(rows){
+    if(!Array.isArray(rows)||!rows.length) return [];
+    // Already aggregated (has nested products arrays) — normalize field-name variants only
+    var hasNested=rows.some(function(r){return r&&Array.isArray(r.products);});
+    if(hasNested){
+      return rows.map(function(o){
+        return Object.assign({},o,{
+          closeBy:String(o.closeBy||o.CloseBy||o.close_by||o.CLOSEBY||'').trim(),
+          date:String(o.date||o.dateTime||o.DateTime||o.datetime||o.createdAt||o.CreatedAt||'')
+        });
+      });
+    }
+    // Flat rows (one row per product line) — group by orderId, preserve unit
+    var grouped={},keys=[];
+    rows.forEach(function(raw,idx){
+      var oid=String(raw.id||raw.orderId||raw.OrderID||raw.orderID||'R'+(idx+1)).trim();
+      var pName=String(raw.product||raw.Product||raw.productName||raw.ProductName||raw.name||raw.Name||'').trim();
+      var qty=+(raw.qty||raw.QTY||raw.quantity||raw.Quantity||1)||1;
+      var price=+(raw.price||raw.Price||0)||0;
+      var discount=+(raw.discount||raw.Discount||0)||0;
+      var unit=String(raw.unit||raw.Unit||'').trim();
+      if(!grouped[oid]){
+        keys.push(oid);
+        grouped[oid]={
+          id:oid,
+          date:String(raw.date||raw.dateTime||raw.DateTime||raw.datetime||raw.createdAt||raw.CreatedAt||''),
+          closeBy:String(raw.closeBy||raw.CloseBy||raw.close_by||raw.CLOSEBY||'').trim(),
+          customer:String(raw.customer||raw.Customer||''),
+          phone:String(raw.phone||raw.Phone||''),
+          page:String(raw.page||raw.Page||''),
+          province:String(raw.province||raw.Province||''),
+          status:String(raw.status||raw.Status||'Pending'),
+          note:String(raw.note||raw.Note||''),
+          products:[]
+        };
+      }
+      if(pName) grouped[oid].products.push({name:pName,qty:qty,price:price,discount:discount,unit:unit});
+    });
+    return keys.map(function(k){return grouped[k];});
+  }
+
   async function _fetchCMDOrders(limit){
     try{
-      var data=await CamboAPI.get({action:'list',limit:String(limit)});
-      // Use raw API response — preserves unit field per product (not stripped by orders-data.js)
-      return Array.isArray(data&&data.orders)?data.orders
-            :Array.isArray(data&&data.data&&data.data.orders)?data.data.orders:[];
+      // Fetch normalized orders (correct count/aggregation, same as Commission)
+      // AND raw rows (has unit field that normalizeOrder strips) — both in parallel.
+      var pair=await Promise.all([
+        CamboOrdersData.fetchOrders(limit),
+        CamboAPI.get({action:'list',limit:String(limit)})
+      ]);
+      var orders=pair[0]||[];
+      // Build productName → unit map from raw flat rows
+      var rawData=pair[1],rawRows=[];
+      if(Array.isArray(rawData&&rawData.orders)) rawRows=rawData.orders;
+      else if(Array.isArray(rawData&&rawData.data&&rawData.data.orders)) rawRows=rawData.data.orders;
+      else if(Array.isArray(rawData&&rawData.rows)) rawRows=rawData.rows;
+      else if(Array.isArray(rawData&&rawData.data)) rawRows=rawData.data;
+      // Build _unitMap: keyed by both Stock ID ("id:CAMBO-A-001") AND normalized name
+      // This way lookup works whether SaleOrder has ProductID or only product name
+      _unitMap={};
+      rawRows.forEach(function(r){
+        var nm=_nm(r.product||r.Product||r.productName||r.ProductName||r.name||r.Name||'');
+        var ut=String(r.unit||r.Unit||'').trim();
+        var pid=String(r.productId||r.ProductID||r.ProductId||r.product_id||'').trim();
+        if(ut){
+          if(nm&&!_unitMap[nm]) _unitMap[nm]=ut;           // name key (fuzzy fallback)
+          if(pid&&!_unitMap['id:'+pid]) _unitMap['id:'+pid]=ut; // ID key (exact, preferred)
+        }
+      });
+      // Attach unit back — prefer ProductID exact match, fall back to fuzzy name
+      orders.forEach(function(o){
+        (o.products||[]).forEach(function(p){
+          if(!p.unit){
+            var pid=String(p.productId||p.ProductID||p.ProductId||p.product_id||'').trim();
+            p.unit=(pid&&_unitMap['id:'+pid])||_lkUnit(String(p.name||''));
+          }
+        });
+      });
+      return orders;
     }catch(e){console.warn('_fetchCMDOrders',e);return[];}
   }
   async function _fetchCMDStock(){
@@ -440,17 +541,24 @@
   }
 
   /* ══ HELPERS ══ */
+  function _rawDate(o){
+    // Check all date field variants (raw API may use any casing)
+    return o.date||o.dateTime||o.DateTime||o.datetime||o.createdAt||o.CreatedAt||'';
+  }
   function toDate(o){
-    var raw=String(o.date||o.createdAt||'');
-    if(!raw) return null;
+    var raw=String(_rawDate(o));
+    // Default to today when date is missing (matches normalizeOrder behavior)
+    if(!raw) return new Date();
     var d=new Date(raw);
     if(!isNaN(d)) return d;
+    // DD/MM/YYYY (Cambodia sheet format)
     var m=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
     if(m) return new Date(+m[3],+m[2]-1,+m[1]);
-    return null;
+    return new Date();
   }
   function fmtD(o){
-    if(window.CamboOrdersData) return CamboOrdersData.formatDate(o.date||'');
+    var dateVal=String(_rawDate(o));
+    if(window.CamboOrdersData) return CamboOrdersData.formatDate(dateVal);
     var d=toDate(o); if(!d) return '-';
     return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
   }
@@ -553,13 +661,22 @@
     renderAgents(); renderKPI(); renderTop(); updateSummary();
   };
 
+  function _isDoublePack(name){
+    return String(name||'').replace(/\s+/g,' ').trim()==='ឈុតសម្រកទ្វេដង CCR';
+  }
+  function _itemBase(p){
+    var pName=String(p.name||p.product||''),q=+p.qty||1;
+    var pid=String(p.productId||p.ProductID||p.ProductId||p.product_id||'').trim();
+    var u=String(p.unit||'').trim()||_lkUnit(pid||pName);
+    // Use ProductID for stock lookup (exact) when available, else fall back to name (fuzzy)
+    if(u==='កេស') return q*_defPack(_lkStock(pid||pName));
+    return q;
+  }
   function agentItems(a){
-    // Unit-aware: 'កេស' × defPack from Stock lookup, otherwise qty × 1
     return a.orders.reduce(function(s,o){
       return s+(Array.isArray(o.products)?o.products.reduce(function(ss,p){
-        var u=String(p.unit||'ឈុត').trim(),q=+p.qty||1;
-        if(u==='កេស'){var stk=_lkStock(p.name||p.product||'');return ss+q*(stk&&stk.defPack?stk.defPack:1);}
-        return ss+q;
+        var base=_itemBase(p);
+        return ss+(_isDoublePack(String(p.name||p.product||''))?base*2:base);
       },0):0);
     },0);
   }
@@ -575,7 +692,7 @@
     var def=Number(document.getElementById('defRate').value)||0;
     var map={};
     _filtered.forEach(function(o){
-      var cb=(o.closeBy||'').trim()||'Unknown';
+      var cb=(o.closeBy||o.CloseBy||o.close_by||o.CLOSEBY||'').trim()||'Unknown';
       if(!map[cb]) map[cb]={name:cb,orders:[],rate:sett[cb]!==undefined?sett[cb].rate:def,status:sett[cb]!==undefined?sett[cb].status:'Pending'};
       map[cb].orders.push(o);
     });
@@ -661,7 +778,7 @@
     h+=ag.orders.map(function(o,i){
       var prods=Array.isArray(o.products)?o.products:[];
       var qty=prods.reduce(function(s,p){return s+(+p.qty||1);},0);
-      var smartQty=prods.reduce(function(s,p){var u=String(p.unit||'ឈុត').trim(),q=+p.qty||1;if(u==='កេស'){var stk=_lkStock(p.name||p.product||'');return s+q*(stk&&stk.defPack?stk.defPack:1);}return s+q;},0);
+      var smartQty=prods.reduce(function(s,p){var base=_itemBase(p);return s+(_isDoublePack(String(p.name||p.product||''))?base*2:base);},0);
       var enc=encodeURIComponent(ag.name);
       return '<div class="cm-order-card" onclick="navTo(\'products\',\''+enc+'\','+i+')">'
         +'<div class="cm-order-row">'
@@ -696,11 +813,13 @@
     } else {
       h+=prods.map(function(p){
         var sub=((+p.qty||1)*(+p.price||0))-(+p.discount||0);
-        var pu=String(p.unit||'ឈុត').trim(),pq=+p.qty||1;
+        var pName=String(p.name||p.product||''),pu=String(p.unit||'ឈុត').trim(),pq=+p.qty||1;
         var qtyLabel;
-        if(pu==='កេស'){
-          var stk=_lkStock(p.name||p.product||'');
-          var dp=stk&&stk.defPack?stk.defPack:1;
+        if(_isDoublePack(pName)){
+          qtyLabel=pq+' <b style="color:#fb923c">ឈុត</b> <span style="color:#fb923c;font-size:10px;background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.3);border-radius:4px;padding:1px 5px">×2 = '+(pq*2)+' ឈុត</span>';
+        } else if(pu==='កេស'){
+          var stk=_lkStock(pName);
+          var dp=_defPack(stk);
           qtyLabel=pq+' <b style="color:#f59e0b">កេស</b> <span style="color:var(--muted)">→ '+(pq*dp)+' ឈុត</span>';
         } else if(pu==='លាយ'){
           qtyLabel=pq+' <b style="color:#a78bfa">លាយ</b>';
@@ -937,11 +1056,10 @@
   window.loadData=async function(){
     document.getElementById('panelContent').innerHTML='<div class="no-data">⏳ កំពុងទាញទិន្នន័យ...</div>';
     try{
-      // Fetch orders (unit preserved) + Stock (defPack) in parallel
       var res=await Promise.all([_fetchCMDOrders(5000),_fetchCMDStock()]);
-      _all=res[0];
       _stockData=res[1];
       _buildStockMap();
+      _all=res[0]||[];
     }catch(e){console.warn('CMD load error',e);}
     applyFilter();
   };
