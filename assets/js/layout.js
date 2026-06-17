@@ -19,7 +19,8 @@
       'pages/products.html':      { title: t('ផលិតផល','Products'),               subtitle: t('រក្សាទុក និងគ្រប់គ្រងផលិតផល','Browse and manage products') },
       'pages/stock.html':         { title: t('ស្តុក','Stock'),                    subtitle: t('តាមដានស្តុក និងការផ្លាស់ប្ដូរ','Track inventory levels and stock movements') },
       'pages/delivery.html':      { title: t('ដឹកជញ្ជូន','Delivery'),            subtitle: t('គ្រប់គ្រងការដឹកជញ្ជូន','Manage delivery and shipping') },
-      'pages/cmd.html':           { title: t('កម្រៃជើងសារ','Commission'),         subtitle: t('កម្រៃអ្នកលក់ និងតារាងចំណាត់ថ្នាក់','Agent commission and leaderboard') },
+      'pages/commission.html':    { title: t('កម្រៃជើងសារ','Commission'),         subtitle: t('កម្រៃអ្នកលក់ និងតារាងចំណាត់ថ្នាក់','Agent commission and leaderboard') },
+      'pages/cmd.html':           { title: t('CMD','CMD'),                        subtitle: t('Commission Developing','Commission Developing') },
       'pages/packaging.html':     { title: t('វេចខ្ចប់','Packaging'),             subtitle: t('វេចខ្ចប់ និងរៀបចំការដឹកជញ្ជូន','Packaging and delivery preparation') },
       'pages/settings.html':      { title: t('ការកំណត់','Settings'),              subtitle: t('រៀបចំ Workspace របស់អ្នក','Configure your workspace') },
       'login.html':               { title: t('ចូលប្រើ','Login'),                  subtitle: '' },
@@ -98,7 +99,8 @@
         <div class="sb-divider sb-divider-sm"></div>
         <div class="sb-section-label">${t('ការគ្រប់គ្រង','Management')}</div>
         <ul class="sb-list">
-          ${link('pages/cmd.html', ic.commission, t('កម្រៃជើងសារ','Commission'))}
+          ${link('pages/commission.html', ic.commission,t('កម្រៃជើងសារ','Commission'))}
+          ${link('pages/cmd.html',        ic.cmd,       t('CMD','CMD'))}
           ${link('pages/customers.html',  ic.customers, t('អតិថិជន','Customers'))}
           ${link('pages/products.html',   ic.products,  t('ផលិតផល','Products'))}
           ${link('pages/stock.html',      ic.stock,     t('ស្តុក','Stock'))}
