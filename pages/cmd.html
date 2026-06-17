@@ -691,11 +691,20 @@
   function _isDoublePack(name){
     return String(name||'').replace(/\s+/g,' ').trim()==='ឈុតសម្រកទ្វេដង CCR';
   }
+  // Extract unit from product name suffix — "(កេស)" or "(លាយ)" in name = definitive unit
+  function _unitFromName(name){
+    var s=String(name||'');
+    if(s.indexOf('(កេស)')>=0) return 'កេស';
+    if(s.indexOf('(លាយ)')>=0) return 'លាយ';
+    return '';
+  }
   function _itemBase(p){
     var pName=String(p.name||p.product||''),q=+p.qty||1;
     var pid=String(p.productId||p.ProductID||p.ProductId||p.product_id||'').trim();
-    var u=String(p.unit||'').trim()||_lkUnit(pid||pName);
-    // Use ProductID for stock lookup (exact) when available, else fall back to name (fuzzy)
+    // Priority: name suffix "(កេស)"/"(លាយ)" > stored unit > _unitMap lookup
+    // Name suffix is highest priority because product names like "X (កេស)" definitively
+    // indicate the calculation unit, even if SaleOrder unit column was saved incorrectly.
+    var u=_unitFromName(pName)||String(p.unit||'').trim()||_lkUnit(pid||pName);
     if(u==='កេស') return q*_defPack(_lkStock(pid||pName));
     return q;
   }
