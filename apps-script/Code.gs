@@ -1152,6 +1152,43 @@ function fixStockIds() {
 function safe_(value) { return value == null ? '' : String(value).trim(); }
 
 /**
+ * backfillSaleOrderProductIds — Run ONCE to fill empty ProductID (col V) for all existing SaleOrder rows.
+ * Matches product name (col O) against NewOrder sheet to find the ID.
+ */
+function backfillSaleOrderProductIds() {
+  const ss        = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet     = ss.getSheetByName('SaleOrder');
+  if (!sheet) { Logger.log('SaleOrder sheet not found'); return; }
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) { Logger.log('No data rows'); return; }
+
+  const data    = sheet.getRange(2, 1, lastRow - 1, 22).getValues();
+  const noCache = _loadNoCache_();
+  let updated = 0, skipped = 0, notFound = 0;
+
+  data.forEach((row, i) => {
+    const productName = String(row[14] || '').trim(); // col O = Product
+    const existingId  = String(row[21] || '').trim(); // col V = ProductID
+    if (!productName) return;
+    if (existingId)  { skipped++; return; }           // already filled — skip
+
+    const pid = _lookupIdFromCache_(noCache, productName);
+    if (pid) {
+      sheet.getRange(i + 2, 22).setValue(pid);
+      updated++;
+    } else {
+      notFound++;
+      Logger.log('⚠️ No match: ' + productName);
+    }
+  });
+
+  Logger.log('════ backfillSaleOrderProductIds done ════');
+  Logger.log('Updated: ' + updated + ' | Skipped (already had ID): ' + skipped + ' | Not found: ' + notFound);
+  SpreadsheetApp.getUi().alert('Backfill done!\nUpdated: ' + updated + '\nNot found: ' + notFound);
+}
+
+/**
  * findProductIdByName_ — ស្វែងរក ID ពី NewOrder sheet ដោយ match ឈ្មោះ
  */
 function findProductIdByName_(name) {
