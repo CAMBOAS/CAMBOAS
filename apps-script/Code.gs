@@ -924,15 +924,26 @@ function orderToRows_(orderId, order) {
   });
 }
 
-// Load all [ID, Name] rows from NewOrder sheet — read once, not per product
+// Load all [ID, Name] pairs for ProductID auto-lookup — read once per order save.
+// Reads Stock sheet (col A=ID, col B=Products) as primary source since that is where
+// CAMBO-A-001 etc. are defined. Falls back to NewOrder sheet if Stock not found.
 function _loadNoCache_() {
   try {
-    const ss    = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName('NewOrder');
-    if (!sheet) return [];
-    const lastRow = sheet.getLastRow();
-    if (lastRow <= 1) return [];
-    return sheet.getRange(2, 1, lastRow - 1, 2).getValues(); // col A = ID, col B = Name
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    // Stock sheet: col A = ID, col B = Products (authoritative product catalog)
+    const stockSheet = ss.getSheetByName('Stock');
+    const rows = [];
+    if (stockSheet && stockSheet.getLastRow() > 1) {
+      stockSheet.getRange(2, 1, stockSheet.getLastRow() - 1, 2).getValues()
+        .forEach(r => { if (safe_(r[0]) && safe_(r[1])) rows.push(r); });
+    }
+    // Also read NewOrder sheet (col A = ID, col B = Name) as supplemental source
+    const noSheet = ss.getSheetByName('NewOrder');
+    if (noSheet && noSheet.getLastRow() > 1) {
+      noSheet.getRange(2, 1, noSheet.getLastRow() - 1, 2).getValues()
+        .forEach(r => { if (safe_(r[0]) && safe_(r[1])) rows.push(r); });
+    }
+    return rows;
   } catch(e) { return []; }
 }
 
