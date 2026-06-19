@@ -531,12 +531,10 @@ function updateDateBtn(){
     // Show chip ONLY for custom date range (start ≠ end)
     // Hide for: today, yesterday, last7, thisMonth, lastMonth, all
     var singlePresets = ['today','yesterday','last7','thisMonth','lastMonth','all'];
-    var isCustom = _date.preset === 'custom' && _date.start;
-    var show = isCustom;
+    var isCustomRange = _date.preset === 'custom' && _date.start && _date.end && _date.start !== _date.end;
+    var show = isCustomRange;
     chip.classList.toggle('show', show);
-    if(show) chip.textContent = _date.start === _date.end
-      ? '📅 ' + displayDate(_date.start)
-      : displayDate(_date.start)+' → '+displayDate(_date.end);
+    if(show) chip.textContent = displayDate(_date.start)+' → '+displayDate(_date.end);
   }
   // highlight active in popup
   document.querySelectorAll('#olDatePop [data-p]').forEach(function(b){
