@@ -155,6 +155,12 @@
   }
 
   /* ─── ORDER DRAWER ──────────────────────────────────────── */
+  const ST_META = {
+    pending:   { color: '#fbbf24', bg: 'rgba(251,191,36,.18)',  border: 'rgba(251,191,36,.4)',  label: 'Pending'   },
+    delivered: { color: '#4ade80', bg: 'rgba(74,222,128,.18)',  border: 'rgba(74,222,128,.4)',  label: 'Delivered' },
+    cancelled: { color: '#f87171', bg: 'rgba(248,113,113,.18)', border: 'rgba(248,113,113,.4)', label: 'Cancelled' },
+  };
+
   function openOrderDrawer(o) {
     const overlay = document.getElementById('orderDrawerOverlay');
     const drawer  = document.getElementById('orderDrawer');
@@ -163,7 +169,7 @@
     if (!overlay || !drawer || !body) return;
 
     const statusKey = String(o.status || '').toLowerCase();
-    const st  = STATUS_STYLE[statusKey] || { bg: 'rgba(148,163,184,.15)', color: '#94a3b8', label: o.status || '—' };
+    const st  = ST_META[statusKey] || { color: '#94a3b8', bg: 'rgba(148,163,184,.18)', border: 'rgba(148,163,184,.4)', label: o.status || '—' };
     const amt = typeof orderTotal === 'function' ? orderTotal(o) : 0;
     const initials = String(o.customer || '?').trim().charAt(0).toUpperCase();
 
@@ -176,49 +182,66 @@
     if (idEl) idEl.textContent = o.id ? '#' + o.id : dateStr;
 
     const prods = Array.isArray(o.products) && o.products.length ? o.products : [];
-    const prodRows = prods.map(p => {
-      const lineTotal = (Number(p.qty || 1) * Number(p.price || 0) - Number(p.discount || 0));
-      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid rgba(148,163,184,.08)">
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;color:var(--text);font-weight:500">${p.name || '—'}</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px">x${p.qty || 1} × $${Number(p.price||0).toFixed(2)}${Number(p.discount||0) ? ' <span style="color:#f87171">-$'+Number(p.discount).toFixed(2)+'</span>' : ''}</div>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:var(--text);flex-shrink:0">$${lineTotal.toFixed(2).replace(/\.00$/,'')}</div>
-      </div>`;
-    }).join('') || '<div style="font-size:12px;color:var(--muted);padding:8px 0">មិនមានផលិតផល</div>';
-
     const delivFee = Number(o.deliveryFee || 0);
 
+    const prodRows = prods.map((p, i) => {
+      const qty       = Number(p.qty || 1);
+      const price     = Number(p.price || 0);
+      const disc      = Number(p.discount || 0);
+      const lineTotal = qty * price - disc;
+      return `
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);margin-bottom:6px">
+          <div style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px">${i+1}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:#e2e8f0;line-height:1.4">${p.name || '—'}</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:3px">
+              x${qty} × <span style="color:#a78bfa">$${price.toFixed(2)}</span>
+              ${disc ? `<span style="color:#f87171;margin-left:4px">−$${disc.toFixed(2)}</span>` : ''}
+            </div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:#e2e8f0;flex-shrink:0">$${lineTotal.toFixed(2).replace(/\.00$/,'')}</div>
+        </div>`;
+    }).join('') || `<div style="text-align:center;padding:16px;color:#64748b;font-size:12px">មិនមានផលិតផល</div>`;
+
     body.innerHTML = `
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-        <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0">${initials}</div>
-        <div>
-          <div style="font-size:16px;font-weight:700;color:var(--text)">${o.customer || '—'}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">${o.phone || '—'}</div>
+      <div style="margin:-20px -20px 20px;padding:24px 20px 20px;background:linear-gradient(135deg,#1e1b4b 0%,#0f172a 60%,#0c1a2e 100%);border-bottom:1px solid rgba(139,92,246,.25)">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 0 3px rgba(139,92,246,.3)">${initials}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:17px;font-weight:700;color:#f1f5f9;line-height:1.2">${o.customer || '—'}</div>
+            <div style="font-size:12px;color:#94a3b8;margin-top:3px;display:flex;align-items:center;gap:5px">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91A16 16 0 0 0 15.09 16.09l.91-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              ${o.phone || '—'}
+            </div>
+          </div>
+          <span style="flex-shrink:0;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;background:${st.bg};color:${st.color};border:1px solid ${st.border}">${st.label}</span>
         </div>
-        <span style="margin-left:auto;font-size:10px;padding:4px 10px;border-radius:20px;font-weight:600;background:${st.bg};color:${st.color}">${st.label}</span>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">
-        ${infoChip('📍','ខេត្ត', o.province || '—')}
-        ${infoChip('📅','កាលបរិច្ឆេទ', dateStr)}
-        ${infoChip('👤','CloseBy', o.closeBy || '—')}
-        ${infoChip('📄','Page', o.page || '—')}
-        ${o.delivery ? infoChip('🚚','Delivery', o.delivery) : ''}
+        ${chip('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>','#06b6d4','ខេត្ត', o.province || '—')}
+        ${chip('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>','#a78bfa','កាលបរិច្ឆេទ', dateStr)}
+        ${chip('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>','#4ade80','CloseBy', o.closeBy || '—')}
+        ${chip('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"/></svg>','#fbbf24','Page', o.page || '—')}
+        ${o.delivery ? chip('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>','#f472b6','Delivery', o.delivery) : ''}
       </div>
 
-      <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Products</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px">Products</div>
+        <div style="flex:1;height:1px;background:rgba(148,163,184,.15)"></div>
+        <div style="font-size:10px;color:#64748b">${prods.length} item${prods.length !== 1 ? 's' : ''}</div>
+      </div>
       ${prodRows}
 
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(148,163,184,.15)">
-        ${delivFee ? `<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px"><span>Delivery Fee</span><span>$${delivFee.toFixed(2)}</span></div>` : ''}
+      <div style="margin-top:14px;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(6,182,212,.08));border:1px solid rgba(139,92,246,.25)">
+        ${delivFee ? `<div style="display:flex;justify-content:space-between;font-size:12px;color:#94a3b8;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(148,163,184,.15)"><span>Delivery Fee</span><span style="color:#e2e8f0">$${delivFee.toFixed(2)}</span></div>` : ''}
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:13px;font-weight:600;color:var(--muted)">សរុប</span>
-          <span style="font-size:20px;font-weight:800;color:var(--text)">$${amt.toFixed(2).replace(/\.00$/,'')}</span>
+          <span style="font-size:13px;font-weight:600;color:#94a3b8">សរុបទាំងអស់</span>
+          <span style="font-size:24px;font-weight:800;background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">$${amt.toFixed(2).replace(/\.00$/,'')}</span>
         </div>
       </div>
 
-      ${o.address ? `<div style="margin-top:14px;padding:10px 12px;border-radius:10px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.1);font-size:11px;color:var(--muted);line-height:1.6"><span style="font-weight:600;color:var(--text)">អាសយដ្ឋាន:</span> ${o.address}</div>` : ''}
+      ${o.address ? `<div style="margin-top:12px;padding:10px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);display:flex;gap:8px;align-items:flex-start"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.5" style="flex-shrink:0;margin-top:2px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><span style="font-size:11px;color:#cbd5e1;line-height:1.6">${o.address}</span></div>` : ''}
     `;
 
     overlay.style.display = 'block';
@@ -228,10 +251,10 @@
     });
   }
 
-  function infoChip(icon, label, value) {
-    return `<div style="padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(148,163,184,.1)">
-      <div style="font-size:10px;color:var(--muted);margin-bottom:2px">${label}</div>
-      <div style="font-size:12px;font-weight:600;color:var(--text)">${value}</div>
+  function chip(svgIcon, color, label, value) {
+    return `<div style="padding:10px 12px;border-radius:10px;background:rgba(15,23,42,.6);border:1px solid rgba(148,163,184,.12)">
+      <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">${svgIcon}<span style="font-size:10px;color:#64748b;font-weight:500">${label}</span></div>
+      <div style="font-size:12px;font-weight:700;color:#e2e8f0;line-height:1.3">${value}</div>
     </div>`;
   }
 
