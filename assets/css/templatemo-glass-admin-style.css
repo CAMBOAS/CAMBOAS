@@ -1223,6 +1223,9 @@ a {
     border-radius: 8px;
     cursor: pointer;
     transition: all var(--transition-fast);
+    position: relative;
+    flex-direction: column;
+    gap: 1px;
 }
 
 .calendar-day:hover {
@@ -1231,6 +1234,7 @@ a {
 
 .calendar-day.other-month {
     color: var(--text-muted);
+    opacity: 0.4;
 }
 
 .calendar-day.today {
@@ -1243,11 +1247,28 @@ a {
 .calendar-day.has-event::after {
     content: '';
     position: absolute;
-    bottom: 4px;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 4px;
     height: 4px;
     background: var(--gold);
     border-radius: 50%;
+}
+
+.calendar-day.today.has-event::after {
+    background: rgba(255,255,255,0.8);
+}
+
+.cal-order-badge {
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+}
+
+.calendar-day.today .cal-order-badge {
+    color: rgba(255,255,255,0.9);
 }
 
 /* ============================================

@@ -250,31 +250,40 @@
                     <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px"></div>
                 </div>
 
-                <!-- Donut Chart -->
+                <!-- Order Status Donut -->
                 <div class="glass-card">
                     <div class="card-header">
                         <div>
-                            <h2 class="card-title">Traffic Sources</h2>
-                            <p class="card-subtitle">User acquisition breakdown</p>
+                            <h2 class="card-title">Order Status</h2>
+                            <p class="card-subtitle">ស្ថានភាព Orders ទាំងអស់</p>
                         </div>
                     </div>
                     <div class="donut-container">
                         <div class="donut-chart">
-                            <svg width="140" height="140" viewBox="0 0 140 140">
+                            <svg id="statusDonutSvg" width="140" height="140" viewBox="0 0 140 140">
                                 <circle class="donut-bg" cx="70" cy="70" r="54"/>
-                                <circle class="donut-segment" cx="70" cy="70" r="54" stroke="var(--emerald-light)" stroke-dasharray="169.6 339.3" stroke-dashoffset="0"/>
-                                <circle class="donut-segment" cx="70" cy="70" r="54" stroke="var(--gold)" stroke-dasharray="101.8 339.3" stroke-dashoffset="-169.6"/>
-                                <circle class="donut-segment" cx="70" cy="70" r="54" stroke="var(--coral)" stroke-dasharray="67.9 339.3" stroke-dashoffset="-271.4"/>
+                                <circle id="statusSegPending"   class="donut-segment" cx="70" cy="70" r="54" stroke="#fbbf24" stroke-dasharray="0 339.3" stroke-dashoffset="0"/>
+                                <circle id="statusSegDelivered" class="donut-segment" cx="70" cy="70" r="54" stroke="#4ade80" stroke-dasharray="0 339.3" stroke-dashoffset="0"/>
+                                <circle id="statusSegCancelled" class="donut-segment" cx="70" cy="70" r="54" stroke="#f87171" stroke-dasharray="0 339.3" stroke-dashoffset="0"/>
                             </svg>
                             <div class="donut-center">
-                                <div class="donut-value">24.5K</div>
-                                <div class="donut-label">Visitors</div>
+                                <div class="donut-value" id="statusDonutTotal">0</div>
+                                <div class="donut-label">Orders</div>
                             </div>
                         </div>
                         <div class="donut-legend">
-                            <div class="legend-item"><span class="legend-color cyan"></span><span>Organic Search (50%)</span></div>
-                            <div class="legend-item"><span class="legend-color magenta"></span><span>Social Media (30%)</span></div>
-                            <div class="legend-item"><span class="legend-color purple"></span><span>Direct Traffic (20%)</span></div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#fbbf24"></span>
+                                <span>Pending &nbsp;<strong id="statusPendingCount" style="color:#fbbf24">0</strong></span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#4ade80"></span>
+                                <span>Delivered &nbsp;<strong id="statusDeliveredCount" style="color:#4ade80">0</strong></span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background:#f87171"></span>
+                                <span>Cancelled &nbsp;<strong id="statusCancelledCount" style="color:#f87171">0</strong></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -321,6 +330,7 @@
     <script src="assets/js/dashboard-live.js?v=159"></script>
     <script src="assets/js/dashboard-layout.js?v=158"></script>
     <script src="assets/js/province-sales.js?v=158"></script>
+    <script src="assets/js/dashboard-widgets.js?v=160"></script>
     <!-- CAMBO MINI 607 Glass Admin -->
 
 <script>
