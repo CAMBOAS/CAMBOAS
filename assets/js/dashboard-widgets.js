@@ -89,44 +89,63 @@
     });
   }
 
-  /* ─── ORDER STATUS DONUT ────────────────────────────────── */
-  const CIRC = 339.3; // 2π × 54
+  /* ─── RECENT ORDERS ─────────────────────────────────────── */
+  const STATUS_STYLE = {
+    pending:   { bg: 'rgba(251,191,36,.15)',  color: '#fbbf24', label: 'Pending'   },
+    delivered: { bg: 'rgba(74,222,128,.15)',  color: '#4ade80', label: 'Delivered' },
+    cancelled: { bg: 'rgba(248,113,113,.15)', color: '#f87171', label: 'Cancelled' },
+  };
 
-  function renderDonut(rows) {
-    const total     = rows.length;
-    const pending   = rows.filter(o => String(o.status || '').toLowerCase() === 'pending').length;
-    const delivered = rows.filter(o => String(o.status || '').toLowerCase() === 'delivered').length;
-    const cancelled = rows.filter(o => String(o.status || '').toLowerCase() === 'cancelled').length;
-    const other     = total - pending - delivered - cancelled;
-    const pending2  = pending + other;
+  function renderRecentOrders(rows) {
+    const el = document.getElementById('recentOrdersList');
+    if (!el) return;
 
-    const elTotal     = document.getElementById('statusDonutTotal');
-    const elPending   = document.getElementById('statusPendingCount');
-    const elDelivered = document.getElementById('statusDeliveredCount');
-    const elCancelled = document.getElementById('statusCancelledCount');
-    const segPending   = document.getElementById('statusSegPending');
-    const segDelivered = document.getElementById('statusSegDelivered');
-    const segCancelled = document.getElementById('statusSegCancelled');
+    if (!rows.length) {
+      el.innerHTML = '<div style="text-align:center;padding:24px;opacity:.45;font-size:13px">មិនមានទិន្នន័យ</div>';
+      return;
+    }
 
-    if (elTotal)     elTotal.textContent     = total;
-    if (elPending)   elPending.textContent   = pending2;
-    if (elDelivered) elDelivered.textContent = delivered;
-    if (elCancelled) elCancelled.textContent = cancelled;
+    const sorted = rows.slice().sort((a, b) => {
+      const da = typeof parseOrderDate === 'function' ? parseOrderDate(a.date) : new Date(a.date);
+      const db = typeof parseOrderDate === 'function' ? parseOrderDate(b.date) : new Date(b.date);
+      return (db || 0) - (da || 0);
+    });
 
-    if (!total || !segPending || !segDelivered || !segCancelled) return;
+    const recent = sorted.slice(0, 8);
 
-    const lenP = Math.round((pending2   / total) * CIRC * 10) / 10;
-    const lenD = Math.round((delivered  / total) * CIRC * 10) / 10;
-    const lenC = Math.round((cancelled  / total) * CIRC * 10) / 10;
+    el.innerHTML = recent.map(o => {
+      const statusKey = String(o.status || '').toLowerCase();
+      const st  = STATUS_STYLE[statusKey] || { bg: 'rgba(148,163,184,.15)', color: '#94a3b8', label: o.status || '—' };
+      const amt = typeof orderTotal === 'function'
+        ? '$' + orderTotal(o).toFixed(2).replace(/\.00$/, '')
+        : '—';
 
-    segPending.setAttribute('stroke-dasharray',   `${lenP} ${CIRC}`);
-    segPending.setAttribute('stroke-dashoffset',  '0');
+      const prods = Array.isArray(o.products) && o.products.length
+        ? o.products.map(p => p.name || '').filter(Boolean).join(', ')
+        : (o.product || '—');
+      const prodShort = prods.length > 32 ? prods.slice(0, 32) + '…' : prods;
 
-    segDelivered.setAttribute('stroke-dasharray',  `${lenD} ${CIRC}`);
-    segDelivered.setAttribute('stroke-dashoffset', `-${lenP}`);
+      const initials = String(o.customer || '?').trim().charAt(0).toUpperCase();
 
-    segCancelled.setAttribute('stroke-dasharray',  `${lenC} ${CIRC}`);
-    segCancelled.setAttribute('stroke-dashoffset', `-${lenP + lenD}`);
+      const dateStr = (() => {
+        const d = typeof parseOrderDate === 'function' ? parseOrderDate(o.date) : null;
+        if (!d) return '';
+        return (d.getDate()) + '/' + (d.getMonth() + 1);
+      })();
+
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(148,163,184,.08);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.06)'" onmouseout="this.style.background='rgba(255,255,255,.03)'">
+        <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.customer || '—'}</div>
+          <div style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px">${prodShort}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
+          <span style="font-size:12px;font-weight:700;color:var(--text)">${amt}</span>
+          <span style="font-size:9px;padding:2px 7px;border-radius:20px;font-weight:600;background:${st.bg};color:${st.color}">${st.label}</span>
+        </div>
+        <div style="font-size:10px;color:var(--muted);flex-shrink:0;min-width:28px;text-align:right">${dateStr}</div>
+      </div>`;
+    }).join('');
   }
 
   /* ─── INIT & REFRESH ────────────────────────────────────── */
@@ -136,7 +155,7 @@
     if (typeof _dashRows !== 'undefined' && _dashRows.length) {
       buildOrderDays(_dashRows);
       renderCalendar();
-      renderDonut(_dashRows);
+      renderRecentOrders(_dashRows);
     }
   });
 
@@ -144,7 +163,7 @@
     const rows = Array.isArray(e.detail) ? e.detail : [];
     buildOrderDays(rows);
     renderCalendar();
-    renderDonut(rows);
+    renderRecentOrders(rows);
   });
 
 })();

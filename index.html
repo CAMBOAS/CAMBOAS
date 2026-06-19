@@ -250,42 +250,16 @@
                     <div id="calGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px"></div>
                 </div>
 
-                <!-- Order Status Donut -->
-                <div class="glass-card">
-                    <div class="card-header">
+                <!-- Recent Orders -->
+                <div class="glass-card" style="display:flex;flex-direction:column;">
+                    <div class="card-header" style="flex-shrink:0">
                         <div>
-                            <h2 class="card-title">Order Status</h2>
-                            <p class="card-subtitle">ស្ថានភាព Orders ទាំងអស់</p>
+                            <h2 class="card-title">Recent Orders</h2>
+                            <p class="card-subtitle">Orders ចុងក្រោយបំផុត</p>
                         </div>
+                        <a href="pages/order-list.html" class="card-btn" style="flex-shrink:0">View All</a>
                     </div>
-                    <div class="donut-container">
-                        <div class="donut-chart">
-                            <svg id="statusDonutSvg" width="140" height="140" viewBox="0 0 140 140">
-                                <circle class="donut-bg" cx="70" cy="70" r="54"/>
-                                <circle id="statusSegPending"   class="donut-segment" cx="70" cy="70" r="54" stroke="#fbbf24" stroke-dasharray="0 339.3" stroke-dashoffset="0"/>
-                                <circle id="statusSegDelivered" class="donut-segment" cx="70" cy="70" r="54" stroke="#4ade80" stroke-dasharray="0 339.3" stroke-dashoffset="0"/>
-                                <circle id="statusSegCancelled" class="donut-segment" cx="70" cy="70" r="54" stroke="#f87171" stroke-dasharray="0 339.3" stroke-dashoffset="0"/>
-                            </svg>
-                            <div class="donut-center">
-                                <div class="donut-value" id="statusDonutTotal">0</div>
-                                <div class="donut-label">Orders</div>
-                            </div>
-                        </div>
-                        <div class="donut-legend">
-                            <div class="legend-item">
-                                <span class="legend-color" style="background:#fbbf24"></span>
-                                <span>Pending &nbsp;<strong id="statusPendingCount" style="color:#fbbf24">0</strong></span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background:#4ade80"></span>
-                                <span>Delivered &nbsp;<strong id="statusDeliveredCount" style="color:#4ade80">0</strong></span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background:#f87171"></span>
-                                <span>Cancelled &nbsp;<strong id="statusCancelledCount" style="color:#f87171">0</strong></span>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="recentOrdersList" style="flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,.2) transparent;display:flex;flex-direction:column;gap:6px;margin-top:8px;padding-right:2px"></div>
                 </div>
 
                 <!-- Cambodia Province Sales Card -->
