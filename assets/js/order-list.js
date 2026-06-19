@@ -531,10 +531,12 @@ function updateDateBtn(){
     // Show chip ONLY for custom date range (start ≠ end)
     // Hide for: today, yesterday, last7, thisMonth, lastMonth, all
     var singlePresets = ['today','yesterday','last7','thisMonth','lastMonth','all'];
-    var isCustomRange = _date.preset === 'custom' && _date.start && _date.end && _date.start !== _date.end;
-    var show = isCustomRange;
+    var isCustom = _date.preset === 'custom' && _date.start;
+    var show = isCustom;
     chip.classList.toggle('show', show);
-    if(show) chip.textContent = displayDate(_date.start)+' → '+displayDate(_date.end);
+    if(show) chip.textContent = _date.start === _date.end
+      ? '📅 ' + displayDate(_date.start)
+      : displayDate(_date.start)+' → '+displayDate(_date.end);
   }
   // highlight active in popup
   document.querySelectorAll('#olDatePop [data-p]').forEach(function(b){
@@ -1579,8 +1581,16 @@ function loadSaleInforFilters(){
 }
 
 async function init(){
-  var r = getPreset('today');
-  _date = {preset:'today', start:r.start, end:r.end, label:r.label};
+  // Check if navigated from Calendar with a specific date
+  var _urlDate = new URLSearchParams(window.location.search).get('date');
+  if (_urlDate && /^\d{4}-\d{2}-\d{2}$/.test(_urlDate)) {
+    var dp = _urlDate.split('-');
+    var dayLabel = dp[2] + '/' + dp[1] + '/' + dp[0];
+    _date = {preset:'custom', start:_urlDate, end:_urlDate, label:dayLabel};
+  } else {
+    var r = getPreset('today');
+    _date = {preset:'today', start:r.start, end:r.end, label:r.label};
+  }
   updateDateBtn();
 
   _orders = await loadOrders();

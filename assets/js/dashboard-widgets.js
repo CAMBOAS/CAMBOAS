@@ -51,14 +51,14 @@
                    && now.getMonth()    === viewMonth
                    && now.getDate()     === d;
 
-      const cls = ['calendar-day', isToday ? 'today' : '', count ? 'has-event' : '']
+      const cls = ['calendar-day', isToday ? 'today' : '', count ? 'has-event' : '', count ? 'cal-clickable' : '']
         .filter(Boolean).join(' ');
 
       const badge = count
         ? `<span class="cal-order-badge">${count}</span>`
         : '';
 
-      html += `<div class="${cls}" title="${count ? count + ' orders' : ''}">${d}${badge}</div>`;
+      html += `<div class="${cls}" data-date="${key}" title="${count ? count + ' orders — ចុចដើម្បីមើល' : ''}">${d}${badge}</div>`;
     }
 
     const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
@@ -87,6 +87,15 @@
       if (viewMonth > 11) { viewMonth = 0; viewYear++; }
       renderCalendar();
     });
+
+    const gridEl = document.getElementById('calGrid');
+    if (gridEl) {
+      gridEl.addEventListener('click', e => {
+        const day = e.target.closest('.cal-clickable');
+        if (!day || !day.dataset.date) return;
+        window.location.href = 'pages/order-list.html?date=' + day.dataset.date;
+      });
+    }
   }
 
   /* ─── RECENT ORDERS ─────────────────────────────────────── */
@@ -156,9 +165,9 @@
 
   /* ─── ORDER DRAWER ──────────────────────────────────────── */
   const ST_META = {
-    pending:   { color: '#fbbf24', bg: 'rgba(251,191,36,.18)',  border: 'rgba(251,191,36,.4)',  label: 'Pending'   },
-    delivered: { color: '#4ade80', bg: 'rgba(74,222,128,.18)',  border: 'rgba(74,222,128,.4)',  label: 'Delivered' },
-    cancelled: { color: '#f87171', bg: 'rgba(248,113,113,.18)', border: 'rgba(248,113,113,.4)', label: 'Cancelled' },
+    pending:   { color: '#d97706', bg: '#fef3c7', label: 'Pending'   },
+    delivered: { color: '#059669', bg: '#d1fae5', label: 'Delivered' },
+    cancelled: { color: '#dc2626', bg: '#fee2e2', label: 'Cancelled' },
   };
 
   function openOrderDrawer(o) {
@@ -169,79 +178,102 @@
     if (!overlay || !drawer || !body) return;
 
     const statusKey = String(o.status || '').toLowerCase();
-    const st  = ST_META[statusKey] || { color: '#94a3b8', bg: 'rgba(148,163,184,.18)', border: 'rgba(148,163,184,.4)', label: o.status || '—' };
+    const st  = ST_META[statusKey] || { color: '#475569', bg: '#f1f5f9', label: o.status || '—' };
     const amt = typeof orderTotal === 'function' ? orderTotal(o) : 0;
-    const initials = String(o.customer || '?').trim().charAt(0).toUpperCase();
+    const delivFee = Number(o.deliveryFee || 0);
 
     const dateStr = (() => {
       const d = typeof parseOrderDate === 'function' ? parseOrderDate(o.date) : null;
       if (!d) return o.date || '—';
-      return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+      const pad = n => String(n).padStart(2,'0');
+      return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
     })();
 
     if (idEl) idEl.textContent = o.id ? '#' + o.id : dateStr;
 
     const prods = Array.isArray(o.products) && o.products.length ? o.products : [];
-    const delivFee = Number(o.deliveryFee || 0);
 
-    const prodRows = prods.map((p, i) => {
-      const qty       = Number(p.qty || 1);
-      const price     = Number(p.price || 0);
-      const disc      = Number(p.discount || 0);
-      const lineTotal = qty * price - disc;
-      return `
-        <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);margin-bottom:6px">
-          <div style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px">${i+1}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:600;color:#e2e8f0;line-height:1.4">${p.name || '—'}</div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:3px">
-              x${qty} × <span style="color:#a78bfa">$${price.toFixed(2)}</span>
-              ${disc ? `<span style="color:#f87171;margin-left:4px">−$${disc.toFixed(2)}</span>` : ''}
-            </div>
-          </div>
-          <div style="font-size:13px;font-weight:700;color:#e2e8f0;flex-shrink:0">$${lineTotal.toFixed(2).replace(/\.00$/,'')}</div>
-        </div>`;
-    }).join('') || `<div style="text-align:center;padding:16px;color:#64748b;font-size:12px">មិនមានផលិតផល</div>`;
+    const infoRows = [
+      ['ឈ្មោះ',        o.customer   || '—'],
+      ['ទូរស័ព្ទ',      o.phone      || '—'],
+      ['អាសយដ្ឋាន',    o.address    || o.detailAddress || '—'],
+      ['ខេត្ត/ក្រុង',  o.province   || '—'],
+      ['ថ្ងៃ/ម៉ោង',    dateStr],
+      ['ដឹកជញ្ជូន',   o.delivery   || '—'],
+      ['Pages',         o.page       || '—'],
+      ['CloseBy',       o.closeBy    || '—'],
+      ['Priority',      o.priority   || '—'],
+      ['Status',        null, st],
+      ['Note',          o.note       || ''],
+    ].map(([label, val, statusMeta]) => {
+      const valueHtml = statusMeta
+        ? `<span style="padding:3px 12px;border-radius:20px;font-size:12px;font-weight:600;background:${statusMeta.bg};color:${statusMeta.color}">${statusMeta.label}</span>`
+        : `<span style="font-size:13px;color:var(--text)">${val}</span>`;
+      return `<div style="display:flex;align-items:center;min-height:40px;border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:8px 12px;margin-bottom:6px;background:var(--input-bg,rgba(248,250,252,.8))">
+        <span style="font-size:12px;color:#8b5cf6;font-weight:600;min-width:90px;flex-shrink:0">${label}</span>
+        <span style="width:1px;height:16px;background:var(--line,#e2e8f0);margin:0 10px;flex-shrink:0"></span>
+        ${valueHtml}
+      </div>`;
+    }).join('');
+
+    const prodTableRows = prods.map(p => {
+      const qty   = Number(p.qty   || 1);
+      const price = Number(p.price || 0);
+      const disc  = Number(p.discount || 0);
+      const unit  = p.unit || 'ឈុត';
+      const total = qty * price - disc;
+      return `<tr>
+        <td style="padding:8px 10px;font-size:12px;color:var(--text);border-bottom:1px solid var(--line,#e2e8f0)">${p.name || '—'}</td>
+        <td style="padding:8px 6px;font-size:12px;color:var(--text);text-align:center;border-bottom:1px solid var(--line,#e2e8f0)">${qty}</td>
+        <td style="padding:8px 6px;font-size:12px;color:var(--text);text-align:center;border-bottom:1px solid var(--line,#e2e8f0)">${unit}</td>
+        <td style="padding:8px 6px;font-size:12px;color:var(--text);text-align:right;border-bottom:1px solid var(--line,#e2e8f0)">${price}</td>
+        <td style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--text);text-align:right;border-bottom:1px solid var(--line,#e2e8f0)">$${total.toFixed(2).replace(/\.00$/,'')}</td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="5" style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">មិនមានផលិតផល</td></tr>`;
+
+    const khrAmt = Math.round(amt * 4100);
 
     body.innerHTML = `
-      <div style="margin:-20px -20px 20px;padding:24px 20px 20px;background:linear-gradient(135deg,#1e1b4b 0%,#0f172a 60%,#0c1a2e 100%);border-bottom:1px solid rgba(139,92,246,.25)">
-        <div style="display:flex;align-items:center;gap:14px">
-          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 0 3px rgba(139,92,246,.3)">${initials}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:17px;font-weight:700;color:#f1f5f9;line-height:1.2">${o.customer || '—'}</div>
-            <div style="font-size:12px;color:#94a3b8;margin-top:3px;display:flex;align-items:center;gap:5px">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91A16 16 0 0 0 15.09 16.09l.91-.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              ${o.phone || '—'}
-            </div>
-          </div>
-          <span style="flex-shrink:0;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;background:${st.bg};color:${st.color};border:1px solid ${st.border}">${st.label}</span>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span style="font-size:13px;font-weight:700;color:#8b5cf6">ព័ត៌មានអតិថិជន</span>
+      </div>
+      ${infoRows}
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span style="font-size:13px;font-weight:700;color:#06b6d4">ផលិតផល</span>
         </div>
       </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">
-        ${chip('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>','#06b6d4','ខេត្ត', o.province || '—')}
-        ${chip('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>','#a78bfa','កាលបរិច្ឆេទ', dateStr)}
-        ${chip('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>','#4ade80','CloseBy', o.closeBy || '—')}
-        ${chip('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"/></svg>','#fbbf24','Page', o.page || '—')}
-        ${o.delivery ? chip('<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>','#f472b6','Delivery', o.delivery) : ''}
+      <div style="border:1px solid var(--line,#e2e8f0);border-radius:10px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:rgba(139,92,246,.08)">
+              <th style="padding:8px 10px;font-size:11px;font-weight:600;color:#8b5cf6;text-align:left">ផលិតផល</th>
+              <th style="padding:8px 6px;font-size:11px;font-weight:600;color:#8b5cf6;text-align:center">ចំនួន</th>
+              <th style="padding:8px 6px;font-size:11px;font-weight:600;color:#8b5cf6;text-align:center">ប្រភេទ</th>
+              <th style="padding:8px 6px;font-size:11px;font-weight:600;color:#8b5cf6;text-align:right">តំម្លៃ</th>
+              <th style="padding:8px 10px;font-size:11px;font-weight:600;color:#8b5cf6;text-align:right">សរុប</th>
+            </tr>
+          </thead>
+          <tbody>${prodTableRows}</tbody>
+        </table>
       </div>
 
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px">Products</div>
-        <div style="flex:1;height:1px;background:rgba(148,163,184,.15)"></div>
-        <div style="font-size:10px;color:#64748b">${prods.length} item${prods.length !== 1 ? 's' : ''}</div>
-      </div>
-      ${prodRows}
-
-      <div style="margin-top:14px;padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(6,182,212,.08));border:1px solid rgba(139,92,246,.25)">
-        ${delivFee ? `<div style="display:flex;justify-content:space-between;font-size:12px;color:#94a3b8;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(148,163,184,.15)"><span>Delivery Fee</span><span style="color:#e2e8f0">$${delivFee.toFixed(2)}</span></div>` : ''}
+      <div style="margin-top:14px;padding:12px 16px;border-radius:10px;background:var(--input-bg,rgba(248,250,252,.8));border:1px solid var(--line,#e2e8f0)">
+        ${delivFee ? `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--line,#e2e8f0)">
+          <span style="font-size:13px;color:var(--muted)">🚚 ថ្ងៃដឹក</span>
+          <span style="font-size:13px;font-weight:600;color:var(--text)">$${delivFee.toFixed(2)}</span>
+        </div>` : ''}
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:13px;font-weight:600;color:#94a3b8">សរុបទាំងអស់</span>
-          <span style="font-size:24px;font-weight:800;background:linear-gradient(135deg,#a78bfa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">$${amt.toFixed(2).replace(/\.00$/,'')}</span>
+          <span style="font-size:14px;font-weight:700;color:var(--text)">GRAND TOTAL</span>
+          <div style="text-align:right">
+            <div style="font-size:22px;font-weight:800;background:linear-gradient(135deg,#8b5cf6,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">$${amt.toFixed(2).replace(/\.00$/,'')}</div>
+            <div style="font-size:11px;color:#8b5cf6;margin-top:1px">${khrAmt.toLocaleString()}រ</div>
+          </div>
         </div>
       </div>
-
-      ${o.address ? `<div style="margin-top:12px;padding:10px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);display:flex;gap:8px;align-items:flex-start"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.5" style="flex-shrink:0;margin-top:2px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg><span style="font-size:11px;color:#cbd5e1;line-height:1.6">${o.address}</span></div>` : ''}
     `;
 
     overlay.style.display = 'block';
@@ -249,13 +281,6 @@
       overlay.style.opacity = '1';
       drawer.style.transform = 'translateX(0)';
     });
-  }
-
-  function chip(svgIcon, color, label, value) {
-    return `<div style="padding:10px 12px;border-radius:10px;background:rgba(15,23,42,.6);border:1px solid rgba(148,163,184,.12)">
-      <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">${svgIcon}<span style="font-size:10px;color:#64748b;font-weight:500">${label}</span></div>
-      <div style="font-size:12px;font-weight:700;color:#e2e8f0;line-height:1.3">${value}</div>
-    </div>`;
   }
 
   function closeOrderDrawer() {

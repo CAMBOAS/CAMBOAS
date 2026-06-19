@@ -53,6 +53,15 @@
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
+
+    /* Drawer */
+    --drawer-bg: #1a2030;
+    --field-border: rgba(148,163,184,.2);
+    --field-bg: rgba(255,255,255,.04);
+    --text: var(--text-primary);
+    --muted: var(--text-muted);
+    --line: rgba(148,163,184,.2);
+    --input-bg: rgba(255,255,255,.04);
 }
 
 /* Light Mode */
@@ -73,6 +82,13 @@
     --text-primary: #1a1a1a;
     --text-secondary: rgba(26, 26, 26, 0.7);
     --text-muted: rgba(26, 26, 26, 0.5);
+
+    /* Drawer - Light */
+    --drawer-bg: #ffffff;
+    --field-border: #e2e8f0;
+    --field-bg: #f8fafc;
+    --line: #e2e8f0;
+    --input-bg: #f8fafc;
 }
 
 [data-theme="light"] .orb {
@@ -1269,6 +1285,17 @@ a {
 
 .calendar-day.today .cal-order-badge {
     color: rgba(255,255,255,0.9);
+}
+
+.calendar-day.cal-clickable {
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+}
+.calendar-day.cal-clickable:hover {
+    background: rgba(139,92,246,.25);
+    transform: scale(1.08);
+    border-radius: 8px;
+    color: #c4b5fd;
 }
 
 /* ============================================
