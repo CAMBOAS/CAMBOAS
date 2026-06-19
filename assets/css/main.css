@@ -1458,7 +1458,7 @@ body.sb-collapsed .shared-topbar { left: var(--sb-w-col); }
   grid-template-columns: repeat(3, minmax(0,1fr)) !important;
   gap: 20px !important;
   margin-bottom: 28px !important;
-  align-items: start !important;
+  align-items: stretch !important;
 }
 
 /* ── 5. Top Customers fills card height ── */
