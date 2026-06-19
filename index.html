@@ -135,20 +135,20 @@
                 </div>
 
                 <div class="glass-card glass-card-3d stat-card stat-card-enhanced">
-                    <div class="sc-accent sc-accent-green"></div>
+                    <div class="sc-accent sc-accent-orange"></div>
                     <div class="stat-card-inner">
                         <div class="stat-info">
-                            <h3>Delivered</h3>
-                            <div class="stat-value">0%</div>
-                            <span class="stat-change positive">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                                Success rate
+                            <h3>ចំណូលថ្ងៃនេះ</h3>
+                            <div class="stat-value" id="cardTodayRev">$0</div>
+                            <span class="stat-change" id="cardTodayChange">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="cardTodayArrow"><polyline points="18 15 12 9 6 15"/></svg>
+                                <span id="cardTodayChangeText">vs yesterday</span>
                             </span>
-                            <div class="sc-today">Delivered: <span class="sc-today-val" id="deliveredCount">0</span></div>
+                            <div class="sc-today">Orders: <span class="sc-today-val" id="cardTodayOrders">0</span></div>
                         </div>
-                        <div class="stat-icon success">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        <div class="stat-icon orange">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
                             </svg>
                         </div>
                     </div>

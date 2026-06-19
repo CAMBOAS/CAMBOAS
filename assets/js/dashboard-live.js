@@ -46,30 +46,58 @@ function updateStats(rows) {
   const totalRevenue = rows.reduce((s,o) => s + orderTotal(o), 0);
   const totalOrders  = rows.length;
   const pending   = rows.filter(o => String(o.status||'').toLowerCase() === 'pending').length;
-  const delivered = rows.filter(o => String(o.status||'').toLowerCase() === 'delivered').length;
 
   const stats = document.querySelectorAll('.stat-value');
   if (stats[0]) stats[0].textContent = `$${totalRevenue.toFixed(2).replace(/\.00$/, '')}`;
   if (stats[1]) stats[1].textContent = String(new Set(rows.map(o => o.customer).filter(Boolean)).size || 0);
   if (stats[2]) stats[2].textContent = String(totalOrders);
-  if (stats[3]) stats[3].textContent = totalOrders ? `${Math.round((delivered / totalOrders) * 100)}%` : '0%';
 
-  // Today stats
-  const today = new Date(); today.setHours(0,0,0,0);
-  const todayRows = rows.filter(o => {
-    const d = parseOrderDate(o.date);
-    return d && d >= today;
-  });
-  const todayRev = document.getElementById('todayRevenue');
-  const todayOrd = document.getElementById('todayOrders');
-  const todayCus = document.getElementById('todayCustomers');
-  const delCount = document.getElementById('deliveredCount');
+  // Today & yesterday ranges
+  const now       = new Date();
+  const today     = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+  const todayEnd  = new Date(today); todayEnd.setHours(23, 59, 59, 999);
+  const yesterdayEnd = new Date(yesterday); yesterdayEnd.setHours(23, 59, 59, 999);
+
+  const todayRows = rows.filter(o => { const d = parseOrderDate(o.date); return d && d >= today && d <= todayEnd; });
+  const yesterdayRows = rows.filter(o => { const d = parseOrderDate(o.date); return d && d >= yesterday && d < today; });
+
+  const todayRevAmt     = todayRows.reduce((s,o) => s + orderTotal(o), 0);
+  const yesterdayRevAmt = yesterdayRows.reduce((s,o) => s + orderTotal(o), 0);
+
+  // Sub-values on other cards
+  const todayRev  = document.getElementById('todayRevenue');
+  const todayOrd  = document.getElementById('todayOrders');
+  const todayCus  = document.getElementById('todayCustomers');
   const pendBadge = document.getElementById('pendingBadge');
-  if (todayRev) todayRev.textContent = '$' + todayRows.reduce((s,o) => s + orderTotal(o), 0).toFixed(2).replace(/\.00$/, '');
+  if (todayRev) todayRev.textContent = '$' + todayRevAmt.toFixed(2).replace(/\.00$/, '');
   if (todayOrd) todayOrd.textContent = todayRows.length;
   if (todayCus) todayCus.textContent = new Set(todayRows.map(o => o.customer).filter(Boolean)).size;
-  if (delCount)  delCount.textContent = delivered;
   if (pendBadge) pendBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${pending} Pending`;
+
+  // Today's Revenue card
+  const cardRev    = document.getElementById('cardTodayRev');
+  const cardChange = document.getElementById('cardTodayChange');
+  const cardText   = document.getElementById('cardTodayChangeText');
+  const cardArrow  = document.getElementById('cardTodayArrow');
+  const cardOrders = document.getElementById('cardTodayOrders');
+
+  if (cardRev) cardRev.textContent = '$' + todayRevAmt.toFixed(2).replace(/\.00$/, '');
+  if (cardOrders) cardOrders.textContent = todayRows.length;
+
+  if (cardChange && cardText && cardArrow) {
+    if (yesterdayRevAmt === 0) {
+      cardChange.className = 'stat-change positive';
+      cardArrow.setAttribute('points', '18 15 12 9 6 15');
+      cardText.textContent = 'គ្មានទិន្នន័យម្សិល';
+    } else {
+      const pct = ((todayRevAmt - yesterdayRevAmt) / yesterdayRevAmt) * 100;
+      const isUp = pct >= 0;
+      cardChange.className = 'stat-change ' + (isUp ? 'positive' : 'negative');
+      cardArrow.setAttribute('points', isUp ? '18 15 12 9 6 15' : '6 9 12 15 18 9');
+      cardText.textContent = (isUp ? '+' : '') + pct.toFixed(1) + '% vs ម្សិល';
+    }
+  }
 }
 
 function buildChartData(rows, period) {
