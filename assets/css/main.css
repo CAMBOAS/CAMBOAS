@@ -2211,27 +2211,18 @@ body.sb-collapsed .main-content {
   width: calc(100% - var(--sb-w-col)) !important;
 }
 
-/* Hide text labels, decorative dots, section titles */
+/* Hide ALL non-icon elements: labels, dots, dividers, section titles */
 .sidebar.sb-collapsed .sb-label,
 .sidebar.sb-collapsed .sb-brand-text,
 .sidebar.sb-collapsed .sb-active-dot,
 .sidebar.sb-collapsed .sb-user-name,
 .sidebar.sb-collapsed .sb-user-role,
-.sidebar.sb-collapsed .sb-section-label { display: none !important; }
-
-/* Keep dividers VISIBLE as group separators (like reference design) */
+.sidebar.sb-collapsed .sb-section-label,
 .sidebar.sb-collapsed .sb-divider,
-.sidebar.sb-collapsed .sb-divider-sm {
-  display: block !important;
-  margin: 4px 12px !important;
-  height: 1px !important;
-  background: rgba(148,163,200,.12) !important;
-  border: none !important;
-}
-[data-theme="light"] .sidebar.sb-collapsed .sb-divider,
-[data-theme="light"] .sidebar.sb-collapsed .sb-divider-sm {
-  background: rgba(0,0,0,.08) !important;
-}
+.sidebar.sb-collapsed .sb-divider-sm { display: none !important; }
+
+/* Add spacing between nav groups via list bottom margin */
+.sidebar.sb-collapsed .sb-list { margin-bottom: 8px !important; }
 
 /* Hide active accent bar */
 .sidebar.sb-collapsed .sb-link::before { display: none !important; }

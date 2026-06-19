@@ -273,7 +273,13 @@
 
     function applyCollapse(collapsed) {
       const sb = document.querySelector('.sidebar');
-      if (sb) sb.classList.toggle('sb-collapsed', collapsed);
+      if (sb) {
+        sb.classList.toggle('sb-collapsed', collapsed);
+        // Force-hide via inline style to guarantee nothing bleeds through
+        sb.querySelectorAll('.sb-section-label,.sb-divider,.sb-divider-sm').forEach(el => {
+          el.style.display = collapsed ? 'none' : '';
+        });
+      }
       document.body.classList.toggle('sb-collapsed', collapsed);
       const btn = document.getElementById('sbToggleBtn');
       if (btn) btn.innerHTML = collapsed ? _chevR : _chevL;
