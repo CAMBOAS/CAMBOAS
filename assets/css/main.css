@@ -1456,6 +1456,7 @@ body.sb-collapsed .shared-topbar { left: var(--sb-w-col); }
 .bottom-grid {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+  grid-auto-rows: 480px !important;
   gap: 20px !important;
   margin-bottom: 28px !important;
   align-items: stretch !important;
