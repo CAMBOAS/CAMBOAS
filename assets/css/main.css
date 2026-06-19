@@ -2211,39 +2211,51 @@ body.sb-collapsed .main-content {
   width: calc(100% - var(--sb-w-col)) !important;
 }
 
-/* Hide every text / decorative element */
+/* Hide text labels, decorative dots, section titles */
 .sidebar.sb-collapsed .sb-label,
 .sidebar.sb-collapsed .sb-brand-text,
 .sidebar.sb-collapsed .sb-active-dot,
 .sidebar.sb-collapsed .sb-user-name,
 .sidebar.sb-collapsed .sb-user-role,
-.sidebar.sb-collapsed .sb-divider,
-.sidebar.sb-collapsed .sb-divider-sm,
 .sidebar.sb-collapsed .sb-section-label { display: none !important; }
 
-/* Hide active accent bar (::before at left:-10px) */
+/* Keep dividers VISIBLE as group separators (like reference design) */
+.sidebar.sb-collapsed .sb-divider,
+.sidebar.sb-collapsed .sb-divider-sm {
+  display: block !important;
+  margin: 4px 12px !important;
+  height: 1px !important;
+  background: rgba(148,163,200,.12) !important;
+  border: none !important;
+}
+[data-theme="light"] .sidebar.sb-collapsed .sb-divider,
+[data-theme="light"] .sidebar.sb-collapsed .sb-divider-sm {
+  background: rgba(0,0,0,.08) !important;
+}
+
+/* Hide active accent bar */
 .sidebar.sb-collapsed .sb-link::before { display: none !important; }
 
-/* Nav links: icon-only pill, centered */
+/* Nav links: centered icon-only pill */
 .sidebar.sb-collapsed .sb-link {
   justify-content: center !important;
   padding: 9px 0 !important;
-  margin: 2px 8px !important;
+  margin: 1px 8px !important;
   border-radius: 10px !important;
   gap: 0 !important;
 }
 
-/* Icon size stays correct */
+/* Icon sizing */
 .sidebar.sb-collapsed .sb-icon { width: 20px !important; height: 20px !important; }
 .sidebar.sb-collapsed .sb-icon svg { width: 18px !important; height: 18px !important; }
 
 /* Logo: center icon only */
 .sidebar.sb-collapsed .sb-brand {
   justify-content: center !important;
-  padding: 16px 8px 12px !important;
+  padding: 16px 8px 10px !important;
 }
 
-/* Theme button: moon/sun icon only */
+/* Theme button: icon only */
 .sidebar.sb-collapsed .sb-theme-btn {
   justify-content: center !important;
   padding: 8px !important;
@@ -2252,9 +2264,9 @@ body.sb-collapsed .main-content {
 .sidebar.sb-collapsed .sb-theme-btn .sb-theme-toggle { display: none !important; }
 
 /* User: avatar circle only */
-.sidebar.sb-collapsed .sb-user { justify-content: center !important; padding: 6px !important; }
+.sidebar.sb-collapsed .sb-user { justify-content: center !important; padding: 4px !important; }
 .sidebar.sb-collapsed .sb-user > div:last-child { display: none !important; }
-.sidebar.sb-collapsed .sb-footer { padding: 10px 6px 14px !important; }
+.sidebar.sb-collapsed .sb-footer { padding: 8px 6px 14px !important; }
 
 /* ── Tooltip on hover (collapsed) ── */
 .sidebar.sb-collapsed .sb-link { position: relative !important; }
