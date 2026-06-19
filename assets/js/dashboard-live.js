@@ -181,6 +181,7 @@ async function refreshDashboard() {
   _dashRows = rows;
   updateStats(rows);
   updateChart(rows, _chartPeriod);
+  window.dispatchEvent(new CustomEvent('cambo-dash-refreshed', { detail: rows }));
 }
 
 window.addEventListener('cambo-orders-updated', refreshDashboard);
