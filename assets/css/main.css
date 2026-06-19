@@ -2205,43 +2205,37 @@ input::placeholder, textarea::placeholder {
 }
 
 /* ── Collapsed state ── */
-.sidebar.sb-collapsed { width: var(--sb-w-col) !important; }
+.sidebar.sb-collapsed {
+  width: var(--sb-w-col) !important;
+  overflow: hidden !important;
+}
 body.sb-collapsed .main-content {
   margin-left: var(--sb-w-col) !important;
   width: calc(100% - var(--sb-w-col)) !important;
 }
 
-/* Hide ALL text / decorative elements when collapsed — zero height + overflow */
+/* Hide ALL text / decorative elements when collapsed */
 .sidebar.sb-collapsed .sb-label,
 .sidebar.sb-collapsed .sb-brand-text,
 .sidebar.sb-collapsed .sb-active-dot,
 .sidebar.sb-collapsed .sb-user-name,
 .sidebar.sb-collapsed .sb-user-role,
-.sidebar.sb-collapsed .sb-divider { display: none !important; }
+.sidebar.sb-collapsed .sb-divider,
+.sidebar.sb-collapsed .sb-section-label,
+.sidebar.sb-collapsed .sb-divider-sm { display: none !important; }
 
-/* Section labels: collapse to zero height so no glyph bleeds */
-.sidebar.sb-collapsed .sb-section-label {
-  height: 0 !important; overflow: hidden !important;
-  padding: 0 !important; margin: 0 !important;
-  font-size: 0 !important; opacity: 0 !important;
-}
-
-/* Prevent any orphan text nodes in nav from showing */
+/* Clip nav overflow so no text bleeds through */
 .sidebar.sb-collapsed .sb-nav { overflow: hidden !important; }
 
-/* Theme button: clip text + toggle pill */
-.sidebar.sb-collapsed .sb-theme-btn {
-  overflow: hidden !important;
-}
+/* Theme button: icon only */
+.sidebar.sb-collapsed .sb-theme-btn { overflow: hidden !important; }
 .sidebar.sb-collapsed .sb-theme-btn > span:not(.sb-theme-icon),
 .sidebar.sb-collapsed .sb-theme-btn .sb-theme-toggle {
-  display: none !important; width: 0 !important; overflow: hidden !important;
-}
-
-/* User info wrapper: hide the inner div that has no class */
-.sidebar.sb-collapsed .sb-user > div:last-child {
   display: none !important;
 }
+
+/* User info wrapper: avatar only */
+.sidebar.sb-collapsed .sb-user > div:last-child { display: none !important; }
 
 /* Center nav icons */
 .sidebar.sb-collapsed .sb-link {
