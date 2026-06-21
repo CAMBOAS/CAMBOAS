@@ -206,6 +206,36 @@
     /* datetime-local unified picker */
     #dtLocal::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
 
+    /* od-dtlocal-inp: same look as od-inp for all screen sizes */
+    .od-dtlocal-inp {
+      flex: 1;
+      width: 100%;
+      height: 44px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(148,163,184,.22);
+      background: var(--input, rgba(255,255,255,.95));
+      padding: 0 14px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--text, #18213a);
+      outline: none;
+      cursor: pointer;
+      box-sizing: border-box;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .od-dtlocal-inp:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139,92,246,.12);
+    }
+    [data-theme="dark"] .od-dtlocal-inp {
+      border-color: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.07);
+      color: #e8e0ff;
+      color-scheme: dark;
+    }
+    [data-theme="dark"] .od-dtlocal-inp:focus { border-color: #8b5cf6; }
+
     /* Searchable combo inside fg */
     .fg .searchable-select { width: 100%; }
     .fg .searchable-select .combo-input {
@@ -810,6 +840,46 @@
       flex-shrink: 0;
     }
     .rmvbtn:active { background: rgba(239,68,68,.24); }
+
+    /* Col-heads hidden by default; phone shows its own version below */
+    .cart-col-heads { display: none; }
+
+    /* ── Phone cart col-heads: QTY left, Price right ── */
+    #cartPanel .cart-col-heads {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 16px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted, #6b7898);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    [data-theme="dark"] #cartPanel .cart-col-heads { border-bottom-color: rgba(255,255,255,0.07); }
+    /* Show only QTY (span 2) and Price (span 4); hide empty spacers */
+    #cartPanel .cart-col-heads span:nth-child(1),
+    #cartPanel .cart-col-heads span:nth-child(3),
+    #cartPanel .cart-col-heads span:nth-child(5) { display: none; }
+
+    /* ── Phone cart item: 2-row grid
+       Row 1: [name (span 2)] [×]
+       Row 2: [qty-ctrl]  [unit]  [price]           ── */
+    #cartPanel .citem {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      grid-template-rows: auto auto;
+      gap: 8px 10px;
+      flex-direction: unset;
+    }
+    #cartPanel .citem-top { display: contents; margin-bottom: 0; }
+    #cartPanel .citem-bot { display: contents; }
+    #cartPanel .citem .citem-name  { grid-column: 1 / span 2; grid-row: 1; align-self: center; }
+    #cartPanel .citem .citem-price { grid-column: 3; grid-row: 2; justify-self: end; align-self: center; }
+    #cartPanel .citem .qty-ctrl    { grid-column: 1; grid-row: 2; }
+    #cartPanel .citem .citem-unit  { grid-column: 2; grid-row: 2; align-self: center; }
+    #cartPanel .citem .rmvbtn      { grid-column: 3; grid-row: 1; justify-self: end; align-self: center; }
 
     /* ══════════════════════════════════════════════════════
        SUMMARY / TOTAL
@@ -2178,7 +2248,55 @@
       #cartPanel #cartItems  { display: block !important; }
       #cartPanel #khrInputRow{ display: flex !important; }
 
-      /* Restore vertical body layout */
+      /* Cart header: title left, QTY/Price column labels right */
+      #cartPanel #cartHead {
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 14px 18px !important;
+        border-bottom: 1.5px solid rgba(0,0,0,0.07) !important;
+      }
+      [data-theme="dark"] #cartPanel #cartHead { border-bottom-color: rgba(255,255,255,0.08) !important; }
+      #cartPanel #cartHead h3 { margin: 0 !important; font-size: 15px !important; }
+      /* ── Shared 6-column grid for col-heads + items ──
+         col1: 1fr  name
+         col2: 82px qty controls  (− n +)
+         col3: 46px unit label    (ឈុត / កេស / លាយ)
+         col4: 54px price
+         col5: 28px × button                             */
+      .cart-col-heads { display: none; }
+      #cartPanel .cart-col-heads,
+      #cartPanel .citem {
+        display: grid !important;
+        grid-template-columns: 1fr 82px 46px 54px 28px !important;
+        column-gap: 8px !important;
+        align-items: center !important;
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+      }
+
+      /* Col-head labels */
+      #cartPanel .cart-col-heads {
+        padding-top: 6px !important;
+        padding-bottom: 6px !important;
+        border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.07em !important;
+        color: var(--muted, #6b7898) !important;
+      }
+      [data-theme="dark"] #cartPanel .cart-col-heads { border-bottom-color: rgba(255,255,255,0.07) !important; }
+      #cartPanel .cart-col-heads span:nth-child(1) { /* empty — name col */ }
+      /* QTY header spans col2+col3 (covers qty-ctrl + unit) */
+      #cartPanel .cart-col-heads span:nth-child(2) {
+        grid-column: 2 / span 2 !important;
+        text-align: center !important;
+      }
+      #cartPanel .cart-col-heads span:nth-child(3) { display: none !important; } /* hidden, merged into QTY span above */
+      #cartPanel .cart-col-heads span:nth-child(4) { text-align: right !important; }  /* Price */
+      #cartPanel .cart-col-heads span:nth-child(5) { /* empty — × col */ }
+
+      /* Cart body */
       #cartPanel .mob-sect-body {
         display: block !important;
         flex-direction: unset !important;
@@ -2186,39 +2304,88 @@
         padding: 0 !important;
       }
 
-      /* Restore sum-box to vertical */
-      #cartPanel .sum-box {
-        display: block !important;
-        flex: unset !important;
-        flex-direction: unset !important;
-        gap: unset !important;
-        border: revert !important;
-        background: revert !important;
-        padding: 14px 16px !important;
-      }
-      #cartPanel .srow {
-        flex: unset !important;
+      /* Cart item: map children into grid columns via display:contents + grid-column */
+      #cartPanel .citem { padding-top: 10px !important; padding-bottom: 10px !important; }
+      #cartPanel .citem-top { display: contents !important; }
+      #cartPanel .citem-bot { display: contents !important; }
+      #cartPanel .citem .citem-name  { grid-column: 1 !important; grid-row: 1 !important; font-size: 13.5px !important; min-width: 0 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+      #cartPanel .citem .qty-ctrl    { grid-column: 2 !important; grid-row: 1 !important; justify-self: center !important; }
+      #cartPanel .citem .citem-unit  { grid-column: 3 !important; grid-row: 1 !important; justify-self: center !important; font-size: 12px !important; }
+      #cartPanel .citem .citem-price { grid-column: 4 !important; grid-row: 1 !important; justify-self: end !important; font-size: 13.5px !important; font-weight: 700 !important; }
+      #cartPanel .citem .rmvbtn      { grid-column: 5 !important; grid-row: 1 !important; justify-self: center !important; }
+      /* Edit mode: restore top as a normal flex column */
+      #cartPanel .citem.is-editing .citem-top {
+        display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
+        grid-column: 1 / -1 !important;
         gap: 8px !important;
-        padding: 6px 0 !important;
-        border-right: none !important;
-        min-height: auto !important;
       }
-      #cartPanel .srow:last-child { border-right: none !important; }
+      #cartPanel .citem.is-editing .cedit-name {
+        flex: 1 !important;
+        min-width: 0 !important;
+      }
+      #cartPanel .citem.is-editing .cedit-row {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex-shrink: 0 !important;
+      }
+      #cartPanel .citem.is-editing .citem-bot { display: none !important; }
+
+      /* Sum box: table-like rows with dividers */
+      #cartPanel .sum-box {
+        display: block !important; flex: unset !important;
+        flex-direction: unset !important; gap: unset !important;
+        border: none !important; background: transparent !important;
+        padding: 0 18px !important;
+      }
+      #cartPanel .srow {
+        flex: unset !important; flex-direction: row !important;
+        align-items: center !important; justify-content: space-between !important;
+        gap: 8px !important; padding: 10px 0 !important;
+        border-top: 1px solid rgba(0,0,0,0.06) !important;
+        border-right: none !important; min-height: auto !important;
+      }
+      #cartPanel .srow:first-child { border-top: none !important; }
+      [data-theme="dark"] #cartPanel .srow { border-top-color: rgba(255,255,255,0.07) !important; }
       #cartPanel .srow span:first-child {
-        font-size: 13px !important; font-weight: 600 !important;
-        letter-spacing: unset !important; text-transform: unset !important;
-        color: unset !important; white-space: unset !important;
+        font-size: 13px !important; font-weight: 500 !important;
+        color: var(--muted, #6b7898) !important;
+        letter-spacing: unset !important; text-transform: unset !important; white-space: unset !important;
       }
-      #cartPanel .srow span:last-child { font-size: 15px !important; font-weight: 700 !important; }
-      #cartPanel .srow.total span:last-child { font-size: 18px !important; }
+      #cartPanel .srow span:last-child { font-size: 14px !important; font-weight: 700 !important; color: var(--text, #18213a) !important; }
+      #cartPanel .srow.total { border-top: 1.5px solid rgba(0,0,0,0.10) !important; padding-top: 12px !important; }
+      [data-theme="dark"] #cartPanel .srow.total { border-top-color: rgba(255,255,255,0.12) !important; }
+      #cartPanel .srow.total span:first-child { font-size: 14px !important; font-weight: 800 !important; color: var(--text, #18213a) !important; }
+      #cartPanel .srow.total span:last-child { font-size: 18px !important; font-weight: 800 !important; color: #7c5cff !important; }
+
+      /* KHR row: pill rate button + right-aligned KHR amount */
       #cartPanel .khr-row {
-        border-top: 1px solid rgba(0,0,0,0.07) !important;
-        padding: 8px 16px !important;
-        margin: 0 !important;
+        display: flex !important; align-items: center !important;
+        justify-content: space-between !important;
+        border-top: 1.5px solid rgba(0,0,0,0.07) !important;
         border-left: none !important;
+        padding: 12px 18px !important; margin: 0 !important;
       }
+      [data-theme="dark"] #cartPanel .khr-row { border-top-color: rgba(255,255,255,0.09) !important; }
+      #cartPanel .khr-edit-btn {
+        display: flex !important; align-items: center !important; gap: 6px !important;
+        border: 1.5px solid rgba(0,0,0,0.18) !important;
+        border-radius: 999px !important;
+        background: transparent !important;
+        padding: 7px 14px !important;
+        font-size: 13px !important; font-weight: 700 !important;
+        color: var(--text, #18213a) !important;
+        cursor: pointer !important; min-width: auto !important;
+      }
+      [data-theme="dark"] #cartPanel .khr-edit-btn { border-color: rgba(255,255,255,0.22) !important; color: #e8e0ff !important; }
+      #cartPanel .khr-row > div { text-align: right !important; }
+      #cartPanel .khr-lbl { font-size: 11px !important; font-weight: 600 !important; color: var(--muted, #6b7898) !important; }
+      #cartPanel .khr-val { font-size: 18px !important; font-weight: 800 !important; color: #7c5cff !important; }
+      [data-theme="dark"] #cartPanel .khr-val { color: #a78bfa !important; }
+      [data-theme="dark"] #cartPanel .srow.total span:last-child { color: #a78bfa !important; }
 
       /* ── Action bar: in-flow card, full width ── */
       #mobBottomBar,
@@ -2442,6 +2609,13 @@
               <span class="mob-sect-chevron">▾</span>
             </div>
             <div class="mob-sect-body" id="cartBody">
+              <div class="cart-col-heads">
+                <span></span>
+                <span>QTY</span>
+                <span></span>
+                <span>Price</span>
+                <span></span>
+              </div>
               <div id="cartItems">
                 <div class="cart-empty">🛒 មិនទាន់មានផលិតផល<br><small>ចុចលើ product ខាងលើ</small></div>
               </div>
@@ -3157,6 +3331,44 @@ function _initKHR(){
 }
 
 /* ── DOM ready ── */
+/* ── Phone auto-format: XXX XXX XXX(X)
+   9 digits  → 012 345 678
+   10 digits → 096 288 5809
+   Preserves cursor position while typing / editing.           ── */
+(function(){
+  function fmtPhone(raw){
+    var d = raw.replace(/\D/g,'').slice(0,12);
+    if(d.length <= 3)  return d;
+    if(d.length <= 6)  return d.slice(0,3)+' '+d.slice(3);
+    if(d.length <= 9)  return d.slice(0,3)+' '+d.slice(3,6)+' '+d.slice(6);
+    return d.slice(0,3)+' '+d.slice(3,6)+' '+d.slice(6,9)+' '+d.slice(9);
+  }
+  function attachPhoneFmt(el){
+    if(!el) return;
+    el.addEventListener('input', function(){
+      var pos   = this.selectionStart;
+      var oldV  = this.value;
+      var newV  = fmtPhone(oldV);
+      if(newV === oldV) return;
+      /* Map cursor: count digits before old cursor, find same count in new value */
+      var dBefore = oldV.slice(0, pos).replace(/\D/g,'').length;
+      this.value  = newV;
+      var cur = 0, cnt = 0;
+      for(var i = 0; i < newV.length; i++){
+        if(/\d/.test(newV[i])){ cnt++; if(cnt === dBefore){ cur = i+1; break; } }
+      }
+      if(cnt < dBefore) cur = newV.length;
+      this.setSelectionRange(cur, cur);
+    });
+  }
+  /* Attach on DOMContentLoaded */
+  document.addEventListener('DOMContentLoaded', function(){
+    attachPhoneFmt(document.getElementById('phone'));
+  });
+  /* Also expose so phone-carrier.js can reuse */
+  window.fmtPhone = fmtPhone;
+})();
+
 document.addEventListener('DOMContentLoaded', function(){
   els={customer:_el('customer'),phone:_el('phone'),datePart:_el('datePart'),timePart:_el('timePart'),province:_el('province'),addressDetail:_el('addressDetail'),deliveryName:_el('deliveryName'),deliveryFee:_el('deliveryFee'),payment:_el('payment'),paymentOptions:_el('paymentOptions'),note:_el('note'),page:_el('page'),closeBy:_el('closeBy'),status:_el('status')};
 
