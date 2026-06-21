@@ -1218,7 +1218,7 @@ function renderDrawerEdit(o){
     })()
     +rowCombo('drDeliveryCombo','drDelivery', (o.deliveryName&&o.deliveryName.toLowerCase()!=='delivery'?o.deliveryName:''), 'ដឹកជញ្ជូន', 'ដឹកជញ្ជូន...')
     +rowInp('drDeliveryFee',o.deliveryFee||0,   'ថ្លៃដឹក', 'number')
-    +rowInp('drPayment',    o.payment||'',      'Payment')
+    +rowCombo('drPaymentCombo','drPayment', o.payment||'', 'Payment', 'Payment...')
     +rowCombo('drPageCombo',   'drPage',    o.page||o.pages||'',       'Pages',    'Pages...')
     +rowCombo('drCloseByCombo','drCloseBy', o.closeBy||o.closeby||'',  'CloseBy',  'CloseBy...')
     +rowSel('drPriority',   o.priority||'Medium','Priority',['High','Medium','Low'])
@@ -1275,6 +1275,7 @@ function renderDrawerEdit(o){
       [
         {id:'drProvinceCombo', list:SC.PROVINCES, title:'ខេត្ត / ក្រុង'},
         {id:'drDeliveryCombo', list:SC.DELIVERY,  title:'ដឹកជញ្ជូន'},
+        {id:'drPaymentCombo',  list:SC.PAYMENT_LIVE||['ABA','AC','Wing','Delivery','Other'], title:'Payment'},
         {id:'drPageCombo',     list:SC.PAGES,     title:'Pages'},
         {id:'drCloseByCombo',  list:SC.CLOSEBY,   title:'CloseBy'}
       ].forEach(function(c){
