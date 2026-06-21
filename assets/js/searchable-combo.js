@@ -302,10 +302,22 @@ document.addEventListener('DOMContentLoaded', function(){
       if (!res || !res.ok || !res.saleinfor) return;
       var s = res.saleinfor;
       /* Update each combo if sheet has data */
-      if (s.provinces && s.provinces.length && combos.province) combos.province.update(s.provinces);
-      if (s.delivery  && s.delivery.length  && combos.delivery)  combos.delivery.update(s.delivery);
-      if (s.pages     && s.pages.length     && combos.pages)     combos.pages.update(s.pages);
-      if (s.closeby   && s.closeby.length   && combos.closeby)   combos.closeby.update(s.closeby);
+      if (s.provinces && s.provinces.length) {
+        window.SearchableCombo.PROVINCES = s.provinces;
+        if (combos.province) combos.province.update(s.provinces);
+      }
+      if (s.delivery && s.delivery.length) {
+        window.SearchableCombo.DELIVERY = s.delivery;
+        if (combos.delivery) combos.delivery.update(s.delivery);
+      }
+      if (s.pages && s.pages.length) {
+        window.SearchableCombo.PAGES = s.pages;
+        if (combos.pages) combos.pages.update(s.pages);
+      }
+      if (s.closeby && s.closeby.length) {
+        window.SearchableCombo.CLOSEBY = s.closeby;
+        if (combos.closeby) combos.closeby.update(s.closeby);
+      }
       /* Store payment list and notify pages that need to rebuild buttons */
       if (s.payment && s.payment.length) {
         window.SearchableCombo.PAYMENT_LIVE = s.payment;
