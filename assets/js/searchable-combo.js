@@ -295,6 +295,24 @@ document.addEventListener('DOMContentLoaded', function(){
   if (delivWrap) combos.delivery = makeCombo(delivWrap, DELIVERY, 'ដឹកជញ្ជូន');
 
   window.SearchableCombo.combos = combos;
+
+  /* ── Load live data from SaleInfor Google Sheet ── */
+  if (window.CamboAPI) {
+    window.CamboAPI.get({ action: 'saleinfor' }).then(function(res) {
+      if (!res || !res.ok || !res.saleinfor) return;
+      var s = res.saleinfor;
+      /* Update each combo if sheet has data */
+      if (s.provinces && s.provinces.length && combos.province) combos.province.update(s.provinces);
+      if (s.delivery  && s.delivery.length  && combos.delivery)  combos.delivery.update(s.delivery);
+      if (s.pages     && s.pages.length     && combos.pages)     combos.pages.update(s.pages);
+      if (s.closeby   && s.closeby.length   && combos.closeby)   combos.closeby.update(s.closeby);
+      /* Store payment list and notify pages that need to rebuild buttons */
+      if (s.payment && s.payment.length) {
+        window.SearchableCombo.PAYMENT_LIVE = s.payment;
+        document.dispatchEvent(new CustomEvent('saleInforLoaded', { detail: s }));
+      }
+    }).catch(function() { /* keep hardcoded fallback on error */ });
+  }
 });
 
 })();

@@ -3370,6 +3370,20 @@ function _initKHR(){
   window.fmtPhone = fmtPhone;
 })();
 
+/* ── Rebuild payment buttons when SaleInfor sheet data arrives ── */
+document.addEventListener('saleInforLoaded', function(e) {
+  var payments = e.detail && e.detail.payment;
+  if (!payments || !payments.length) return;
+  var container = document.getElementById('paymentOptions');
+  var hiddenInp = document.getElementById('payment');
+  if (!container) return;
+  var currentVal = hiddenInp ? hiddenInp.value : '';
+  container.innerHTML = payments.map(function(p) {
+    var active = p === currentVal ? ' active' : '';
+    return '<button type="button" class="pay-btn' + active + '" data-value="' + p.replace(/"/g,'&quot;') + '">' + p + '</button>';
+  }).join('');
+});
+
 document.addEventListener('DOMContentLoaded', function(){
   els={customer:_el('customer'),phone:_el('phone'),datePart:_el('datePart'),timePart:_el('timePart'),province:_el('province'),addressDetail:_el('addressDetail'),deliveryName:_el('deliveryName'),deliveryFee:_el('deliveryFee'),payment:_el('payment'),paymentOptions:_el('paymentOptions'),note:_el('note'),page:_el('page'),closeBy:_el('closeBy'),status:_el('status')};
 

@@ -392,7 +392,22 @@
 })();
 </script>
 
-    <script src="../assets/js/searchable-combo.js?v=167"></script>
+    <script src="../assets/js/searchable-combo.js?v=168"></script>
+<script>
+/* Rebuild payment buttons from SaleInfor sheet */
+document.addEventListener('saleInforLoaded', function(e) {
+  var payments = e.detail && e.detail.payment;
+  if (!payments || !payments.length) return;
+  var container = document.getElementById('paymentOptions');
+  var hiddenInp = document.getElementById('payment');
+  if (!container) return;
+  var currentVal = hiddenInp ? hiddenInp.value : '';
+  container.innerHTML = payments.map(function(p) {
+    var active = p === currentVal ? ' active' : '';
+    return '<button type="button" class="payment-btn' + active + '" data-value="' + p.replace(/"/g,'&quot;') + '">' + p + '</button>';
+  }).join('');
+});
+</script>
 
   <!-- ═══════════════════════════════════════
        PRODUCT MANAGER FULLSCREEN MODAL v5
