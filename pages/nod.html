@@ -205,6 +205,8 @@
     }
     /* datetime-local unified picker */
     #dtLocal::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+    /* Phone: hide dtLocal, show separate date+time inputs */
+    .od-dtlocal-desk { display: none; }
 
     /* od-dtlocal-inp: same look as od-inp for all screen sizes */
     .od-dtlocal-inp {
@@ -1965,8 +1967,11 @@
         color: #e8e0ff !important;
       }
 
-      /* Date/time */
+      /* Date/time — desktop: single datetime-local only */
       #custBody .od-datetime { display: block !important; }
+      #custBody .od-dtlocal-desk { display: block !important; }
+      #custBody .od-date-inp  { display: none !important; }
+      #custBody .od-time-inp  { display: none !important; }
       #custBody .od-dtlocal-inp {
         width: 100% !important; height: 42px !important;
         border: 1.5px solid rgba(100,120,180,0.18) !important;
@@ -2537,7 +2542,9 @@
               <div class="od-row">
                 <span class="od-lbl">ថ្ងៃ / ម៉ោង</span>
                 <div class="od-datetime">
-                  <input id="dtLocal" type="datetime-local" hidden>
+                  <!-- Desktop: single datetime-local; Phone: separate date+time (iOS-safe) -->
+                  <input id="dtLocal" type="datetime-local" class="od-dtlocal-inp od-dtlocal-desk"
+                    oninput="(function(dl){var v=dl.value;if(!v)return;var p=v.split('T');var dp=document.getElementById('datePart');var tp=document.getElementById('timePart');if(dp)dp.value=p[0];if(tp)tp.value=p[1]||'00:00';})(this)">
                   <input id="datePart" type="date" class="od-dtlocal-inp od-date-inp"
                     oninput="(function(dp,tp,dl){var v=dp+'T'+(tp||'00:00');if(dl)dl.value=v;})(this.value,document.getElementById('timePart').value,document.getElementById('dtLocal'))">
                   <input id="timePart" type="time" class="od-dtlocal-inp od-time-inp"
