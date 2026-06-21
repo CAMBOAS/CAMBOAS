@@ -2533,14 +2533,15 @@
                 </select>
               </div>
 
-              <!-- ── ថ្ងៃខែឆ្នាំ + ម៉ោង (unified datetime-local) ── -->
+              <!-- ── ថ្ងៃខែឆ្នាំ + ម៉ោង (date + time separate — iOS-safe) ── -->
               <div class="od-row">
                 <span class="od-lbl">ថ្ងៃ / ម៉ោង</span>
                 <div class="od-datetime">
-                  <input id="dtLocal" type="datetime-local" class="od-dtlocal-inp"
-                    oninput="(function(v,dp,tp){if(!v)return;var s=v.split('T');if(dp)dp.value=s[0]||'';if(tp)tp.value=s[1]||'';})(this.value,document.getElementById('datePart'),document.getElementById('timePart'))">
-                  <input id="datePart" type="date" hidden>
-                  <input id="timePart" type="time" hidden>
+                  <input id="dtLocal" type="datetime-local" hidden>
+                  <input id="datePart" type="date" class="od-dtlocal-inp od-date-inp"
+                    oninput="(function(dp,tp,dl){var v=dp+'T'+(tp||'00:00');if(dl)dl.value=v;})(this.value,document.getElementById('timePart').value,document.getElementById('dtLocal'))">
+                  <input id="timePart" type="time" class="od-dtlocal-inp od-time-inp"
+                    oninput="(function(dp,tp,dl){if(!dp)return;var v=dp+'T'+tp;if(dl)dl.value=v;})(document.getElementById('datePart').value,this.value,document.getElementById('dtLocal'))">
                 </div>
               </div>
 
