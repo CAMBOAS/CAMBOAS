@@ -300,6 +300,7 @@
 <div id="anDateFloatMenu">
   <button class="an-date-opt active" data-mode="month"     onclick="anPickMode(this,'ខែនេះ')">ខែនេះ<span class="opt-chk">✓</span></button>
   <button class="an-date-opt"        data-mode="today"     onclick="anPickMode(this,'ថ្ងៃនេះ')">ថ្ងៃនេះ<span class="opt-chk">✓</span></button>
+  <button class="an-date-opt"        data-mode="yesterday" onclick="anPickMode(this,'ម្សិលមិញ')">ម្សិលមិញ<span class="opt-chk">✓</span></button>
   <button class="an-date-opt"        data-mode="week"      onclick="anPickMode(this,'សប្ដាហ៍នេះ')">សប្ដាហ៍នេះ<span class="opt-chk">✓</span></button>
   <button class="an-date-opt"        data-mode="lastmonth" onclick="anPickMode(this,'ខែមុន')">ខែមុន<span class="opt-chk">✓</span></button>
   <button class="an-date-opt"        data-mode="all"       onclick="anPickMode(this,'ទាំងអស់')">ទាំងអស់<span class="opt-chk">✓</span></button>
@@ -316,6 +317,10 @@
     var now = new Date();
     if(mode==='today'){
       var t=toYMD(now); return {s:t,e:t};
+    }
+    if(mode==='yesterday'){
+      var y=new Date(now); y.setDate(now.getDate()-1);
+      var yt=toYMD(y); return {s:yt,e:yt};
     }
     if(mode==='week'){
       var day=now.getDay()||7;
