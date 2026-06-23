@@ -206,11 +206,18 @@ function renderAnalytics(rows){
 }
 
 async function initAnalytics(){
-  const rows = await CamboOrdersData.fetchOrders();
+  const [rows, saleInforRes] = await Promise.all([
+    CamboOrdersData.fetchOrders(),
+    window.CamboAPI ? window.CamboAPI.get({ action: 'saleinfor' }).catch(() => null) : Promise.resolve(null)
+  ]);
 
   const pageSelect = document.getElementById('analyticsPage');
   if (pageSelect){
-    [...new Set(rows.map(r => r.page).filter(Boolean))].sort().forEach(page => {
+    const siPages = saleInforRes && saleInforRes.ok && saleInforRes.saleinfor && saleInforRes.saleinfor.pages;
+    const pages = (siPages && siPages.length)
+      ? siPages
+      : [...new Set(rows.map(r => r.page).filter(Boolean))].sort();
+    pages.forEach(page => {
       const op = document.createElement('option');
       op.value = page; op.textContent = page;
       pageSelect.appendChild(op);
