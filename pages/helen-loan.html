@@ -98,8 +98,9 @@
     @media(max-width:1080px){.lg{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:600px){.form-row{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-    /* ── Mobile Tab Switcher ── */
+    /* ── Mobile-only elements: hidden on desktop ── */
     .mob-tabs{display:none}
+    .mob-form-hd{display:none}
     @media(max-width:768px){
       .lw{gap:12px}
       .mob-tabs{display:flex;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(148,163,200,.12);margin-bottom:2px}
