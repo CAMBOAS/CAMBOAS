@@ -154,8 +154,27 @@
       }
       .mob-form-hd span{font-size:15px;font-weight:700;color:var(--text);font-family:inherit}
 
-      /* ── Form card ── */
-      .lp:first-child{padding:0!important;border-radius:20px;overflow:hidden}
+      /* ── Form card: edge-to-edge breakout ── */
+      .lp:first-child{
+        padding:0!important;border-radius:0!important;
+        border:none!important;box-shadow:none!important;
+        outline:none!important;
+        backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+        background:var(--card)!important;
+        position:relative!important;
+        left:50%!important;right:50%!important;
+        margin-left:-50vw!important;margin-right:-50vw!important;
+        width:100vw!important;max-width:100vw!important;
+      }
+      .lw,.lg{overflow-x:hidden}
+      /* Delete modal compact on mobile */
+      .del-box{padding:22px 20px!important;max-width:calc(100vw - 32px)!important}
+      /* Refresh button hidden on mobile (save toolbar space) */
+      button[data-i18n="refresh"]{display:none!important}
+      /* Search bar full width */
+      #srch{min-width:0!important}
+      /* Loan cards list padding */
+      .loan-cards{padding:0 4px}
       .lp:first-child .lp-title{display:none}
       .form-section{display:block!important;gap:0!important;margin:0!important}
       .form-row{display:block!important;margin:0!important;padding:0!important}
@@ -296,14 +315,14 @@
                   <span class="fi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
                   <span class="fl" data-i18n="lFullName">ឈ្មោះពេញ *</span>
                 </label>
-                <input type="text" id="fName" data-i18n="phName" data-i18n-attr="placeholder" placeholder="បញ្ចូលឈ្មោះ...">
+                <input type="text" id="fName" data-i18n="phName" data-i18n-attr="placeholder" placeholder="បញ្ចូលឈ្មោះ..." autocapitalize="words" autocomplete="name" enterkeyhint="next">
               </div>
               <div class="field-group">
                 <label>
                   <span class="fi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
                   <span class="fl" data-i18n="lNID">អត្តសញ្ញាណប័ណ្ណ</span>
                 </label>
-                <input type="text" id="fNID" data-i18n="phNID" data-i18n-attr="placeholder" placeholder="XXX-XXX-XXX">
+                <input type="text" id="fNID" data-i18n="phNID" data-i18n-attr="placeholder" placeholder="XXX-XXX-XXX" inputmode="numeric" autocomplete="off" enterkeyhint="next">
               </div>
             </div>
 
@@ -313,7 +332,7 @@
                   <span class="fi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
                   <span class="fl" data-i18n="lDOB">ថ្ងៃខែឆ្នាំកំណើត</span>
                 </label>
-                <input type="text" id="fDOB" placeholder="dd/mm/yyyy" maxlength="10" oninput="fmtDOB(this)" style="letter-spacing:.04em">
+                <input type="text" id="fDOB" placeholder="dd/mm/yyyy" maxlength="10" oninput="fmtDOB(this)" inputmode="numeric" enterkeyhint="next" style="letter-spacing:.04em">
               </div>
               <div class="field-group">
                 <label>
@@ -334,7 +353,7 @@
                   <span class="fi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.85a16 16 0 0 0 5.24 5.24l1.21-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 15.27v1.65z"/></svg></span>
                   <span class="fl" data-i18n="lPhone">លេខទូរស័ព្ទ</span>
                 </label>
-                <input type="tel" id="fPhone" data-i18n="phPhone" data-i18n-attr="placeholder" placeholder="Enter Phone Number">
+                <input type="tel" id="fPhone" data-i18n="phPhone" data-i18n-attr="placeholder" placeholder="Enter Phone Number" inputmode="tel" autocomplete="tel" enterkeyhint="next">
               </div>
               <div class="field-group">
                 <label>
@@ -362,7 +381,7 @@
                   <span class="fi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
                   <span class="fl" data-i18n="lMoney">ទឹកប្រាក់ ($)</span>
                 </label>
-                <input type="number" id="fMoney" placeholder="0.00" step="0.01" min="0">
+                <input type="text" id="fMoney" placeholder="0.00" inputmode="decimal" enterkeyhint="done" autocomplete="off">
               </div>
             </div>
 
