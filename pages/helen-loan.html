@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+  <title>ការកម្ចី - CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=158">
+  <link rel="stylesheet" href="../assets/css/main.css?v=158">
+  <style>
+    .lw{display:grid;gap:18px}
+    .stats-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .kpi{padding:16px 18px;border-radius:20px}
+    .kpi span{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .kpi strong{display:block;margin-top:8px;font-size:24px;color:var(--text)}
+    .lg{display:grid;grid-template-columns:1fr 1.15fr;gap:18px}
+    .lp{padding:22px 24px;border-radius:22px}
+    .lp-title{margin:0 0 16px;font-size:16px;font-weight:700;color:var(--text);display:flex;align-items:center}
+    .btn-export{padding:6px 10px;border-radius:10px;border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.08);color:#86efac;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;display:flex;align-items:center;gap:5px;transition:.15s;flex-shrink:0}
+    .btn-export:hover{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.5)}
+    .sheet-toggle{display:flex;border-radius:10px;overflow:hidden;border:1px solid rgba(99,102,241,.3);flex-shrink:0}
+    .sheet-toggle button{padding:6px 11px;font-size:11.5px;font-weight:700;font-family:inherit;border:none;color:#a5b4fc;background:rgba(99,102,241,.06);transition:.15s;white-space:nowrap;display:flex;align-items:center;gap:4px;border-right:1px solid rgba(99,102,241,.2);cursor:pointer}
+    .sheet-toggle button:last-child{border-right:none}
+    .sheet-toggle button:hover{background:rgba(99,102,241,.18)}
+    .lp-title-actions{margin-left:auto;display:flex;gap:6px;align-items:center}
+    /* Form */
+    .form-section{display:grid;gap:12px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .field-group{display:flex;flex-direction:column;gap:5px}
+    .field-group label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .field-group input,.field-group select,.field-group textarea{
+      width:100%;padding:10px 13px;border-radius:12px;font-size:13px;font-family:inherit;
+      background:rgba(255,255,255,.06);border:1px solid rgba(148,163,200,.15);color:var(--text);
+      transition:.15s;box-sizing:border-box}
+    .field-group input:focus,.field-group select:focus,.field-group textarea:focus{
+      outline:none;border-color:rgba(6,182,212,.4);background:rgba(6,182,212,.05)}
+    .field-group textarea{resize:vertical;min-height:70px}
+    .radio-group{display:flex;gap:14px;align-items:center;padding:8px 0}
+    .radio-group label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer;font-weight:500}
+    .radio-group input[type=radio]{accent-color:#06b6d4;width:16px;height:16px}
+    .btn-save{width:100%;padding:13px;border-radius:14px;border:none;cursor:pointer;font-size:15px;font-weight:700;font-family:inherit;
+      background:linear-gradient(135deg,#06b6d4,#3b82f6);color:#fff;transition:.2s;margin-top:4px}
+    .btn-save:hover{opacity:.88;transform:translateY(-1px)}
+    .btn-save:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .btn-clear{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(148,163,200,.2);cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;
+      background:transparent;color:var(--muted);margin-top:4px;transition:.15s}
+    .btn-clear:hover{border-color:rgba(148,163,200,.4);color:var(--text)}
+    /* Table */
+    .tools{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+    .tools input,.tools select{min-height:36px;padding:0 12px;border-radius:10px;font-size:13px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(148,163,200,.15);color:var(--text);font-family:inherit}
+    .loan-table-wrap{overflow-x:auto;border-radius:14px}
+    .loan-table{width:100%;border-collapse:collapse;font-size:12.5px}
+    .loan-table th{padding:9px 12px;text-align:left;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;
+      color:var(--muted);border-bottom:1px solid rgba(148,163,200,.12);white-space:nowrap}
+    .loan-table td{padding:10px 12px;border-bottom:1px solid rgba(148,163,200,.07);color:var(--text);vertical-align:middle}
+    .loan-table tr:last-child td{border-bottom:none}
+    .loan-table tr:hover td{background:rgba(6,182,212,.04)}
+    .tag{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid;white-space:nowrap}
+    .tag-m{background:rgba(6,182,212,.1);color:#7dd3fc;border-color:rgba(6,182,212,.2)}
+    .tag-f{background:rgba(236,72,153,.1);color:#f9a8d4;border-color:rgba(236,72,153,.2)}
+    .tag-o{background:rgba(251,191,36,.1);color:#fde68a;border-color:rgba(251,191,36,.2)}
+    .tag-g{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.2)}
+    .tag-def{background:rgba(255,255,255,.06);color:var(--muted);border-color:rgba(148,163,200,.15)}
+    .empty-msg{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+    .toast{position:fixed;bottom:24px;right:24px;padding:13px 20px;border-radius:14px;font-size:13px;font-weight:600;
+      background:rgba(6,182,212,.15);border:1px solid rgba(6,182,212,.3);color:#7dd3fc;
+      backdrop-filter:blur(12px);z-index:9999;transform:translateY(20px);opacity:0;transition:.3s;pointer-events:none}
+    .toast.show{transform:translateY(0);opacity:1}
+    .toast.err{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5}
+    .loading-row td{text-align:center;padding:30px;color:var(--muted);font-size:13px}
+    .btn-act{padding:5px 8px;border-radius:8px;border:none;cursor:pointer;font-size:12px;line-height:1;transition:.15s}
+    .btn-edit{background:rgba(6,182,212,.12);color:#7dd3fc;}
+    .btn-edit:hover{background:rgba(6,182,212,.25)}
+    .btn-del{background:rgba(239,68,68,.1);color:#fca5a5;}
+    .btn-del:hover{background:rgba(239,68,68,.22)}
+    .btn-update{width:100%;padding:13px;border-radius:14px;border:none;cursor:pointer;font-size:15px;font-weight:700;font-family:inherit;
+      background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;transition:.2s;margin-top:4px}
+    .btn-update:hover{opacity:.88;transform:translateY(-1px)}
+    .btn-update:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .edit-banner{padding:9px 14px;border-radius:12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);
+      color:#fde68a;font-size:12px;font-weight:600;margin-bottom:10px;display:none;align-items:center;gap:8px}
+    .edit-banner.show{display:flex}
+    /* Delete confirm modal */
+    .del-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:9998;display:none;align-items:center;justify-content:center}
+    .del-modal.show{display:flex}
+    .del-box{background:var(--card);border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:28px 32px;max-width:360px;width:90%;text-align:center}
+    .del-box h4{margin:0 0 8px;font-size:18px;color:var(--text)}
+    .del-box p{margin:0 0 20px;font-size:13px;color:var(--muted)}
+    .del-btns{display:flex;gap:10px}
+    .del-btns button{flex:1;padding:11px;border-radius:12px;border:none;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit}
+    .del-cancel{background:rgba(255,255,255,.06);color:var(--muted)}
+    .del-cancel:hover{background:rgba(255,255,255,.1)}
+    .del-confirm{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+    .del-confirm:hover{opacity:.88}
+    @media(max-width:1080px){.lg{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){.form-row{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
+</head>
+<body>
+<div class="background"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+<div class="dashboard">
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar" id="sharedSidebar"></aside>
+  <main class="main-content">
+    <div class="shared-topbar" id="sharedHeader"></div>
+    <div class="lw">
+
+      <!-- KPI Stats -->
+      <div class="stats-row">
+        <article class="glass-card kpi"><span data-i18n="kpiTotal">អ្នកកម្ចីសរុប</span><strong id="stTotal">0</strong></article>
+        <article class="glass-card kpi"><span data-i18n="kpiMoney">ប្រាក់សរុប ($)</span><strong id="stMoney">$0</strong></article>
+        <article class="glass-card kpi"><span>SS3</span><strong id="stSS3">0</strong></article>
+        <article class="glass-card kpi"><span data-i18n="kpiToday">ថ្ងៃនេះ</span><strong id="stToday">0</strong></article>
+      </div>
+
+      <div class="lg">
+        <!-- LEFT: Input Form -->
+        <article class="glass-card lp">
+          <h3 class="lp-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            <span data-i18n="formTitle">ព័ត៌មានអ្នកកម្ចី</span>
+          </h3>
+          <div class="form-section">
+            <div class="form-row">
+              <div class="field-group">
+                <label data-i18n="lFullName">ឈ្មោះពេញ *</label>
+                <input type="text" id="fName" data-i18n="phName" data-i18n-attr="placeholder" placeholder="បញ្ចូលឈ្មោះ...">
+              </div>
+              <div class="field-group">
+                <label data-i18n="lNID">អត្តសញ្ញាណប័ណ្ណ</label>
+                <input type="text" id="fNID" data-i18n="phNID" data-i18n-attr="placeholder" placeholder="XXX-XXX-XXX">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field-group">
+                <label data-i18n="lDOB">ថ្ងៃខែឆ្នាំកំណើត</label>
+                <input type="text" id="fDOB" placeholder="dd/mm/yyyy" maxlength="10"
+                  oninput="fmtDOB(this)" style="letter-spacing:.04em">
+              </div>
+              <div class="field-group">
+                <label data-i18n="lGender">ភេទ</label>
+                <div class="radio-group">
+                  <label data-i18n-radio="gMale"><input type="radio" name="gender" value="ប្រុស"> ប្រុស</label>
+                  <label data-i18n-radio="gFemale"><input type="radio" name="gender" value="ស្រី"> ស្រី</label>
+                  <label data-i18n-radio="gOther"><input type="radio" name="gender" value="ផ្សេងៗ"> ផ្សេងៗ</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field-group">
+                <label data-i18n="lPhone">លេខទូរស័ព្ទ</label>
+                <input type="tel" id="fPhone" data-i18n="phPhone" data-i18n-attr="placeholder" placeholder="Enter Phone Number">
+              </div>
+              <div class="field-group">
+                <label data-i18n="lGroups">ក្រុម</label>
+                <select id="fGroups">
+                  <option value="" data-i18n="selGroup">-- ជ្រើសក្រុម --</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field-group">
+                <label data-i18n="lStatus">ស្ថានភាព</label>
+                <select id="fStatus">
+                  <option value="" data-i18n="selStatus">-- ជ្រើសស្ថានភាព --</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label data-i18n="lMoney">ទឹកប្រាក់ ($)</label>
+                <input type="number" id="fMoney" placeholder="0.00" step="0.01" min="0">
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label data-i18n="lNote">កំណត់ចំណាំ</label>
+              <textarea id="fNote" data-i18n="phNote" data-i18n-attr="placeholder" placeholder="បញ្ចូលកំណត់ចំណាំ..."></textarea>
+            </div>
+
+            <div class="edit-banner" id="editBanner">
+              ✏️ <span id="editBannerText">កំពុង Edit — ចុច Update ដើម្បីរក្សាទុក</span>
+              <button onclick="cancelEdit()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#fde68a;font-size:16px">✕</button>
+            </div>
+            <button class="btn-save" id="btnSave" onclick="saveLoan()" data-i18n="btnSave">💾 រក្សាទុក</button>
+            <button class="btn-update" id="btnUpdate" onclick="updateLoan()" style="display:none">✏️ Update</button>
+            <button class="btn-clear" onclick="clearForm()" data-i18n="btnClear">លុបទម្រង់</button>
+          </div>
+        </article>
+
+        <!-- RIGHT: Loan List -->
+        <article class="glass-card lp">
+          <h3 class="lp-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span data-i18n="listTitle">បញ្ជីអ្នកកម្ចី</span>
+            <span id="loanCount" style="font-size:12px;font-weight:400;color:var(--muted);margin-left:5px"></span>
+            <div class="lp-title-actions">
+              <div class="sheet-toggle">
+                <button id="btnSheetLoan" onclick="openSheetUrl('loan')" title="Open HelenLoan sheet">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  HelenLoan
+                </button>
+                <button id="btnSheetLoanT" onclick="openSheetUrl('loanT')" title="Open HelenLoanT sheet">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  HelenLoanT
+                </button>
+              </div>
+              <button class="btn-export" onclick="exportLoans()" title="Export CSV">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span data-i18n="exportBtn">Export</span>
+              </button>
+            </div>
+          </h3>
+          <div class="tools">
+            <input type="text" id="srch" data-i18n="srchPH" data-i18n-attr="placeholder" placeholder="ស្វែងរកឈ្មោះ / ទូរស័ព្ទ..." oninput="filterLoans()" style="flex:1;min-width:160px">
+            <select id="fGroup" onchange="filterLoans()">
+              <option value="" data-i18n="allGroups">All Groups</option>
+            </select>
+            <button onclick="loadLoans()" data-i18n="refresh" style="padding:7px 14px;border-radius:10px;border:1px solid rgba(148,163,200,.2);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit">↻ Refresh</button>
+          </div>
+          <div class="loan-table-wrap">
+            <table class="loan-table">
+              <thead>
+                <tr>
+                  <th data-i18n-th="thNo">#</th>
+                  <th data-i18n-th="thName">ឈ្មោះ</th>
+                  <th data-i18n-th="thNID">អត្តសញ្ញាណប័ណ្ណ</th>
+                  <th data-i18n-th="thGender">ភេទ</th>
+                  <th data-i18n-th="thPhone">ទូរស័ព្ទ</th>
+                  <th data-i18n-th="thGroup">ក្រុម</th>
+                  <th data-i18n-th="thMoney">ទឹកប្រាក់</th>
+                  <th data-i18n-th="thStatus">ស្ថានភាព</th>
+                  <th data-i18n-th="thDate">កាលបរិច្ឆេទ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="loanTbody">
+                <tr class="loading-row"><td colspan="8">កំពុងផ្ទុកទិន្នន័យ...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+
+    </div><!-- .lw -->
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="del-modal" id="delModal">
+  <div class="del-box">
+    <h4>🗑️ <span id="delModalTitle">លុបអ្នកកម្ចី</span></h4>
+    <p id="delModalMsg">តើអ្នកប្រាកដថាចង់លុប <b id="delName"></b>?</p>
+    <div class="del-btns">
+      <button class="del-cancel" onclick="closeDelModal()" id="btnDelCancel">បោះបង់</button>
+      <button class="del-confirm" onclick="confirmDelete()" id="btnDelConfirm">លុបចោល</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/layout.js?v=158"></script>
+<script src="../assets/js/dashboard-layout.js?v=158"></script>
+<script src="../assets/js/cambo-api.js?v=158"></script>
+<script>
+/* ── DOB auto-format: type digits only → auto-insert "/" → dd/mm/yyyy ── */
+function fmtDOB(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 8);
+  if (v.length > 4) v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+  else if (v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
+  el.value = v;
+}
+
+/* ── i18n helper (reads from layout.js global) ── */
+function t(kh, en) {
+  return (window.getLang ? window.getLang() : (localStorage.getItem('cambo_lang') || 'kh')) === 'en' ? en : kh;
+}
+
+/* ── All UI text strings ── */
+const I18N = {
+  formTitle:    [['ព័ត៌មានអ្នកកម្ចី',    'Borrower Information']],
+  lFullName:    [['ឈ្មោះពេញ *',          'Full Name *']],
+  lNID:         [['អត្តសញ្ញាណប័ណ្ណ',     'National ID']],
+  lDOB:         [['ថ្ងៃខែឆ្នាំកំណើត',   'Date of Birth']],
+  lGender:      [['ភេទ',                  'Gender']],
+  gMale:        [['ប្រុស',               'Male']],
+  gFemale:      [['ស្រី',               'Female']],
+  gOther:       [['ផ្សេងៗ',             'Other']],
+  lPhone:       [['លេខទូរស័ព្ទ',         'Phone Number']],
+  lGroups:      [['ក្រុម',               'Group']],
+  lStatus:      [['ស្ថានភាព',            'Status']],
+  lMoney:       [['ទឹកប្រាក់ ($)',        'Amount ($)']],
+  lNote:        [['កំណត់ចំណាំ',          'Note']],
+  btnSave:      [['💾 រក្សាទុក',         '💾 Save']],
+  btnClear:     [['លុបទម្រង់',           'Clear Form']],
+  btnSaving:    [['កំពុងរក្សាទុក...',    'Saving...']],
+  listTitle:    [['បញ្ជីអ្នកកម្ចី',      'Borrower List']],
+  srchPH:       [['ស្វែងរកឈ្មោះ / ទូរស័ព្ទ...', 'Search name / phone...']],
+  allGroups:    [['All Groups',           'All Groups']],
+  exportBtn:    [['Export',              'Export']],
+  refresh:      [['↻ Refresh',            '↻ Refresh']],
+  thNo:         [['#',                    '#']],
+  thName:       [['ឈ្មោះ',               'Name']],
+  thNID:        [['អត្តសញ្ញាណប័ណ្ណ',    'National ID']],
+  thGender:     [['ភេទ',                 'Gender']],
+  thPhone:      [['ទូរស័ព្ទ',            'Phone']],
+  thGroup:      [['ក្រុម',               'Group']],
+  thMoney:      [['ទឹកប្រាក់',           'Amount']],
+  thStatus:     [['ស្ថានភាព',            'Status']],
+  thDate:       [['កាលបរិច្ឆេទ',         'Date']],
+  kpiTotal:     [['អ្នកកម្ចីសរុប',       'Total Borrowers']],
+  kpiMoney:     [['ប្រាក់សរុប ($)',       'Total Amount ($)']],
+  kpiToday:     [['ថ្ងៃនេះ',             'Today']],
+  loading:      [['កំពុងផ្ទុកទិន្នន័យ...','Loading...']],
+  noData:       [['មិនមានទិន្នន័យ',       'No data found']],
+  selGroup:     [['-- ជ្រើសក្រុម --',     '-- Select Group --']],
+  selStatus:    [['-- ជ្រើសស្ថានភាព --', '-- Select Status --']],
+  errName:      [['សូមបញ្ចូលឈ្មោះ!',     'Please enter a name!']],
+  saveOk:       [['✅ រក្សាទុកបានជោគជ័យ!','✅ Saved successfully!']],
+  errServer:    [['❌ មិនអាចភ្ជាប់ Server','❌ Cannot connect to Server']],
+  phName:       [['បញ្ចូលឈ្មោះ...',       'Enter full name...']],
+  phNID:        [['XXX-XXX-XXX',          'XXX-XXX-XXX']],
+  phPhone:      [['Enter Phone Number',   'Enter Phone Number']],
+  phStatus:     [['ស្ថានភាព...',          'Status...']],
+  phNote:       [['បញ្ចូលកំណត់ចំណាំ...', 'Enter note...']],
+};
+function tx(key) {
+  const pair = I18N[key];
+  if (!pair) return key;
+  return t(pair[0][0], pair[0][1]);
+}
+
+/* ── Apply all UI text based on current language ── */
+function applyLang() {
+  const els = document.querySelectorAll('[data-i18n]');
+  els.forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const attr = el.getAttribute('data-i18n-attr');
+    if (attr) { el.setAttribute(attr, tx(key)); }
+    else { el.textContent = tx(key); }
+  });
+  /* Radio labels need special handling since they have nested input */
+  document.querySelectorAll('[data-i18n-radio]').forEach(el => {
+    const key = el.getAttribute('data-i18n-radio');
+    el.childNodes[el.childNodes.length - 1].textContent = ' ' + tx(key);
+  });
+  /* Table headers */
+  const ths = document.querySelectorAll('[data-i18n-th]');
+  ths.forEach(el => { el.textContent = tx(el.getAttribute('data-i18n-th')); });
+}
+
+let allLoans = [];
+let filtered  = [];
+
+/* ── Load Groups & Statuses from HelenInfor sheet ── */
+async function loadHelenInfor() {
+  try {
+    const data = await CamboAPI.get({ action: 'helen_infor' });
+    if (data.ok) {
+      const skip = ['groups','status','group'];
+      const clean = arr => (arr||[]).filter(v => !skip.includes(v.toLowerCase()));
+      populateSelect('fGroups', clean(data.groups),   tx('selGroup'));
+      populateSelect('fStatus', clean(data.statuses), tx('selStatus'));
+    }
+  } catch(e) { /* silently fail — user can still type */ }
+}
+
+function populateSelect(id, items, placeholder) {
+  const sel = document.getElementById(id);
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">${placeholder}</option>` +
+    items.map(v => `<option value="${v}"${v===cur?' selected':''}>${v}</option>`).join('');
+}
+
+/* ── Load loans from Google Sheet ── */
+async function loadLoans() {
+  document.getElementById('loanTbody').innerHTML =
+    `<tr class="loading-row"><td colspan="10">${tx('loading')}</td></tr>`;
+  try {
+    const data = await CamboAPI.get({ action: 'helen_loan_list' });
+    allLoans = (data.ok && Array.isArray(data.loans)) ? data.loans : [];
+  } catch(e) {
+    allLoans = [];
+    showToast(tx('errServer'), true);
+  }
+  populateGroupFilter();
+  filterLoans();
+  updateStats();
+}
+
+function populateGroupFilter() {
+  const sel = document.getElementById('fGroup');
+  const cur = sel.value;
+  const groups = [...new Set(allLoans.map(l => l.Groups).filter(Boolean))].sort();
+  sel.innerHTML = `<option value="">${tx('allGroups')}</option>` +
+    groups.map(g => `<option value="${g}"${g===cur?' selected':''}>${g}</option>`).join('');
+}
+
+function filterLoans() {
+  const q = document.getElementById('srch').value.toLowerCase();
+  const g = document.getElementById('fGroup').value;
+  filtered = allLoans.filter(l =>
+    (!q || (l.FullName||'').toLowerCase().includes(q) || (l.Phone||'').includes(q)) &&
+    (!g || l.Groups === g)
+  );
+  renderTable();
+}
+
+function exportLoans() {
+  const data = filtered.length ? filtered : allLoans;
+  if (!data.length) { showToast(t('គ្មានទិន្នន័យ','No data to export'), true); return; }
+  const headers = ['#','Full Name','National ID','DOB','Gender','Phone','Group','Amount ($)','Status','Date','Note'];
+  const rows = data.map((l, i) => {
+    const rawDt = l.DateTime ? l.DateTime.split('T')[0] : '';
+    const dtParts = rawDt.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const dt = dtParts ? dtParts[3]+'/'+dtParts[2]+'/'+dtParts[1] : (rawDt || '');
+    return [
+      i+1,
+      l.FullName||'', l.NationalID||'', l.DOB||'', l.Gender||'',
+      '\t'+(l.Phone||''), l.Groups||'', l.Money||'', l.Status||'', dt, l.Note||''
+    ];
+  });
+  const csv = [headers, ...rows].map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const bom = '﻿';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const now = new Date();
+  const stamp = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  a.download = 'HelenLoan_' + stamp + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(t('បានទាញទិន្នន័យ '+data.length+' ជួរ', 'Exported '+data.length+' rows'));
+}
+
+function renderTable() {
+  document.getElementById('loanCount').textContent = '(' + filtered.length + ')';
+  const tb = document.getElementById('loanTbody');
+  if (!filtered.length) {
+    tb.innerHTML = `<tr><td colspan="10" class="empty-msg">${tx('noData')}</td></tr>`;
+    return;
+  }
+  tb.innerHTML = filtered.map((l, i) => {
+    const groupTag  = l.Groups ? `<span class="tag tag-m">${l.Groups}</span>` : '-';
+    const gClass    = l.Gender === 'ប្រុស' || l.Gender === 'Male'   ? 'tag-m'
+                    : l.Gender === 'ស្រី'  || l.Gender === 'Female' ? 'tag-f'
+                    : l.Gender ? 'tag-o' : '';
+    const genderTag = l.Gender ? `<span class="tag ${gClass}">${l.Gender}</span>` : '-';
+    const money     = l.Money ? '$' + parseFloat(l.Money).toFixed(2) : '-';
+    const rawDt     = l.DateTime ? l.DateTime.split('T')[0] : '';
+    const dtParts   = rawDt.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const dt        = dtParts ? dtParts[3]+'/'+dtParts[2]+'/'+dtParts[1] : (rawDt || '-');
+    const status    = l.Status ? `<span class="tag tag-g">${l.Status}</span>` : '-';
+    const key = l.DateTime || '';
+    return `<tr>
+      <td style="color:var(--muted);font-size:11px">${i+1}</td>
+      <td><b style="font-size:13px">${l.FullName||'-'}</b></td>
+      <td style="color:var(--muted);font-size:12px">${l.NationalID||'-'}</td>
+      <td>${genderTag}</td>
+      <td style="color:var(--muted)">${l.Phone||'-'}</td>
+      <td>${groupTag}</td>
+      <td style="color:#7dd3fc;font-weight:700">${money}</td>
+      <td>${status}</td>
+      <td style="color:var(--muted);font-size:11px;white-space:nowrap">${dt}</td>
+      <td style="white-space:nowrap">
+        <button class="btn-act btn-edit" onclick="editLoan('${key}')" title="Edit">✏️</button>
+        <button class="btn-act btn-del"  onclick="openDelModal('${key}','${(l.FullName||'').replace(/'/g,"\\'")}')" title="Delete">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStats() {
+  const today = new Date().toISOString().split('T')[0];
+  const totalMoney = allLoans.reduce((s,l) => s + (parseFloat(l.Money)||0), 0);
+  const ss3 = allLoans.filter(l => l.Groups === 'SS3').length;
+  document.getElementById('stTotal').textContent = allLoans.length;
+  document.getElementById('stMoney').textContent = '$' + totalMoney.toFixed(0);
+  document.getElementById('stSS3').textContent   = ss3;
+  document.getElementById('stToday').textContent = allLoans.filter(l => (l.DateTime||'').startsWith(today)).length;
+}
+
+/* ── Save loan ── */
+async function saveLoan() {
+  const name = document.getElementById('fName').value.trim();
+  if (!name) { showToast(tx('errName'), true); document.getElementById('fName').focus(); return; }
+
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  btn.textContent = tx('btnSaving');
+
+  const gender = document.querySelector('input[name="gender"]:checked')?.value || 'ប្រុស';
+  try {
+    const res = await CamboAPI.post({
+      action: 'helen_loan_add',
+      loan: {
+        FullName:   name,
+        NationalID: document.getElementById('fNID').value.trim(),
+        DOB:        document.getElementById('fDOB').value,
+        Gender:     gender,
+        Phone:      document.getElementById('fPhone').value.trim(),
+        Groups:     document.getElementById('fGroups').value.trim() || 'SS3',
+        Status:     document.getElementById('fStatus').value.trim(),
+        Money:      document.getElementById('fMoney').value.trim(),
+        Note:       document.getElementById('fNote').value.trim(),
+      }
+    });
+    if (res.ok) { showToast(tx('saveOk')); clearForm(); loadLoans(); }
+    else        { showToast('❌ ' + (res.message || 'Error'), true); }
+  } catch(e) {
+    showToast(tx('errServer'), true);
+  }
+  btn.disabled = false;
+  btn.textContent = tx('btnSave');
+}
+
+function clearForm() {
+  ['fName','fNID','fDOB','fPhone','fMoney','fNote'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fGroups').value = '';
+  document.getElementById('fStatus').value = '';
+  document.querySelectorAll('input[name="gender"]').forEach(r => r.checked = false);
+  cancelEdit();
+}
+
+/* ── Edit mode ── */
+let editKey = null;
+
+function editLoan(key) {
+  const l = allLoans.find(x => x.DateTime === key);
+  if (!l) return;
+  editKey = key;
+
+  document.getElementById('fName').value   = l.FullName   || '';
+  document.getElementById('fNID').value    = l.NationalID || '';
+  document.getElementById('fDOB').value    = l.DOB        || '';
+  document.getElementById('fPhone').value  = l.Phone      || '';
+  document.getElementById('fGroups').value = l.Groups     || '';
+  document.getElementById('fStatus').value = l.Status     || '';
+  document.getElementById('fMoney').value  = l.Money      || '';
+  document.getElementById('fNote').value   = l.Note       || '';
+
+  /* Gender radio */
+  document.querySelectorAll('input[name="gender"]').forEach(r => {
+    r.checked = r.value === l.Gender;
+  });
+
+  document.getElementById('editBanner').classList.add('show');
+  document.getElementById('btnSave').style.display   = 'none';
+  document.getElementById('btnUpdate').style.display = '';
+  document.getElementById('fName').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelEdit() {
+  editKey = null;
+  document.getElementById('editBanner').classList.remove('show');
+  document.getElementById('btnSave').style.display   = '';
+  document.getElementById('btnUpdate').style.display = 'none';
+}
+
+async function updateLoan() {
+  const name = document.getElementById('fName').value.trim();
+  if (!name) { showToast(tx('errName'), true); return; }
+
+  const btn = document.getElementById('btnUpdate');
+  btn.disabled = true;
+  btn.textContent = tx('btnSaving');
+
+  const gender = document.querySelector('input[name="gender"]:checked')?.value || '';
+  try {
+    const res = await CamboAPI.post({
+      action: 'helen_loan_update',
+      key: editKey,
+      loan: {
+        FullName:   name,
+        NationalID: document.getElementById('fNID').value.trim(),
+        DOB:        document.getElementById('fDOB').value.trim(),
+        Gender:     gender,
+        Phone:      document.getElementById('fPhone').value.trim(),
+        Groups:     document.getElementById('fGroups').value.trim(),
+        Status:     document.getElementById('fStatus').value.trim(),
+        Money:      document.getElementById('fMoney').value.trim(),
+        Note:       document.getElementById('fNote').value.trim(),
+      }
+    });
+    if (res.ok) {
+      showToast('✅ ' + (getLang()==='en' ? 'Updated successfully!' : 'កែប្រែបានជោគជ័យ!'));
+      clearForm();
+      loadLoans();
+    } else {
+      showToast('❌ ' + (res.message || 'Error'), true);
+    }
+  } catch(e) {
+    showToast(tx('errServer'), true);
+  }
+  btn.disabled = false;
+  btn.textContent = '✏️ Update';
+}
+
+/* ── Delete modal ── */
+let delKey = null;
+
+function openDelModal(key, name) {
+  delKey = key;
+  document.getElementById('delName').textContent = name;
+  document.getElementById('delModal').classList.add('show');
+}
+
+function closeDelModal() {
+  delKey = null;
+  document.getElementById('delModal').classList.remove('show');
+}
+
+async function confirmDelete() {
+  if (!delKey) return;
+  const btn = document.getElementById('btnDelConfirm');
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    const res = await CamboAPI.post({ action: 'helen_loan_delete', key: delKey });
+    if (res.ok) {
+      showToast('🗑️ ' + (getLang()==='en' ? 'Deleted successfully!' : 'លុបបានជោគជ័យ!'));
+      closeDelModal();
+      loadLoans();
+    } else {
+      showToast('❌ ' + (res.message || 'Error'), true);
+    }
+  } catch(e) {
+    showToast(tx('errServer'), true);
+  }
+  btn.disabled = false;
+  btn.textContent = getLang()==='en' ? 'Delete' : 'លុបចោល';
+}
+
+/* Close modal on backdrop click */
+document.getElementById('delModal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeDelModal();
+});
+
+function showToast(msg, err) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (err ? ' err' : '') + ' show';
+  setTimeout(() => { el.className = 'toast' + (err ? ' err' : ''); }, 3000);
+}
+
+/* ── Register lang-change callback so page re-renders on KH⟷EN toggle ── */
+window.__langCallbacks = window.__langCallbacks || [];
+window.__langCallbacks.push(function() {
+  applyLang();
+  /* Re-render select placeholders with new language */
+  document.querySelectorAll('#fGroups option[value=""], #fStatus option[value=""]').forEach(opt => {
+    const key = opt.closest('#fGroups') ? 'selGroup' : 'selStatus';
+    opt.textContent = tx(key);
+  });
+  populateGroupFilter();
+  renderTable();
+  updateStats();
+});
+
+var sheetUrls = { loan: null, loanT: null };
+
+async function loadSheetUrl() {
+  try {
+    const data = await CamboAPI.get({ action: 'helen_sheet_url' });
+    if (data.ok) {
+      if (data.loan)  sheetUrls.loan  = data.loan;
+      if (data.loanT) sheetUrls.loanT = data.loanT;
+    }
+  } catch(e) {}
+}
+
+function openSheetUrl(type) {
+  const url = sheetUrls[type];
+  if (url) {
+    window.open(url, '_blank', 'noopener');
+  } else {
+    showToast(t('សូម Deploy Apps Script ជាមុន','Deploy Apps Script first'), true);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  applyLang();
+  loadHelenInfor();
+  loadLoans();
+  loadSheetUrl();
+});
+</script>
+<script src="../assets/js/sw-register.js?v=158"></script>
+</body>
+</html>

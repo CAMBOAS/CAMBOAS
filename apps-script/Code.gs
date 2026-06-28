@@ -95,6 +95,19 @@ function doGet(e) {
     if (action === 'stock_history') return jsonOutput_(listStrokeHistory_(e));
     if (action === 'products')      return jsonOutput_({ ok:true, products: listProducts_() });
     if (action === 'saleinfor')     return jsonOutput_({ ok:true, saleinfor: listSaleInfor_() });
+    if (action === 'helen_loan_list') return jsonOutput_({ ok:true, loans: listHelenLoans_() });
+    if (action === 'helen_infor')     return jsonOutput_({ ok:true, groups: listHelenInfor_('groups'), statuses: listHelenInfor_('statuses') });
+    if (action === 'helen_sheet_url') {
+      var ss2  = SpreadsheetApp.getActiveSpreadsheet();
+      var sh1  = ss2.getSheetByName(LOAN_SHEET);
+      var sh2  = ss2.getSheetByName('HelenLoanT');
+      var base = ss2.getUrl();
+      return jsonOutput_({
+        ok: true,
+        loan:  base + '#gid=' + (sh1 ? sh1.getSheetId() : 0),
+        loanT: sh2 ? base + '#gid=' + sh2.getSheetId() : base
+      });
+    }
     // ── Debug: test write directly via GET ──
     if (action === 'test_write') {
       const name = String((e && e.parameter && e.parameter.name) || '').trim();
@@ -165,6 +178,24 @@ function doPost(e) {
     if (action === 'deleteProduct') {
       deleteProduct_(body.id);
       return jsonOutput_({ ok:true });
+    }
+
+    /* HelenLoan — add new borrower */
+    if (action === 'helen_loan_add') {
+      addHelenLoan_(body.loan || {});
+      return jsonOutput_({ ok:true });
+    }
+
+    /* HelenLoan — update existing borrower by DateTime key */
+    if (action === 'helen_loan_update') {
+      const updated = updateHelenLoan_(body.key, body.loan || {});
+      return jsonOutput_({ ok:updated, message: updated ? 'Updated' : 'Row not found' });
+    }
+
+    /* HelenLoan — delete borrower by DateTime key */
+    if (action === 'helen_loan_delete') {
+      const deleted = deleteHelenLoan_(body.key);
+      return jsonOutput_({ ok:deleted, message: deleted ? 'Deleted' : 'Row not found' });
     }
 
     /* Legacy payload — no action field (from new-order.html submitOrder) */
@@ -1427,3 +1458,168 @@ function sendTelegramMessageFromOrder_(orderId, order) {
   if (code < 200 || code >= 300) throw new Error('Telegram send failed: ' + resp.getContentText());
   return { ok:true };
 }
+
+/* ════════════════════════════════════════
+   HELEN LOAN FUNCTIONS
+   ════════════════════════════════════════ */
+const LOAN_SHEET   = 'HelenLoan';
+const LOAN_HEADER  = ['DateTime','FullName','NationalID','DOB','Gender','Phone','Groups','Status','Money','Note'];
+
+/**
+ * listHelenLoans_ — Read all rows from HelenLoan sheet
+ */
+function listHelenLoans_() {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(LOAN_SHEET);
+  if (!sheet) return [];
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return [];
+
+  const data = sheet.getRange(2, 1, lastRow - 1, LOAN_HEADER.length).getValues();
+  return data.map(function(r) {
+    const obj = {};
+    LOAN_HEADER.forEach(function(col, i) {
+      if (r[i] instanceof Date) {
+        obj[col] = col === 'DOB'
+          ? Utilities.formatDate(r[i], TZ, 'dd/MM/yyyy')
+          : Utilities.formatDate(r[i], TZ, "yyyy-MM-dd'T'HH:mm:ss");
+      } else {
+        obj[col] = String(r[i] || '');
+      }
+    });
+    return obj;
+  }).filter(function(r) { return r.FullName; });
+}
+
+/**
+ * listHelenInfor_ — Read Groups (col A) and Statuses (col B) from HelenInfor sheet
+ */
+function listHelenInfor_(type) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('HelenInfor');
+  if (!sheet) return [];
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 1) return [];
+  const col = (type === 'statuses') ? 2 : 1;
+  const data = sheet.getRange(1, col, lastRow, 1).getValues();
+  return data.map(function(r) { return String(r[0] || '').trim(); }).filter(Boolean);
+}
+
+/**
+ * findHelenLoanRow_ — find row number by DateTime key (col A)
+ */
+function findHelenLoanRow_(key) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(LOAN_SHEET);
+  if (!sheet) return -1;
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return -1;
+  const vals = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  for (var i = 0; i < vals.length; i++) {
+    var cell = vals[i][0];
+    var cellStr = cell instanceof Date ? Utilities.formatDate(cell, TZ, "yyyy-MM-dd'T'HH:mm:ss") : String(cell || '');
+    if (cellStr === key) return i + 2; // 1-based row number
+  }
+  return -1;
+}
+
+/**
+ * updateHelenLoan_ — Update row matched by DateTime key
+ */
+function updateHelenLoan_(key, loan) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(LOAN_SHEET);
+  if (!sheet) return false;
+  const rowNum = findHelenLoanRow_(key);
+  if (rowNum < 0) return false;
+  const row = [
+    key,
+    String(loan.FullName   || '').trim(),
+    String(loan.NationalID || '').trim(),
+    String(loan.DOB        || '').trim(),
+    String(loan.Gender     || '').trim(),
+    String(loan.Phone      || '').trim(),
+    String(loan.Groups     || '').trim(),
+    String(loan.Status     || '').trim(),
+    loan.Money ? Number(loan.Money) : '',
+    String(loan.Note       || '').trim(),
+  ];
+  sheet.getRange(rowNum, 3, 1, 1).setNumberFormat('@');
+  sheet.getRange(rowNum, 6, 1, 1).setNumberFormat('@');
+  sheet.getRange(rowNum, 1, 1, row.length).setValues([row]);
+  return true;
+}
+
+/**
+ * deleteHelenLoan_ — Move row to HelenLoanT (trash/archive) instead of permanent delete
+ */
+function deleteHelenLoan_(key) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(LOAN_SHEET);
+  if (!sheet) return false;
+  const rowNum = findHelenLoanRow_(key);
+  if (rowNum < 0) return false;
+
+  /* Read the row data */
+  const rowData = sheet.getRange(rowNum, 1, 1, LOAN_HEADER.length).getValues()[0];
+
+  /* Get or create HelenLoanT sheet */
+  var trash = ss.getSheetByName('HelenLoanT');
+  if (!trash) {
+    trash = ss.insertSheet('HelenLoanT');
+    trash.getRange(1, 1, 1, LOAN_HEADER.length).setValues([LOAN_HEADER]);
+    trash.getRange(1, 1, 1, LOAN_HEADER.length).setFontWeight('bold');
+    trash.setFrozenRows(1);
+  }
+
+  /* Append to HelenLoanT at row 2 (newest first) */
+  const lastTrash = trash.getLastRow();
+  if (lastTrash > 1) trash.insertRowBefore(2);
+  const destRow = lastTrash > 1 ? 2 : trash.getLastRow() + 1;
+  trash.getRange(destRow, 1, 1, rowData.length).setValues([rowData]);
+
+  /* Delete from HelenLoan */
+  sheet.deleteRow(rowNum);
+  return true;
+}
+
+/**
+ * addHelenLoan_ — Append a new row to HelenLoan sheet (newest at TOP)
+ */
+function addHelenLoan_(loan) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  let   sheet = ss.getSheetByName(LOAN_SHEET);
+
+  /* Auto-create sheet with header if missing */
+  if (!sheet) {
+    sheet = ss.insertSheet(LOAN_SHEET);
+    sheet.getRange(1, 1, 1, LOAN_HEADER.length).setValues([LOAN_HEADER]);
+    sheet.getRange(1, 1, 1, LOAN_HEADER.length).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+
+  const now = Utilities.formatDate(new Date(), TZ, "yyyy-MM-dd'T'HH:mm:ss");
+
+  /* DOB arrives already as dd/mm/yyyy from the UI text input — store as-is */
+  const row = [
+    now,
+    String(loan.FullName   || '').trim(),
+    String(loan.NationalID || '').trim(),
+    String(loan.DOB        || '').trim(),
+    String(loan.Gender     || '').trim(),
+    String(loan.Phone      || '').trim(),
+    String(loan.Groups     || 'SS3').trim(),
+    String(loan.Status     || '').trim(),
+    loan.Money ? Number(loan.Money) : '',
+    String(loan.Note       || '').trim(),
+  ];
+
+  /* Insert at row 2 so newest appears first */
+  if (sheet.getLastRow() > 1) sheet.insertRowBefore(2);
+  const range = sheet.getRange(2, 1, 1, row.length);
+  /* Force Phone (col 6) and NationalID (col 3) as plain text to preserve leading zeros */
+  sheet.getRange(2, 3, 1, 1).setNumberFormat('@');
+  sheet.getRange(2, 6, 1, 1).setNumberFormat('@');
+  range.setValues([row]);
+}
+
