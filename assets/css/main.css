@@ -2153,11 +2153,14 @@ input::placeholder, textarea::placeholder {
 .mac-btn-ok:hover{opacity:.88}
 .mac-btn-ok.danger{background:#ff453a}
 
-/* ── Global scroll lock when ANY modal/sheet is open ──
+/* ── Global scroll lock when ANY modal/sheet/dropdown is open ──
    :has() locks body scroll automatically — no JS needed, works across all pages */
 body:has(.del-modal.show),
 body:has(.mac-modal-overlay.show),
-body:has(.ol-backdrop.show){overflow:hidden;touch-action:none}
+body:has(.ol-backdrop.show),
+body:has(#cmDateFloatMenu.show),
+body:has(#anDateFloatMenu.show),
+body:has(#anPageFloatMenu.show){overflow:hidden;touch-action:none}
 
 /* ════ COLLAPSIBLE SIDEBAR — CLEAN ════ */
 :root { --sb-w-col: 64px; }
