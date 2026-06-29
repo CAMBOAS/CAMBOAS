@@ -2423,6 +2423,14 @@
   .del-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:9998;display:none;align-items:center;justify-content:center}
   .del-modal.show{display:flex}
   .del-box{background:var(--card);border:1px solid rgba(148,163,200,.15);border-radius:16px;padding:24px;width:min(340px,90vw);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  /* Full screen modal on mobile */
+  #saleInforModal .del-box{display:flex;flex-direction:column}
+  #saleInforList{flex:1;overflow-y:auto}
+  @media(max-width:768px){
+    #saleInforModal{align-items:flex-end;background:rgba(0,0,0,.4)}
+    #saleInforModal .del-box{width:100%!important;max-width:100%!important;border-radius:20px 20px 0 0!important;border-bottom:none!important;min-height:70vh;max-height:92vh}
+    #saleInforList{max-height:none!important;flex:1}
+  }
   </style>
 </head>
 <body>
