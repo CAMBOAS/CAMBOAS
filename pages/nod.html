@@ -3913,10 +3913,16 @@ document.addEventListener('DOMContentLoaded', function(){
     applyBtn.disabled = true;
     _parsed = null;
     modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
     setTimeout(function(){ textarea.focus(); }, 120);
   }
 
-  function closeModal() { if (modal) modal.hidden = true; }
+  function closeModal() {
+    if (modal) modal.hidden = true;
+    document.body.style.overflow = '';
+    document.body.style.touchAction = '';
+  }
 
   function onInput() {
     var txt = textarea.value.trim();
