@@ -180,6 +180,12 @@
       /* List article: padding for inner content */
       .lg > article.mob-show:last-child .lp-title{padding:0 14px;margin-bottom:8px}
       .lg > article.mob-show:last-child .tools{padding:0 14px}
+      /* Light mode mobile: solid white bg — no gradient orbs showing through */
+      [data-theme="light"] .lg > article.mob-show{background:#ffffff!important}
+      [data-theme="light"] .loan-card{background:#ffffff!important}
+      [data-theme="light"] .field-group > input,
+      [data-theme="light"] .field-group > select,
+      [data-theme="light"] .field-group > textarea{background:#f8fafc!important}
       /* Delete modal compact on mobile */
       .del-box{padding:22px 20px!important;max-width:calc(100vw - 32px)!important}
       /* Refresh button hidden on mobile (save toolbar space) */
@@ -315,7 +321,10 @@
             <div class="mob-form-hd-icon">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
             </div>
-            <span data-i18n="formTitle">ព័ត៌មានអ្នកកម្ចី</span>
+            <span data-i18n="formTitle" style="flex:1">ព័ត៌មានអ្នកកម្ចី</span>
+            <button onclick="openInforSettings()" style="background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:6px;color:#6366f1;cursor:pointer;display:flex;align-items:center;justify-content:center" title="Manage Groups & Statuses">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
           </div>
           <h3 class="lp-title">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
@@ -480,6 +489,30 @@
 <button class="fab" id="fab" onclick="switchTab('form')" title="Add borrower">＋</button>
 
 <div class="toast" id="toast"></div>
+
+<!-- ── HelenInfor Settings Modal ── -->
+<div class="del-modal" id="inforModal">
+  <div class="del-box" style="max-width:360px;width:92%;text-align:left;padding:0;overflow:hidden;border-color:rgba(99,102,241,.3)">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid rgba(148,163,200,.15)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span style="font-size:15px;font-weight:700;color:var(--text);flex:1">Manage Groups &amp; Statuses</span>
+      <button onclick="closeInforSettings()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:2px 6px">✕</button>
+    </div>
+    <!-- Tabs -->
+    <div style="display:flex;border-bottom:1px solid rgba(148,163,200,.15)">
+      <button id="inforTabG" onclick="switchInforTab('groups')" style="flex:1;padding:10px;border:none;background:rgba(99,102,241,.12);color:#6366f1;font-weight:700;font-size:13px;cursor:pointer;border-bottom:2px solid #6366f1">ក្រុម (Groups)</button>
+      <button id="inforTabS" onclick="switchInforTab('statuses')" style="flex:1;padding:10px;border:none;background:transparent;color:var(--muted);font-weight:600;font-size:13px;cursor:pointer">ស្ថានភាព (Status)</button>
+    </div>
+    <!-- List -->
+    <div id="inforList" style="max-height:220px;overflow-y:auto;padding:8px 0"></div>
+    <!-- Add new -->
+    <div style="padding:12px 16px;border-top:1px solid rgba(148,163,200,.15);display:flex;gap:8px">
+      <input id="inforNewVal" placeholder="ឈ្មោះថ្មី..." style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,200,.3);background:var(--card);color:var(--text);font-size:13px;font-family:inherit;outline:none">
+      <button onclick="addInforItem()" style="padding:8px 14px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">+ បន្ថែម</button>
+    </div>
+  </div>
+</div>
 
 <div class="del-modal" id="delModal">
   <div class="del-box">
@@ -909,6 +942,83 @@ async function updateLoan() {
 
 /* ── Delete modal ── */
 let delKey = null;
+
+/* ── HelenInfor Settings ── */
+var inforTab = 'groups';
+var inforData = { groups: [], statuses: [] };
+
+function openInforSettings() {
+  document.getElementById('inforModal').classList.add('show');
+  loadInforData();
+}
+function closeInforSettings() {
+  document.getElementById('inforModal').classList.remove('show');
+  document.getElementById('inforNewVal').value = '';
+}
+function switchInforTab(tab) {
+  inforTab = tab;
+  var tg = document.getElementById('inforTabG');
+  var ts = document.getElementById('inforTabS');
+  if (tab === 'groups') {
+    tg.style.background = 'rgba(99,102,241,.12)'; tg.style.color = '#6366f1'; tg.style.borderBottom = '2px solid #6366f1';
+    ts.style.background = 'transparent'; ts.style.color = 'var(--muted)'; ts.style.borderBottom = 'none';
+  } else {
+    ts.style.background = 'rgba(99,102,241,.12)'; ts.style.color = '#6366f1'; ts.style.borderBottom = '2px solid #6366f1';
+    tg.style.background = 'transparent'; tg.style.color = 'var(--muted)'; tg.style.borderBottom = 'none';
+  }
+  renderInforList();
+}
+async function loadInforData() {
+  document.getElementById('inforList').innerHTML = '<div style="padding:14px 16px;color:var(--muted);font-size:13px">កំពុងផ្ទុក...</div>';
+  try {
+    const res = await CamboAPI.get({ action: 'helen_infor' });
+    if (res.ok) {
+      inforData.groups   = res.groups   || [];
+      inforData.statuses = res.statuses || [];
+    }
+  } catch(e) {}
+  renderInforList();
+}
+function renderInforList() {
+  var items = inforData[inforTab] || [];
+  var html = items.length ? items.map(function(v) {
+    return '<div style="display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid rgba(148,163,200,.08)">' +
+      '<span style="flex:1;font-size:13px;color:var(--text)">' + v + '</span>' +
+      '<button onclick="deleteInforItem(\'' + v.replace(/'/g,"\\'") + '\')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:6px;color:#f87171;padding:4px 10px;font-size:12px;cursor:pointer">លុប</button>' +
+    '</div>';
+  }).join('') : '<div style="padding:14px 16px;color:var(--muted);font-size:13px">មិនមានទិន្នន័យ</div>';
+  document.getElementById('inforList').innerHTML = html;
+}
+async function addInforItem() {
+  var val = (document.getElementById('inforNewVal').value || '').trim();
+  if (!val) return showToast('⚠️ សូមបញ្ចូលឈ្មោះ!');
+  try {
+    const res = await CamboAPI.post({ action: 'helen_infor_add', type: inforTab, value: val });
+    if (res.ok) {
+      inforData[inforTab].push(val);
+      document.getElementById('inforNewVal').value = '';
+      renderInforList();
+      populateInforSelects();
+      showToast('✅ បន្ថែមបានជោគជ័យ!');
+    } else { showToast('❌ ' + (res.message || 'Error')); }
+  } catch(e) { showToast('❌ Server error'); }
+}
+async function deleteInforItem(val) {
+  try {
+    const res = await CamboAPI.post({ action: 'helen_infor_delete', type: inforTab, value: val });
+    if (res.ok) {
+      inforData[inforTab] = inforData[inforTab].filter(function(x){ return x !== val; });
+      renderInforList();
+      populateInforSelects();
+      showToast('🗑️ លុបបានជោគជ័យ!');
+    } else { showToast('❌ ' + (res.message || 'Error')); }
+  } catch(e) { showToast('❌ Server error'); }
+}
+function populateInforSelects() {
+  // Refresh fGroups and fStatus dropdowns with updated data
+  populateSelect('fGroups', inforData.groups,   tx('selGroup'));
+  populateSelect('fStatus', inforData.statuses, tx('selStatus'));
+}
 
 function openDelModal(key, name) {
   delKey = key;

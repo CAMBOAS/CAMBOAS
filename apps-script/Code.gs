@@ -198,6 +198,18 @@ function doPost(e) {
       return jsonOutput_({ ok:deleted, message: deleted ? 'Deleted' : 'Row not found' });
     }
 
+    /* HelenInfor — add group or status */
+    if (action === 'helen_infor_add') {
+      const result = addHelenInfor_(body.type, body.value);
+      return jsonOutput_(result);
+    }
+
+    /* HelenInfor — delete group or status */
+    if (action === 'helen_infor_delete') {
+      const result = deleteHelenInfor_(body.type, body.value);
+      return jsonOutput_(result);
+    }
+
     /* Legacy payload — no action field (from new-order.html submitOrder) */
     if (!action && body && Array.isArray(body.items) && body.items.length) {
       const normalized = normalizeLegacyPayloadToOrder_(body);
@@ -1503,6 +1515,56 @@ function listHelenInfor_(type) {
   const col = (type === 'statuses') ? 2 : 1;
   const data = sheet.getRange(1, col, lastRow, 1).getValues();
   return data.map(function(r) { return String(r[0] || '').trim(); }).filter(Boolean);
+}
+
+/**
+ * addHelenInfor_ — Add new value to HelenInfor sheet (col A=groups, col B=statuses)
+ */
+function addHelenInfor_(type, value) {
+  if (!value || !String(value).trim()) return { ok:false, message:'Value is empty' };
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('HelenInfor') || ss.insertSheet('HelenInfor');
+  const col   = (type === 'statuses') ? 2 : 1;
+  const val   = String(value).trim();
+  // Check duplicate
+  const lastRow = sheet.getLastRow();
+  if (lastRow > 0) {
+    const existing = sheet.getRange(1, col, lastRow, 1).getValues().map(r => String(r[0]||'').trim());
+    if (existing.includes(val)) return { ok:false, message:'Already exists' };
+  }
+  // Append to next empty row in the column
+  var nextRow = 1;
+  if (lastRow > 0) {
+    const colData = sheet.getRange(1, col, lastRow, 1).getValues();
+    for (var i = 0; i < colData.length; i++) {
+      if (!String(colData[i][0]||'').trim()) { nextRow = i + 1; break; }
+      nextRow = i + 2;
+    }
+  }
+  sheet.getRange(nextRow, col).setValue(val);
+  return { ok:true, message:'Added' };
+}
+
+/**
+ * deleteHelenInfor_ — Delete a value from HelenInfor sheet
+ */
+function deleteHelenInfor_(type, value) {
+  if (!value) return { ok:false, message:'Value is empty' };
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('HelenInfor');
+  if (!sheet) return { ok:false, message:'Sheet not found' };
+  const col     = (type === 'statuses') ? 2 : 1;
+  const val     = String(value).trim();
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 1) return { ok:false, message:'Not found' };
+  const data = sheet.getRange(1, col, lastRow, 1).getValues();
+  for (var i = 0; i < data.length; i++) {
+    if (String(data[i][0]||'').trim() === val) {
+      sheet.getRange(i + 1, col).clearContent();
+      return { ok:true, message:'Deleted' };
+    }
+  }
+  return { ok:false, message:'Not found' };
 }
 
 /**
