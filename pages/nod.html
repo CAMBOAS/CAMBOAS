@@ -4146,15 +4146,11 @@ document.addEventListener('DOMContentLoaded', function(){
 
   window.openSaleInforSettings = function() {
     document.getElementById('saleInforModal').classList.add('show');
-    document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
     loadSaleInforData();
   };
 
   window.closeSaleInforSettings = function() {
     document.getElementById('saleInforModal').classList.remove('show');
-    document.body.style.overflow = '';
-    document.body.style.touchAction = '';
     document.getElementById('saleInforNewVal').value = '';
   };
 
