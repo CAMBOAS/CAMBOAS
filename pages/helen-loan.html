@@ -992,6 +992,7 @@ function renderInforList() {
 async function addInforItem() {
   var val = (document.getElementById('inforNewVal').value || '').trim();
   if (!val) return showToast('⚠️ សូមបញ្ចូលឈ្មោះ!');
+  if (!confirm('បន្ថែម "' + val + '" ?\nតើអ្នកប្រាកដឬ?')) return;
   try {
     const res = await CamboAPI.post({ action: 'helen_infor_add', type: inforTab, value: val });
     if (res.ok) {
@@ -1004,6 +1005,7 @@ async function addInforItem() {
   } catch(e) { showToast('❌ Server error'); }
 }
 async function deleteInforItem(val) {
+  if (!confirm('លុប "' + val + '" ចេញ?\nតើអ្នកប្រាកដឬ?')) return;
   try {
     const res = await CamboAPI.post({ action: 'helen_infor_delete', type: inforTab, value: val });
     if (res.ok) {
