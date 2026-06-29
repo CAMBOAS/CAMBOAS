@@ -168,15 +168,18 @@
       .mob-tabs{margin:0 14px!important}
       .tools{padding:0 14px}
       .loan-cards{padding:0 14px!important}
-      /* Form card: no card styling on mobile */
-      .lp:first-child{
+      /* Both articles: no card styling on mobile — blend with page */
+      .lg > article.mob-show{
         padding:0!important;border-radius:0!important;
         border:none!important;box-shadow:none!important;
         outline:none!important;
         backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-        background:var(--card)!important;
+        background:transparent!important;
         width:100%!important;max-width:100%!important;
       }
+      /* List article: padding for inner content */
+      .lg > article.mob-show:last-child .lp-title{padding:0 14px;margin-bottom:8px}
+      .lg > article.mob-show:last-child .tools{padding:0 14px}
       /* Delete modal compact on mobile */
       .del-box{padding:22px 20px!important;max-width:calc(100vw - 32px)!important}
       /* Refresh button hidden on mobile (save toolbar space) */
