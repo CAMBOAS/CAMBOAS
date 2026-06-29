@@ -210,6 +210,18 @@ function doPost(e) {
       return jsonOutput_(result);
     }
 
+    /* SaleInfor — add item to Province/Delivery/Pages/CloseBy/Payment */
+    if (action === 'saleinfor_add') {
+      const result = addSaleInfor_(body.type, body.value);
+      return jsonOutput_(result);
+    }
+
+    /* SaleInfor — delete item */
+    if (action === 'saleinfor_delete') {
+      const result = deleteSaleInfor_(body.type, body.value);
+      return jsonOutput_(result);
+    }
+
     /* Legacy payload — no action field (from new-order.html submitOrder) */
     if (!action && body && Array.isArray(body.items) && body.items.length) {
       const normalized = normalizeLegacyPayloadToOrder_(body);
@@ -1561,6 +1573,62 @@ function deleteHelenInfor_(type, value) {
   for (var i = 0; i < data.length; i++) {
     if (String(data[i][0]||'').trim() === val) {
       sheet.getRange(i + 1, col).clearContent();
+      return { ok:true, message:'Deleted' };
+    }
+  }
+  return { ok:false, message:'Not found' };
+}
+
+/**
+ * addSaleInfor_ — Add new value to SaleInfor sheet
+ * Columns: A=Province(1), B=Delivery(2), C=Pages(3), D=CloseBy(4), E=Payment(5)
+ */
+function addSaleInfor_(type, value) {
+  if (!value || !String(value).trim()) return { ok:false, message:'Value is empty' };
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('SaleInfor');
+  if (!sheet) return { ok:false, message:'Sheet SaleInfor not found' };
+  const colMap = { provinces:1, delivery:2, pages:3, closeby:4, payment:5 };
+  const col = colMap[type];
+  if (!col) return { ok:false, message:'Unknown type: ' + type };
+  const val = String(value).trim();
+  const lastRow = sheet.getLastRow();
+  // Skip row 1 (header), check duplicates in col from row 2
+  if (lastRow >= 2) {
+    const existing = sheet.getRange(2, col, lastRow - 1, 1).getValues().map(r => String(r[0]||'').trim());
+    if (existing.includes(val)) return { ok:false, message:'Already exists' };
+  }
+  // Append to next empty row in the column (starting from row 2)
+  var nextRow = 2;
+  if (lastRow >= 2) {
+    const colData = sheet.getRange(2, col, lastRow - 1, 1).getValues();
+    for (var i = 0; i < colData.length; i++) {
+      if (!String(colData[i][0]||'').trim()) { nextRow = i + 2; break; }
+      nextRow = i + 3;
+    }
+  }
+  sheet.getRange(nextRow, col).setValue(val);
+  return { ok:true, message:'Added' };
+}
+
+/**
+ * deleteSaleInfor_ — Delete a value from SaleInfor sheet
+ */
+function deleteSaleInfor_(type, value) {
+  if (!value) return { ok:false, message:'Value is empty' };
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('SaleInfor');
+  if (!sheet) return { ok:false, message:'Sheet not found' };
+  const colMap = { provinces:1, delivery:2, pages:3, closeby:4, payment:5 };
+  const col = colMap[type];
+  if (!col) return { ok:false, message:'Unknown type: ' + type };
+  const val = String(value).trim();
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return { ok:false, message:'Not found' };
+  const data = sheet.getRange(2, col, lastRow - 1, 1).getValues();
+  for (var i = 0; i < data.length; i++) {
+    if (String(data[i][0]||'').trim() === val) {
+      sheet.getRange(i + 2, col).clearContent();
       return { ok:true, message:'Deleted' };
     }
   }
