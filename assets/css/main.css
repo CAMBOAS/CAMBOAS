@@ -2161,6 +2161,7 @@ body:has(.ol-backdrop.show),
 body:has(#cmDateFloatMenu.show),
 body:has(#anDateFloatMenu.show),
 body:has(#anPageFloatMenu.show),
+body:has(#invoiceModal:not([hidden])),
 body.sidebar-open{overflow:hidden;touch-action:none}
 
 /* ════ COLLAPSIBLE SIDEBAR — CLEAN ════ */
