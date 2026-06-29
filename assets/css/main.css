@@ -2160,7 +2160,8 @@ body:has(.mac-modal-overlay.show),
 body:has(.ol-backdrop.show),
 body:has(#cmDateFloatMenu.show),
 body:has(#anDateFloatMenu.show),
-body:has(#anPageFloatMenu.show){overflow:hidden;touch-action:none}
+body:has(#anPageFloatMenu.show),
+body.sidebar-open{overflow:hidden;touch-action:none}
 
 /* ════ COLLAPSIBLE SIDEBAR — CLEAN ════ */
 :root { --sb-w-col: 64px; }
