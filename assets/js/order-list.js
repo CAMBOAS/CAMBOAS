@@ -1331,19 +1331,19 @@ window.olDeleteOrder = async function(){
     /* ── 4. Success toast ── */
     var _t = document.createElement('div');
     _t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#4ade80;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.4)';
-    _t.textContent = '✅ Order "'+o.customer+'" ត្រូវបានលុបហើយ';
+    _t.textContent = '🗑️ Order "'+o.customer+'" ត្រូវបានផ្ទេរទៅ Trash';
     document.body.appendChild(_t);
     setTimeout(function(){ _t.remove(); }, 2500);
 
-    /* ── 5. Sync delete to Google Sheet (background, non-blocking) ── */
+    /* ── 5. Move order to SaleOrderT (Trash) — background, non-blocking ── */
     fetch(SCRIPT_URL, {
       method:'POST',
       headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify({action:'delete', orderId: o.id})
+      body: JSON.stringify({action:'trash_order', orderId: o.id})
     }).then(function(r){ return r.json(); })
     .then(function(d){
-      if(d && d.ok === false) console.warn('Sheet delete failed:', d.message);
-    }).catch(function(e){ console.warn('Sheet delete error:', e); });
+      if(d && d.ok === false) console.warn('Sheet trash failed:', d.message);
+    }).catch(function(e){ console.warn('Sheet trash error:', e); });
 
   } catch(err) {
     console.error('olDeleteOrder error:', err);

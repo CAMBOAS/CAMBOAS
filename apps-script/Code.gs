@@ -148,6 +148,12 @@ function doPost(e) {
       return jsonOutput_({ ok:true, deletedRows: deleteOrder_(body.orderId) });
     }
 
+    /* Move order to SaleOrderT (Trash) instead of permanent delete */
+    if (action === 'trash_order') {
+      const result = trashOrder_(body.orderId);
+      return jsonOutput_(result);
+    }
+
     /* Stroke (Stock) CRUD */
     if (action === 'stroke_update') {
       strokeUpdate_(body.originalName, body.data || {});
@@ -289,6 +295,52 @@ function deleteOrder_(orderId) {
     if (safe_(ids[i]) === safe_(orderId)) { sheet.deleteRow(i + 2); deleted++; }
   }
   return deleted;
+}
+
+/**
+ * trashOrder_ — Move all rows matching orderId from SaleOrder → SaleOrderT
+ * SaleOrderT acts as a Trash bin so data is never permanently lost.
+ */
+function trashOrder_(orderId) {
+  if (!safe_(orderId)) return { ok:false, message:'Missing orderId' };
+  const ss       = SpreadsheetApp.getActiveSpreadsheet();
+  const src      = ss.getSheetByName('SaleOrder');
+  if (!src) return { ok:false, message:'SaleOrder sheet not found' };
+
+  // Get or create SaleOrderT (Trash) sheet
+  var dst = ss.getSheetByName('SaleOrderT');
+  if (!dst) {
+    dst = ss.insertSheet('SaleOrderT');
+    // Copy header row
+    const header = src.getRange(1, 1, 1, src.getLastColumn()).getValues();
+    dst.getRange(1, 1, 1, header[0].length).setValues(header);
+  }
+
+  const lastRow = src.getLastRow();
+  if (lastRow <= 1) return { ok:false, message:'No data in SaleOrder' };
+
+  const numCols = src.getLastColumn();
+  const ids     = src.getRange(2, 2, lastRow - 1, 1).getValues().flat(); // col B = OrderID
+  let moved     = 0;
+
+  // Iterate bottom-up so row index stays valid after deleteRow
+  for (let i = ids.length - 1; i >= 0; i--) {
+    if (safe_(ids[i]) === safe_(orderId)) {
+      const srcRow  = i + 2;
+      const rowData = src.getRange(srcRow, 1, 1, numCols).getValues();
+
+      // Append to SaleOrderT
+      const dstLastRow = dst.getLastRow();
+      dst.getRange(dstLastRow + 1, 1, 1, numCols).setValues(rowData);
+
+      // Remove from SaleOrder
+      src.deleteRow(srcRow);
+      moved++;
+    }
+  }
+
+  if (moved === 0) return { ok:false, message:'Order not found: ' + orderId };
+  return { ok:true, moved: moved, message: moved + ' row(s) moved to SaleOrderT' };
 }
 
 /**
