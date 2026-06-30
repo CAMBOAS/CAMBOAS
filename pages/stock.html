@@ -1312,7 +1312,11 @@ function openEdit(id){
   });
   document.getElementById('eCat').onchange=function(){ _editDirty=true; };
   document.getElementById('editOverlay').classList.add('open');
+  _lockScroll();
 }
+
+function _lockScroll(){ document.body.style.overflow='hidden'; document.body.style.touchAction='none'; }
+function _unlockScroll(){ document.body.style.overflow=''; document.body.style.touchAction=''; }
 
 function closeEdit(e){
   if(e && e.target!==document.getElementById('editOverlay')) return;
@@ -1323,13 +1327,13 @@ function closeEdit(e){
       _svgConfirmWarn,
       function(){
         document.getElementById('editOverlay').classList.remove('open');
-        _editId=null; _editDirty=false;
+        _editId=null; _editDirty=false; _unlockScroll();
       },
       'បោះបង់', 'ត្រឡប់ក្រោយ'
     );
   } else {
     document.getElementById('editOverlay').classList.remove('open');
-    _editId=null; _editDirty=false;
+    _editId=null; _editDirty=false; _unlockScroll();
   }
 }
 
@@ -1353,7 +1357,7 @@ async function _doSaveEdit(){
   _imgCache[p.name]=p.img; saveImgCache();
   // ── Close modal & update UI instantly (no waiting) ──
   document.getElementById('editOverlay').classList.remove('open');
-  _editId=null; _editDirty=false;
+  _editId=null; _editDirty=false; _unlockScroll();
   rt(); saveStock();
   notify('⏳ កំពុងរក្សាទុក...', true);
   // ── Send to Google Sheets in background ──
@@ -1396,7 +1400,7 @@ async function deleteProduct(){
   if(!confirm('លុប "'+p.name+'" ចេញពី Stroke sheet?')) return;
   var name=p.name;
   S=S.filter(function(x){ return x.id!==_editId; });
-  document.getElementById('editOverlay').classList.remove('open'); _editId=null;
+  document.getElementById('editOverlay').classList.remove('open'); _editId=null; _unlockScroll();
   rt(); saveStock();
   try {
     var res=await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
@@ -1454,6 +1458,7 @@ function openAddModal(){
   });
   document.getElementById('aCat').onchange=function(){ _addDirty=true; };
   document.getElementById('addOverlay').classList.add('open');
+  _lockScroll();
 }
 function closeAdd(e){
   if(e && e.target!==document.getElementById('addOverlay')) return;
@@ -1464,13 +1469,13 @@ function closeAdd(e){
       _svgConfirmWarn,
       function(){
         document.getElementById('addOverlay').classList.remove('open');
-        _addDirty=false;
+        _addDirty=false; _unlockScroll();
       },
       'បោះបង់', 'ត្រឡប់ក្រោយ'
     );
   } else {
     document.getElementById('addOverlay').classList.remove('open');
-    _addDirty=false;
+    _addDirty=false; _unlockScroll();
   }
 }
 function saveAdd(){
@@ -1509,7 +1514,7 @@ async function _doSaveAdd(){
           img:d.img,lastUpdated:new Date().toISOString()});
   if(d.img){ _imgCache[d.product]=d.img; saveImgCache(); }
   document.getElementById('addOverlay').classList.remove('open');
-  _addDirty=false;
+  _addDirty=false; _unlockScroll();
   rt(); saveStock();
   notify('⏳ កំពុងបន្ថែម...', true);
   try {
