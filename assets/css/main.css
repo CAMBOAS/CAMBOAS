@@ -2162,6 +2162,10 @@ body:has(#cmDateFloatMenu.show),
 body:has(#anDateFloatMenu.show),
 body:has(#anPageFloatMenu.show),
 body:has(#invoiceModal:not([hidden])),
+body:has(.edit-overlay.open),
+body:has(.confirm-overlay.open),
+body:has(.sk-act-overlay.open),
+body:has(.sk-date-overlay.open),
 body.sidebar-open{overflow:hidden;touch-action:none}
 
 /* ════ COLLAPSIBLE SIDEBAR — CLEAN ════ */
