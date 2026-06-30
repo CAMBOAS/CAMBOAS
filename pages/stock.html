@@ -144,17 +144,21 @@
     [data-theme="light"] .stock-indicator{border-color:rgba(148,163,184,.2)}
     [data-theme="light"] #aPackPerBox,[data-theme="light"] #aBottPerPack{background:rgba(6,182,212,.08)!important;border-color:rgba(6,182,212,.25)}
 
-    /* ── Mobile: Full-screen modal ── */
+    /* ── Mobile: Bottom sheet slide-up ── */
+    .edit-overlay{transition:opacity .2s ease}
+    .edit-modal{transition:transform .3s cubic-bezier(.32,.72,0,1)}
     @media(max-width:640px){
-      .edit-overlay{align-items:flex-start;padding:0}
+      .edit-overlay{align-items:flex-end;padding:0}
       .edit-modal{
-        border-radius:0;max-width:100%;
-        height:100vh;height:100dvh;
+        border-radius:22px 22px 0 0;max-width:100%;
+        height:95vh;height:95dvh;
         padding:12px 14px 0;
-        border:none;box-shadow:none;
-        overflow-y:auto;-webkit-overflow-scrolling:touch;
+        border:none;border-bottom:none;box-shadow:0 -8px 40px rgba(0,0,0,.4);
+        overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
         display:flex;flex-direction:column;
+        transform:translateY(100%);
       }
+      .edit-overlay.open .edit-modal{transform:translateY(0)}
       .edit-modal h3{font-size:14px;padding-bottom:9px;margin-bottom:9px;flex-shrink:0}
       .edit-grid{flex:1 0 auto;margin-bottom:0;gap:8px}
       .edit-field{gap:3px}
