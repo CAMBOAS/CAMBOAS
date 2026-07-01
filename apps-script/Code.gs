@@ -95,8 +95,9 @@ function doGet(e) {
     if (action === 'stock_history') return jsonOutput_(listStrokeHistory_(e));
     if (action === 'products')      return jsonOutput_({ ok:true, products: listProducts_() });
     if (action === 'saleinfor')     return jsonOutput_({ ok:true, saleinfor: listSaleInfor_() });
-    if (action === 'helen_loan_list') return jsonOutput_({ ok:true, loans: listHelenLoans_() });
-    if (action === 'helen_infor')     return jsonOutput_({ ok:true, groups: listHelenInfor_('groups'), statuses: listHelenInfor_('statuses') });
+    if (action === 'helen_loan_list')  return jsonOutput_({ ok:true, loans: listHelenLoans_() });
+    if (action === 'helen_loan_trash') return jsonOutput_({ ok:true, loans: listHelenLoanTrash_() });
+    if (action === 'helen_infor')      return jsonOutput_({ ok:true, groups: listHelenInfor_('groups'), statuses: listHelenInfor_('statuses') });
     if (action === 'helen_sheet_url') {
       var ss2  = SpreadsheetApp.getActiveSpreadsheet();
       var sh1  = ss2.getSheetByName(LOAN_SHEET);
@@ -202,6 +203,18 @@ function doPost(e) {
     if (action === 'helen_loan_delete') {
       const deleted = deleteHelenLoan_(body.key);
       return jsonOutput_({ ok:deleted, message: deleted ? 'Deleted' : 'Row not found' });
+    }
+
+    /* HelenLoan — permanently delete borrower from HelenLoanT (no recovery) */
+    if (action === 'helen_loan_perm_delete') {
+      const done = permDeleteHelenLoan_(body.key);
+      return jsonOutput_({ ok:done, message: done ? 'Permanently deleted' : 'Row not found' });
+    }
+
+    /* HelenLoan — recover borrower from HelenLoanT back to HelenLoan */
+    if (action === 'helen_loan_recover') {
+      const recovered = recoverHelenLoan_(body.key);
+      return jsonOutput_({ ok:recovered, message: recovered ? 'Recovered' : 'Row not found in trash' });
     }
 
     /* HelenInfor — add group or status */
@@ -1568,6 +1581,31 @@ function listHelenLoans_() {
 }
 
 /**
+ * listHelenLoanTrash_ — Read all rows from HelenLoanT (Trash) sheet
+ */
+function listHelenLoanTrash_() {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('HelenLoanT');
+  if (!sheet) return [];
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return [];
+  const data = sheet.getRange(2, 1, lastRow - 1, LOAN_HEADER.length).getValues();
+  return data.map(function(r) {
+    const obj = {};
+    LOAN_HEADER.forEach(function(col, i) {
+      if (r[i] instanceof Date) {
+        obj[col] = col === 'DOB'
+          ? Utilities.formatDate(r[i], TZ, 'dd/MM/yyyy')
+          : Utilities.formatDate(r[i], TZ, "yyyy-MM-dd'T'HH:mm:ss");
+      } else {
+        obj[col] = String(r[i] || '');
+      }
+    });
+    return obj;
+  }).filter(function(r) { return r.FullName; });
+}
+
+/**
  * listHelenInfor_ — Read Groups (col A) and Statuses (col B) from HelenInfor sheet
  */
 function listHelenInfor_(type) {
@@ -1762,6 +1800,74 @@ function deleteHelenLoan_(key) {
 
   /* Delete from HelenLoan */
   sheet.deleteRow(rowNum);
+  return true;
+}
+
+/**
+ * permDeleteHelenLoan_ — Permanently delete a row from HelenLoanT (no recovery)
+ */
+function permDeleteHelenLoan_(key) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const trash = ss.getSheetByName('HelenLoanT');
+  if (!trash) return false;
+  const lastRow = trash.getLastRow();
+  if (lastRow < 2) return false;
+  const keys = trash.getRange(2, 1, lastRow - 1, 1).getValues();
+  for (var i = 0; i < keys.length; i++) {
+    var val = keys[i][0];
+    var valStr = val instanceof Date
+      ? Utilities.formatDate(val, TZ, "yyyy-MM-dd'T'HH:mm:ss")
+      : String(val || '');
+    if (valStr === key) {
+      trash.deleteRow(i + 2);
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * recoverHelenLoan_ — Move row from HelenLoanT back to HelenLoan (recover from trash)
+ */
+function recoverHelenLoan_(key) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const trash = ss.getSheetByName('HelenLoanT');
+  if (!trash) return false;
+
+  /* Find the row in HelenLoanT by DateTime key (col A) */
+  const lastRow = trash.getLastRow();
+  if (lastRow < 2) return false;
+  const keys = trash.getRange(2, 1, lastRow - 1, 1).getValues();
+  let rowNum = -1;
+  for (var i = 0; i < keys.length; i++) {
+    var val = keys[i][0];
+    var valStr = val instanceof Date
+      ? Utilities.formatDate(val, TZ, "yyyy-MM-dd'T'HH:mm:ss")
+      : String(val || '');
+    if (valStr === key) { rowNum = i + 2; break; }
+  }
+  if (rowNum < 0) return false;
+
+  /* Read the row data */
+  const rowData = trash.getRange(rowNum, 1, 1, LOAN_HEADER.length).getValues()[0];
+
+  /* Get or create HelenLoan sheet */
+  let sheet = ss.getSheetByName(LOAN_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(LOAN_SHEET);
+    sheet.getRange(1, 1, 1, LOAN_HEADER.length).setValues([LOAN_HEADER]);
+    sheet.getRange(1, 1, 1, LOAN_HEADER.length).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+
+  /* Insert at row 2 (newest first) */
+  const lastLoan = sheet.getLastRow();
+  if (lastLoan >= 1) sheet.insertRowBefore(2);
+  const destRow = lastLoan >= 1 ? 2 : 1;
+  sheet.getRange(destRow, 1, 1, rowData.length).setValues([rowData]);
+
+  /* Delete from HelenLoanT */
+  trash.deleteRow(rowNum);
   return true;
 }
 
