@@ -575,6 +575,32 @@
   </div>
 </div>
 
+<!-- Permanent Delete Confirm Modal -->
+<div class="del-modal" id="permDelModal">
+  <div class="del-box" style="border-color:rgba(239,68,68,.3)">
+    <div style="font-size:32px;margin-bottom:8px">🗑️</div>
+    <h4 style="margin:0 0 6px;font-size:17px;color:var(--text)">លុបចោលរហូត?</h4>
+    <p style="margin:0 0 20px;font-size:13px;color:var(--muted)">ទិន្នន័យ <b id="permDelName" style="color:var(--text)"></b> មិនអាចស្ដារបានទៀតឡើយ!</p>
+    <div class="del-btns">
+      <button class="del-cancel" onclick="closePermDelModal()">ចោះបង់</button>
+      <button id="btnPermDelConfirm" style="flex:1;padding:11px;border-radius:12px;border:none;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff" onclick="doPermDelete()">លុបចោល</button>
+    </div>
+  </div>
+</div>
+
+<!-- Recover Confirm Modal -->
+<div class="del-modal" id="recoverModal">
+  <div class="del-box" style="border-color:rgba(34,197,94,.3)">
+    <div style="font-size:32px;margin-bottom:8px">♻️</div>
+    <h4 style="margin:0 0 6px;font-size:17px;color:var(--text)">ស្ដារ?</h4>
+    <p style="margin:0 0 20px;font-size:13px;color:var(--muted)">ស្ដារ <b id="recoverName" style="color:var(--text)"></b> ត្រឡប់ទៅ HelenLoan</p>
+    <div class="del-btns">
+      <button class="del-cancel" onclick="closeRecoverModal()">ចោះបង់</button>
+      <button id="btnRecoverConfirm" style="flex:1;padding:11px;border-radius:12px;border:none;cursor:pointer;font-size:14px;font-weight:700;font-family:inherit;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff" onclick="doRecover()">Recover</button>
+    </div>
+  </div>
+</div>
+
 
 <script src="../assets/js/layout.js?v=158"></script>
 <script src="../assets/js/dashboard-layout.js?v=158"></script>
@@ -815,6 +841,47 @@ function renderCards() {
         '<div class="lc-right"><span class="loan-card-money">' + money + '</span></div>' +
       '</div>' +
       /* Row 3: [Ph: phone] | [Note] | [Date] */
+      '<div class="loan-card-row">' +
+        '<div class="lc-left">' + (l.Phone ? '<a class="loan-card-phone" href="tel:' + l.Phone + '">Ph: ' + l.Phone + '</a>' : '') + '</div>' +
+        '<div class="lc-mid"><span class="loan-card-note">' + (l.Note || '') + '</span></div>' +
+        '<div class="lc-right"><span class="loan-card-date">' + dateStr + '</span></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderTrashCards() {
+  var wrap = document.getElementById('loanCards');
+  if (!wrap || !isMobile()) return;
+  wrap.style.display = 'flex';
+  if (!trashLoans.length) {
+    wrap.innerHTML = '<div class="empty-msg">🗑️ Trash ទទេ — គ្មានទិន្នន័យ</div>';
+    return;
+  }
+  var svgRecover = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>';
+  var svgDel = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+  wrap.innerHTML = trashLoans.map(function(l, i) {
+    var gClass = l.Gender === 'ប្រុស' || l.Gender === 'Male'   ? 'tag-m'
+               : l.Gender === 'ស្រី'  || l.Gender === 'Female' ? 'tag-f'
+               : l.Gender ? 'tag-o' : 'tag-def';
+    var money  = l.Money ? '$' + parseFloat(l.Money).toFixed(2) : '-';
+    var key    = l.DateTime || '';
+    var safeName = (l.FullName || '').replace(/'/g, "\\'");
+    var dateStr = key ? key.slice(0,10).split('-').reverse().join('/') : '';
+    return '<div class="loan-card" style="opacity:.9">' +
+      '<div class="loan-card-row">' +
+        '<div class="lc-left"><span class="loan-card-num">#' + (i+1) + '</span> <span class="loan-card-name">' + (l.FullName || '-') + '</span></div>' +
+        '<div class="lc-mid">' + (l.Groups ? '<span class="tag tag-m" style="font-size:11px">' + l.Groups + '</span>' : '') + '</div>' +
+        '<div class="lc-right"><div class="loan-card-actions">' +
+          '<button class="btn-act" onclick="recoverLoan(\'' + key + '\',\'' + safeName + '\')" title="Recover" style="background:rgba(34,197,94,.22);color:#22c55e;border:1px solid rgba(34,197,94,.45)">' + svgRecover + '</button>' +
+          '<button class="btn-act" onclick="permDeleteLoan(\'' + key + '\',\'' + safeName + '\')" title="Delete permanently" style="background:rgba(239,68,68,.18);color:#ef4444;border:1px solid rgba(239,68,68,.35)">' + svgDel + '</button>' +
+        '</div></div>' +
+      '</div>' +
+      '<div class="loan-card-row">' +
+        '<div class="lc-left"><span class="loan-card-nid">ID: ' + (l.NationalID || '-') + '</span></div>' +
+        '<div class="lc-mid">' + (l.Gender ? '<span class="tag ' + gClass + '" style="font-size:11px">' + l.Gender + '</span>' : '') + '</div>' +
+        '<div class="lc-right"><span class="loan-card-money">' + money + '</span></div>' +
+      '</div>' +
       '<div class="loan-card-row">' +
         '<div class="lc-left">' + (l.Phone ? '<a class="loan-card-phone" href="tel:' + l.Phone + '">Ph: ' + l.Phone + '</a>' : '') + '</div>' +
         '<div class="lc-mid"><span class="loan-card-note">' + (l.Note || '') + '</span></div>' +
@@ -1092,9 +1159,12 @@ async function switchToTrashView() {
     trashLoans = (data.ok && Array.isArray(data.loans)) ? data.loans : [];
     document.getElementById('loanCount').textContent = '(' + trashLoans.length + ')';
     renderTrashTable();
+    renderTrashCards();
   } catch(e) {
     document.getElementById('loanTbody').innerHTML =
       '<tr><td colspan="10" style="text-align:center;padding:30px;color:#fca5a5;font-size:13px">❌ មិនអាចភ្ជាប់ Server</td></tr>';
+    const wrap = document.getElementById('loanCards');
+    if (wrap && isMobile()) wrap.innerHTML = '<div class="empty-msg" style="color:#fca5a5">❌ មិនអាចភ្ជាប់ Server</div>';
   }
 }
 
@@ -1106,6 +1176,7 @@ function switchToLiveView() {
   document.querySelectorAll('.tools input, .tools select, .tools button').forEach(el => el.style.opacity = '');
   filterLoans();
   updateStats();
+  renderCards();
 }
 
 function renderTrashTable() {
@@ -1150,12 +1221,27 @@ function renderTrashTable() {
   }).join('');
 }
 
-async function permDeleteLoan(key, name) {
-  if (!confirm(`⚠️ លុបចោល "${name}" រហូត?\nទិន្នន័យនេះមិនអាចស្ដារបានទៀតឡើយ!`)) return;
+let _permDelKey = null, _permDelName = null;
+let _recoverKey = null, _recoverName = null;
+
+function permDeleteLoan(key, name) {
+  _permDelKey = key; _permDelName = name;
+  document.getElementById('permDelName').textContent = name;
+  document.getElementById('permDelModal').classList.add('show');
+}
+function closePermDelModal() {
+  _permDelKey = null;
+  document.getElementById('permDelModal').classList.remove('show');
+}
+async function doPermDelete() {
+  if (!_permDelKey) return;
+  const btn = document.getElementById('btnPermDelConfirm');
+  btn.disabled = true; btn.textContent = '...';
   try {
-    const res = await CamboAPI.post({ action: 'helen_loan_perm_delete', key });
+    const res = await CamboAPI.post({ action: 'helen_loan_perm_delete', key: _permDelKey });
     if (res.ok) {
-      showToast('🗑️ លុបចោលរហូត — ' + name);
+      showToast('🗑️ លុបចោលរហូត — ' + _permDelName);
+      closePermDelModal();
       await switchToTrashView();
     } else {
       showToast('❌ ' + (res.message || 'Error'), true);
@@ -1163,21 +1249,35 @@ async function permDeleteLoan(key, name) {
   } catch(e) {
     showToast('❌ មិនអាចភ្ជាប់ Server', true);
   }
+  btn.disabled = false; btn.textContent = 'លុបចោល';
 }
 
-async function recoverLoan(key, name) {
-  if (!confirm(`ស្ដារ "${name}" ត្រឡប់ទៅ HelenLoan?`)) return;
+function recoverLoan(key, name) {
+  _recoverKey = key; _recoverName = name;
+  document.getElementById('recoverName').textContent = name;
+  document.getElementById('recoverModal').classList.add('show');
+}
+function closeRecoverModal() {
+  _recoverKey = null;
+  document.getElementById('recoverModal').classList.remove('show');
+}
+async function doRecover() {
+  if (!_recoverKey) return;
+  const btn = document.getElementById('btnRecoverConfirm');
+  btn.disabled = true; btn.textContent = '...';
   try {
-    const res = await CamboAPI.post({ action: 'helen_loan_recover', key });
+    const res = await CamboAPI.post({ action: 'helen_loan_recover', key: _recoverKey });
     if (res.ok) {
-      showToast('✅ ស្ដារបានជោគជ័យ — ' + name);
-      await switchToTrashView(); // refresh trash list
+      showToast('✅ ស្ដារបានជោគជ័យ — ' + _recoverName);
+      closeRecoverModal();
+      await switchToTrashView();
     } else {
       showToast('❌ ' + (res.message || 'Error'), true);
     }
   } catch(e) {
     showToast('❌ មិនអាចភ្ជាប់ Server', true);
   }
+  btn.disabled = false; btn.textContent = 'Recover';
 }
 
 function openDelModal(key, name) {
