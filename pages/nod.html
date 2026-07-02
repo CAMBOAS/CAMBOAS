@@ -542,7 +542,8 @@
 
     /* Price input */
     .pprice-inp {
-      width: 40px;
+      width: 100%;
+      max-width: 80px;
       height: 22px;
       border: none;
       background: transparent;
@@ -552,7 +553,7 @@
       font-family: inherit;
       text-align: center;
       outline: none;
-      padding: 0;
+      padding: 0 2px;
       -moz-appearance: textfield;
     }
     .pprice-inp::-webkit-outer-spin-button,
@@ -2163,15 +2164,30 @@
       .ptype-badge { display: none !important; }
       .punit-info  { display: none !important; }
 
-      /* Controls */
-      .prow-ctrl { grid-template-columns: 60px 48px 38px 38px !important; gap: 4px !important; padding: 6px 0 0 !important; margin-top: auto !important; justify-content: start !important; }
-      .pctrl-cell { min-height: 40px !important; border-radius: 10px !important; padding: 4px 2px 3px !important; background: #fff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
-      [data-theme="dark"] .pctrl-cell { background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.10) !important; }
-      .pctrl-box  { min-height: 40px !important; border-radius: 10px !important; }
-      .pprice-inp { width: 28px !important; font-size: 13px !important; }
-      .pqty-inp   { width: 22px !important; font-size: 13px !important; }
-      .pcell-sym  { font-size: 9px !important; }
-      .pcell-lbl  { font-size: 9px !important; }
+      /* Controls — Smart Orders style */
+      .prow-ctrl { grid-template-columns: repeat(4, minmax(0,1fr)) !important; gap: 6px !important; padding: 6px 0 0 !important; margin-top: auto !important; width: 100% !important; align-items: end !important; }
+      /* pctrl-cell: label on top, input below */
+      .pctrl-cell { min-height: unset !important; border-radius: 0 !important; padding: 0 !important; background: transparent !important; border: none !important; flex-direction: column !important; gap: 3px !important; align-items: stretch !important; justify-content: flex-end !important; }
+      [data-theme="dark"] .pctrl-cell { background: transparent !important; border: none !important; }
+      /* label on top */
+      .pcell-lbl { order: -1 !important; font-size: 9px !important; font-weight: 700 !important; letter-spacing: 0.06em !important; text-transform: uppercase !important; color: var(--muted) !important; text-align: center !important; }
+      /* value row becomes the input box */
+      .pcell-val { width: 100% !important; height: 34px !important; border: 1.5px solid var(--line, rgba(0,0,0,0.08)) !important; background: rgba(255,255,255,0.80) !important; border-radius: 8px !important; justify-content: center !important; align-items: center !important; gap: 1px !important; }
+      [data-theme="dark"] .pcell-val { background: rgba(255,255,255,0.08) !important; border-color: rgba(255,255,255,0.12) !important; }
+      .pprice-inp { width: 36px !important; font-size: 14px !important; font-weight: 800 !important; }
+      .pqty-inp   { width: 28px !important; font-size: 14px !important; font-weight: 800 !important; }
+      .pcell-sym  { font-size: 10px !important; font-weight: 800 !important; }
+      /* unit box */
+      .pctrl-box { min-height: unset !important; border-radius: 0 !important; background: transparent !important; position: static !important; overflow: visible !important; flex-direction: column !important; gap: 3px !important; align-items: stretch !important; }
+      .pctrl-box.pctrl-unit-box { background: transparent !important; border: none !important; }
+      .pctrl-box.pctrl-unit-box::before { content: 'UNIT'; display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); text-align: center; }
+      .punit-btn { position: static !important; height: 34px !important; border-radius: 8px !important; border: 1.5px solid rgba(124,92,255,0.35) !important; background: rgba(124,92,255,0.08) !important; color: var(--primary, #7c5cff) !important; font-size: 12px !important; font-weight: 700 !important; }
+      [data-theme="dark"] .punit-btn { background: rgba(124,92,255,0.18) !important; border-color: rgba(196,181,253,0.35) !important; color: #c4b5fd !important; }
+      /* add box */
+      .pctrl-box.padd-box { background: transparent !important; box-shadow: none !important; flex-direction: column !important; gap: 3px !important; }
+      .pctrl-box.padd-box::before { content: '+'; display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.06em; color: transparent; }
+      .padd-btn { position: static !important; height: 34px !important; border-radius: 8px !important; background: linear-gradient(135deg, #7c5cff, #a855f7) !important; font-size: 22px !important; font-weight: 300 !important; box-shadow: 0 4px 12px rgba(124,92,255,0.28) !important; }
+      .padd-btn:hover { opacity: .88 !important; }
 
       /* ── CART PANEL: fixed compact strip ── */
       #cartPanel {
@@ -3167,7 +3183,7 @@ function renderPList(list){
           /* Price cell */
           +'<div class="pctrl-cell">'
             +'<div class="pcell-val">'
-              +'<span class="pcell-sym">$</span>'
+              +''
               +'<input class="pprice-inp" type="number" value="'+basePrice+'" min="0" step="0.5" onclick="event.stopPropagation()">'
             +'</div>'
             +'<span class="pcell-lbl">Price</span>'
