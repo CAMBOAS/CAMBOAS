@@ -96,7 +96,6 @@
           ${link('pages/analytics.html',      ic.analytics, t('វិភាគទិន្នន័យ','Analytics'))}
           ${link('pages/new-order.html',      ic.neworder,  t('បញ្ជាទិញថ្មី','New Order'))}
           ${link('pages/nod.html',            ic.neworder,  t('NOD','NOD'))}
-          ${link('pages/orders-details.html', ic.orders,    t('Smart Orders','Smart Orders'))}
           ${link('pages/order-list.html',     ic.orderlist, t('បញ្ជីបញ្ជាទិញ','Order List'))}
         </ul>
         <div class="sb-divider sb-divider-sm"></div>
