@@ -358,7 +358,7 @@ function trashOrder_(orderId) {
 
 /**
  * listProducts_ — Read product catalogue from NewOrder sheet
- * Columns: A=ID, B=Products, C=Type, D=Price, E=Sale, F=Box, G=Pack, H=QTY, I=Description, J=URL
+ * Columns: A=ID, B=Products, C=Type, D=Price, E=Sale, F=Description
  */
 /**
  * addProduct_ — Append a new product row to NewOrder sheet with auto ID
@@ -475,7 +475,7 @@ function listProducts_() {
   if (!sheet) return [];
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return [];
-  const data = sheet.getRange(2, 1, lastRow - 1, 10).getValues();
+  const data = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
   return data
     .filter(function(r) { return safe_(r[0]) && safe_(r[1]); })
     .map(function(r) {
@@ -485,11 +485,7 @@ function listProducts_() {
         type:        safe_(r[2]),
         price:       toNumber_(r[3]),
         sale:        toNumber_(r[4]),
-        box:         toNumber_(r[5]),
-        pack:        toNumber_(r[6]),
-        qty:         toNumber_(r[7]),
-        description: safe_(r[8]),
-        url:         safe_(r[9])
+        description: safe_(r[5])
       };
     });
 }
