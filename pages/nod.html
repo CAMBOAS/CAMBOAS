@@ -2456,8 +2456,17 @@
   /* ── Product Detail Modal ── */
   #pdModal { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(0,0,0,0.55); backdrop-filter:blur(6px); opacity:0; pointer-events:none; transition:opacity .22s ease; }
   #pdModal.open { opacity:1; pointer-events:all; }
-  #pdBox { background:var(--card,#fff); border-radius:20px; width:100%; max-width:420px; max-height:88vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,.22); transform:translateY(28px) scale(.97); transition:transform .25s cubic-bezier(.34,1.56,.64,1); }
+  #pdBox { background:var(--card,#fff); border-radius:20px; width:100%; max-width:420px; max-height:88vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 24px 64px rgba(0,0,0,.22); transform:translateY(28px) scale(.97); transition:transform .25s cubic-bezier(.34,1.56,.64,1); }
   #pdModal.open #pdBox { transform:translateY(0) scale(1); }
+
+  /* ── Mobile: bottom sheet full screen ── */
+  @media (max-width: 768px) {
+    #pdModal { align-items:flex-end; justify-content:flex-end; padding:0; }
+    #pdBox { max-width:100%; width:100%; height:92vh; max-height:92vh; border-radius:24px 24px 0 0; transform:translateY(100%); transition:transform .35s cubic-bezier(.32,1,.4,1); box-shadow:0 -8px 40px rgba(0,0,0,.18); overflow:hidden; }
+    #pdModal.open #pdBox { transform:translateY(0); }
+    #pdImgWrap { max-height:220px; border-radius:24px 24px 0 0; }
+    #pdContent { padding:16px 18px 8px; }
+  }
   #pdImgWrap { width:100%; aspect-ratio:1/1; max-height:260px; overflow:hidden; border-radius:20px 20px 0 0; background:linear-gradient(135deg,rgba(124,92,255,.06),rgba(168,85,247,.06)); display:flex; align-items:center; justify-content:center; position:relative; }
   #pdImgWrap img { width:100%; height:100%; object-fit:contain; padding:16px; }
   #pdImgWrap .pd-cat-badge { position:absolute; top:12px; right:12px; background:rgba(124,92,255,.15); color:var(--primary,#7c5cff); border:1px solid rgba(124,92,255,.25); padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; backdrop-filter:blur(8px); }
@@ -2469,10 +2478,11 @@
   .pd-sale-badge { background:rgba(239,68,68,.1); color:#ef4444; border:1px solid rgba(239,68,68,.2); padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; }
   #pdDivider { border:none; border-top:1px solid var(--line,rgba(0,0,0,.08)); margin:12px 0; }
   #pdDesc { font-size:13.5px; color:var(--muted,#888); line-height:1.65; white-space:pre-wrap; }
-  #pdActions { display:flex; gap:10px; margin-top:18px; }
-  #pdBtnAdd { flex:1; height:44px; border-radius:12px; background:linear-gradient(135deg,#7c5cff,#a855f7); color:#fff; font-size:15px; font-weight:700; border:none; cursor:pointer; transition:opacity .15s; }
+  #pdScroll { flex:1; overflow-y:auto; }
+  #pdActions { display:flex; gap:10px; padding:12px 20px 16px; background:var(--card,#fff); border-top:1px solid var(--line,rgba(0,0,0,.07)); }
+  #pdBtnAdd { flex:1; height:48px; border-radius:12px; background:linear-gradient(135deg,#7c5cff,#a855f7); color:#fff; font-size:15px; font-weight:700; border:none; cursor:pointer; transition:opacity .15s; }
   #pdBtnAdd:hover { opacity:.88; }
-  #pdBtnClose { width:44px; height:44px; border-radius:12px; border:1.5px solid var(--line,rgba(0,0,0,.1)); background:transparent; color:var(--muted,#888); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+  #pdBtnClose { width:48px; height:48px; border-radius:12px; border:1.5px solid var(--line,rgba(0,0,0,.1)); background:transparent; color:var(--muted,#888); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; }
   #pdBtnClose:hover { background:rgba(0,0,0,.05); }
   .pthumb img { cursor:zoom-in; transition:transform .18s ease; }
   .pthumb img:hover { transform:scale(1.06); }
@@ -4272,23 +4282,25 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- Product Detail Modal -->
 <div id="pdModal" onclick="if(event.target===this)closePdModal()">
-  <div id="pdBox">
-    <div id="pdImgWrap">
-      <img id="pdImg" src="" alt="" onerror="this.style.display='none'">
-      <span id="pdCatBadge" class="pd-cat-badge"></span>
+  <div id="pdBox" style="display:flex;flex-direction:column;overflow:hidden;">
+    <div id="pdScroll">
+      <div id="pdImgWrap">
+        <img id="pdImg" src="" alt="" onerror="this.style.display='none'">
+        <span id="pdCatBadge" class="pd-cat-badge"></span>
+      </div>
+      <div id="pdContent">
+        <div id="pdMeta">
+          <span id="pdName"></span>
+          <span class="pd-sale-badge" id="pdSale" style="display:none"></span>
+          <span class="pd-price" id="pdPrice"></span>
+        </div>
+        <hr id="pdDivider">
+        <div id="pdDesc"></div>
+      </div>
     </div>
-    <div id="pdContent">
-      <div id="pdMeta">
-        <span id="pdName"></span>
-        <span class="pd-sale-badge" id="pdSale" style="display:none"></span>
-        <span class="pd-price" id="pdPrice"></span>
-      </div>
-      <hr id="pdDivider">
-      <div id="pdDesc"></div>
-      <div id="pdActions">
-        <button id="pdBtnAdd" onclick="pdAddToCart()">🛒 បន្ថែមទៅកង់</button>
-        <button id="pdBtnClose" onclick="closePdModal()">✕</button>
-      </div>
+    <div id="pdActions">
+      <button id="pdBtnAdd" onclick="pdAddToCart()">🛒 បន្ថែមទៅកង់</button>
+      <button id="pdBtnClose" onclick="closePdModal()">✕</button>
     </div>
   </div>
 </div>
