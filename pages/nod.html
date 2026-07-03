@@ -4296,20 +4296,12 @@ document.addEventListener('DOMContentLoaded', function(){
 <script>
 var _pdProductId = null;
 function _lockScroll() {
-  var scrollY = window.scrollY;
+  document.documentElement.style.overflow = 'hidden';
   document.body.style.overflow = 'hidden';
-  document.body.style.position = 'fixed';
-  document.body.style.top = '-' + scrollY + 'px';
-  document.body.style.width = '100%';
-  document.body.dataset.scrollY = scrollY;
 }
 function _unlockScroll() {
-  var scrollY = document.body.dataset.scrollY || 0;
+  document.documentElement.style.overflow = '';
   document.body.style.overflow = '';
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.width = '';
-  window.scrollTo(0, parseInt(scrollY));
 }
 function showProductDetail(pid) {
   var p = _allProducts().find(function(x){ return String(x.id)===String(pid); });
