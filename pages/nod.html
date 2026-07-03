@@ -1869,8 +1869,17 @@
         background: transparent !important;
       }
       [data-theme="dark"] #custHead { background: transparent !important; }
-      /* Hide collapse chevron on large screens */
-      .od-chevron-pill { display: none !important; }
+      /* Show collapse chevron on desktop too */
+      .od-chevron-pill { display: flex !important; }
+      #custHead { cursor: pointer !important; user-select: none; }
+      #custHead:hover { background: rgba(124,92,255,.04) !important; }
+      #custHead.is-open .od-chevron-pill { transform: rotate(180deg); }
+      #custBody.is-hidden { display: none !important; }
+      /* Cart Summary collapse on desktop */
+      #cartHead { cursor: pointer !important; user-select: none; }
+      #cartHead .mob-sect-chevron { display: inline-block !important; transition: transform .28s ease; }
+      #cartHead.is-open .mob-sect-chevron { transform: rotate(180deg); }
+      #cartBody.is-hidden { display: none !important; }
 
       /* Section header */
       .mob-sect-head {
