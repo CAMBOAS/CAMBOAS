@@ -2474,7 +2474,7 @@
   #pdMeta { display:flex; flex-wrap:wrap; align-items:center; margin-bottom:14px; gap:6px 8px; }
   #pdName { width:100%; font-size:17px; font-weight:800; color:var(--text,#1a1a2e); line-height:1.35; }
   .pd-sale-badge { flex:1; text-align:center; }
-  .pd-price { font-size:17px; font-weight:900; color:var(--primary,#7c5cff); margin-left:auto; white-space:nowrap; }
+  .pd-price { position:absolute; bottom:12px; right:12px; font-size:26px; font-weight:900; color:#fff; background:linear-gradient(135deg,#7c5cff,#a855f7); padding:6px 14px; border-radius:14px; white-space:nowrap; box-shadow:0 4px 16px rgba(124,92,255,.35); }
   .pd-sale-badge { background:rgba(239,68,68,.1); color:#ef4444; border:1px solid rgba(239,68,68,.2); padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; }
   #pdDivider { border:none; border-top:1px solid var(--line,rgba(0,0,0,.08)); margin:12px 0; }
   #pdDesc { font-size:13.5px; color:var(--muted,#888); line-height:1.65; white-space:pre-wrap; }
@@ -4287,12 +4287,12 @@ document.addEventListener('DOMContentLoaded', function(){
       <div id="pdImgWrap">
         <img id="pdImg" src="" alt="" onerror="this.style.display='none'">
         <span id="pdCatBadge" class="pd-cat-badge"></span>
+        <span class="pd-price" id="pdPrice"></span>
       </div>
       <div id="pdContent">
         <div id="pdMeta">
           <span id="pdName"></span>
           <span class="pd-sale-badge" id="pdSale" style="display:none"></span>
-          <span class="pd-price" id="pdPrice"></span>
         </div>
         <hr id="pdDivider">
         <div id="pdDesc"></div>
