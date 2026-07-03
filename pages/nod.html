@@ -2462,9 +2462,10 @@
   #pdImgWrap img { width:100%; height:100%; object-fit:contain; padding:16px; }
   #pdImgWrap .pd-cat-badge { position:absolute; top:12px; right:12px; background:rgba(124,92,255,.15); color:var(--primary,#7c5cff); border:1px solid rgba(124,92,255,.25); padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; backdrop-filter:blur(8px); }
   #pdContent { padding:18px 20px 24px; }
-  #pdName { font-size:17px; font-weight:800; color:var(--text,#1a1a2e); line-height:1.35; margin-bottom:10px; }
-  #pdMeta { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
-  .pd-price { font-size:22px; font-weight:900; color:var(--primary,#7c5cff); }
+  #pdMeta { display:flex; align-items:center; margin-bottom:14px; gap:8px; }
+  #pdName { font-size:17px; font-weight:800; color:var(--text,#1a1a2e); line-height:1.35; flex:1; }
+  .pd-sale-badge { margin:0 auto; }
+  .pd-price { font-size:17px; font-weight:900; color:var(--primary,#7c5cff); margin-left:auto; white-space:nowrap; }
   .pd-sale-badge { background:rgba(239,68,68,.1); color:#ef4444; border:1px solid rgba(239,68,68,.2); padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; }
   #pdDivider { border:none; border-top:1px solid var(--line,rgba(0,0,0,.08)); margin:12px 0; }
   #pdDesc { font-size:13.5px; color:var(--muted,#888); line-height:1.65; white-space:pre-wrap; }
@@ -4277,10 +4278,10 @@ document.addEventListener('DOMContentLoaded', function(){
       <span id="pdCatBadge" class="pd-cat-badge"></span>
     </div>
     <div id="pdContent">
-      <div id="pdName"></div>
       <div id="pdMeta">
-        <span class="pd-price" id="pdPrice"></span>
+        <span id="pdName"></span>
         <span class="pd-sale-badge" id="pdSale" style="display:none"></span>
+        <span class="pd-price" id="pdPrice"></span>
       </div>
       <hr id="pdDivider">
       <div id="pdDesc"></div>
