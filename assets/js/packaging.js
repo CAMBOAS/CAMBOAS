@@ -592,15 +592,15 @@ async function init(){
   const el=document.getElementById('pkgList');
   if(el) el.innerHTML='<div class="pkg-empty">⏳ Loading...</div>';
   _orders=await loadOrders();
-  // Default: All Time + Pending (show all pending orders regardless of date)
-  _dateStart = ''; _dateEnd = '';
+  // Default: Today + Pending
+  var _todayStr = new Date().toISOString().slice(0,10);
+  _dateStart = _todayStr; _dateEnd = _todayStr;
   _filter = 'pending';
   // Update button label
   var lbl = document.getElementById('pkgDateLabel');
-  if(lbl) lbl.textContent = 'All Time';
-  // No preset button active by default
+  if(lbl) lbl.textContent = 'Today';
   document.querySelectorAll('.ol-date-preset').forEach(function(b){
-    b.classList.toggle('active', b.dataset.p==='all');
+    b.classList.toggle('active', b.dataset.p==='today');
   });
   render();
 
