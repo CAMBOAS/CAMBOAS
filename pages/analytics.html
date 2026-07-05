@@ -119,31 +119,20 @@
   .ml-amt{font-size:13px;font-weight:800;color:#7dd3fc;flex-shrink:0;white-space:nowrap}
   [data-theme="light"] .ml-amt{color:#4f46e5}
 
-  /* ── Customer Health (RFM) ── */
-  .rfm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-  .rfm-seg{border-radius:12px;padding:10px 12px;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:4px;transition:transform .14s,box-shadow .14s;cursor:default}
-  .rfm-seg:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.12)}
-  .rfm-seg-top{display:flex;align-items:center;gap:6px}
-  .rfm-icon{font-size:16px;line-height:1}
-  .rfm-label{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
-  .rfm-count{font-size:22px;font-weight:900;line-height:1.1}
-  .rfm-desc{font-size:10px;color:var(--muted);line-height:1.4}
-  .rfm-vip{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(251,191,36,.06))}
-  .rfm-vip .rfm-label{color:#f59e0b}
-  .rfm-vip .rfm-count{color:#fbbf24}
-  .rfm-regular{background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(52,211,153,.05))}
-  .rfm-regular .rfm-label{color:#10b981}
-  .rfm-regular .rfm-count{color:#34d399}
-  .rfm-atrisk{background:linear-gradient(135deg,rgba(249,115,22,.12),rgba(251,146,60,.06))}
-  .rfm-atrisk .rfm-label{color:#f97316}
-  .rfm-atrisk .rfm-count{color:#fb923c}
-  .rfm-lost{background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(252,165,165,.05))}
-  .rfm-lost .rfm-label{color:#ef4444}
-  .rfm-lost .rfm-count{color:#fca5a5}
-  .rfm-bar-row{display:flex;height:6px;border-radius:999px;overflow:hidden;gap:2px;margin-top:4px}
-  .rfm-bar-seg{border-radius:999px;transition:width .6s ease}
-  .rfm-total-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);margin-top:2px}
-  [data-theme="light"] .rfm-count{filter:brightness(.8)}
+  /* ── Calculate Widget ── */
+  .calc-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:10px 8px;align-items:end;margin-bottom:14px}
+  .calc-field{display:flex;flex-direction:column;gap:5px}
+  .calc-field label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.03em}
+  .calc-field input{background:rgba(255,255,255,.06);border:1px solid rgba(148,163,184,.18);border-radius:10px;padding:9px 12px;font-size:15px;font-weight:700;color:var(--text);outline:none;width:100%;box-sizing:border-box;transition:border-color .15s,background .15s}
+  .calc-field input:focus{border-color:#8b5cf6;background:rgba(139,92,246,.08)}
+  [data-theme="light"] .calc-field input{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.14)}
+  [data-theme="light"] .calc-field input:focus{border-color:#7c3aed;background:rgba(124,58,237,.07)}
+  .calc-op{font-size:20px;font-weight:900;color:var(--muted);padding-bottom:9px;text-align:center;align-self:end}
+  .calc-result{background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(6,182,212,.08));border:1px solid rgba(139,92,246,.3);border-radius:10px;padding:9px 12px;font-size:20px;font-weight:900;color:#a78bfa;min-height:42px;display:flex;align-items:center}
+  .calc-result.positive{color:#34d399;border-color:rgba(52,211,153,.35);background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(52,211,153,.06))}
+  .calc-result.negative{color:#f87171;border-color:rgba(239,68,68,.3);background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(252,165,165,.06))}
+  .calc-reset-btn{width:100%;padding:9px;border-radius:10px;border:1px solid rgba(148,163,184,.18);background:rgba(255,255,255,.04);color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,color .15s}
+  .calc-reset-btn:hover{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.25)}
 
   @media(max-width:1100px){.an-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.an-grid{grid-template-columns:1fr}}
   @media(max-width:600px){
@@ -268,17 +257,41 @@
           </div>
           <div class="mini-list" id="topProductsList"></div>
         </article>
-        <article class="glass-card an-card">
+        <article class="glass-card an-card" id="calcWidget">
           <div class="an-card-head">
-            <h3>Customer Health</h3>
-            <p>ស្ថានភាព customer របស់អ្នក</p>
+            <h3>🧮 គណនា</h3>
+            <p>គណនាចំណេញ / ខាត</p>
           </div>
-          <div class="rfm-grid" id="rfmSegments"></div>
-          <div class="rfm-bar-row" id="rfmBar"></div>
-          <div class="rfm-total-row">
-            <span>Total unique customers</span>
-            <span id="rfmTotal" style="font-weight:700;color:var(--text)">—</span>
+          <div class="calc-grid">
+            <div class="calc-field">
+              <label>តម្លៃទំនិញ</label>
+              <input type="number" id="calcPrice" placeholder="0" oninput="calcUpdate()" min="0">
+            </div>
+            <div class="calc-op">×</div>
+            <div class="calc-field">
+              <label>លក់ក្នង</label>
+              <input type="number" id="calcQty" placeholder="0" oninput="calcUpdate()" min="0">
+            </div>
+            <div class="calc-field">
+              <label>ចំណេញសរុប</label>
+              <input type="number" id="calcRevenue" placeholder="0" oninput="calcUpdate()" min="0">
+            </div>
+            <div class="calc-op">−</div>
+            <div class="calc-field">
+              <label>ត្រូវដក</label>
+              <input type="number" id="calcCost" placeholder="0" oninput="calcUpdate()" min="0">
+            </div>
+            <div class="calc-field">
+              <label>ថ្ងៃ/ខែ/ក...</label>
+              <input type="text" id="calcNote" placeholder="ថ្ងៃ ខែ ឬ ចំណាំ...">
+            </div>
+            <div class="calc-op">=</div>
+            <div class="calc-field">
+              <label>ចំណេញ / ខាត</label>
+              <div id="calcResult" class="calc-result">$0</div>
+            </div>
           </div>
+          <button class="calc-reset-btn" onclick="calcReset()">↺ លុបចោល</button>
         </article>
       </section>
 
@@ -453,6 +466,29 @@
     }
   });
 })();
+
+function calcUpdate() {
+  var price = parseFloat(document.getElementById('calcPrice').value) || 0;
+  var qty   = parseFloat(document.getElementById('calcQty').value)   || 0;
+  var cost  = parseFloat(document.getElementById('calcCost').value)  || 0;
+  var rev   = price * qty;
+  var revEl = document.getElementById('calcRevenue');
+  if (revEl) { revEl.value = rev > 0 ? rev : ''; }
+  var profit = rev - cost;
+  var el = document.getElementById('calcResult');
+  if (!el) return;
+  el.className = 'calc-result' + (profit > 0 ? ' positive' : profit < 0 ? ' negative' : '');
+  el.textContent = (profit >= 0 ? '+$' : '-$') + Math.abs(profit).toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:2});
+}
+
+function calcReset() {
+  ['calcPrice','calcQty','calcRevenue','calcCost','calcNote'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  var r = document.getElementById('calcResult');
+  if (r) { r.className = 'calc-result'; r.textContent = '$0'; }
+}
 </script>
 </body>
 </html>
