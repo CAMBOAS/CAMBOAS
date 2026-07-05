@@ -10,34 +10,61 @@ window._olSel = _sel;
 window._cardSelMode = false;
 var _qrOn = true; // QR Code toggle state
 
-/* ── Print marks: localStorage persistence ── */
+/* ── Print marks: localStorage cache + Google Sheet sync ── */
 var _printMarks = {};
 (function(){ try{ _printMarks = JSON.parse(localStorage.getItem('cambo_print_marks')||'{}'); }catch(e){ _printMarks={}; } })();
 function _savePrintMarks(){ try{ localStorage.setItem('cambo_print_marks', JSON.stringify(_printMarks)); }catch(e){} }
-function _setPrintMark(id, color){
-  if(color) _printMarks[String(id)] = color; else delete _printMarks[String(id)];
-  _savePrintMarks();
+
+function _syncPrintMarkToSheet(id, status){
+  try {
+    CamboAPI.post({ action:'set_print_status', orderId:String(id), status:status||'' });
+  } catch(e) { /* fail silently — localStorage already updated */ }
 }
-function _cyclePrintMark(id){
-  var cur = _printMarks[String(id)] || '';
-  var next = cur==='' ? 'blue' : cur==='blue' ? 'red' : '';
-  _setPrintMark(id, next);
-  // Update dot in DOM without re-render
+
+function _setPrintMark(id, status, syncSheet){
+  if(status) _printMarks[String(id)] = status; else delete _printMarks[String(id)];
+  _savePrintMarks();
+  if(syncSheet !== false) _syncPrintMarkToSheet(id, status);
+}
+
+function _updateDot(id, status){
   var dot = document.querySelector('.ol-print-dot[data-id="'+id+'"]');
-  if(dot){ dot.className = 'ol-print-dot' + (next ? ' '+next : ''); dot.title = next==='blue'?'មិនទាន់ Print':next==='red'?'Print ហើយ':'គ្មានចំណាំ'; }
+  if(dot){
+    dot.className = 'ol-print-dot' + (status ? ' '+status : '');
+    dot.title = status === 'green' ? 'Print ហើយ ✓' : 'គ្មានចំណាំ — ចុចដើម្បី Mark';
+  }
+}
+
+function _cyclePrintMark(id){
+  var cur  = _printMarks[String(id)] || '';
+  var next = cur === '' ? 'green' : '';  // toggle: off → green → off
+  _setPrintMark(id, next);
+  _updateDot(id, next);
 }
 window.olCyclePrint = _cyclePrintMark;
-function olMarkSelected(color){
-  _sel.forEach(function(id){ _setPrintMark(id, color); });
-  document.querySelectorAll('.ol-print-dot').forEach(function(dot){
-    var id = dot.dataset.id;
-    if(_sel.has(String(id))){
-      dot.className = 'ol-print-dot' + (color ? ' '+color : '');
-      dot.title = color==='blue'?'មិនទាន់ Print':color==='red'?'Print ហើយ':'គ្មានចំណាំ';
-    }
-  });
+
+function olMarkSelected(status){
+  _sel.forEach(function(id){ _setPrintMark(id, status); _updateDot(id, status); });
 }
 window.olMarkSelected = olMarkSelected;
+
+/* Load print statuses from Google Sheet on startup — merge over localStorage */
+function _loadPrintStatusesFromSheet(){
+  CamboAPI.get({ action:'print_statuses' }).then(function(res){
+    if(res && res.ok && res.statuses){
+      Object.keys(res.statuses).forEach(function(id){
+        _printMarks[id] = res.statuses[id];
+      });
+      _savePrintMarks();
+      // Refresh dots in DOM
+      document.querySelectorAll('.ol-print-dot').forEach(function(dot){
+        var id = dot.dataset.id;
+        _updateDot(id, _printMarks[id]||'');
+      });
+    }
+  }).catch(function(){});
+}
+window._loadPrintStatusesFromSheet = _loadPrintStatusesFromSheet;
 var _sort = {col:'date', dir:'desc'};
 var _q = '', _f = {};
 var _date = {preset:'today', start:'', end:'', label:'Today'}; // start/end filled on DOMContentLoaded
@@ -1627,6 +1654,8 @@ async function init(){
   populateFilterOptions();
   loadSaleInforFilters();
   render();
+  // Load print statuses from Sheet (background, merge over localStorage)
+  setTimeout(_loadPrintStatusesFromSheet, 800);
 
   /* show date-desc sort arrow on initial load */
   var initArr = document.getElementById('arr-date');
@@ -1765,9 +1794,8 @@ async function init(){
     if(a==='printall') printTable();
     if(a==='printsel') printSelected();
     if(a==='reportdelivery') reportDelivery();
-    if(a==='markblue')  { olMarkSelected('blue'); return; }
-    if(a==='markred')   { olMarkSelected('red');  return; }
-    if(a==='markclear') { olMarkSelected('');     return; }
+    if(a==='markgreen') { olMarkSelected('green'); return; }
+    if(a==='markclear') { olMarkSelected('');      return; }
     $id('olActDrop')?.classList.remove('open');
   });
 

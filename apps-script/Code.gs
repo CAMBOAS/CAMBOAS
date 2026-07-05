@@ -98,6 +98,7 @@ function doGet(e) {
     if (action === 'helen_loan_list')  return jsonOutput_({ ok:true, loans: listHelenLoans_() });
     if (action === 'helen_loan_trash') return jsonOutput_({ ok:true, loans: listHelenLoanTrash_() });
     if (action === 'helen_infor')      return jsonOutput_({ ok:true, groups: listHelenInfor_('groups'), statuses: listHelenInfor_('statuses') });
+    if (action === 'print_statuses')   return jsonOutput_({ ok:true, statuses: getPrintStatuses_() });
     if (action === 'helen_sheet_url') {
       var ss2  = SpreadsheetApp.getActiveSpreadsheet();
       var sh1  = ss2.getSheetByName(LOAN_SHEET);
@@ -239,6 +240,12 @@ function doPost(e) {
     if (action === 'saleinfor_delete') {
       const result = deleteSaleInfor_(body.type, body.value);
       return jsonOutput_(result);
+    }
+
+    /* Print status — mark order as printed / unprinted */
+    if (action === 'set_print_status') {
+      setPrintStatus_(body.orderId, body.status);
+      return jsonOutput_({ ok:true });
     }
 
     /* Legacy payload — no action field (from new-order.html submitOrder) */
@@ -1905,5 +1912,53 @@ function addHelenLoan_(loan) {
   sheet.getRange(2, 3, 1, 1).setNumberFormat('@');
   sheet.getRange(2, 6, 1, 1).setNumberFormat('@');
   range.setValues([row]);
+}
+
+
+/* ════════════════════════════════════════
+   PRINT STATUS FUNCTIONS
+   PrintStatus sheet: A=OrderID, B=Status, C=UpdatedAt
+   ════════════════════════════════════════ */
+const PRINT_STATUS_SHEET = 'PrintStatus';
+
+function getPrintStatuses_() {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(PRINT_STATUS_SHEET);
+  if (!sheet || sheet.getLastRow() <= 1) return {};
+  const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 2).getValues();
+  const result = {};
+  data.forEach(function(r) {
+    if (safe_(r[0])) result[safe_(r[0])] = safe_(r[1]);
+  });
+  return result;
+}
+
+function setPrintStatus_(orderId, status) {
+  if (!orderId) return;
+  const ss  = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(PRINT_STATUS_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(PRINT_STATUS_SHEET);
+    sheet.getRange(1, 1, 1, 3).setValues([['OrderID','Status','UpdatedAt']]);
+    sheet.setFrozenRows(1);
+  }
+  const now = Utilities.formatDate(new Date(), TZ, "yyyy-MM-dd HH:mm:ss");
+  const lastRow = sheet.getLastRow();
+  // Check if orderId already exists → update
+  if (lastRow > 1) {
+    const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues().flat();
+    for (let i = 0; i < ids.length; i++) {
+      if (safe_(ids[i]) === safe_(orderId)) {
+        if (status) {
+          sheet.getRange(i + 2, 2, 1, 2).setValues([[status, now]]);
+        } else {
+          sheet.deleteRow(i + 2); // clear = delete row
+        }
+        return;
+      }
+    }
+  }
+  // Not found → append new row (only if setting a status)
+  if (status) sheet.appendRow([safe_(orderId), status, now]);
 }
 

@@ -288,13 +288,11 @@
   .ol-table .ol-col-num  { width:24px; text-align:center !important; padding:0 2px !important; }
   .ol-table .ol-col-date  { width:82px; }
   .ol-table .ol-col-print { width:44px; text-align:center !important; padding:0 4px !important; }
-  .ol-print-dot { width:20px; height:20px; border-radius:50%; border:2.5px solid rgba(148,163,184,.35); background:transparent; cursor:pointer; display:inline-block; transition:transform .15s,background .15s,border-color .15s; vertical-align:middle; }
-  .ol-print-dot:hover { transform:scale(1.2); border-color:rgba(148,163,184,.6); }
-  .ol-print-dot.blue { background:#3b82f6; border-color:#2563eb; }
-  .ol-print-dot.red  { background:#ef4444; border-color:#dc2626; }
+  .ol-print-dot { width:20px; height:20px; border-radius:50%; border:2.5px solid rgba(148,163,184,.35); background:transparent; cursor:pointer; display:inline-block; transition:transform .15s,background .15s,border-color .15s,box-shadow .15s; vertical-align:middle; }
+  .ol-print-dot:hover { transform:scale(1.2); border-color:rgba(34,197,94,.5); }
+  .ol-print-dot.green { background:#22c55e; border-color:#16a34a; box-shadow:0 0 6px rgba(34,197,94,.45); }
   [data-theme="light"] .ol-print-dot { border-color:rgba(100,116,139,.3); }
-  [data-theme="light"] .ol-print-dot.blue { background:#3b82f6; border-color:#1d4ed8; }
-  [data-theme="light"] .ol-print-dot.red  { background:#ef4444; border-color:#b91c1c; }
+  [data-theme="light"] .ol-print-dot.green { background:#16a34a; border-color:#15803d; box-shadow:0 0 6px rgba(22,163,74,.35); }
   .ol-table .ol-col-cust { width:130px; }
   .ol-table .ol-col-tel  { width:100px; }
   .ol-table .ol-col-prov { width:110px; }
@@ -835,9 +833,8 @@
     <button data-a="reportdelivery">📋 Report Delivery</button>
     <div class="ol-divider"></div>
     <div style="padding:4px 14px 2px;font-size:10px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase">ចំណាំ Print</div>
-    <button data-a="markblue" style="gap:8px"><span style="width:14px;height:14px;border-radius:50%;background:#3b82f6;display:inline-block;flex-shrink:0"></span> Mark Blue — មិនទាន់ Print</button>
-    <button data-a="markred"  style="gap:8px"><span style="width:14px;height:14px;border-radius:50%;background:#ef4444;display:inline-block;flex-shrink:0"></span> Mark Red — Print ហើយ</button>
-    <button data-a="markclear" style="gap:8px"><span style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(148,163,184,.5);display:inline-block;flex-shrink:0"></span> Clear Mark</button>
+    <button data-a="markgreen" style="gap:8px"><span style="width:14px;height:14px;border-radius:50%;background:#22c55e;display:inline-block;flex-shrink:0;box-shadow:0 0 5px rgba(34,197,94,.5)"></span> ✓ Print ហើយ (Selected)</button>
+    <button data-a="markclear" style="gap:8px"><span style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(148,163,184,.4);display:inline-block;flex-shrink:0"></span> Clear Mark (Selected)</button>
   </div>
 
   <script src="../assets/js/vendor/html2canvas-lite.js?v=158"></script>
