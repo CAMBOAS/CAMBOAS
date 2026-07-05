@@ -92,19 +92,59 @@
     // ── iPhone: screen size + iOS version → model name ──
     if (/iPhone/i.test(ua)) {
       brand = 'Apple';
-      var iosM = ua.match(/iPhone OS (\d+)_/i);
+      var iosM = ua.match(/iPhone OS (\d+)_(\d+)/i);
       var ios  = iosM ? parseInt(iosM[1]) : 0;
       var W = screen.width, H = screen.height;
       var lg = Math.max(W,H), sm2 = Math.min(W,H);
-      if      (lg===667  && sm2===375) model = ios>=13 ? 'iPhone SE (2020/2022)' : 'iPhone 6/7/8';
-      else if (lg===736  && sm2===414) model = 'iPhone 6+/7+/8+';
-      else if (lg===812  && sm2===375) model = ios>=15 ? 'iPhone 13 mini'        : ios>=14 ? 'iPhone 12 mini' : 'iPhone X/XS/11 Pro';
-      else if (lg===896  && sm2===414) model = ios>=14 ? 'iPhone 11/XR'          : 'iPhone XS Max/11 Pro Max';
-      else if (lg===844  && sm2===390) model = ios>=16 ? 'iPhone 14'             : 'iPhone 12/13';
-      else if (lg===926  && sm2===428) model = ios>=16 ? 'iPhone 14 Plus'        : 'iPhone 12/13 Pro Max';
-      else if (lg===852  && sm2===393) model = ios>=17 ? 'iPhone 15/15 Pro'      : 'iPhone 14 Pro';
-      else if (lg===932  && sm2===430) model = ios>=17 ? 'iPhone 15 Plus/Pro Max': 'iPhone 14 Pro Max';
-      else model = 'iPhone (iOS ' + (ios||'?') + ')';
+
+      if (lg===667 && sm2===375) {
+        model = ios>=13 ? 'iPhone SE (2020/2022)' : 'iPhone 6/7/8';
+
+      } else if (lg===736 && sm2===414) {
+        model = 'iPhone 6 Plus/7 Plus/8 Plus';
+
+      } else if (lg===812 && sm2===375) {
+        // X=iOS12, XS=iOS12, 11Pro=iOS13, 12mini=iOS14, 13mini=iOS15
+        if      (ios>=15) model = 'iPhone 13 mini';
+        else if (ios>=14) model = 'iPhone 12 mini';
+        else if (ios>=13) model = 'iPhone X/XS/11 Pro';
+        else              model = 'iPhone X';
+
+      } else if (lg===896 && sm2===414) {
+        // XR=iOS12, 11=iOS13, XSMax=iOS12, 11ProMax=iOS13
+        if (ios>=13) model = 'iPhone 11/XR';
+        else         model = 'iPhone XS Max';
+
+      } else if (lg===844 && sm2===390) {
+        // iPhone 12=iOS14, 13=iOS15, 14=iOS16 — same screen, use iOS to best-guess
+        if      (ios>=16) model = 'iPhone 14';   // most likely; could also be 12/13 on iOS16+
+        else if (ios>=15) model = 'iPhone 13';
+        else              model = 'iPhone 12';
+
+      } else if (lg===926 && sm2===428) {
+        // 12ProMax=iOS14, 13ProMax=iOS15, 14Plus=iOS16
+        if      (ios>=16) model = 'iPhone 14 Plus';
+        else if (ios>=15) model = 'iPhone 13 Pro Max';
+        else              model = 'iPhone 12 Pro Max';
+
+      } else if (lg===852 && sm2===393) {
+        // 14Pro=iOS16, 15=iOS17, 15Pro=iOS17
+        if (ios>=17) model = 'iPhone 15/15 Pro';
+        else         model = 'iPhone 14 Pro';
+
+      } else if (lg===932 && sm2===430) {
+        // 14ProMax=iOS16, 15Plus=iOS17, 15ProMax=iOS17
+        if (ios>=17) model = 'iPhone 15 Plus/Pro Max';
+        else         model = 'iPhone 14 Pro Max';
+
+      } else if (lg===874 && sm2===402) {
+        model = 'iPhone 16/16 Pro';
+      } else if (lg===956 && sm2===440) {
+        model = 'iPhone 16 Plus/Pro Max';
+
+      } else {
+        model = 'iPhone (iOS ' + (ios||'?') + ')';
+      }
     }
 
     // ── iPad / iPod / Mac ──
