@@ -421,6 +421,15 @@
     position:relative; touch-action:manipulation;
   }
   .ol-item-badge{position:absolute;bottom:10px;right:10px;min-width:22px;height:22px;border-radius:11px;background:#3b82f6;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;line-height:1;box-shadow:0 2px 6px rgba(59,130,246,.4)}
+  /* Mobile card print status badge */
+  .ol-card-print-badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px; cursor:pointer; user-select:none; margin-top:7px; border:1.5px solid; transition:background .15s,border-color .15s; }
+  .ol-card-print-badge.printed   { background:rgba(34,197,94,.12); color:#22c55e; border-color:rgba(34,197,94,.35); }
+  .ol-card-print-badge.unprinted { background:rgba(148,163,184,.08); color:#94a3b8; border-color:rgba(148,163,184,.25); }
+  .ol-card-print-badge .ol-card-print-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .ol-card-print-badge.printed   .ol-card-print-dot { background:#22c55e; box-shadow:0 0 5px rgba(34,197,94,.6); }
+  .ol-card-print-badge.unprinted .ol-card-print-dot { background:rgba(148,163,184,.4); }
+  [data-theme="light"] .ol-card-print-badge.printed   { background:rgba(22,163,74,.08); color:#15803d; border-color:rgba(22,163,74,.3); }
+  [data-theme="light"] .ol-card-print-badge.unprinted { color:#64748b; border-color:rgba(100,116,139,.25); }
   .ol-card:hover { border-color:rgba(139,92,246,.4); box-shadow:0 4px 20px rgba(139,92,246,.1); }
   .ol-card-top  { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
   .ol-card-num  { font-size:10px; color:#8b5cf6; font-weight:700; background:rgba(139,92,246,.12); border-radius:5px; padding:2px 6px; flex-shrink:0; }

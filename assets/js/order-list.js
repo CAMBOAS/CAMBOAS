@@ -2081,6 +2081,8 @@ window.olCardSelAll = function(){
 };
 
 document.addEventListener('DOMContentLoaded', init);
+// Expose print mark getter for mobile card IIFE
+window._getPrintMark = function(id){ return _printMarks[String(id)] || ''; };
 })();
 
 /* ── Responsive: Mobile Card View ── */
@@ -2118,7 +2120,12 @@ document.addEventListener('DOMContentLoaded', init);
       var addrDetail = o.addressDetail||o.address||'-';
       var delivery   = o.deliveryName||o.delivery||'-';
       var phone      = o.phone||'-';
-      var isSel = selMode && olSel && olSel.has(String(o.id));
+      var isSel      = selMode && olSel && olSel.has(String(o.id));
+      var markGreenC = (typeof window._getPrintMark==='function' ? window._getPrintMark(o.id) : '') === 'green' || (o.status||o.orderStatus) === 'ព្រីនហើយ';
+      var printBadge = '<span class="ol-card-print-badge '+(markGreenC?'printed':'unprinted')+'" onclick="event.stopPropagation();window.olCyclePrint(\''+o.id+'\')">'
+        +'<span class="ol-card-print-dot"></span>'
+        +(markGreenC ? 'ព្រីនហើយ ✓' : 'មិនទាន់ព្រីន')
+        +'</span>';
       return '<div class="ol-card'+(isSel?' ol-card-sel':'')+'" data-id="'+o.id+'">'
         +'<div class="ol-card-top">'
           +'<span class="ol-card-sel-ring">'
@@ -2142,6 +2149,7 @@ document.addEventListener('DOMContentLoaded', init);
           +'</div>'
         +'</div>'
         +(prods?'<div class="ol-card-prod">'+prods+'</div>':'')
+        +printBadge
         +(itemCount>0?'<span class="ol-item-badge">'+itemCount+'</span>':'')
         +'</div>';
     }).join('');
