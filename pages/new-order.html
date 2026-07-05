@@ -2934,7 +2934,7 @@ window.clearProductCache = function(){ try{ sessionStorage.removeItem(_PCACHE); 
 
 /* ── Load live products from Google Sheets (NewOrder tab) ── */
 async function loadProductsFromSheet(){
-  function _mapProds(raw){ return raw.map(function(p,i){ var cat=_mapCategory(p.type); var desc=p.description||p.desc||p.detail||''; return { id:p.id||(i+1), name:p.name||'', price:p.price||0, category:cat, detail:desc||p.name||'', description:desc, image:p.url||_getImgPath(p.name,cat), sale:p.sale||1, box:p.box||0, pack:p.pack||0, qty:p.qty||0 }; }); }
+  function _mapProds(raw){ return raw.map(function(p,i){ var cat=_mapCategory(p.type); var desc=p.description||p.desc||p.detail||''; return { id:p.id||(i+1), name:p.name||'', price:p.price||0, category:cat, detail:desc||p.name||'', description:desc, image:_getImgPath(p.name,cat), sale:p.sale||1, box:p.box||0, pack:p.pack||0, qty:p.qty||0 }; }); }
   function _apply(list){ products=list; window.__camboProducts=window.pmFilterDeleted?window.pmFilterDeleted(products):products; renderPList(getFiltered()); }
   try{
     // Show cached data immediately — no waiting
