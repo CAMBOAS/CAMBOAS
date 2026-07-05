@@ -67,29 +67,41 @@ function _showPrintToast(msg, ok){
   t._timer = setTimeout(function(){ t.style.display='none'; }, 3000);
 }
 
-/* Actions green button — mark selected + save to Sheet + visual feedback */
-function olMarkSelected(status){
+/* Actions mark button — update SaleOrder Status col E directly + local _orders + render */
+function olMarkSelected(markAction){
   var ids = Array.from(_sel);
   if(!ids.length){ _showPrintToast('⚠️ មិនទាន់ Select row ណាមួយ', false); return; }
-  ids.forEach(function(id){ _setPrintMark(id, status, false); _updateDot(id, status); _updateRowPrinted(id, status); });
-  if(status){
-    // Save ALL selected to Sheet in one go (parallel POST per id)
-    var done=0, fail=0;
-    ids.forEach(function(id){
-      CamboAPI.post({ action:'set_print_status', orderId:String(id), status:status })
-        .then(function(res){ if(res && res.ok) done++; else fail++; })
-        .catch(function(){ fail++; })
-        .finally(function(){
-          if(done+fail === ids.length){
-            _showPrintToast(fail ? '⚠️ Saved '+done+'/'+ids.length+' — check connection' : '✅ Saved '+done+' order(s) to Sheet', !fail);
-          }
-        });
-    });
-  } else {
-    // Clear — also save to Sheet
-    ids.forEach(function(id){ CamboAPI.post({ action:'set_print_status', orderId:String(id), status:'' }).catch(function(){}); });
-    _showPrintToast('🗑️ Cleared '+ids.length+' mark(s)', true);
-  }
+
+  // Determine new status value
+  var newStatus = markAction === 'green' ? 'ព្រីនហើយ' : 'មិនទាន់ព្រីន';
+
+  // Update local _orders immediately so render() shows correct color
+  ids.forEach(function(id){
+    var o = _orders.find(function(x){ return String(x.id)===String(id); });
+    if(o){ o.status = newStatus; o.orderStatus = newStatus; }
+    // Also update print mark cache for dot
+    if(markAction === 'green') _printMarks[String(id)] = 'green';
+    else delete _printMarks[String(id)];
+  });
+  _savePrintMarks();
+  render(); // re-render immediately with new status
+
+  // Sync to SaleOrder sheet (background, parallel POST per id)
+  var done=0, fail=0;
+  ids.forEach(function(id){
+    CamboAPI.post({ action:'update_order_status', orderId:String(id), status:newStatus })
+      .then(function(res){ if(res && res.ok) done++; else fail++; })
+      .catch(function(){ fail++; })
+      .finally(function(){
+        if(done+fail === ids.length){
+          var icon = markAction==='green' ? '✅' : '🗑️';
+          var label = markAction==='green' ? 'ព្រីនហើយ' : 'មិនទាន់ព្រីន';
+          _showPrintToast(fail
+            ? '⚠️ Saved '+done+'/'+ids.length+' — check connection'
+            : icon+' '+label+' — '+done+' order(s)', !fail);
+        }
+      });
+  });
 }
 window.olMarkSelected = olMarkSelected;
 

@@ -248,6 +248,12 @@ function doPost(e) {
       return jsonOutput_({ ok:true });
     }
 
+    /* Update SaleOrder Status column (col E) directly */
+    if (action === 'update_order_status') {
+      updateOrderStatus_(body.orderId, body.status);
+      return jsonOutput_({ ok:true });
+    }
+
     /* Legacy payload — no action field (from new-order.html submitOrder) */
     if (!action && body && Array.isArray(body.items) && body.items.length) {
       const normalized = normalizeLegacyPayloadToOrder_(body);
@@ -1962,5 +1968,21 @@ function setPrintStatus_(orderId, status) {
   }
   // Not found → append new row (only if setting a status)
   if (status) sheet.appendRow([safe_(orderId), status, now]);
+}
+
+/**
+ * updateOrderStatus_ — Update Status column (col E) in SaleOrder sheet for all rows matching orderId
+ */
+function updateOrderStatus_(orderId, status) {
+  if (!safe_(orderId)) return;
+  const sheet   = getSheet_();
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return;
+  const ids = sheet.getRange(2, 2, lastRow - 1, 1).getValues().flat(); // col B = OrderID
+  for (let i = 0; i < ids.length; i++) {
+    if (safe_(ids[i]) === safe_(orderId)) {
+      sheet.getRange(i + 2, 5).setValue(safe_(status)); // col E = Status
+    }
+  }
 }
 
