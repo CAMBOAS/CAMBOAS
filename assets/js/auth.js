@@ -122,11 +122,11 @@
       function getIP() {
         return fetch('https://ipapi.co/json/')
           .then(function (r) { return r.json(); })
-          .then(function (g) { return { ip: g.ip || '', city: g.city, region: g.region, country: g.country_name }; })
+          .then(function (g) { var raw = g.ip || ''; return { ip: raw ? 'IPv4 (' + raw + ')' : '', city: g.city, region: g.region, country: g.country_name }; })
           .catch(function () {
             return fetch('https://ipwhois.app/json/')
               .then(function (r) { return r.json(); })
-              .then(function (g) { return { ip: g.ip || '', city: g.city, region: g.region, country: g.country }; })
+              .then(function (g) { var raw = g.ip || ''; return { ip: raw ? 'IPv4 (' + raw + ')' : '', city: g.city, region: g.region, country: g.country }; })
               .catch(function () { return { ip: '', city: '', region: '', country: '' }; });
           });
       }
