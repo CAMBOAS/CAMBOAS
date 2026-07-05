@@ -49,7 +49,11 @@ window.olCyclePrint = _cyclePrintMark;
 /* Update row background when printed */
 function _updateRowPrinted(id, status){
   var tr = document.querySelector('tr[data-id="'+id+'"]');
-  if(tr){ tr.classList.toggle('ol-row-printed', !!status); }
+  if(!tr) return;
+  // Keep green if order's own status = ព្រីនហើយ (even if print mark is empty)
+  var o = _orders.find(function(x){ return String(x.id)===String(id); });
+  var byStatus = !!(o && (o.status||o.orderStatus) === 'ព្រីនហើយ');
+  tr.classList.toggle('ol-row-printed', !!status || byStatus);
 }
 
 /* Show toast notification */
