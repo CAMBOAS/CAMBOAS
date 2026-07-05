@@ -2923,7 +2923,8 @@ function _mapCategory(type){
 var _catFolder = { Hair:'hair', Body:'body', Face:'face', Drink:'drink' };
 function _getImgPath(name, category) {
   var folder = _catFolder[category] || 'hair';
-  return '../images/products/' + folder + '/' + (name||'') + '.png';
+  var clean = (name||'').replace(/[​‌‍﻿­]/g, '').trim();
+  return '../images/products/' + folder + '/' + clean + '.png';
 }
 
 /* ── Product cache (sessionStorage, 5-min TTL) ── */
