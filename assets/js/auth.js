@@ -104,29 +104,81 @@
     return { brand: brand, model: model };
   }
 
-  // After login success — log device + IP + location to Sheet, returns Promise
+  // After login success — log device + IP + precise location to Sheet, returns Promise
   function logDevice(account) {
     if (!window.CamboAPI) return Promise.resolve();
     try {
       var info = getDeviceInfo();
+
       function sendLog(ip, loc) {
         return window.CamboAPI.get({
-          action:   'log_login',
-          account:  account,
-          device:   info.brand,
-          model:    info.model,
-          ip:       ip || '',
-          location: loc || ''
+          action: 'log_login', account: account,
+          device: info.brand,  model:   info.model,
+          ip: ip || '',        location: loc || ''
         }).catch(function () { return null; });
       }
-      return fetch('https://ipapi.co/json/')
-        .then(function (r) { return r.json(); })
-        .then(function (geo) {
-          var ip  = geo.ip || '';
-          var loc = (geo.city ? geo.city + ', ' : '') + (geo.country_name || '');
-          return sendLog(ip, loc);
-        })
-        .catch(function () { return sendLog('', ''); });
+
+      // Get IP address from API with fallback
+      function getIP() {
+        return fetch('https://ipapi.co/json/')
+          .then(function (r) { return r.json(); })
+          .then(function (g) { return { ip: g.ip || '', city: g.city, region: g.region, country: g.country_name }; })
+          .catch(function () {
+            return fetch('https://ipwhois.app/json/')
+              .then(function (r) { return r.json(); })
+              .then(function (g) { return { ip: g.ip || '', city: g.city, region: g.region, country: g.country }; })
+              .catch(function () { return { ip: '', city: '', region: '', country: '' }; });
+          });
+      }
+
+      // Reverse geocode lat/lon → detailed address via Nominatim
+      function reverseGeocode(lat, lon) {
+        return fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json&zoom=14&addressdetails=1')
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            var a = d.address || {};
+            return [
+              a.village || a.suburb || a.neighbourhood || a.quarter || a.hamlet,
+              a.city_district || a.district,
+              a.city || a.town || a.county || a.municipality,
+              a.state || a.province,
+              a.country
+            ].filter(Boolean).join(', ');
+          })
+          .catch(function () { return ''; });
+      }
+
+      return new Promise(function (resolve) {
+        // Try GPS first → precise location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (pos) {
+              var lat = pos.coords.latitude;
+              var lon = pos.coords.longitude;
+              Promise.all([getIP(), reverseGeocode(lat, lon)])
+                .then(function (res) {
+                  var ipData = res[0];
+                  var gpsLoc = res[1];
+                  var loc = gpsLoc || [ipData.city, ipData.region, ipData.country].filter(Boolean).join(', ');
+                  resolve(sendLog(ipData.ip, loc));
+                });
+            },
+            function () {
+              // GPS denied → fall back to IP-based location
+              getIP().then(function (d) {
+                var loc = [d.city, d.region, d.country].filter(Boolean).join(', ');
+                resolve(sendLog(d.ip, loc));
+              });
+            },
+            { timeout: 6000, maximumAge: 300000 }
+          );
+        } else {
+          getIP().then(function (d) {
+            var loc = [d.city, d.region, d.country].filter(Boolean).join(', ');
+            resolve(sendLog(d.ip, loc));
+          });
+        }
+      });
     } catch (e) { return Promise.resolve(); }
   }
 
