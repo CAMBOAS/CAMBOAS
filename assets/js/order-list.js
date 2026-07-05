@@ -570,8 +570,9 @@ function render(){
       ptxt += ' <span style="color:#8b5cf6;font-weight:700;background:rgba(139,92,246,.1);padding:1px 6px;border-radius:6px;font-size:11px;margin-left:4px">+'+(prods.length-1)+'</span>';
     }
     var pmore = '';
-    var selected = _sel.has(String(o.id));
-    var printed  = !!_printMarks[String(o.id)];
+    var selected  = _sel.has(String(o.id));
+    var markGreen = _printMarks[String(o.id)] === 'green' || (o.status||o.orderStatus) === 'ព្រីនហើយ';
+    var printed   = markGreen;
     return '<tr class="'+(selected?'sel ':'')+( printed?'ol-row-printed':'')+'" data-id="'+o.id+'">'
       +'<td class="ol-cb-th ol-col-cb"><input type="checkbox" class="ol-chk" data-id="'+o.id+'" '+(selected?'checked':'')+' onclick="event.stopPropagation()"></td>'
       +'<td class="ol-col-num">'+(idx+1)+'</td>'
@@ -583,7 +584,7 @@ function render(){
       +'<td class="ol-muted ol-col-cb2">'+esc(o.closeBy||o.closeby||'')+'</td>'
       +'<td class="ol-total ol-col-tot">$'+total.toFixed(2)+'</td>'
       +'<td class="ol-muted ol-col-date">'+fmtDisplay(o.date)+'</td>'
-      +(function(){ var m=_printMarks[String(o.id)]||''; var lbl=m==='blue'?'មិនទាន់ Print':m==='red'?'Print ហើយ':'គ្មានចំណាំ'; return '<td class="ol-col-print" onclick="event.stopPropagation();window.olCyclePrint(\''+o.id+'\')"><span class="ol-print-dot'+(m?' '+m:'')+'" data-id="'+o.id+'" title="'+lbl+'"></span></td>'; })()
+      +(function(){ var m=markGreen?'green':(_printMarks[String(o.id)]||''); var lbl=m==='green'?'Print ហើយ ✓':'គ្មានចំណាំ'; return '<td class="ol-col-print" onclick="event.stopPropagation();window.olCyclePrint(\''+o.id+'\')"><span class="ol-print-dot'+(m?' '+m:'')+'" data-id="'+o.id+'" title="'+lbl+'"></span></td>'; })()
       +'</tr>';
   }).join('');
 
