@@ -35,29 +35,52 @@ function _updateDot(id, status){
   }
 }
 
-/* Individual dot click — toggle green/clear + save to SaleOrder sheet */
+/* Confirm modal then toggle green/clear + save to SaleOrder sheet */
 function _cyclePrintMark(id){
-  var cur       = _printMarks[String(id)] || '';
-  var isGreen   = cur === 'green';
-  var next      = isGreen ? '' : 'green';
-  var newStatus = isGreen ? 'មិនទាន់ព្រីន' : 'ព្រីនហើយ';
+  var cur     = _printMarks[String(id)] || '';
+  var o       = _orders.find(function(x){ return String(x.id) === String(id); });
+  var byStatus = o && (o.status || o.orderStatus) === 'ព្រីនហើយ';
+  var isGreen = cur === 'green' || byStatus;
 
-  // Update local _orders status immediately
-  var o = _orders.find(function(x){ return String(x.id) === String(id); });
-  if(o){ o.status = newStatus; o.orderStatus = newStatus; }
+  // Build confirm modal
+  var overlay = document.createElement('div');
+  overlay.className = 'ol-dot-confirm-overlay';
+  overlay.innerHTML =
+    '<div class="ol-dot-confirm-box">' +
+      '<div class="ol-dot-confirm-icon">' + (isGreen ? '🗑️' : '🖨️') + '</div>' +
+      '<div class="ol-dot-confirm-title">' + (isGreen ? 'លុប​ចំណាំ Print?' : 'បញ្ជាក់​ Print ហើយ?') + '</div>' +
+      '<div class="ol-dot-confirm-sub">' +
+        (isGreen ? 'Order នេះនឹងត្រូវវិលត្រឡប់ទៅ <b>មិនទាន់ព្រីន</b>' : 'Order នេះនឹងត្រូវកំណត់ជា <b>ព្រីនហើយ ✓</b>') +
+      '</div>' +
+      '<div class="ol-dot-confirm-btns">' +
+        '<button class="ol-dot-confirm-no">បោះបង់</button>' +
+        '<button class="ol-dot-confirm-yes' + (isGreen ? ' clear' : '') + '">' + (isGreen ? 'លុបចំណាំ' : 'បញ្ជាក់') + '</button>' +
+      '</div>' +
+    '</div>';
 
-  if(next) _printMarks[String(id)] = next; else delete _printMarks[String(id)];
-  _savePrintMarks();
-  _updateDot(id, next);
-  _updateRowPrinted(id, next);
+  document.body.appendChild(overlay);
 
-  // Save to SaleOrder sheet
-  CamboAPI.post({ action:'update_order_status', orderId:String(id), status:newStatus })
-    .then(function(res){
-      var ok = res && res.ok;
-      _showPrintToast(ok ? (next ? '✅ ព្រីនហើយ' : '🗑️ មិនទាន់ព្រីន') : '⚠️ រក្សាទុកមិនបាន', ok);
-    })
-    .catch(function(){ _showPrintToast('⚠️ រក្សាទុកមិនបាន', false); });
+  function close(){ overlay.remove(); }
+
+  overlay.querySelector('.ol-dot-confirm-no').addEventListener('click', close);
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
+
+  overlay.querySelector('.ol-dot-confirm-yes').addEventListener('click', function(){
+    close();
+    var next      = isGreen ? '' : 'green';
+    var newStatus = isGreen ? 'មិនទាន់ព្រីន' : 'ព្រីនហើយ';
+    if(o){ o.status = newStatus; o.orderStatus = newStatus; }
+    if(next) _printMarks[String(id)] = next; else delete _printMarks[String(id)];
+    _savePrintMarks();
+    _updateDot(id, next);
+    _updateRowPrinted(id, next);
+    CamboAPI.post({ action:'update_order_status', orderId:String(id), status:newStatus })
+      .then(function(res){
+        var ok = res && res.ok;
+        _showPrintToast(ok ? (next ? '✅ ព្រីនហើយ' : '🗑️ មិនទាន់ព្រីន') : '⚠️ រក្សាទុកមិនបាន', ok);
+      })
+      .catch(function(){ _showPrintToast('⚠️ រក្សាទុកមិនបាន', false); });
+  });
 }
 window.olCyclePrint = _cyclePrintMark;
 
@@ -87,35 +110,58 @@ function olMarkSelected(markAction){
   var ids = Array.from(_sel);
   if(!ids.length){ _showPrintToast('⚠️ មិនទាន់ Select row ណាមួយ', false); return; }
 
-  // Determine new status value
-  var newStatus = markAction === 'green' ? 'ព្រីនហើយ' : 'មិនទាន់ព្រីន';
+  var isGreen   = markAction === 'green';
+  var newStatus = isGreen ? 'ព្រីនហើយ' : 'មិនទាន់ព្រីន';
+  var count     = ids.length;
 
-  // Update local _orders immediately so render() shows correct color
-  ids.forEach(function(id){
-    var o = _orders.find(function(x){ return String(x.id)===String(id); });
-    if(o){ o.status = newStatus; o.orderStatus = newStatus; }
-    // Also update print mark cache for dot
-    if(markAction === 'green') _printMarks[String(id)] = 'green';
-    else delete _printMarks[String(id)];
-  });
-  _savePrintMarks();
-  render(); // re-render immediately with new status
+  // Confirmation modal
+  var overlay = document.createElement('div');
+  overlay.className = 'ol-dot-confirm-overlay';
+  overlay.innerHTML =
+    '<div class="ol-dot-confirm-box">' +
+      '<div class="ol-dot-confirm-icon">' + (isGreen ? '🖨️' : '🗑️') + '</div>' +
+      '<div class="ol-dot-confirm-title">' + (isGreen ? 'បញ្ជាក់ Print ហើយ?' : 'លុបចំណាំ Print?') + '</div>' +
+      '<div class="ol-dot-confirm-sub">' +
+        (isGreen
+          ? 'Order <b>' + count + '</b> នឹងត្រូវកំណត់ជា <b>ព្រីនហើយ ✓</b>'
+          : 'Order <b>' + count + '</b> នឹងត្រូវវិលត្រឡប់ទៅ <b>មិនទាន់ព្រីន</b>') +
+      '</div>' +
+      '<div class="ol-dot-confirm-btns">' +
+        '<button class="ol-dot-confirm-no">បោះបង់</button>' +
+        '<button class="ol-dot-confirm-yes' + (isGreen ? '' : ' clear') + '">' + (isGreen ? 'បញ្ជាក់' : 'លុបចំណាំ') + '</button>' +
+      '</div>' +
+    '</div>';
 
-  // Sync to SaleOrder sheet (background, parallel POST per id)
-  var done=0, fail=0;
-  ids.forEach(function(id){
-    CamboAPI.post({ action:'update_order_status', orderId:String(id), status:newStatus })
-      .then(function(res){ if(res && res.ok) done++; else fail++; })
-      .catch(function(){ fail++; })
-      .finally(function(){
-        if(done+fail === ids.length){
-          var icon = markAction==='green' ? '✅' : '🗑️';
-          var label = markAction==='green' ? 'ព្រីនហើយ' : 'មិនទាន់ព្រីន';
-          _showPrintToast(fail
-            ? '⚠️ Saved '+done+'/'+ids.length+' — check connection'
-            : icon+' '+label+' — '+done+' order(s)', !fail);
-        }
-      });
+  document.body.appendChild(overlay);
+  function close(){ overlay.remove(); }
+  overlay.querySelector('.ol-dot-confirm-no').addEventListener('click', close);
+  overlay.addEventListener('click', function(e){ if(e.target === overlay) close(); });
+
+  overlay.querySelector('.ol-dot-confirm-yes').addEventListener('click', function(){
+    close();
+    ids.forEach(function(id){
+      var o = _orders.find(function(x){ return String(x.id)===String(id); });
+      if(o){ o.status = newStatus; o.orderStatus = newStatus; }
+      if(isGreen) _printMarks[String(id)] = 'green';
+      else delete _printMarks[String(id)];
+    });
+    _savePrintMarks();
+    render();
+    var done=0, fail=0;
+    ids.forEach(function(id){
+      CamboAPI.post({ action:'update_order_status', orderId:String(id), status:newStatus })
+        .then(function(res){ if(res && res.ok) done++; else fail++; })
+        .catch(function(){ fail++; })
+        .finally(function(){
+          if(done+fail === ids.length){
+            var icon = isGreen ? '✅' : '🗑️';
+            var label = isGreen ? 'ព្រីនហើយ' : 'មិនទាន់ព្រីន';
+            _showPrintToast(fail
+              ? '⚠️ Saved '+done+'/'+ids.length+' — check connection'
+              : icon+' '+label+' — '+done+' order(s)', !fail);
+          }
+        });
+    });
   });
 }
 window.olMarkSelected = olMarkSelected;
