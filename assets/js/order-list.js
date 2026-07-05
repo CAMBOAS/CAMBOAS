@@ -35,16 +35,57 @@ function _updateDot(id, status){
   }
 }
 
+/* Individual dot click — local toggle only, no Sheet save */
 function _cyclePrintMark(id){
   var cur  = _printMarks[String(id)] || '';
-  var next = cur === '' ? 'green' : '';  // toggle: off → green → off
-  _setPrintMark(id, next);
+  var next = cur === '' ? 'green' : '';
+  if(next) _printMarks[String(id)] = next; else delete _printMarks[String(id)];
+  _savePrintMarks();
   _updateDot(id, next);
+  _updateRowPrinted(id, next);
 }
 window.olCyclePrint = _cyclePrintMark;
 
+/* Update row background when printed */
+function _updateRowPrinted(id, status){
+  var tr = document.querySelector('tr[data-id="'+id+'"]');
+  if(tr){ tr.classList.toggle('ol-row-printed', !!status); }
+}
+
+/* Show toast notification */
+function _showPrintToast(msg, ok){
+  var t = document.getElementById('olPrintToast');
+  if(!t){ t = document.createElement('div'); t.id='olPrintToast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.className = 'ol-print-toast ' + (ok !== false ? 'ok' : 'err');
+  t.style.display='flex';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.display='none'; }, 3000);
+}
+
+/* Actions green button — mark selected + save to Sheet + visual feedback */
 function olMarkSelected(status){
-  _sel.forEach(function(id){ _setPrintMark(id, status); _updateDot(id, status); });
+  var ids = Array.from(_sel);
+  if(!ids.length){ _showPrintToast('⚠️ មិនទាន់ Select row ណាមួយ', false); return; }
+  ids.forEach(function(id){ _setPrintMark(id, status, false); _updateDot(id, status); _updateRowPrinted(id, status); });
+  if(status){
+    // Save ALL selected to Sheet in one go (parallel POST per id)
+    var done=0, fail=0;
+    ids.forEach(function(id){
+      CamboAPI.post({ action:'set_print_status', orderId:String(id), status:status })
+        .then(function(res){ if(res && res.ok) done++; else fail++; })
+        .catch(function(){ fail++; })
+        .finally(function(){
+          if(done+fail === ids.length){
+            _showPrintToast(fail ? '⚠️ Saved '+done+'/'+ids.length+' — check connection' : '✅ Saved '+done+' order(s) to Sheet', !fail);
+          }
+        });
+    });
+  } else {
+    // Clear — also save to Sheet
+    ids.forEach(function(id){ CamboAPI.post({ action:'set_print_status', orderId:String(id), status:'' }).catch(function(){}); });
+    _showPrintToast('🗑️ Cleared '+ids.length+' mark(s)', true);
+  }
 }
 window.olMarkSelected = olMarkSelected;
 
@@ -56,10 +97,11 @@ function _loadPrintStatusesFromSheet(){
         _printMarks[id] = res.statuses[id];
       });
       _savePrintMarks();
-      // Refresh dots in DOM
+      // Refresh dots + row highlights in DOM
       document.querySelectorAll('.ol-print-dot').forEach(function(dot){
         var id = dot.dataset.id;
         _updateDot(id, _printMarks[id]||'');
+        _updateRowPrinted(id, _printMarks[id]||'');
       });
     }
   }).catch(function(){});
@@ -529,7 +571,8 @@ function render(){
     }
     var pmore = '';
     var selected = _sel.has(String(o.id));
-    return '<tr class="'+(selected?'sel':'')+'" data-id="'+o.id+'">'
+    var printed  = !!_printMarks[String(o.id)];
+    return '<tr class="'+(selected?'sel ':'')+( printed?'ol-row-printed':'')+'" data-id="'+o.id+'">'
       +'<td class="ol-cb-th ol-col-cb"><input type="checkbox" class="ol-chk" data-id="'+o.id+'" '+(selected?'checked':'')+' onclick="event.stopPropagation()"></td>'
       +'<td class="ol-col-num">'+(idx+1)+'</td>'
       +'<td class="ol-customer ol-col-cust">'+esc(o.customer||'—')+'</td>'
