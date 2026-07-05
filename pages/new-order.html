@@ -2287,6 +2287,8 @@
       }
       [data-theme="dark"] #cartPanel #cartHead { border-bottom-color: rgba(255,255,255,0.08) !important; }
       #cartPanel #cartHead h3 { margin: 0 !important; font-size: 15px !important; }
+      #cartPanel #cartHead .od-sect-info { flex: 1 !important; min-width: 0 !important; }
+      #cartPanel #cartHead .od-chevron-pill { align-self: center !important; flex-shrink: 0 !important; transform-origin: center center !important; }
       /* ── Shared 6-column grid for col-heads + items ──
          col1: 1fr  name
          col2: 82px qty controls  (− n +)
@@ -2333,6 +2335,7 @@
         align-items: unset !important;
         padding: 0 !important;
       }
+      #cartPanel .mob-sect-body.is-hidden { display: none !important; }
 
       /* Cart item: map children into grid columns via display:contents + grid-column */
       #cartPanel .citem { padding-top: 10px !important; padding-bottom: 10px !important; }
@@ -2699,7 +2702,7 @@
                 </svg>
               </div>
               <div class="od-sect-info">
-                <h3>ក្បួនរបស់ <span class="cart-count-badge" id="cartCountBadge" style="display:none">0</span></h3>
+                <h3>កន្ត្រក <span class="cart-count-badge" id="cartCountBadge" style="display:none">0</span></h3>
                 <span>Cart Summary</span>
               </div>
               <div class="od-chevron-pill mob-sect-chevron">
