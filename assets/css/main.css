@@ -2292,8 +2292,9 @@ body.sb-collapsed .main-content {
 }
 
 /* User: avatar circle only */
-.sidebar.sb-collapsed .sb-user { display:flex !important; justify-content: center !important; width:100% !important; padding: 4px 0 !important; }
+.sidebar.sb-collapsed .sb-user { display:flex !important; justify-content:center !important; width:100% !important; padding:4px 0 8px !important; background:transparent !important; border-radius:0 !important; }
 .sidebar.sb-collapsed .sb-user > div:last-child { display: none !important; }
+.sidebar.sb-collapsed .sb-user-avatar { border-radius:50% !important; width:36px !important; height:36px !important; box-shadow:0 0 0 2px rgba(139,92,246,.35) !important; }
 .sidebar.sb-collapsed .sb-footer { padding: 8px 0 14px !important; }
 
 /* ── Tooltip on hover (collapsed) ── */
