@@ -35,14 +35,29 @@ function _updateDot(id, status){
   }
 }
 
-/* Individual dot click — local toggle only, no Sheet save */
+/* Individual dot click — toggle green/clear + save to SaleOrder sheet */
 function _cyclePrintMark(id){
-  var cur  = _printMarks[String(id)] || '';
-  var next = cur === '' ? 'green' : '';
+  var cur       = _printMarks[String(id)] || '';
+  var isGreen   = cur === 'green';
+  var next      = isGreen ? '' : 'green';
+  var newStatus = isGreen ? 'មិនទាន់ព្រីន' : 'ព្រីនហើយ';
+
+  // Update local _orders status immediately
+  var o = _orders.find(function(x){ return String(x.id) === String(id); });
+  if(o){ o.status = newStatus; o.orderStatus = newStatus; }
+
   if(next) _printMarks[String(id)] = next; else delete _printMarks[String(id)];
   _savePrintMarks();
   _updateDot(id, next);
   _updateRowPrinted(id, next);
+
+  // Save to SaleOrder sheet
+  CamboAPI.post({ action:'update_order_status', orderId:String(id), status:newStatus })
+    .then(function(res){
+      var ok = res && res.ok;
+      _showPrintToast(ok ? (next ? '✅ ព្រីនហើយ' : '🗑️ មិនទាន់ព្រីន') : '⚠️ រក្សាទុកមិនបាន', ok);
+    })
+    .catch(function(){ _showPrintToast('⚠️ រក្សាទុកមិនបាន', false); });
 }
 window.olCyclePrint = _cyclePrintMark;
 
