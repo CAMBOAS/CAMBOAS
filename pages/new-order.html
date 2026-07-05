@@ -3501,6 +3501,18 @@ document.addEventListener('DOMContentLoaded', function(){
         }).join('');
         if (cur) _el('payment').value = cur;
       }
+      // Populate Status dropdown from SaleInfor col F
+      if (d.status && d.status.length) {
+        var sel = _el('status');
+        if (sel) {
+          var curStatus = sel.value || 'Pending';
+          sel.innerHTML = d.status.map(function(v){
+            return '<option value="'+v+'"'+(v===curStatus?' selected':'')+'>'+v+'</option>';
+          }).join('');
+          // If current value not in new list, default to first option
+          if (!d.status.includes(curStatus)) sel.value = d.status[0];
+        }
+      }
     }
 
     /* Apply cached data immediately (no flicker) */
