@@ -122,6 +122,83 @@ function doGet(e) {
         return jsonOutput_({ ok:false, message:err.message });
       }
     }
+    /* ── Login: verify account/password against Login sheet ── */
+    if (action === 'verify_login') {
+      const loginSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Login');
+      if (!loginSheet) return jsonOutput_({ success: false, message: 'Login sheet not found' });
+      const loginData = loginSheet.getDataRange().getValues();
+      const acct = String((e.parameter.account  || '')).trim();
+      const pass = String((e.parameter.password || '')).trim();
+      let matched = false;
+      for (let i = 1; i < loginData.length; i++) {
+        if (String(loginData[i][0]).trim() === acct && String(loginData[i][1]).trim() === pass) {
+          matched = true; break;
+        }
+      }
+      return jsonOutput_({ success: matched });
+    }
+
+    /* ── Login: log device info + active date to Login sheet ── */
+    if (action === 'log_login') {
+      const loginSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Login');
+      if (!loginSheet) return jsonOutput_({ success: false });
+      const loginData = loginSheet.getDataRange().getValues();
+      const acct   = String((e.parameter.account || '')).trim();
+      const device = String((e.parameter.device  || '')).trim();
+      const model  = String((e.parameter.model   || '')).trim();
+      const now    = new Date();
+      const dd     = String(now.getDate()).padStart(2,'0');
+      const mm     = String(now.getMonth()+1).padStart(2,'0');
+      const yyyy   = now.getFullYear();
+      const hh     = String(now.getHours()).padStart(2,'0');
+      const mi     = String(now.getMinutes()).padStart(2,'0');
+      const ss     = String(now.getSeconds()).padStart(2,'0');
+      const activeStr = dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + mi + ':' + ss;
+      for (let i = 1; i < loginData.length; i++) {
+        if (String(loginData[i][0]).trim() === acct) {
+          loginSheet.getRange(i+1, 3).setValue(device);     // C = Device
+          loginSheet.getRange(i+1, 4).setValue(model);      // D = Model
+          loginSheet.getRange(i+1, 5).setValue(now);        // E = Last Login (datetime)
+          loginSheet.getRange(i+1, 6).setValue(activeStr);  // F = Active (date + time)
+          break;
+        }
+      }
+      return jsonOutput_({ success: true });
+    }
+
+    /* ── Settings: read all key-value rows from Settings sheet ── */
+    if (action === 'get_settings') {
+      const stSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Settings');
+      if (!stSheet) return jsonOutput_({ success: false, message: 'Settings sheet not found' });
+      const stData = stSheet.getDataRange().getValues();
+      const out = {};
+      for (let i = 0; i < stData.length; i++) {
+        if (stData[i][0]) out[String(stData[i][0])] = String(stData[i][1]);
+      }
+      return jsonOutput_({ success: true, data: out });
+    }
+
+    /* ── Settings: write key-value rows to Settings sheet ── */
+    if (action === 'save_settings') {
+      const stSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Settings');
+      if (!stSheet) return jsonOutput_({ success: false, message: 'Settings sheet not found' });
+      const loginReq  = String((e.parameter.login_required || 'false')).trim();
+      const adminAcct = String((e.parameter.admin_account  || '')).trim();
+      const adminPass = String((e.parameter.admin_password || '')).trim();
+      function setKey_(key, value) {
+        const d = stSheet.getDataRange().getValues();
+        for (let i = 0; i < d.length; i++) {
+          if (String(d[i][0]) === key) { stSheet.getRange(i+1, 2).setValue(value); return; }
+        }
+        stSheet.appendRow([key, value]);
+      }
+      setKey_('login_required', loginReq);
+      if (adminAcct) setKey_('admin_account', adminAcct);
+      if (adminPass) setKey_('admin_password', adminPass);
+      setKey_('updated_at', Utilities.formatDate(new Date(), TZ, 'dd/MM/yyyy HH:mm'));
+      return jsonOutput_({ success: true });
+    }
+
     return jsonOutput_({ ok:false, message:'Unknown action' });
   } catch(err) { return jsonOutput_({ ok:false, message: err.message || String(err) }); }
 }

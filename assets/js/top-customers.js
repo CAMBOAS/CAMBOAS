@@ -1,11 +1,11 @@
-/**
+﻿/**
  * Top Customers Widget — CAMBO MINI Dashboard
  * Uses same data source as dashboard-live.js (Google Apps Script + localStorage fallback)
  */
 (function(){
 'use strict';
 
-var DIRECT_URL = 'https://script.google.com/macros/s/AKfycby02QuBgyAvBrfmxmxEzkUI5kuaEktZteRZwclNEw0xesnPY5zdC-CmvQ_7j8p3VjSgLQ/exec';
+var DIRECT_URL = 'https://script.google.com/macros/s/AKfycbzWajDJqXeGNE6vS4PmE8IuTv76_crBE6TXgA32hy0k12KPMNVBtj6FcFcvHeraBIztXA/exec';
 var currentPeriod = 'monthly';
 var _cachedOrders = null;
 

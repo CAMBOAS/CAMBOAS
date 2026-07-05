@@ -1,6 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="km">
 <head>
+  <script>(function(){var r=localStorage.getItem('cambo_login_required');if(r==='false')return;var k='cambo_session';if(sessionStorage.getItem(k)==='1'||localStorage.getItem(k)==='1')return;document.documentElement.style.visibility='hidden';location.replace('../login.html');})();</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
@@ -2869,7 +2870,7 @@
 <div id="printArea" style="display:none;"></div>
 
 <script>
-window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby02QuBgyAvBrfmxmxEzkUI5kuaEktZteRZwclNEw0xesnPY5zdC-CmvQ_7j8p3VjSgLQ/exec";
+window.APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWajDJqXeGNE6vS4PmE8IuTv76_crBE6TXgA32hy0k12KPMNVBtj6FcFcvHeraBIztXA/exec";
 
 var KHR_RATE = (function(){
   try { var r = Number(localStorage.getItem('cambo_khr_rate')); return r > 0 ? r : 4100; } catch(e) { return 4100; }
@@ -3481,7 +3482,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* ── Load SaleInfor lists from Google Sheet ── */
   (function loadSaleInfor(){
     var base = (window.CamboAPI && window.CamboAPI.getBase) ? window.CamboAPI.getBase()
-             : 'https://script.google.com/macros/s/AKfycby02QuBgyAvBrfmxmxEzkUI5kuaEktZteRZwclNEw0xesnPY5zdC-CmvQ_7j8p3VjSgLQ/exec';
+             : 'https://script.google.com/macros/s/AKfycbzWajDJqXeGNE6vS4PmE8IuTv76_crBE6TXgA32hy0k12KPMNVBtj6FcFcvHeraBIztXA/exec';
     var CACHE_KEY = 'cambo_saleinfor_v1';
 
     function applyData(d) {

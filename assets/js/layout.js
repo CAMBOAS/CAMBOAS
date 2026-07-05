@@ -69,7 +69,8 @@
       const cls    = danger ? 'sb-link sb-link-danger' : 'sb-link';
       const prefix = page.startsWith('pages/') ? (cur.startsWith('pages/') ? '' : 'pages/') : (cur.startsWith('pages/') ? '../' : '');
       const href   = cur.startsWith('pages/') ? (page.startsWith('pages/') ? page.replace('pages/','') : '../' + page) : page;
-      return `<li><a href="${href}" class="${cls} ${active}" data-page="${page}" data-tooltip="${label}"><span class="sb-icon">${icon}</span><span class="sb-label">${label}</span><span class="sb-active-dot"></span></a></li>`;
+      const onclick = danger ? ' onclick="if(window.CamboAuth)window.CamboAuth.logout();"' : '';
+      return `<li><a href="${href}" class="${cls} ${active}" data-page="${page}" data-tooltip="${label}"${onclick}><span class="sb-icon">${icon}</span><span class="sb-label">${label}</span><span class="sb-active-dot"></span></a></li>`;
     }
 
     const isDark = document.documentElement.getAttribute('data-theme') !== 'light';

@@ -11,6 +11,52 @@
   <meta name="description" content="CAMBO MINI — Premium Workspace">
   <link rel="stylesheet" href="assets/css/templatemo-glass-admin-style.css?v=160">
   <style>
+    .login-logo-wrap {
+      display: flex; justify-content: center; margin-bottom: 12px;
+    }
+    .login-logo-img {
+      width: 72px; height: 72px; border-radius: 22px; object-fit: contain;
+      transform-origin: center center;
+    }
+    /* 7 random animations */
+    @keyframes la1 {
+      0%,100%{transform:translateY(0);filter:drop-shadow(0 0 10px rgba(139,92,246,.4))}
+      50%{transform:translateY(-10px);filter:drop-shadow(0 0 24px rgba(139,92,246,.8)) drop-shadow(0 0 36px rgba(6,182,212,.35))}
+    }
+    @keyframes la2 {
+      0%,100%{transform:rotate(0deg) scale(1);filter:drop-shadow(0 0 8px rgba(139,92,246,.35))}
+      25%{transform:rotate(-8deg) scale(1.08)}
+      75%{transform:rotate(8deg) scale(1.08);filter:drop-shadow(0 0 20px rgba(6,182,212,.6))}
+    }
+    @keyframes la3 {
+      0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px rgba(139,92,246,.3))}
+      50%{transform:scale(1.15);filter:drop-shadow(0 0 28px rgba(139,92,246,.85)) drop-shadow(0 0 40px rgba(236,72,153,.35))}
+    }
+    @keyframes la4 {
+      0%{transform:translateY(0) rotate(0deg);filter:drop-shadow(0 0 8px rgba(6,182,212,.4))}
+      33%{transform:translateY(-8px) rotate(5deg);filter:drop-shadow(0 0 18px rgba(139,92,246,.7))}
+      66%{transform:translateY(4px) rotate(-5deg);filter:drop-shadow(0 0 14px rgba(236,72,153,.5))}
+      100%{transform:translateY(0) rotate(0deg);filter:drop-shadow(0 0 8px rgba(6,182,212,.4))}
+    }
+    @keyframes la5 {
+      0%,100%{transform:translateX(0);filter:drop-shadow(0 0 10px rgba(139,92,246,.4))}
+      25%{transform:translateX(-6px);filter:drop-shadow(-6px 0 16px rgba(6,182,212,.5))}
+      75%{transform:translateX(6px);filter:drop-shadow(6px 0 16px rgba(236,72,153,.5))}
+    }
+    @keyframes la6 {
+      0%,100%{transform:scale(1) rotate(0deg);filter:drop-shadow(0 0 10px rgba(139,92,246,.4))}
+      20%{transform:scale(1.12) rotate(-6deg);filter:drop-shadow(0 0 22px rgba(139,92,246,.7))}
+      40%{transform:scale(0.94) rotate(0deg)}
+      60%{transform:scale(1.1) rotate(6deg);filter:drop-shadow(0 0 20px rgba(6,182,212,.65))}
+      80%{transform:scale(0.96) rotate(0deg)}
+    }
+    @keyframes la7 {
+      0%,100%{transform:translateY(0) scale(1);filter:drop-shadow(0 0 8px rgba(139,92,246,.35))}
+      15%{transform:translateY(-12px) scale(1.05);filter:drop-shadow(0 0 24px rgba(139,92,246,.8))}
+      30%{transform:translateY(0) scale(1)}
+      45%{transform:translateY(-6px) scale(1.03);filter:drop-shadow(0 0 16px rgba(6,182,212,.6))}
+      60%{transform:translateY(0) scale(1)}
+    }
     .login-error {
       display:none; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.3);
       color:#fca5a5; border-radius:12px; padding:10px 14px; font-size:13px;
@@ -47,12 +93,14 @@
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
-          <div class="login-logo" style="background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;font-weight:800;font-size:22px">C</div>
+          <div class="login-logo-wrap">
+            <img src="images/logo/LOGO%20CAMBOMINI.png" alt="CAMBO MINI" class="login-logo-img">
+          </div>
           <h1 class="login-title">CAMBO MINI</h1>
           <p class="login-subtitle">ចូលប្រើប្រាស់ Workspace របស់អ្នក</p>
         </div>
 
-        <div class="login-error" id="loginError">Account ឬ Password មិនត្រូវ — សូមព្យាយាមម្ដងទៀត</div>
+        <div class="login-error" id="loginError">Account ឬ Password មិនត្រូវ — សូមធ្វើការទាក់ទងទៅ Admin</div>
 
         <form id="loginForm" autocomplete="off">
           <div class="form-group">
@@ -83,7 +131,7 @@
     </div>
 
     <footer class="site-footer">
-      <p>Copyright © 2026 CAMBO MINI</p>
+      <p>Copyright © 2026 <a href="https://www.facebook.com/SEREYROB22" target="_blank" rel="nofollow">CAMBO</a></p>
     </footer>
   </div>
 
@@ -91,15 +139,39 @@
   <script src="assets/js/auth.js?v=160"></script>
   <script>
   (function () {
-    // If login not required → skip login page
-    if (window.CamboAuth && !window.CamboAuth.isLoginRequired()) {
-      location.replace('index.html');
-      return;
-    }
-    // If already logged in → skip
+    // Random logo animation
+    (function(){
+      var anims = [
+        'la1 3.2s ease-in-out infinite',
+        'la2 2.8s ease-in-out infinite',
+        'la3 2.5s ease-in-out infinite',
+        'la4 3.6s ease-in-out infinite',
+        'la5 3s ease-in-out infinite',
+        'la6 3.4s ease-in-out infinite',
+        'la7 4s ease-in-out infinite'
+      ];
+      var img = document.querySelector('.login-logo-img');
+      if (img) img.style.animation = anims[Math.floor(Math.random() * anims.length)];
+    })();
+
+    // Already logged in → skip
     if (window.CamboAuth && window.CamboAuth.isLoggedIn()) {
-      location.replace('index.html');
-      return;
+      location.replace('index.html'); return;
+    }
+    // Free access (OFF) cached locally → skip login
+    if (localStorage.getItem('cambo_login_required') === 'false') {
+      location.replace('index.html'); return;
+    }
+    // New browser (no cache) → fetch Sheet to check if free or locked
+    if (localStorage.getItem('cambo_login_required') === null && window.CamboAPI) {
+      window.CamboAPI.get({ action: 'get_settings' })
+        .then(function(r) {
+          if (r && r.success && r.data && r.data.login_required !== undefined) {
+            var req = r.data.login_required === 'true';
+            localStorage.setItem('cambo_login_required', req ? 'true' : 'false');
+            if (!req) location.replace('index.html'); // OFF = free → skip login
+          }
+        }).catch(function(){});
     }
 
     var form    = document.getElementById('loginForm');
@@ -130,9 +202,16 @@
         setLoading(false);
         if (ok) {
           window.CamboAuth.setLoggedIn(remember);
-          location.replace('index.html');
+          var doRedirect = function() { location.replace('index.html'); };
+          var dp = window.CamboAuth.logDevice ? window.CamboAuth.logDevice(account) : null;
+          if (dp && dp.then) {
+            var gone = false;
+            var guard = setTimeout(function() { if (!gone) { gone=true; doRedirect(); } }, 3000);
+            dp.then(function() { if (!gone) { gone=true; clearTimeout(guard); doRedirect(); } })
+              .catch(function() { if (!gone) { gone=true; clearTimeout(guard); doRedirect(); } });
+          } else { doRedirect(); }
         } else {
-          showError('Account ឬ Password មិនត្រូវ — សូមព្យាយាមម្ដងទៀត');
+          showError('Account ឬ Password មិនត្រូវ — សូមធ្វើការទាក់ទងទៅ Admin');
           document.getElementById('loginPassword').value = '';
           document.getElementById('loginPassword').focus();
         }

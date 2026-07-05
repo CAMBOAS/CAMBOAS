@@ -1,4 +1,4 @@
-let revenueChart;
+﻿let revenueChart;
 let _chartPeriod = 'monthly';
 let _dashRows = [];
 
@@ -22,7 +22,7 @@ async function fetchDashboardOrders() {
     if (window.CamboAPI) {
       data = await window.CamboAPI.get({action:'list', limit:'1000'});
     } else {
-      const DIRECT = 'https://script.google.com/macros/s/AKfycby02QuBgyAvBrfmxmxEzkUI5kuaEktZteRZwclNEw0xesnPY5zdC-CmvQ_7j8p3VjSgLQ/exec';
+      const DIRECT = 'https://script.google.com/macros/s/AKfycbzWajDJqXeGNE6vS4PmE8IuTv76_crBE6TXgA32hy0k12KPMNVBtj6FcFcvHeraBIztXA/exec';
       const res = await fetch(DIRECT + '?action=list&limit=1000&_=' + Date.now());
       data = await res.json();
     }

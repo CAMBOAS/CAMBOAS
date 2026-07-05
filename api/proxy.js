@@ -1,10 +1,10 @@
-/**
+﻿/**
  * Vercel Serverless Proxy — CAMBO MINI
  * Forwards requests to Google Apps Script to bypass browser CORS restrictions.
  */
 
 const APPS_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycby02QuBgyAvBrfmxmxEzkUI5kuaEktZteRZwclNEw0xesnPY5zdC-CmvQ_7j8p3VjSgLQ/exec';
+  'https://script.google.com/macros/s/AKfycbzWajDJqXeGNE6vS4PmE8IuTv76_crBE6TXgA32hy0k12KPMNVBtj6FcFcvHeraBIztXA/exec';
 
 // Disable Vercel's automatic body parser so we get raw body string
 export const config = {

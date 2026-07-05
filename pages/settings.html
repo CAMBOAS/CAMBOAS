@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="km"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script><title>Settings - CAMBO MINI</title><link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png"><link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png"><link rel="apple-touch-icon" href="../images/logo/LOGO%20CAMBOMINI.png"><link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=160"><link rel="stylesheet" href="../assets/css/main.css?v=160"><style>
+﻿<!DOCTYPE html><html lang="km"><head>
+  <script>(function(){var r=localStorage.getItem('cambo_login_required');if(r==='false')return;var k='cambo_session';if(sessionStorage.getItem(k)==='1'||localStorage.getItem(k)==='1')return;document.documentElement.style.visibility='hidden';location.replace('../login.html');})();</script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script><title>Settings - CAMBO MINI</title><link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png"><link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png"><link rel="apple-touch-icon" href="../images/logo/LOGO%20CAMBOMINI.png"><link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=160"><link rel="stylesheet" href="../assets/css/main.css?v=160"><style>
 .st-wrap{display:grid;gap:18px;max-width:860px}
 .st-card{padding:24px 26px;border-radius:24px}
 .st-card h2{margin:0 0 4px;color:var(--text);font-size:20px}
@@ -55,15 +56,15 @@
 
       <!-- Login Guard -->
       <section class="glass-card st-card">
-        <h3>🔐 Login Guard</h3>
-        <p>ON = អ្នកប្រើប្រាស់ត្រូវ Login ជាមុន ⟶ OFF = ចូល App បានដោយសេរី</p>
+        <h3>🔐 Access Control</h3>
+        <p>ON = ត្រូវ Login ជាមុន (Locked) ⟶ OFF = ចូល App បានដោយសេរី</p>
 
         <div class="guard-toggle-row">
           <div class="guard-toggle-info">
-            <strong>Require Login</strong>
-            <span id="guardStatusText">OFF — ចូល App បានដោយសេរី</span>
+            <strong>Public Access</strong>
+            <span id="guardStatusText">OFF — ត្រូវ Login ជាមុន</span>
           </div>
-          <label class="guard-big-toggle" title="Toggle Login Required">
+          <label class="guard-big-toggle" title="Toggle Access">
             <input type="checkbox" id="guardToggle">
             <div class="guard-big-toggle-track"></div>
             <div class="guard-big-toggle-thumb"></div>
@@ -72,24 +73,40 @@
 
         <div id="guardStatusBadge" class="st-status-badge off">
           <span class="st-status-dot"></span>
-          <span id="guardBadgeLabel">Login Guard: OFF</span>
+          <span id="guardBadgeLabel">Access: Locked</span>
         </div>
 
-        <!-- Credentials (shown when guard is ON) -->
-        <div id="guardCredsSection" class="st-creds-section" style="display:none">
+        <!-- Admin Credentials (always shown) -->
+        <div class="st-creds-section">
           <div class="st-divider"></div>
           <div class="st-creds-title">🔑 Admin Credentials</div>
           <div class="st-fields">
             <div class="st-field">
               <label>Account</label>
-              <input type="text" id="guardAccount" placeholder="Amin123" autocomplete="off">
+              <input type="text" id="guardAccount" placeholder="Account" autocomplete="off">
             </div>
             <div class="st-field">
               <label>Password</label>
               <input type="password" id="guardPassword" placeholder="••••••••" autocomplete="new-password">
             </div>
           </div>
-          <p style="margin-top:8px;font-size:11px;color:var(--muted)">ទុក Account ទំនេរ ប្រសិនបើចង់ប្រើ Google Sheet Login tab ដោយផ្ទាល់</p>
+        </div>
+
+        <!-- Confirm identity before save -->
+        <div class="st-creds-section">
+          <div class="st-divider"></div>
+          <div class="st-creds-title">✅ Confirm Identity មុន Save</div>
+          <div class="st-fields">
+            <div class="st-field">
+              <label>Account</label>
+              <input type="text" id="confirmAccount" placeholder="Account" autocomplete="off">
+            </div>
+            <div class="st-field">
+              <label>Password</label>
+              <input type="password" id="confirmPassword" placeholder="••••••••">
+            </div>
+          </div>
+          <p id="confirmError" style="display:none;margin-top:8px;font-size:12px;color:#fca5a5"></p>
         </div>
 
         <div class="st-actions">
@@ -120,48 +137,111 @@
 <script src="../assets/js/dashboard-layout.js?v=160"></script>
 <script>
 (function(){
-  var toggle   = document.getElementById('guardToggle');
-  var statusTx = document.getElementById('guardStatusText');
-  var badge    = document.getElementById('guardStatusBadge');
-  var badgeLbl = document.getElementById('guardBadgeLabel');
-  var credsDiv = document.getElementById('guardCredsSection');
-  var accInp   = document.getElementById('guardAccount');
-  var passInp  = document.getElementById('guardPassword');
-  var saveBtn  = document.getElementById('guardSaveBtn');
-  var toast    = document.getElementById('guardToast');
+  var toggle      = document.getElementById('guardToggle');
+  var statusTx    = document.getElementById('guardStatusText');
+  var badge       = document.getElementById('guardStatusBadge');
+  var badgeLbl    = document.getElementById('guardBadgeLabel');
+  var accInp      = document.getElementById('guardAccount');
+  var passInp     = document.getElementById('guardPassword');
+  var confirmAcct = document.getElementById('confirmAccount');
+  var confirmPass = document.getElementById('confirmPassword');
+  var confirmErr  = document.getElementById('confirmError');
+  var saveBtn     = document.getElementById('guardSaveBtn');
+  var toast       = document.getElementById('guardToast');
 
-  function updateUI(on) {
-    statusTx.textContent = on ? 'ON — អ្នកប្រើត្រូវ Login ជាមុន' : 'OFF — ចូល App បានដោយសេរី';
-    badge.className = 'st-status-badge ' + (on ? 'on' : 'off');
-    badgeLbl.textContent = 'Login Guard: ' + (on ? 'ON' : 'OFF');
-    credsDiv.style.display = on ? '' : 'none';
+  // ON = locked (require login) | OFF = free access
+  function updateUI(locked) {
+    statusTx.textContent = locked ? 'ON — ត្រូវ Login ជាមុន (Locked)' : 'OFF — ចូល App បានដោយសេរី';
+    badge.className = 'st-status-badge ' + (locked ? 'off' : 'on');
+    badgeLbl.textContent = locked ? 'Access: Locked' : 'Access: Open';
   }
 
-  // Load current state
-  var isOn = window.CamboAuth && window.CamboAuth.isLoginRequired();
-  toggle.checked = isOn;
-  updateUI(isOn);
-
-  // Pre-fill credentials
-  if (window.CamboAuth) {
-    var creds = window.CamboAuth.getCredentials();
-    if (creds.account)  accInp.value  = creds.account;
-    if (creds.password) passInp.value = creds.password;
+  function applySettings(cfg) {
+    var locked = cfg.login_required === 'true';
+    window.CamboAuth.setLoginRequired(locked);
+    if (cfg.admin_account) window.CamboAuth.saveCredentials(cfg.admin_account, cfg.admin_password || '');
+    toggle.checked = locked; // ON = locked
+    updateUI(locked);
+    if (cfg.admin_account)  accInp.value  = cfg.admin_account;
+    if (cfg.admin_password) passInp.value = cfg.admin_password;
   }
 
-  toggle.addEventListener('change', function() {
-    updateUI(toggle.checked);
-  });
+  function loadFromLocal() {
+    var locked = window.CamboAuth && window.CamboAuth.isLoginRequired();
+    toggle.checked = locked; // ON = locked
+    updateUI(locked);
+    if (window.CamboAuth) {
+      var creds = window.CamboAuth.getCredentials();
+      if (creds.account)  accInp.value  = creds.account;
+      if (creds.password) passInp.value = creds.password;
+    }
+  }
+
+  // Load from Sheet first, fall back to localStorage
+  if (window.CamboAPI) {
+    saveBtn.disabled = true;
+    window.CamboAPI.get({ action: 'get_settings' })
+      .then(function(r) {
+        if (r && r.success && r.data) applySettings(r.data);
+        else loadFromLocal();
+      })
+      .catch(function() { loadFromLocal(); })
+      .finally(function() { saveBtn.disabled = false; });
+  } else {
+    loadFromLocal();
+  }
+
+  toggle.addEventListener('change', function() { updateUI(toggle.checked); }); // checked = locked
 
   saveBtn.addEventListener('click', function() {
-    var on = toggle.checked;
-    window.CamboAuth.setLoginRequired(on);
-    if (on && accInp.value.trim()) {
-      window.CamboAuth.saveCredentials(accInp.value.trim(), passInp.value);
+    var cAcct = confirmAcct.value.trim();
+    var cPass = confirmPassword.value;
+    confirmErr.style.display = 'none';
+
+    if (!cAcct || !cPass) {
+      confirmErr.textContent = 'សូមបញ្ចូល Account និង Password ដើម្បី Confirm';
+      confirmErr.style.display = 'block';
+      return;
     }
-    // Show toast
-    toast.classList.add('show');
-    setTimeout(function(){ toast.classList.remove('show'); }, 2500);
+
+    saveBtn.disabled = true;
+    window.CamboAuth.verify(cAcct, cPass).then(function(ok) {
+      if (!ok) {
+        confirmErr.textContent = 'Account ឬ Password មិនត្រូវ';
+        confirmErr.style.display = 'block';
+        saveBtn.disabled = false;
+        return;
+      }
+
+      // Verified — save
+      var locked  = toggle.checked; // ON = locked
+      var account = accInp.value.trim();
+      var pass    = passInp.value;
+
+      window.CamboAuth.setLoginRequired(locked);
+      if (account) window.CamboAuth.saveCredentials(account, pass);
+      // Reset sync TTL so next page load re-syncs immediately
+      localStorage.removeItem('cambo_settings_sync');
+
+      // Sync to Sheet
+      if (window.CamboAPI) {
+        var params = { action: 'save_settings', login_required: locked ? 'true' : 'false' };
+        if (account) { params.admin_account = account; params.admin_password = pass; }
+        window.CamboAPI.get(params).catch(function(){}).finally(function(){ saveBtn.disabled = false; });
+      } else {
+        saveBtn.disabled = false;
+      }
+
+      // Clear confirm fields
+      confirmAcct.value = '';
+      confirmPassword.value = '';
+      toast.classList.add('show');
+      setTimeout(function(){ toast.classList.remove('show'); }, 2500);
+    }).catch(function() {
+      confirmErr.textContent = 'Error — Check Connection';
+      confirmErr.style.display = 'block';
+      saveBtn.disabled = false;
+    });
   });
 
   document.getElementById('logoutBtn').addEventListener('click', function(){
