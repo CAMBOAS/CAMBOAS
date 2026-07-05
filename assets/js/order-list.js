@@ -9,6 +9,35 @@ var _orders = [], _sel = new Set();
 window._olSel = _sel;
 window._cardSelMode = false;
 var _qrOn = true; // QR Code toggle state
+
+/* ── Print marks: localStorage persistence ── */
+var _printMarks = {};
+(function(){ try{ _printMarks = JSON.parse(localStorage.getItem('cambo_print_marks')||'{}'); }catch(e){ _printMarks={}; } })();
+function _savePrintMarks(){ try{ localStorage.setItem('cambo_print_marks', JSON.stringify(_printMarks)); }catch(e){} }
+function _setPrintMark(id, color){
+  if(color) _printMarks[String(id)] = color; else delete _printMarks[String(id)];
+  _savePrintMarks();
+}
+function _cyclePrintMark(id){
+  var cur = _printMarks[String(id)] || '';
+  var next = cur==='' ? 'blue' : cur==='blue' ? 'red' : '';
+  _setPrintMark(id, next);
+  // Update dot in DOM without re-render
+  var dot = document.querySelector('.ol-print-dot[data-id="'+id+'"]');
+  if(dot){ dot.className = 'ol-print-dot' + (next ? ' '+next : ''); dot.title = next==='blue'?'មិនទាន់ Print':next==='red'?'Print ហើយ':'គ្មានចំណាំ'; }
+}
+window.olCyclePrint = _cyclePrintMark;
+function olMarkSelected(color){
+  _sel.forEach(function(id){ _setPrintMark(id, color); });
+  document.querySelectorAll('.ol-print-dot').forEach(function(dot){
+    var id = dot.dataset.id;
+    if(_sel.has(String(id))){
+      dot.className = 'ol-print-dot' + (color ? ' '+color : '');
+      dot.title = color==='blue'?'មិនទាន់ Print':color==='red'?'Print ហើយ':'គ្មានចំណាំ';
+    }
+  });
+}
+window.olMarkSelected = olMarkSelected;
 var _sort = {col:'date', dir:'desc'};
 var _q = '', _f = {};
 var _date = {preset:'today', start:'', end:'', label:'Today'}; // start/end filled on DOMContentLoaded
@@ -456,7 +485,7 @@ function render(){
         : '📭 គ្មាន Order ' + (_date.start === _date.end
             ? displayDate(_date.start)
             : displayDate(_date.start) + ' → ' + displayDate(_date.end));
-    tbody.innerHTML = '<tr><td colspan="10" class="ol-empty">' + emptyMsg + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="ol-empty">' + emptyMsg + '</td></tr>';
     // Clear mobile card view too
     try { if(typeof window._olRenderCards==='function') window._olRenderCards([]); } catch(e){}
     return;
@@ -484,6 +513,7 @@ function render(){
       +'<td class="ol-muted ol-col-cb2">'+esc(o.closeBy||o.closeby||'')+'</td>'
       +'<td class="ol-total ol-col-tot">$'+total.toFixed(2)+'</td>'
       +'<td class="ol-muted ol-col-date">'+fmtDisplay(o.date)+'</td>'
+      +(function(){ var m=_printMarks[String(o.id)]||''; var lbl=m==='blue'?'មិនទាន់ Print':m==='red'?'Print ហើយ':'គ្មានចំណាំ'; return '<td class="ol-col-print" onclick="event.stopPropagation();window.olCyclePrint(\''+o.id+'\')"><span class="ol-print-dot'+(m?' '+m:'')+'" data-id="'+o.id+'" title="'+lbl+'"></span></td>'; })()
       +'</tr>';
   }).join('');
 
@@ -1735,6 +1765,9 @@ async function init(){
     if(a==='printall') printTable();
     if(a==='printsel') printSelected();
     if(a==='reportdelivery') reportDelivery();
+    if(a==='markblue')  { olMarkSelected('blue'); return; }
+    if(a==='markred')   { olMarkSelected('red');  return; }
+    if(a==='markclear') { olMarkSelected('');     return; }
     $id('olActDrop')?.classList.remove('open');
   });
 
