@@ -1183,9 +1183,14 @@ function renderDrawerView(o){
     +drRow('Priority', o.priority||'Medium')
     +drRow('Status', (function(st){
       var s=String(st||'Pending');
+      var isPrinted=s==='ព្រីនហើយ', isNotPrinted=s==='មិនទាន់ព្រីន';
       var isDel=s==='Delivered', isCan=s==='Cancelled';
-      var bg=isDel?'rgba(34,197,94,.15)':isCan?'rgba(239,68,68,.15)':'rgba(245,158,11,.15)';
-      var clr=isDel?themeVal('#4ade80','#16a34a'):isCan?themeVal('#f87171','#dc2626'):themeVal('#fbbf24','#d97706');
+      var bg, clr;
+      if(isPrinted)       { bg='rgba(34,197,94,.15)';   clr=themeVal('#4ade80','#16a34a'); }
+      else if(isNotPrinted){ bg='rgba(245,158,11,.15)';  clr=themeVal('#fbbf24','#d97706'); }
+      else if(isDel)       { bg='rgba(34,197,94,.15)';   clr=themeVal('#4ade80','#16a34a'); }
+      else if(isCan)       { bg='rgba(239,68,68,.15)';   clr=themeVal('#f87171','#dc2626'); }
+      else                 { bg='rgba(148,163,184,.12)'; clr=themeVal('#94a3b8','#64748b'); }
       return '<span style="background:'+bg+';color:'+clr+';padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">'+esc(s)+'</span>';
     })(o.status||o.orderStatus||'Pending'))
     +(o.note ? drRow('Note', '<span style="color:#f87171">'+esc(o.note)+'</span>') : '')
@@ -1322,7 +1327,7 @@ function renderDrawerEdit(o){
     +rowCombo('drPageCombo',   'drPage',    o.page||o.pages||'',       'Pages',    'Pages...')
     +rowCombo('drCloseByCombo','drCloseBy', o.closeBy||o.closeby||'',  'CloseBy',  'CloseBy...')
     +rowSel('drPriority',   o.priority||'Medium','Priority',['High','Medium','Low'])
-    +rowSel('drStatus',     o.status||o.orderStatus||'Pending','Status',['Pending','Delivered','Cancelled'])
+    +rowSel('drStatus',     o.status||o.orderStatus||'Pending','Status', (window._olStatusOptions && window._olStatusOptions.length ? window._olStatusOptions : ['Pending','Delivered','Cancelled']))
     +rowTx ('drNote',       o.note||'',         'Note')
 
     // Products editor section
@@ -1658,6 +1663,8 @@ function loadSaleInforFilters(){
     if(d.delivery && d.delivery.length) fillSelect('olDelivery', d.delivery);
     if(d.pages    && d.pages.length)    fillSelect('olPages',    d.pages);
     // Province is NOT loaded from SaleInfor — it uses 2 groups (ភ្នំពេញ / ខេត្ត) from order data
+    // Store status options globally for use in order detail panel Status dropdown
+    if(d.status && d.status.length) window._olStatusOptions = d.status;
   }
 
   // Apply cached data immediately (no flicker)

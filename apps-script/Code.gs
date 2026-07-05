@@ -461,19 +461,21 @@ function deleteProduct_(id) {
 function listSaleInfor_() {
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName('SaleInfor');
-  if (!sheet) return { provinces:[], delivery:[], pages:[], closeby:[], payment:[] };
+  if (!sheet) return { provinces:[], delivery:[], pages:[], closeby:[], payment:[], status:[] };
   const lastRow = sheet.getLastRow();
-  if (lastRow <= 1) return { provinces:[], delivery:[], pages:[], closeby:[], payment:[] };
-  const data = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
-  const provinces = [], delivery = [], pages = [], closeby = [], payment = [];
+  if (lastRow <= 1) return { provinces:[], delivery:[], pages:[], closeby:[], payment:[], status:[] };
+  const numCols = Math.min(sheet.getLastColumn(), 6);
+  const data = sheet.getRange(2, 1, lastRow - 1, numCols).getValues();
+  const provinces = [], delivery = [], pages = [], closeby = [], payment = [], status = [];
   data.forEach(function(row) {
     if (safe_(row[0])) provinces.push(safe_(row[0]));
     if (safe_(row[1])) delivery.push(safe_(row[1]));
     if (safe_(row[2])) pages.push(safe_(row[2]));
     if (safe_(row[3])) closeby.push(safe_(row[3]));
     if (safe_(row[4])) payment.push(safe_(row[4]));
+    if (numCols >= 6 && safe_(row[5])) status.push(safe_(row[5]));
   });
-  return { provinces, delivery, pages, closeby, payment };
+  return { provinces, delivery, pages, closeby, payment, status };
 }
 
 function listProducts_() {
