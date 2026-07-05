@@ -1179,6 +1179,10 @@
     .pm5-form-title { margin:0 0 4px; font-size:15px; font-weight:700; color:var(--text,#18213a); }
     .pm5-img-zone { width:100%; box-sizing:border-box; height:140px; border:2px dashed rgba(148,163,200,.3); border-radius:14px; cursor:pointer; overflow:hidden; transition:border-color .15s, background .15s; }
     .pm5-img-zone:hover, .pm5-img-zone.pm-drag { border-color:rgba(139,92,246,.55); background:rgba(139,92,246,.05); }
+    .pm5-img-zone-lg { height:220px !important; }
+    .pm5-fields.pm5-row3 { grid-template-columns:1fr 1fr 1fr; }
+    .pm5-fg textarea:focus { border-color:#8b5cf6; }
+    [data-theme="dark"] .pm5-fg textarea { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.12); color:#e8e0ff; }
     .pm5-img-prev { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; color:var(--muted,#6b7898); font-size:13px; }
     .pm5-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .pm5-fg { display:flex; flex-direction:column; gap:5px; min-width:0; }
@@ -2815,21 +2819,17 @@
     <div id="pmTabForm" class="pm5-body" hidden>
       <div class="pm5-form">
         <h3 id="pmFormTitle" class="pm5-form-title">➕ បន្ថែមផលិតផលថ្មី</h3>
-        <div id="pmImgZone" class="pm5-img-zone">
+        <div id="pmImgZone" class="pm5-img-zone pm5-img-zone-lg">
           <input type="file" id="pmImgFile" accept="image/*" hidden>
           <div id="pmImgPrev" class="pm5-img-prev">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             <span>ចុច ឬ Drag រូបភាព</span>
           </div>
         </div>
-        <div class="pm5-fields">
-          <div class="pm5-fg pm5-span2">
-            <label>ឈ្មោះផលិតផល *</label>
-            <input type="text" id="pmFName" placeholder="ឈ្មោះ...">
-          </div>
-          <div class="pm5-fg pm5-span2">
-            <label>ឈ្មោះ Sub</label>
-            <input type="text" id="pmFSub" placeholder="Sub name / description...">
+        <div class="pm5-fields pm5-row3">
+          <div class="pm5-fg">
+            <label>តម្លៃ ($)</label>
+            <input type="number" id="pmFPrice" placeholder="0.00" min="0" step="0.5">
           </div>
           <div class="pm5-fg">
             <label>Category</label>
@@ -2841,26 +2841,21 @@
             </select>
           </div>
           <div class="pm5-fg">
-            <label>តម្លៃ ($)</label>
-            <input type="number" id="pmFPrice" placeholder="0.00" min="0" step="0.5">
-          </div>
-          <div class="pm5-fg">
             <label>Sale <span class="pm5-hint">(ឈុត/1lot)</span></label>
             <input type="number" id="pmFSale" placeholder="1" min="1" step="1" value="1">
           </div>
-          <div class="pm5-fg">
-            <label>Box <span class="pm5-hint">(ចំនួនកេស)</span></label>
-            <input type="number" id="pmFBox" placeholder="1" min="0" step="1" value="1">
-          </div>
-          <div class="pm5-fg">
-            <label>Pack <span class="pm5-hint">(ឈុត/1Box)</span></label>
-            <input type="number" id="pmFPack" placeholder="0" min="0" step="1" value="0">
-          </div>
-          <div class="pm5-fg">
-            <label>QTY <span class="pm5-hint">(គ្រាប់/Box)</span></label>
-            <input type="number" id="pmFQty" placeholder="0" min="0" step="1" value="0">
-          </div>
         </div>
+        <div class="pm5-fg">
+          <label>ឈ្មោះផលិតផល *</label>
+          <input type="text" id="pmFName" placeholder="ឈ្មោះ...">
+        </div>
+        <div class="pm5-fg">
+          <label>Description</label>
+          <textarea id="pmFSub" placeholder="Sub name / description..." rows="5" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--line,rgba(0,0,0,.12));background:var(--input,rgba(255,255,255,.9));color:var(--text,#18213a);font-size:14px;font-family:inherit;outline:none;resize:vertical;transition:border-color .15s;"></textarea>
+        </div>
+        <input type="hidden" id="pmFBox" value="1">
+        <input type="hidden" id="pmFPack" value="0">
+        <input type="hidden" id="pmFQty" value="0">
         <div class="pm5-form-actions">
           <button type="button" class="pm5-cancel-btn pmT" data-tab="list">← ត្រឡប់</button>
           <button type="button" id="pmSaveBtn" class="pm5-save-btn">✓ រក្សាទុក</button>
