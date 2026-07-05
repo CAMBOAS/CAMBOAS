@@ -2264,7 +2264,11 @@ body.sb-collapsed .main-content {
 /* Theme button: icon only */
 .sidebar.sb-collapsed .sb-theme-btn {
   justify-content: center !important;
-  padding: 8px !important;
+  padding: 0 !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  margin: 0 auto 8px !important;
 }
 .sidebar.sb-collapsed .sb-theme-btn > span:not(.sb-theme-icon),
 .sidebar.sb-collapsed .sb-theme-btn .sb-theme-toggle { display: none !important; }
