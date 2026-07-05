@@ -118,15 +118,21 @@
         }).catch(function () { return null; });
       }
 
+      // Format IP with zero-padded octets: 192.168.1.5 → 192.168.001.005
+      function fmtIP(raw) {
+        if (!raw) return '';
+        return raw.split('.').map(function(o){ return o.padStart(3,'0'); }).join('.');
+      }
+
       // Get IP address from API with fallback
       function getIP() {
         return fetch('https://ipapi.co/json/')
           .then(function (r) { return r.json(); })
-          .then(function (g) { var raw = g.ip || ''; return { ip: raw ? 'IPv4 (' + raw + ')' : '', city: g.city, region: g.region, country: g.country_name }; })
+          .then(function (g) { return { ip: fmtIP(g.ip), city: g.city, region: g.region, country: g.country_name }; })
           .catch(function () {
             return fetch('https://ipwhois.app/json/')
               .then(function (r) { return r.json(); })
-              .then(function (g) { var raw = g.ip || ''; return { ip: raw ? 'IPv4 (' + raw + ')' : '', city: g.city, region: g.region, country: g.country }; })
+              .then(function (g) { return { ip: fmtIP(g.ip), city: g.city, region: g.region, country: g.country }; })
               .catch(function () { return { ip: '', city: '', region: '', country: '' }; });
           });
       }
