@@ -52,6 +52,43 @@
     var ua = navigator.userAgent || '';
     var brand = 'Unknown', model = 'Unknown';
 
+    // Samsung SM-code lookup (shared helper)
+    var SAMSUNG_TBL = {
+      'S928':'Galaxy S24 Ultra','S926':'Galaxy S24+','S921':'Galaxy S24',
+      'S918':'Galaxy S23 Ultra','S916':'Galaxy S23+','S911':'Galaxy S23',
+      'S908':'Galaxy S22 Ultra','S906':'Galaxy S22+','S901':'Galaxy S22',
+      'G998':'Galaxy S21 Ultra','G996':'Galaxy S21+','G991':'Galaxy S21',
+      'G988':'Galaxy S20 Ultra','G986':'Galaxy S20+','G981':'Galaxy S20',
+      'F946':'Galaxy Z Fold 5','F936':'Galaxy Z Fold 4','F926':'Galaxy Z Fold 3','F916':'Galaxy Z Fold 2',
+      'F731':'Galaxy Z Flip 5','F721':'Galaxy Z Flip 4','F711':'Galaxy Z Flip 3','F707':'Galaxy Z Flip 2',
+      'A546':'Galaxy A54','A536':'Galaxy A53','A525':'Galaxy A52','A526':'Galaxy A52 5G',
+      'A346':'Galaxy A34','A336':'Galaxy A33','A325':'Galaxy A32',
+      'A235':'Galaxy A23','A225':'Galaxy A22','A215':'Galaxy A21s',
+      'A135':'Galaxy A13','A125':'Galaxy A12','A127':'Galaxy A12',
+      'A042':'Galaxy A04','A032':'Galaxy A03','A022':'Galaxy A02',
+      'N986':'Galaxy Note 20 Ultra','N981':'Galaxy Note 20',
+      'N976':'Galaxy Note 10+','N970':'Galaxy Note 10'
+    };
+    function lookupSamsung(rawCode) {
+      var code = (rawCode || '').toUpperCase();
+      for (var k in SAMSUNG_TBL) { if (code.indexOf(k) === 0) return SAMSUNG_TBL[k]; }
+      return 'Galaxy SM-' + code;
+    }
+
+    // Extract model name from Android UA — try multiple patterns
+    function extractAndroidModel(uaStr) {
+      // Pattern 1: "...; ModelName Build/..." (standard)
+      var m = uaStr.match(/;\s*([^;)]+?)\s+Build\//i);
+      if (m) return m[1].trim();
+      // Pattern 2: "...; ModelName)" before AppleWebKit
+      m = uaStr.match(/;\s*([^;)]+)\)\s*AppleWebKit/i);
+      if (m) return m[1].trim();
+      // Pattern 3: last segment before closing paren
+      m = uaStr.match(/;\s*([^;()]+)\s*\)/);
+      if (m) return m[1].trim();
+      return '';
+    }
+
     // ── iPhone: screen size + iOS version → model name ──
     if (/iPhone/i.test(ua)) {
       brand = 'Apple';
@@ -61,101 +98,69 @@
       var lg = Math.max(W,H), sm2 = Math.min(W,H);
       if      (lg===667  && sm2===375) model = ios>=13 ? 'iPhone SE (2020/2022)' : 'iPhone 6/7/8';
       else if (lg===736  && sm2===414) model = 'iPhone 6+/7+/8+';
-      else if (lg===812  && sm2===375) model = ios>=15 ? 'iPhone 13 mini'       : ios>=14 ? 'iPhone 12 mini' : 'iPhone X/XS/11 Pro';
-      else if (lg===896  && sm2===414) model = ios>=14 ? 'iPhone 11/XR'         : 'iPhone XS Max/11 Pro Max';
-      else if (lg===844  && sm2===390) model = ios>=16 ? 'iPhone 14'            : 'iPhone 12/13';
-      else if (lg===926  && sm2===428) model = ios>=16 ? 'iPhone 14 Plus'       : 'iPhone 12/13 Pro Max';
-      else if (lg===852  && sm2===393) model = ios>=17 ? 'iPhone 15/15 Pro'     : 'iPhone 14 Pro';
-      else if (lg===932  && sm2===430) model = ios>=17 ? 'iPhone 15 Plus/Pro Max' : 'iPhone 14 Pro Max';
+      else if (lg===812  && sm2===375) model = ios>=15 ? 'iPhone 13 mini'        : ios>=14 ? 'iPhone 12 mini' : 'iPhone X/XS/11 Pro';
+      else if (lg===896  && sm2===414) model = ios>=14 ? 'iPhone 11/XR'          : 'iPhone XS Max/11 Pro Max';
+      else if (lg===844  && sm2===390) model = ios>=16 ? 'iPhone 14'             : 'iPhone 12/13';
+      else if (lg===926  && sm2===428) model = ios>=16 ? 'iPhone 14 Plus'        : 'iPhone 12/13 Pro Max';
+      else if (lg===852  && sm2===393) model = ios>=17 ? 'iPhone 15/15 Pro'      : 'iPhone 14 Pro';
+      else if (lg===932  && sm2===430) model = ios>=17 ? 'iPhone 15 Plus/Pro Max': 'iPhone 14 Pro Max';
       else model = 'iPhone (iOS ' + (ios||'?') + ')';
     }
 
-    // ── iPad ──
-    else if (/iPad/i.test(ua)) { brand = 'Apple'; model = 'iPad'; }
-    else if (/iPod/i.test(ua)) { brand = 'Apple'; model = 'iPod touch'; }
-    else if (/Macintosh|Mac OS X/i.test(ua) && !/Android/i.test(ua)) { brand = 'Apple'; model = 'Mac'; }
+    // ── iPad / iPod / Mac ──
+    else if (/iPad/i.test(ua))  { brand = 'Apple'; model = 'iPad'; }
+    else if (/iPod/i.test(ua))  { brand = 'Apple'; model = 'iPod touch'; }
+    else if (/Macintosh/i.test(ua) && !/Android/i.test(ua)) { brand = 'Apple'; model = 'Mac'; }
 
-    // ── Samsung: SM-code lookup table ──
-    else if (/Samsung|SM-[A-Z0-9]+/i.test(ua)) {
-      brand = 'Samsung';
-      var smM = ua.match(/SM-([A-Z0-9]+)/i);
-      if (smM) {
-        var code = smM[1].toUpperCase();
-        var tbl = {
-          // S24 series
-          'S928':'Galaxy S24 Ultra','S926':'Galaxy S24+','S921':'Galaxy S24',
-          // S23 series
-          'S918':'Galaxy S23 Ultra','S916':'Galaxy S23+','S911':'Galaxy S23',
-          // S22 series
-          'S908':'Galaxy S22 Ultra','S906':'Galaxy S22+','S901':'Galaxy S22',
-          // S21 series
-          'G998':'Galaxy S21 Ultra','G996':'Galaxy S21+','G991':'Galaxy S21',
-          // S20 series
-          'G988':'Galaxy S20 Ultra','G986':'Galaxy S20+','G981':'Galaxy S20',
-          // Z Fold
-          'F946':'Galaxy Z Fold 5','F936':'Galaxy Z Fold 4','F926':'Galaxy Z Fold 3','F916':'Galaxy Z Fold 2',
-          // Z Flip
-          'F731':'Galaxy Z Flip 5','F721':'Galaxy Z Flip 4','F711':'Galaxy Z Flip 3','F707':'Galaxy Z Flip 2',
-          // A5x
-          'A546':'Galaxy A54','A536':'Galaxy A53','A525':'Galaxy A52','A526':'Galaxy A52 5G',
-          // A3x
-          'A346':'Galaxy A34','A336':'Galaxy A33','A325':'Galaxy A32',
-          // A2x
-          'A235':'Galaxy A23','A225':'Galaxy A22','A215':'Galaxy A21s',
-          // A1x
-          'A135':'Galaxy A13','A125':'Galaxy A12','A127':'Galaxy A12',
-          // A0x
-          'A042':'Galaxy A04','A032':'Galaxy A03','A022':'Galaxy A02',
-          // Note
-          'N986':'Galaxy Note 20 Ultra','N981':'Galaxy Note 20',
-          'N976':'Galaxy Note 10+','N970':'Galaxy Note 10',
-        };
-        var found = '';
-        for (var k in tbl) { if (code.indexOf(k)===0){ found=tbl[k]; break; } }
-        model = found || 'Galaxy SM-' + code;
-      } else { model = 'Samsung Galaxy'; }
-    }
-
-    // ── Xiaomi / Redmi / POCO ──
+    // ── Xiaomi / Redmi / POCO (check before Samsung to avoid false match) ──
     else if (/Xiaomi|Redmi|POCO/i.test(ua)) {
       brand = 'Xiaomi';
-      var xmM = ua.match(/;\s*((?:Redmi|POCO|Mi|Xiaomi)\s[^;)]+?)\s*(?:Build|MIUI|\))/i);
-      model = xmM ? xmM[1].trim() : 'Xiaomi';
+      var xmM = ua.match(/;\s*((?:Redmi|POCO|Mi\s[\w]|Xiaomi)\s[^;)]+?)\s*(?:Build|MIUI|\))/i);
+      model = xmM ? xmM[1].trim() : (extractAndroidModel(ua) || 'Xiaomi');
     }
 
     // ── OPPO ──
     else if (/OPPO|CPH\d+/i.test(ua)) {
       brand = 'OPPO';
-      var opM = ua.match(/;\s*([^;)]*?(?:CPH\d+|OPPO\s[\w]+)[^;)]*?)\s*(?:Build|\))/i);
-      model = opM ? opM[1].trim() : 'OPPO';
+      model = extractAndroidModel(ua) || 'OPPO';
     }
 
     // ── Realme ──
     else if (/Realme|RMX\d+/i.test(ua)) {
       brand = 'Realme';
-      var rmM = ua.match(/;\s*((?:Realme|RMX)[^;)]+?)\s*(?:Build|\))/i);
-      model = rmM ? rmM[1].trim() : 'Realme';
+      model = extractAndroidModel(ua) || 'Realme';
     }
 
     // ── Vivo ──
     else if (/vivo/i.test(ua)) {
       brand = 'Vivo';
-      var viM = ua.match(/;\s*(vivo\s[^;)]+?)\s*(?:Build|\))/i);
-      model = viM ? viM[1].trim() : 'Vivo';
+      model = extractAndroidModel(ua) || 'Vivo';
     }
 
     // ── Huawei ──
     else if (/Huawei|HUAWEI/i.test(ua)) {
       brand = 'Huawei';
-      var hwM = ua.match(/;\s*([^;)]+?)\s*(?:Build|\))/i);
-      model = hwM ? hwM[1].trim() : 'Huawei';
+      model = extractAndroidModel(ua) || 'Huawei';
     }
 
-    // ── Generic Android: parse model from UA ──
+    // ── Samsung OR any Android with SM- code ──
+    else if (/samsung/i.test(ua) || /SM-[A-Z0-9]/i.test(ua)) {
+      brand = 'Samsung';
+      var smM = ua.match(/SM-([A-Z0-9]+)/i);
+      model = smM ? lookupSamsung(smM[1]) : 'Samsung Galaxy';
+    }
+
+    // ── Generic Android ──
     else if (/Android/i.test(ua)) {
-      brand = 'Android';
-      var amM = ua.match(/;\s*([^;)]+?)\s*(?:Build|MIUI)\//i);
-      model = amM ? amM[1].trim() : 'Android Device';
+      var rawModel = extractAndroidModel(ua);
+      // If extracted model looks like SM- code, treat as Samsung
+      if (/^SM-([A-Z0-9]+)/i.test(rawModel)) {
+        brand = 'Samsung';
+        model = lookupSamsung(rawModel.replace(/^SM-/i,''));
+      } else {
+        brand = 'Android';
+        model = rawModel || 'Android Device';
+      }
     }
 
     // ── Desktop ──
