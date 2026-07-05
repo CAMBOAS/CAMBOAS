@@ -104,17 +104,29 @@
     return { brand: brand, model: model };
   }
 
-  // After login success — log device info to Sheet, returns Promise
+  // After login success — log device + IP + location to Sheet, returns Promise
   function logDevice(account) {
     if (!window.CamboAPI) return Promise.resolve();
     try {
       var info = getDeviceInfo();
-      return window.CamboAPI.get({
-        action:  'log_login',
-        account: account,
-        device:  info.brand,
-        model:   info.model
-      }).catch(function () { return null; });
+      function sendLog(ip, loc) {
+        return window.CamboAPI.get({
+          action:   'log_login',
+          account:  account,
+          device:   info.brand,
+          model:    info.model,
+          ip:       ip || '',
+          location: loc || ''
+        }).catch(function () { return null; });
+      }
+      return fetch('https://ipapi.co/json/')
+        .then(function (r) { return r.json(); })
+        .then(function (geo) {
+          var ip  = geo.ip || '';
+          var loc = (geo.city ? geo.city + ', ' : '') + (geo.country_name || '');
+          return sendLog(ip, loc);
+        })
+        .catch(function () { return sendLog('', ''); });
     } catch (e) { return Promise.resolve(); }
   }
 

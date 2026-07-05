@@ -143,9 +143,11 @@ function doGet(e) {
       const loginSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Login');
       if (!loginSheet) return jsonOutput_({ success: false });
       const loginData = loginSheet.getDataRange().getValues();
-      const acct   = String((e.parameter.account || '')).trim();
-      const device = String((e.parameter.device  || '')).trim();
-      const model  = String((e.parameter.model   || '')).trim();
+      const acct     = String((e.parameter.account  || '')).trim();
+      const device   = String((e.parameter.device   || '')).trim();
+      const model    = String((e.parameter.model    || '')).trim();
+      const ip       = String((e.parameter.ip       || '')).trim();
+      const location = String((e.parameter.location || '')).trim();
       const now    = new Date();
       const dd     = String(now.getDate()).padStart(2,'0');
       const mm     = String(now.getMonth()+1).padStart(2,'0');
@@ -160,6 +162,8 @@ function doGet(e) {
           loginSheet.getRange(i+1, 4).setValue(model);      // D = Model
           loginSheet.getRange(i+1, 5).setValue(now);        // E = Last Login (datetime)
           loginSheet.getRange(i+1, 6).setValue(activeStr);  // F = Active (date + time)
+          loginSheet.getRange(i+1, 7).setValue(ip);         // G = IP
+          loginSheet.getRange(i+1, 8).setValue(location);   // H = Location
           break;
         }
       }
