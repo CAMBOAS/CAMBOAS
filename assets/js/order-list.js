@@ -101,14 +101,13 @@ function _loadPrintStatusesFromSheet(){
         _printMarks[id] = res.statuses[id];
       });
       _savePrintMarks();
-      // Refresh dots + row highlights in DOM
-      document.querySelectorAll('.ol-print-dot').forEach(function(dot){
-        var id = dot.dataset.id;
-        _updateDot(id, _printMarks[id]||'');
-        _updateRowPrinted(id, _printMarks[id]||'');
-      });
     }
-  }).catch(function(){});
+    // Re-render full table so markGreen logic (order.status + printMarks) is applied correctly
+    if(typeof render === 'function') render();
+  }).catch(function(){
+    // Even on error, re-render so order.status=ព្រីនហើយ rows show green
+    if(typeof render === 'function') render();
+  });
 }
 window._loadPrintStatusesFromSheet = _loadPrintStatusesFromSheet;
 var _sort = {col:'date', dir:'desc'};
