@@ -597,6 +597,7 @@ function render(){
       +'<td class="ol-col-prod">'+ptxt+'</td>'
       +'<td class="ol-muted ol-col-page">'+esc(o.page||o.pages||'')+'</td>'
       +'<td class="ol-muted ol-col-cb2">'+esc(o.closeBy||o.closeby||'')+'</td>'
+      +(function(){ var f=Number(o.deliveryFee||0); return '<td class="ol-muted ol-col-delivery">'+(f>0?'$'+f.toFixed(2):'-')+'</td>'; }())
       +'<td class="ol-total ol-col-tot">$'+total.toFixed(2)+'</td>'
       +'<td class="ol-muted ol-col-date">'+fmtDisplay(o.date)+'</td>'
       +(function(){ var m=markGreen?'green':(_printMarks[String(o.id)]||''); var lbl=m==='green'?'Print ហើយ ✓':'គ្មានចំណាំ'; return '<td class="ol-col-print" onclick="event.stopPropagation();window.olCyclePrint(\''+o.id+'\')"><span class="ol-print-dot'+(m?' '+m:'')+'" data-id="'+o.id+'" title="'+lbl+'"></span></td>'; })()
