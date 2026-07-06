@@ -326,6 +326,29 @@
     location.replace(inPages ? '../login.html' : 'login.html');
   }
 
+  // ── Session watch — poll check_session every 30s; auto-logout if kicked ──
+  var _watchTimer = null;
+  function startSessionWatch() {
+    if (_watchTimer) return; // already running
+    if (!isLoginRequired() || !isLoggedIn()) return;
+    var account = localStorage.getItem(ACC_KEY);
+    if (!account || !window.CamboAPI) return;
+
+    _watchTimer = setInterval(function () {
+      if (!isLoggedIn()) { clearInterval(_watchTimer); _watchTimer = null; return; }
+      window.CamboAPI.get({ action: 'check_session', account: account })
+        .then(function (r) {
+          if (r && r.valid === false) {
+            clearInterval(_watchTimer); _watchTimer = null;
+            logout();
+            var inPages = location.pathname.indexOf('/pages/') !== -1;
+            location.replace(inPages ? '../login.html' : 'login.html');
+          }
+        })
+        .catch(function () {}); // ignore network errors — only act on explicit valid:false
+    }, 30000); // check every 30s
+  }
+
   // Cross-browser sync — fetch login_required from Sheet every 3 min
   window.addEventListener('load', function () {
     if (!window.CamboAPI) return;
@@ -345,6 +368,9 @@
           }
         }
       }).catch(function () {});
+
+    // Start session watch 15s after page load (buffer for log_login to complete)
+    setTimeout(startSessionWatch, 15000);
   });
 
   window.CamboAuth = {
@@ -359,6 +385,7 @@
     getDeviceInfo:    getDeviceInfo,
     logDevice:        logDevice,
     authGuard:        authGuard,
+    startSessionWatch:startSessionWatch,
     SESSION_KEY:      SESSION_KEY,
     REQ_KEY:          REQ_KEY
   };

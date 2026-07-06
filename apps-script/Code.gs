@@ -187,6 +187,22 @@ function doGet(e) {
       return jsonOutput_({ success: true, data: list });
     }
 
+    /* ── Login: check if session is still valid (device still registered) ── */
+    if (action === 'check_session') {
+      const loginSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Login');
+      if (!loginSheet) return jsonOutput_({ valid: false });
+      const acct = String((e.parameter.account || '')).trim();
+      if (!acct) return jsonOutput_({ valid: false });
+      const loginData = loginSheet.getDataRange().getValues();
+      for (let i = 1; i < loginData.length; i++) {
+        if (String(loginData[i][0]).trim() === acct) {
+          const device = String(loginData[i][2] || '').trim(); // col C = Device
+          return jsonOutput_({ valid: device !== '' });
+        }
+      }
+      return jsonOutput_({ valid: false }); // account not found
+    }
+
     /* ── Login: kick (force logout) a device — clear C-H for that account ── */
     if (action === 'kick_device') {
       const loginSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Login');
