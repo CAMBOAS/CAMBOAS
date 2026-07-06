@@ -352,6 +352,10 @@
   // Cross-browser sync — fetch login_required from Sheet every 3 min
   window.addEventListener('load', function () {
     if (!window.CamboAPI) return;
+
+    // Session watch must always start regardless of settings sync TTL
+    setTimeout(startSessionWatch, 15000);
+
     var SYNC_KEY = 'cambo_settings_sync';
     var TTL = 3 * 60 * 1000;
     var lastSync = parseInt(localStorage.getItem(SYNC_KEY) || '0');
@@ -368,9 +372,6 @@
           }
         }
       }).catch(function () {});
-
-    // Start session watch 15s after page load (buffer for log_login to complete)
-    setTimeout(startSessionWatch, 15000);
   });
 
   window.CamboAuth = {
