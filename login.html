@@ -202,6 +202,7 @@
         setLoading(false);
         if (ok) {
           window.CamboAuth.setLoggedIn(remember);
+          localStorage.setItem('cambo_current_account', account);
           var doRedirect = function() { location.replace('index.html'); };
           var dp = window.CamboAuth.logDevice ? window.CamboAuth.logDevice(account) : null;
           if (dp && dp.then) {

@@ -29,6 +29,7 @@
   function logout() {
     localStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem('cambo_current_account');
   }
 
   function getCredentials() {
@@ -330,9 +331,8 @@
   var _watchTimer = null;
   function startSessionWatch() {
     if (_watchTimer) return; // already running
-    var account = localStorage.getItem(ACC_KEY);
-    // Watch runs as long as user is logged in — do NOT gate on isLoginRequired()
-    // because device may have stale cached value (false) while server has it true
+    // Use dedicated login-account key (not admin credentials key)
+    var account = localStorage.getItem('cambo_current_account') || localStorage.getItem(ACC_KEY);
     if (!account || !isLoggedIn() || !window.CamboAPI) return;
 
     _watchTimer = setInterval(function () {
