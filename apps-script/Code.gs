@@ -149,13 +149,7 @@ function doGet(e) {
       const ip       = String((e.parameter.ip       || '')).trim();
       const location = String((e.parameter.location || '')).trim();
       const now    = new Date();
-      const dd     = String(now.getDate()).padStart(2,'0');
-      const mm     = String(now.getMonth()+1).padStart(2,'0');
-      const yyyy   = now.getFullYear();
-      const hh     = String(now.getHours()).padStart(2,'0');
-      const mi     = String(now.getMinutes()).padStart(2,'0');
-      const ss     = String(now.getSeconds()).padStart(2,'0');
-      const activeStr = dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + mi + ':' + ss;
+      const activeStr = Utilities.formatDate(now, TZ, 'dd/MM/yyyy hh:mm:ss a');
       for (let i = 1; i < loginData.length; i++) {
         if (String(loginData[i][0]).trim() === acct) {
           loginSheet.getRange(i+1, 3).setValue(device);     // C = Device
@@ -183,7 +177,7 @@ function doGet(e) {
           account:  String(r[0] || ''),
           device:   String(r[2] || ''),
           model:    String(r[3] || ''),
-          lastLogin:r[4] ? Utilities.formatDate(new Date(r[4]), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss') : '',
+          lastLogin:r[4] ? Utilities.formatDate(new Date(r[4]), TZ, 'dd/MM/yyyy hh:mm:ss a') : '',
           active:   String(r[5] || ''),
           ip:       String(r[6] || ''),
           location: String(r[7] || '')
