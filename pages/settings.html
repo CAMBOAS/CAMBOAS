@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html><html lang="km"><head>
   <script>(function(){var r=localStorage.getItem('cambo_login_required');if(r==='false')return;var k='cambo_session';if(sessionStorage.getItem(k)==='1'||localStorage.getItem(k)==='1')return;document.documentElement.style.visibility='hidden';location.replace('../login.html');})();</script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script><title>Settings - CAMBO MINI</title><link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png"><link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png"><link rel="apple-touch-icon" href="../images/logo/LOGO%20CAMBOMINI.png"><link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=160"><link rel="stylesheet" href="../assets/css/main.css?v=160"><style>
-.st-wrap{display:grid;gap:18px;max-width:860px}
+.st-wrap{display:grid;gap:18px;max-width:1100px;width:100%}
 .st-card{padding:24px 26px;border-radius:24px}
 .st-card h2{margin:0 0 4px;color:var(--text);font-size:20px}
 .st-card h3{margin:0 0 6px;color:var(--text);font-size:16px}
@@ -39,6 +39,34 @@
 .st-creds-section{margin-top:18px}
 .st-creds-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px}
 @media(max-width:600px){.st-fields{grid-template-columns:1fr}}
+
+/* ── Devices Table (desktop) ── */
+.dev-table-wrap{overflow-x:auto;border-radius:14px;border:1px solid rgba(148,163,200,.14)}
+.dev-table{width:100%;border-collapse:collapse;font-size:13px}
+.dev-table thead tr{background:rgba(139,92,246,.08);border-bottom:1px solid rgba(148,163,200,.15)}
+.dev-table thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+.dev-table tbody tr{border-bottom:1px solid rgba(148,163,200,.08);transition:background .15s}
+.dev-table tbody tr:last-child{border-bottom:none}
+.dev-table tbody tr:hover{background:rgba(139,92,246,.04)}
+.dev-table td{padding:10px 14px;color:var(--text);vertical-align:middle}
+.dev-table td.dev-num{color:var(--muted);font-size:12px;font-weight:700;width:36px;text-align:center}
+.dev-table td.dev-ip{color:#60a5fa;font-weight:600;white-space:nowrap;font-size:12px}
+.dev-table td.dev-time{font-size:12px;white-space:nowrap}
+.dev-table .dev-model{font-weight:700;font-size:13px}
+.dev-table .dev-brand{font-size:11px;color:var(--muted)}
+.dev-loc-link{display:inline-flex;align-items:center;gap:5px;color:#818cf8;text-decoration:none;font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.18);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.dev-loc-link:hover{background:rgba(129,140,248,.16)}
+[data-theme="light"] .dev-table thead tr{background:rgba(99,102,241,.05)}
+[data-theme="light"] .dev-table tbody tr:hover{background:rgba(99,102,241,.04)}
+[data-theme="light"] .dev-table-wrap{border-color:rgba(99,102,241,.15)}
+[data-theme="light"] .dev-table tbody tr{border-color:rgba(99,102,241,.1)}
+
+/* Desktop = table | Mobile = cards */
+.dev-cards{display:none}
+@media(max-width:700px){
+  .dev-table-wrap{display:none}
+  .dev-cards{display:flex;flex-direction:column;gap:10px}
+}
 </style></head><body>
 <div class="background"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
 <div class="dashboard">
@@ -130,7 +158,26 @@
             Refresh
           </button>
         </div>
-        <div id="devicesBody" style="display:flex;flex-direction:column;gap:10px">
+        <!-- Desktop table -->
+        <div class="dev-table-wrap" id="devicesTableWrap">
+          <table class="dev-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Device / Model</th>
+                <th>IP</th>
+                <th>Last Login</th>
+                <th>Active</th>
+                <th>Location</th>
+              </tr>
+            </thead>
+            <tbody id="devicesTableBody">
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Mobile cards -->
+        <div class="dev-cards" id="devicesBody">
           <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">Loading...</div>
         </div>
         <div id="devicesEmpty" style="display:none;text-align:center;padding:24px;color:var(--muted);font-size:13px">គ្មានទិន្នន័យ</div>
@@ -268,63 +315,72 @@
   });
 
   // ── Devices Login List ──
-  var devicesBody  = document.getElementById('devicesBody');
-  var devicesEmpty = document.getElementById('devicesEmpty');
+  var devicesBody      = document.getElementById('devicesBody');
+  var devicesTableBody = document.getElementById('devicesTableBody');
+  var devicesEmpty     = document.getElementById('devicesEmpty');
+
+  var ICON_APPLE   = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4M8.5 6.5C9 4.5 10.5 3 12 3"/><rect x="5" y="8" width="14" height="13" rx="2"/><line x1="9" y1="8" x2="9" y2="21"/><line x1="15" y1="8" x2="15" y2="21"/></svg>';
+  var ICON_ANDROID = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>';
+  var ICON_WINDOWS = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+  var ICON_DEFAULT = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>';
+  var ICON_PIN     = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+  var ICON_EXT     = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
 
   function deviceIcon(device) {
-    if (/apple/i.test(device)) return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4M8.5 6.5C9 4.5 10.5 3 12 3"/><rect x="5" y="8" width="14" height="13" rx="2"/><line x1="9" y1="8" x2="9" y2="21"/><line x1="15" y1="8" x2="15" y2="21"/></svg>';
-    if (/samsung|android/i.test(device)) return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>';
-    if (/windows/i.test(device)) return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
-    return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>';
+    if (/apple/i.test(device))          return ICON_APPLE;
+    if (/samsung|android|xiaomi|oppo|realme|vivo|huawei/i.test(device)) return ICON_ANDROID;
+    if (/windows/i.test(device))        return ICON_WINDOWS;
+    return ICON_DEFAULT;
+  }
+
+  function locLink(location) {
+    if (!location) return '—';
+    var url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(location);
+    return '<a href="' + url + '" target="_blank" rel="noopener" class="dev-loc-link">'
+      + ICON_PIN + '<span style="overflow:hidden;text-overflow:ellipsis">' + esc(location) + '</span>' + ICON_EXT + '</a>';
   }
 
   function renderDevices(list) {
     if (!list || !list.length) {
+      devicesTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">គ្មានទិន្នន័យ</td></tr>';
       devicesBody.innerHTML = '';
       devicesEmpty.style.display = 'block';
       return;
     }
     devicesEmpty.style.display = 'none';
+
+    // ── Desktop table rows ──
+    devicesTableBody.innerHTML = list.map(function(r, i) {
+      return '<tr>'
+        + '<td class="dev-num">' + (i+1) + '</td>'
+        + '<td><div class="dev-model">' + esc(r.model || r.device || '—') + '</div><div class="dev-brand">' + esc(r.device) + '</div></td>'
+        + '<td class="dev-ip">' + esc(r.ip || '—') + '</td>'
+        + '<td class="dev-time">' + esc(r.lastLogin || '—') + '</td>'
+        + '<td class="dev-time">' + esc(r.active || '—') + '</td>'
+        + '<td>' + locLink(r.location) + '</td>'
+        + '</tr>';
+    }).join('');
+
+    // ── Mobile cards ──
     devicesBody.innerHTML = list.map(function(r, i) {
       var mapUrl = r.location ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(r.location) : '';
       return '<div style="border:1px solid rgba(148,163,200,.14);border-radius:16px;padding:14px 16px;background:rgba(255,255,255,.03);display:flex;flex-direction:column;gap:10px">'
-
-        // Row 1: number + device/model + ip
         + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
           + '<div style="display:flex;align-items:center;gap:10px">'
             + '<span style="width:24px;height:24px;border-radius:8px;background:rgba(139,92,246,.15);color:#a78bfa;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + (i+1) + '</span>'
             + '<span style="color:#a78bfa">' + deviceIcon(r.device) + '</span>'
-            + '<div>'
-              + '<div style="font-size:13px;font-weight:700;color:var(--text)">' + esc(r.model || r.device || '—') + '</div>'
-              + '<div style="font-size:11px;color:var(--muted)">' + esc(r.device) + '</div>'
-            + '</div>'
+            + '<div><div style="font-size:13px;font-weight:700;color:var(--text)">' + esc(r.model || r.device || '—') + '</div><div style="font-size:11px;color:var(--muted)">' + esc(r.device) + '</div></div>'
           + '</div>'
           + '<span style="font-size:11px;color:#60a5fa;font-weight:600;white-space:nowrap">' + esc(r.ip) + '</span>'
         + '</div>'
-
-        // Divider
         + '<div style="height:1px;background:rgba(148,163,200,.1)"></div>'
-
-        // Row 2: last login + active
         + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
-          + '<div>'
-            + '<div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px">Last Login</div>'
-            + '<div style="font-size:12px;color:var(--text)">' + esc(r.lastLogin || '—') + '</div>'
-          + '</div>'
-          + '<div>'
-            + '<div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px">Active</div>'
-            + '<div style="font-size:12px;color:var(--text)">' + esc(r.active || '—') + '</div>'
-          + '</div>'
+          + '<div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px">Last Login</div><div style="font-size:12px;color:var(--text)">' + esc(r.lastLogin || '—') + '</div></div>'
+          + '<div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:2px;text-transform:uppercase;letter-spacing:.5px">Active</div><div style="font-size:12px;color:var(--text)">' + esc(r.active || '—') + '</div></div>'
         + '</div>'
-
-        // Row 3: location link
         + (r.location ? '<a href="' + mapUrl + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:rgba(129,140,248,.08);border:1px solid rgba(129,140,248,.18);text-decoration:none;color:#818cf8;font-size:12px;font-weight:600">'
-            + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'
-            + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(r.location) + '</span>'
-            + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'
-          + '</a>' : '')
-
-      + '</div>';
+            + ICON_PIN + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(r.location) + '</span>' + ICON_EXT + '</a>' : '')
+        + '</div>';
     }).join('');
   }
 

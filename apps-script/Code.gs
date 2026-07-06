@@ -148,14 +148,15 @@ function doGet(e) {
       const model    = String((e.parameter.model    || '')).trim();
       const ip       = String((e.parameter.ip       || '')).trim();
       const location = String((e.parameter.location || '')).trim();
-      const now    = new Date();
-      const activeStr = Utilities.formatDate(now, TZ, 'dd/MM/yyyy hh:mm:ss a');
+      const now       = new Date();
+      const nowStr    = Utilities.formatDate(now, TZ, 'dd/MM/yyyy hh:mm:ss a');
+      const activeStr = nowStr;
       for (let i = 1; i < loginData.length; i++) {
         if (String(loginData[i][0]).trim() === acct) {
           loginSheet.getRange(i+1, 3).setValue(device);     // C = Device
           loginSheet.getRange(i+1, 4).setValue(model);      // D = Model
-          loginSheet.getRange(i+1, 5).setValue(now);        // E = Last Login (datetime)
-          loginSheet.getRange(i+1, 6).setValue(activeStr);  // F = Active (date + time)
+          loginSheet.getRange(i+1, 5).setValue(nowStr);     // E = Last Login (string, 12h AM/PM)
+          loginSheet.getRange(i+1, 6).setValue(activeStr);  // F = Active (string, 12h AM/PM)
           loginSheet.getRange(i+1, 7).setValue(ip);         // G = IP
           loginSheet.getRange(i+1, 8).setValue(location);   // H = Location
           break;
@@ -177,8 +178,8 @@ function doGet(e) {
           account:  String(r[0] || ''),
           device:   String(r[2] || ''),
           model:    String(r[3] || ''),
-          lastLogin:r[4] ? Utilities.formatDate(new Date(r[4]), TZ, 'dd/MM/yyyy hh:mm:ss a') : '',
-          active:   String(r[5] || ''),
+          lastLogin:r[4] instanceof Date ? Utilities.formatDate(r[4], TZ, 'dd/MM/yyyy hh:mm:ss a') : String(r[4] || ''),
+          active:   r[5] instanceof Date ? Utilities.formatDate(r[5], TZ, 'dd/MM/yyyy hh:mm:ss a') : String(r[5] || ''),
           ip:       String(r[6] || ''),
           location: String(r[7] || '')
         });
