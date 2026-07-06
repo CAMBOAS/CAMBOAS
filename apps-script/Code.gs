@@ -170,6 +170,28 @@ function doGet(e) {
       return jsonOutput_({ success: true });
     }
 
+    /* ── Login: return all login rows (skip header, skip empty) ── */
+    if (action === 'get_login_list') {
+      const lSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Login');
+      if (!lSheet) return jsonOutput_({ success: false });
+      const rows = lSheet.getDataRange().getValues();
+      const list = [];
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r[0]) continue; // skip empty account rows
+        list.push({
+          account:  String(r[0] || ''),
+          device:   String(r[2] || ''),
+          model:    String(r[3] || ''),
+          lastLogin:r[4] ? Utilities.formatDate(new Date(r[4]), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss') : '',
+          active:   String(r[5] || ''),
+          ip:       String(r[6] || ''),
+          location: String(r[7] || '')
+        });
+      }
+      return jsonOutput_({ success: true, data: list });
+    }
+
     /* ── Settings: read all key-value rows from Settings sheet ── */
     if (action === 'get_settings') {
       const stSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Settings');

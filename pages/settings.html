@@ -118,6 +118,39 @@
         </div>
       </section>
 
+      <!-- Devices Login List -->
+      <section class="glass-card st-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+          <div>
+            <h3 style="margin:0 0 2px">📱 Devices Login List</h3>
+            <p style="margin:0">បញ្ជីអ្នកប្រើប្រាស់ដែលបានចូលប្រើ</p>
+          </div>
+          <button class="st-btn st-btn-secondary" id="refreshDevicesBtn" type="button" style="display:flex;align-items:center;gap:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div id="devicesTableWrap" style="overflow-x:auto;border-radius:14px;border:1px solid rgba(148,163,200,.12)">
+          <table id="devicesTable" style="width:100%;border-collapse:collapse;font-size:12px;min-width:680px">
+            <thead>
+              <tr style="background:rgba(139,92,246,.08);border-bottom:1px solid rgba(148,163,200,.15)">
+                <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:700;white-space:nowrap">#</th>
+                <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:700;white-space:nowrap">Device</th>
+                <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:700;white-space:nowrap">Model</th>
+                <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:700;white-space:nowrap">Last Login</th>
+                <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:700;white-space:nowrap">Active</th>
+                <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:700;white-space:nowrap">IP</th>
+                <th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:700;white-space:nowrap">Location</th>
+              </tr>
+            </thead>
+            <tbody id="devicesBody">
+              <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="devicesEmpty" style="display:none;text-align:center;padding:24px;color:var(--muted);font-size:13px">គ្មានទិន្នន័យ</div>
+      </section>
+
       <!-- Logout Section -->
       <section class="glass-card st-card">
         <h3>🚪 Session</h3>
@@ -248,6 +281,52 @@
     if (window.CamboAuth) window.CamboAuth.logout();
     location.href = '../login.html';
   });
+
+  // ── Devices Login List ──
+  var devicesBody  = document.getElementById('devicesBody');
+  var devicesEmpty = document.getElementById('devicesEmpty');
+  var devicesWrap  = document.getElementById('devicesTableWrap');
+
+  function renderDevices(list) {
+    if (!list || !list.length) {
+      devicesBody.innerHTML = '';
+      devicesWrap.style.display = 'none';
+      devicesEmpty.style.display = 'block';
+      return;
+    }
+    devicesWrap.style.display = '';
+    devicesEmpty.style.display = 'none';
+    devicesBody.innerHTML = list.map(function(r, i) {
+      var even = i % 2 === 0;
+      var bg = even ? '' : 'background:rgba(148,163,200,.04)';
+      return '<tr style="border-bottom:1px solid rgba(148,163,200,.07);' + bg + '">'
+        + '<td style="padding:9px 12px;color:var(--muted);white-space:nowrap">' + (i+1) + '</td>'
+        + '<td style="padding:9px 12px;color:var(--muted);white-space:nowrap">' + esc(r.device) + '</td>'
+        + '<td style="padding:9px 12px;color:var(--text);white-space:nowrap">' + esc(r.model) + '</td>'
+        + '<td style="padding:9px 12px;color:var(--muted);white-space:nowrap;font-size:11px">' + esc(r.lastLogin) + '</td>'
+        + '<td style="padding:9px 12px;color:var(--muted);white-space:nowrap;font-size:11px">' + esc(r.active) + '</td>'
+        + '<td style="padding:9px 12px;color:#60a5fa;white-space:nowrap;font-size:11px">' + esc(r.ip) + '</td>'
+        + '<td style="padding:9px 12px;color:var(--muted);font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + esc(r.location) + '">' + esc(r.location) + '</td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function loadDevices() {
+    devicesBody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Loading...</td></tr>';
+    devicesWrap.style.display = '';
+    devicesEmpty.style.display = 'none';
+    if (!window.CamboAPI) { renderDevices([]); return; }
+    window.CamboAPI.get({ action: 'get_login_list' })
+      .then(function(r) { renderDevices(r && r.success ? r.data : []); })
+      .catch(function() { renderDevices([]); });
+  }
+
+  document.getElementById('refreshDevicesBtn').addEventListener('click', loadDevices);
+  loadDevices(); // auto-load on page open
 })();
 </script>
 <script src="../assets/js/sw-register.js?v=160"></script>
