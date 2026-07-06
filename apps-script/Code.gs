@@ -187,6 +187,22 @@ function doGet(e) {
       return jsonOutput_({ success: true, data: list });
     }
 
+    /* ── Login: kick (force logout) a device — clear C-H for that account ── */
+    if (action === 'kick_device') {
+      const loginSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Login');
+      if (!loginSheet) return jsonOutput_({ success: false, message: 'Login sheet not found' });
+      const acct = String((e.parameter.account || '')).trim();
+      if (!acct) return jsonOutput_({ success: false, message: 'Missing account' });
+      const loginData = loginSheet.getDataRange().getValues();
+      for (let i = 1; i < loginData.length; i++) {
+        if (String(loginData[i][0]).trim() === acct) {
+          loginSheet.getRange(i+1, 3, 1, 6).clearContent(); // C=Device D=Model E=LastLogin F=Active G=IP H=Location
+          return jsonOutput_({ success: true });
+        }
+      }
+      return jsonOutput_({ success: false, message: 'Account not found' });
+    }
+
     /* ── Settings: read all key-value rows from Settings sheet ── */
     if (action === 'get_settings') {
       const stSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Settings');

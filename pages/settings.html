@@ -164,15 +164,17 @@
             <thead>
               <tr>
                 <th>#</th>
+                <th>Account</th>
                 <th>Device / Model</th>
                 <th>IP</th>
                 <th>Last Login</th>
                 <th>Active</th>
                 <th>Location</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="devicesTableBody">
-              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">Loading...</td></tr>
+              <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Loading...</td></tr>
             </tbody>
           </table>
         </div>
@@ -341,37 +343,55 @@
   }
 
   function renderDevices(list) {
-    if (!list || !list.length) {
-      devicesTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">គ្មានទិន្នន័យ</td></tr>';
+    // Only show rows that have actual login activity
+    var filtered = (list || []).filter(function(r) {
+      return (r.device && r.device.trim()) || (r.ip && r.ip.trim()) || (r.lastLogin && r.lastLogin.trim());
+    });
+
+    if (!filtered.length) {
+      devicesTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">គ្មានទិន្នន័យ</td></tr>';
       devicesBody.innerHTML = '';
       devicesEmpty.style.display = 'block';
       return;
     }
     devicesEmpty.style.display = 'none';
 
+    var ICON_KICK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>';
+
     // ── Desktop table rows ──
-    devicesTableBody.innerHTML = list.map(function(r, i) {
+    devicesTableBody.innerHTML = filtered.map(function(r, i) {
       return '<tr>'
         + '<td class="dev-num">' + (i+1) + '</td>'
+        + '<td style="font-size:13px;font-weight:700;color:var(--text)">' + esc(r.account || '—') + '</td>'
         + '<td><div class="dev-model">' + esc(r.model || r.device || '—') + '</div><div class="dev-brand">' + esc(r.device) + '</div></td>'
         + '<td class="dev-ip">' + esc(r.ip || '—') + '</td>'
         + '<td class="dev-time">' + esc(r.lastLogin || '—') + '</td>'
         + '<td class="dev-time">' + esc(r.active || '—') + '</td>'
         + '<td>' + locLink(r.location) + '</td>'
+        + '<td style="text-align:center;white-space:nowrap">'
+          + '<button class="kick-btn" data-account="' + esc(r.account) + '" title="Kick device" style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#f87171;font-size:11px;font-weight:700;cursor:pointer;transition:background .15s">'
+            + ICON_KICK + 'Kick'
+          + '</button>'
+        + '</td>'
         + '</tr>';
     }).join('');
 
     // ── Mobile cards ──
-    devicesBody.innerHTML = list.map(function(r, i) {
+    devicesBody.innerHTML = filtered.map(function(r, i) {
       var mapUrl = r.location ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(r.location) : '';
       return '<div style="border:1px solid rgba(148,163,200,.14);border-radius:16px;padding:14px 16px;background:rgba(255,255,255,.03);display:flex;flex-direction:column;gap:10px">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
           + '<div style="display:flex;align-items:center;gap:10px">'
             + '<span style="width:24px;height:24px;border-radius:8px;background:rgba(139,92,246,.15);color:#a78bfa;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + (i+1) + '</span>'
             + '<span style="color:#a78bfa">' + deviceIcon(r.device) + '</span>'
-            + '<div><div style="font-size:13px;font-weight:700;color:var(--text)">' + esc(r.model || r.device || '—') + '</div><div style="font-size:11px;color:var(--muted)">' + esc(r.device) + '</div></div>'
+            + '<div><div style="font-size:13px;font-weight:700;color:var(--text)">' + esc(r.model || r.device || '—') + '</div><div style="font-size:11px;color:var(--muted)">' + esc(r.device) + (r.account ? ' · ' + esc(r.account) : '') + '</div></div>'
           + '</div>'
-          + '<span style="font-size:11px;color:#60a5fa;font-weight:600;white-space:nowrap">' + esc(r.ip) + '</span>'
+          + '<div style="display:flex;align-items:center;gap:8px">'
+            + '<span style="font-size:11px;color:#60a5fa;font-weight:600;white-space:nowrap">' + esc(r.ip) + '</span>'
+            + '<button class="kick-btn" data-account="' + esc(r.account) + '" title="Kick device" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:8px;border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.1);color:#f87171;font-size:11px;font-weight:700;cursor:pointer">'
+              + ICON_KICK + 'Kick'
+            + '</button>'
+          + '</div>'
         + '</div>'
         + '<div style="height:1px;background:rgba(148,163,200,.1)"></div>'
         + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
@@ -398,6 +418,41 @@
   }
 
   document.getElementById('refreshDevicesBtn').addEventListener('click', loadDevices);
+
+  // ── Kick device — event delegation on both table and cards ──
+  function handleKickClick(e) {
+    var btn = e.target.closest('.kick-btn');
+    if (!btn) return;
+    var account = btn.getAttribute('data-account');
+    if (!account) return;
+    if (!confirm('Kick device?\n\nAccount: ' + account + '\nDevice នឹងត្រូវ Logout ពី Session នៅ Login ជាថ្មី។')) return;
+
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    window.CamboAPI.get({ action: 'kick_device', account: account })
+      .then(function(r) {
+        if (r && r.success) {
+          btn.textContent = '✓ Kicked';
+          btn.style.color = '#4ade80';
+          btn.style.borderColor = 'rgba(74,222,128,.35)';
+          btn.style.background  = 'rgba(74,222,128,.1)';
+          setTimeout(loadDevices, 1200);
+        } else {
+          alert('Kick failed: ' + (r && r.message ? r.message : 'Unknown error'));
+          btn.disabled = false;
+          btn.style.opacity = '1';
+        }
+      })
+      .catch(function() {
+        alert('Network error — សូម Retry ម្ដងទៀត');
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      });
+  }
+
+  document.getElementById('devicesTableWrap').addEventListener('click', handleKickClick);
+  document.getElementById('devicesBody').addEventListener('click', handleKickClick);
+
   loadDevices(); // auto-load on page open
 })();
 </script>
