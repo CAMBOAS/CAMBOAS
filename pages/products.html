@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var ck  = catKey(p.type);
       var st  = stockById[normStr(p.id)] || stockByName[normStr(p.name)] || null;
       var qty = st ? (st.qty !== undefined ? st.qty : null) : null;
-      var imgUrl = p.url || ('../images/products/' + ck + '/' + p.name + '.png');
+      var imgUrl = p.url || ('../images/products/' + ck + '/' + encodeURIComponent(p.name) + '.png?v=1');
       catsFound[ck] = true;
       return { id:p.id, name:p.name, cat:ck, type:p.type, price:p.price, sale:p.sale||0, description:p.description||'', stock:qty, img:imgUrl };
     });
