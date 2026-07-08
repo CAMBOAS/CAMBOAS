@@ -151,7 +151,8 @@
       animation:pdIn .22s ease;
     }
     @keyframes pdIn { from{opacity:0;transform:scale(.93) translateY(18px)} to{opacity:1;transform:none} }
-    .pd-img { width:100%; height:240px; object-fit:cover; border-radius:22px 22px 0 0; display:block }
+    .pd-img { width:100%; height:260px; object-fit:contain; border-radius:22px 22px 0 0; display:block; background:rgba(255,255,255,.04) }
+    [data-theme="light"] .pd-img { background:#f8fafc }
     .pd-img-err { width:100%; height:240px; border-radius:22px 22px 0 0; background:rgba(255,255,255,.04); display:flex; align-items:center; justify-content:center; font-size:64px }
     .pd-body { padding:22px 24px 26px }
     .pd-close {
@@ -337,9 +338,7 @@ function fp() {
   }
 
   el.innerHTML = list.map(function(p, i) {
-    var priceHtml = (p.sale && p.sale > 0 && p.sale < p.price)
-      ? '<span class="pc-price">$' + p.sale.toFixed(2) + '</span><span class="pc-sale">Sale</span>'
-      : '<span class="pc-price">$' + p.price.toFixed(2) + '</span>';
+    var priceHtml = '<span class="pc-price">$' + p.price.toFixed(2) + '</span>';
 
     return '<article class="glass-card pc" data-pidx="' + i + '">' +
       '<div class="pc-img-wrap">' +
@@ -460,21 +459,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Prices
     var prEl = document.getElementById('pdPrices');
-    if (p.sale && p.sale > 0 && p.sale < p.price) {
-      prEl.innerHTML =
-        '<span class="pd-price">$' + p.sale.toFixed(2) + '</span>' +
-        '<span class="pd-sale-tag">Sale</span>' +
-        '<span class="pd-orig">$' + p.price.toFixed(2) + '</span>';
-    } else {
-      prEl.innerHTML = '<span class="pd-price">$' + p.price.toFixed(2) + '</span>';
-    }
+    prEl.innerHTML = '<span class="pd-price">$' + p.price.toFixed(2) + '</span>';
 
     // Info grid
     var ig = document.getElementById('pdInfoGrid');
     var items = [];
     if (p.id)    items.push(['ID ផលិតផល', esc(String(p.id))]);
     items.push(['ប្រភេទ', esc(p.type)]);
-    items.push(['ស្តុក', p.stock === null ? 'មិនដឹង' : (p.stock === 0 ? '<span style="color:#f87171">0</span>' : p.stock + ' pcs')]);
+    items.push(['តម្លៃ', '$' + p.price.toFixed(2)]);
+    if (p.sale && p.sale > 0) items.push(['ចំនួនលក់/ឈុត', p.sale + ' ផ្ដាច់']);
+    items.push(['ស្តុក', p.stock === null ? 'មិនដឹង' : (p.stock === 0 ? '<span style="color:#f87171">អស់ស្តុក</span>' : p.stock + ' pcs')]);
     ig.innerHTML = items.map(function(r){
       return '<div class="pd-info-item"><div class="pd-info-label">' + r[0] + '</div><div class="pd-info-val">' + r[1] + '</div></div>';
     }).join('');
