@@ -63,8 +63,17 @@
     [data-theme="light"] .cpill { background:#f8fafc; color:#64748b; border-color:#e2e8f0 }
     [data-theme="light"] .cpill.on { background:rgba(139,92,246,.08); border-color:rgba(139,92,246,.3); color:#7c3aed }
 
-    /* ── Product grid ── */
-    .pg { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px }
+    /* ── Product grid — responsive columns ── */
+    .pg { display:grid; grid-template-columns:repeat(4,1fr); gap:14px }
+    /* Large desktop ≥1400px → 5 col */
+    @media(min-width:1400px){ .pg { grid-template-columns:repeat(5,1fr) } }
+    /* Small desktop / laptop 1024–1399px → 4 col (default) */
+    /* Tablet / iPad 768–1023px → 3 col */
+    @media(max-width:1023px){ .pg { grid-template-columns:repeat(3,1fr) } }
+    /* Large phone 540–767px → 2 col */
+    @media(max-width:767px){ .pg { grid-template-columns:repeat(2,1fr); gap:10px } }
+    /* Small phone ≤539px → 2 col tighter */
+    @media(max-width:539px){ .pg { grid-template-columns:repeat(2,1fr); gap:8px } }
 
     /* ── Product card ── */
     .pc {
