@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="km">
 <head>
   <script>(function(){var r=localStorage.getItem('cambo_login_required');if(r==='false')return;var k='cambo_session';if(sessionStorage.getItem(k)==='1'||localStorage.getItem(k)==='1')return;document.documentElement.style.visibility='hidden';location.replace('../login.html');})();</script>
@@ -8,31 +8,189 @@
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=158">
-  <link rel="stylesheet" href="../assets/css/main.css?v=158">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=161">
+  <link rel="stylesheet" href="../assets/css/main.css?v=161">
   <style>
-    .pw{display:grid;gap:18px}
-    .stats-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-    .kpi{padding:16px 18px;border-radius:20px}
-    .kpi span{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-    .kpi strong{display:block;margin-top:8px;font-size:24px;color:var(--text)}
-    .cat-tabs{display:flex;gap:8px;flex-wrap:wrap}
-    .ctab{padding:7px 15px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:.15s;font-family:inherit}
-    .ctab.on{background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.3);color:#7dd3fc}
-    .pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
-    .pc{padding:14px;border-radius:18px;cursor:pointer;transition:.2s}
-    .pc:hover{transform:translateY(-2px)}
-    .pimg{width:100%;height:130px;border-radius:12px;overflow:hidden;margin-bottom:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center}
-    .pimg img{width:100%;height:130px;object-fit:cover;border-radius:12px;display:block}
-    .pname{font-size:13px;font-weight:700;color:var(--text);margin:0 0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .pcat{font-size:11px;color:var(--muted);margin:0 0 9px;text-transform:capitalize}
-    .pfoot{display:flex;justify-content:space-between;align-items:center}
-    .pprice{font-size:14px;font-weight:800;color:#7dd3fc}
-    .stk{font-size:11px;padding:3px 8px;border-radius:999px;font-weight:700;border:1px solid}
-    .sk-ok{background:rgba(34,197,94,.1);color:#86efac;border-color:rgba(34,197,94,.2)}
-    .sk-lo{background:rgba(251,191,36,.1);color:#fde68a;border-color:rgba(251,191,36,.18)}
-    .sk-no{background:rgba(239,68,68,.1);color:#fca5a5;border-color:rgba(239,68,68,.2)}
-    @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    /* ── Page wrapper ── */
+    .pw { display:grid; gap:20px }
+
+    /* ── Top bar ── */
+    .ptop { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px }
+    .ptop-left h2 { margin:0 0 2px; font-size:22px; font-weight:800; color:var(--text) }
+    .ptop-left p  { margin:0; font-size:13px; color:var(--muted) }
+
+    /* ── Status tabs ── */
+    .stab-row { display:flex; gap:6px; flex-wrap:wrap }
+    .stab {
+      display:inline-flex; align-items:center; gap:7px;
+      padding:8px 16px; border-radius:999px;
+      border:1.5px solid var(--line);
+      background:transparent; color:var(--muted);
+      font-size:13px; font-weight:700; cursor:pointer;
+      transition:.15s; font-family:inherit; white-space:nowrap;
+    }
+    .stab .stab-cnt {
+      font-size:11px; font-weight:800;
+      background:rgba(255,255,255,.12); color:var(--muted);
+      border-radius:999px; padding:1px 7px; min-width:20px; text-align:center;
+    }
+    .stab.on {
+      background:rgba(6,182,212,.12); border-color:rgba(6,182,212,.4);
+      color:#7dd3fc;
+    }
+    .stab.on .stab-cnt { background:rgba(6,182,212,.18); color:#7dd3fc }
+    [data-theme="light"] .stab { background:rgba(0,0,0,.03); color:#64748b; border-color:#e2e8f0 }
+    [data-theme="light"] .stab.on { background:rgba(6,182,212,.08); border-color:rgba(6,182,212,.4); color:#0891b2 }
+    [data-theme="light"] .stab .stab-cnt { background:rgba(0,0,0,.06); color:#64748b }
+    [data-theme="light"] .stab.on .stab-cnt { background:rgba(6,182,212,.15); color:#0891b2 }
+
+    /* ── Search + filter bar ── */
+    .pbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+    .psearch-wrap { position:relative; flex:1; min-width:180px }
+    .psearch-wrap svg { position:absolute; left:11px; top:50%; transform:translateY(-50%); opacity:.4; pointer-events:none }
+    #srch { width:100%; min-height:40px; padding:0 12px 0 36px; border-radius:12px; font-size:13px; box-sizing:border-box }
+    #srt  { min-height:40px; padding:0 12px; border-radius:12px; font-size:13px; font-family:inherit }
+
+    /* ── Category pills ── */
+    .cat-pills { display:flex; gap:6px; flex-wrap:wrap }
+    .cpill {
+      padding:5px 14px; border-radius:999px;
+      border:1px solid var(--line); background:rgba(255,255,255,.04);
+      color:var(--muted); font-size:12px; font-weight:700;
+      cursor:pointer; transition:.15s; font-family:inherit;
+    }
+    .cpill.on { background:rgba(139,92,246,.12); border-color:rgba(139,92,246,.35); color:#c4b5fd }
+    [data-theme="light"] .cpill { background:#f8fafc; color:#64748b; border-color:#e2e8f0 }
+    [data-theme="light"] .cpill.on { background:rgba(139,92,246,.08); border-color:rgba(139,92,246,.3); color:#7c3aed }
+
+    /* ── Product grid ── */
+    .pg { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:16px }
+
+    /* ── Product card ── */
+    .pc {
+      border-radius:20px; overflow:hidden; cursor:pointer;
+      transition:transform .2s, box-shadow .2s;
+      position:relative;
+    }
+    .pc:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.25) }
+    [data-theme="light"] .pc:hover { box-shadow:0 12px 40px rgba(0,0,0,.12) }
+
+    /* Image area */
+    .pc-img-wrap {
+      position:relative; width:100%; padding-top:85%;
+      background:rgba(255,255,255,.05); overflow:hidden;
+    }
+    [data-theme="light"] .pc-img-wrap { background:#f1f5f9 }
+    .pc-img-wrap img {
+      position:absolute; inset:0; width:100%; height:100%;
+      object-fit:cover; display:block; transition:transform .3s;
+    }
+    .pc:hover .pc-img-wrap img { transform:scale(1.05) }
+    .pc-img-err {
+      position:absolute; inset:0; display:flex;
+      align-items:center; justify-content:center; font-size:52px;
+    }
+
+    /* Status badge top-left */
+    .pc-badge {
+      position:absolute; top:10px; left:10px;
+      font-size:11px; font-weight:800; padding:4px 10px;
+      border-radius:999px; letter-spacing:.03em;
+      backdrop-filter:blur(8px);
+    }
+    .badge-ok  { background:rgba(34,197,94,.85);  color:#fff }
+    .badge-lo  { background:rgba(251,191,36,.85);  color:#1a1a1a }
+    .badge-no  { background:rgba(239,68,68,.85);   color:#fff }
+    .badge-unk { background:rgba(120,120,140,.7);  color:#fff }
+    [data-theme="light"] .badge-ok { background:rgba(22,163,74,.9) }
+    [data-theme="light"] .badge-lo { background:rgba(217,119,6,.9); color:#fff }
+    [data-theme="light"] .badge-no { background:rgba(220,38,38,.9) }
+
+    /* Card body */
+    .pc-body { padding:13px 14px 14px }
+    .pc-name {
+      font-size:13px; font-weight:700; color:var(--text);
+      margin:0 0 8px; line-height:1.4;
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    .pc-meta {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; flex-wrap:wrap;
+    }
+    .pc-type {
+      font-size:11px; color:var(--muted); font-weight:600;
+      text-transform:uppercase; letter-spacing:.04em;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:60%;
+    }
+    .pc-price { font-size:14px; font-weight:800; color:#7dd3fc; white-space:nowrap }
+    .pc-sale  { font-size:11px; color:#a78bfa; font-weight:700 }
+    [data-theme="light"] .pc-price { color:#0284c7 }
+    [data-theme="light"] .pc-sale  { color:#7c3aed }
+
+    /* Stock mini bar */
+    .pc-stk {
+      display:flex; align-items:center; gap:5px;
+      margin-top:7px; font-size:11px; color:var(--muted); font-weight:600;
+    }
+    .pc-stk-bar { flex:1; height:3px; border-radius:999px; background:rgba(255,255,255,.1); overflow:hidden }
+    [data-theme="light"] .pc-stk-bar { background:rgba(0,0,0,.08) }
+    .pc-stk-fill { height:100%; border-radius:999px; transition:width .4s }
+
+    /* ── Product Detail Modal ── */
+    #pdOverlay {
+      position:fixed; inset:0; z-index:9000; display:none;
+      align-items:center; justify-content:center;
+      background:rgba(0,0,0,.55); backdrop-filter:blur(6px); padding:16px;
+    }
+    #pdOverlay.open { display:flex }
+    #pdBox {
+      position:relative; background:var(--card); border:1px solid var(--line);
+      border-radius:26px; width:100%; max-width:500px; max-height:90vh;
+      overflow-y:auto; box-shadow:0 28px 90px rgba(0,0,0,.55);
+      animation:pdIn .22s ease;
+    }
+    @keyframes pdIn { from{opacity:0;transform:scale(.93) translateY(18px)} to{opacity:1;transform:none} }
+    .pd-img { width:100%; height:240px; object-fit:cover; border-radius:22px 22px 0 0; display:block }
+    .pd-img-err { width:100%; height:240px; border-radius:22px 22px 0 0; background:rgba(255,255,255,.04); display:flex; align-items:center; justify-content:center; font-size:64px }
+    .pd-body { padding:22px 24px 26px }
+    .pd-close {
+      position:absolute; top:14px; right:14px; width:36px; height:36px;
+      border-radius:50%; border:none; background:rgba(0,0,0,.5); color:#fff;
+      font-size:17px; cursor:pointer; display:flex; align-items:center;
+      justify-content:center; backdrop-filter:blur(8px); line-height:1;
+    }
+    .pd-close:hover { background:rgba(0,0,0,.75) }
+    .pd-status { display:inline-flex; align-items:center; gap:6px; margin-bottom:12px; font-size:12px; font-weight:800 }
+    .pd-name  { font-size:20px; font-weight:800; color:var(--text); margin:0 0 4px; line-height:1.3 }
+    .pd-type  { font-size:12px; color:var(--muted); margin:0 0 16px; text-transform:uppercase; letter-spacing:.06em; font-weight:700 }
+    .pd-divider { border:none; border-top:1px solid var(--line); margin:16px 0 }
+    .pd-prices { display:flex; align-items:baseline; gap:10px; margin-bottom:16px; flex-wrap:wrap }
+    .pd-price  { font-size:26px; font-weight:800; color:#7dd3fc }
+    .pd-sale-tag { font-size:12px; background:rgba(167,139,250,.15); color:#a78bfa; border-radius:6px; padding:3px 8px; font-weight:800 }
+    .pd-orig   { font-size:14px; color:var(--muted); text-decoration:line-through }
+    [data-theme="light"] .pd-price { color:#0284c7 }
+    .pd-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px }
+    .pd-info-item { background:rgba(255,255,255,.04); border-radius:12px; padding:10px 13px }
+    [data-theme="light"] .pd-info-item { background:#f8fafc; border:1px solid #e2e8f0 }
+    .pd-info-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:4px }
+    .pd-info-val   { font-size:13px; font-weight:700; color:var(--text) }
+    .pd-desc { font-size:13px; color:var(--muted); line-height:1.7; white-space:pre-wrap }
+    @media(max-width:600px){
+      #pdOverlay { align-items:flex-end; padding:0 }
+      #pdBox { border-radius:24px 24px 0 0; max-height:88vh; animation:pdBs .25s ease }
+      @keyframes pdBs { from{transform:translateY(100%)} to{transform:none} }
+    }
+
+    @media(max-width:680px){
+      .pg { grid-template-columns:repeat(2,1fr); gap:10px }
+      .pc-body { padding:10px 11px 12px }
+      .stab-row { gap:4px }
+      .stab { padding:6px 12px; font-size:12px }
+    }
+    @media(max-width:380px){
+      .pg { grid-template-columns:1fr 1fr; gap:8px }
+    }
   </style>
 </head>
 <body>
@@ -44,41 +202,79 @@
     <div class="shared-topbar" id="sharedHeader"></div>
     <div class="pw">
 
-      <section class="glass-card" style="padding:20px 24px;border-radius:22px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
-          <div><h2 style="margin:0 0 4px;color:var(--text)">Products</h2><p style="margin:0;color:var(--muted);font-size:14px">គ្រប់គ្រងផលិតផល CAMBO MINI</p></div>
-          <div style="display:flex;gap:8px">
-            <input type="text" id="srch" placeholder="ស្វែងរក..." oninput="fp()" style="min-height:38px;padding:0 12px;border-radius:10px;font-size:13px;width:180px">
-            <select id="srt" onchange="fp()" style="min-height:38px;padding:0 12px;border-radius:10px;font-size:13px">
-              <option value="name">Sort: Name</option>
-              <option value="price">Sort: Price</option>
-              <option value="stock">Sort: Stock</option>
+      <!-- Top header -->
+      <div class="glass-card" style="padding:18px 22px;border-radius:22px">
+        <div class="ptop">
+          <div class="ptop-left">
+            <h2>Products</h2>
+            <p>គ្រប់គ្រងផលិតផល CAMBO MINI</p>
+          </div>
+          <div class="pbar">
+            <div class="psearch-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="srch" placeholder="ស្វែងរកផលិតផល..." oninput="fp()">
+            </div>
+            <select id="srt" onchange="fp()">
+              <option value="name">ឈ្មោះ A→Z</option>
+              <option value="price">តម្លៃ ទាប→ខ្ពស់</option>
+              <option value="stock">ស្តុក ច្រើន→តិច</option>
             </select>
           </div>
         </div>
-      </section>
 
-      <div class="stats-row">
-        <article class="glass-card kpi"><span>Total Products</span><strong id="stTot">0</strong></article>
-        <article class="glass-card kpi"><span>In Stock</span><strong id="stOk" style="color:#86efac">0</strong></article>
-        <article class="glass-card kpi"><span>Low Stock</span><strong id="stLo" style="color:#fde68a">0</strong></article>
-        <article class="glass-card kpi"><span>Out of Stock</span><strong id="stNo" style="color:#fca5a5">0</strong></article>
+        <!-- Status tabs -->
+        <div class="stab-row" id="stabRow" style="margin-top:16px">
+          <button class="stab on" data-stab="all" onclick="setStat(event,'all')">
+            ទាំងអស់ <span class="stab-cnt" id="cntAll">0</span>
+          </button>
+          <button class="stab" data-stab="avail" onclick="setStat(event,'avail')">
+            មានស្តុក <span class="stab-cnt" id="cntAvail">0</span>
+          </button>
+          <button class="stab" data-stab="low" onclick="setStat(event,'low')">
+            ស្តុកតិច <span class="stab-cnt" id="cntLow">0</span>
+          </button>
+          <button class="stab" data-stab="out" onclick="setStat(event,'out')">
+            អស់ស្តុក <span class="stab-cnt" id="cntOut">0</span>
+          </button>
+        </div>
+
+        <!-- Category pills -->
+        <div class="cat-pills" id="catPills" style="margin-top:10px"></div>
       </div>
 
-      <div class="cat-tabs" id="tabs"></div>
+      <!-- Grid -->
       <div class="pg" id="pgrid"></div>
+
     </div>
   </main>
 </div>
-<script src="../assets/js/cambo-api.js?v=160"></script>
-<script src="../assets/js/auth.js?v=160"></script>
-<script src="../assets/js/layout.js?v=160"></script>
-<script src="../assets/js/dashboard-layout.js?v=160"></script>
+
+<!-- Product Detail Modal -->
+<div id="pdOverlay">
+  <div id="pdBox">
+    <button class="pd-close" id="pdClose" aria-label="Close">&#x2715;</button>
+    <div id="pdImgWrap"></div>
+    <div class="pd-body">
+      <div class="pd-status" id="pdStatus"></div>
+      <h2 class="pd-name" id="pdName"></h2>
+      <p class="pd-type" id="pdType"></p>
+      <hr class="pd-divider">
+      <div class="pd-prices" id="pdPrices"></div>
+      <div class="pd-info-grid" id="pdInfoGrid"></div>
+      <p class="pd-desc" id="pdDesc" style="display:none"></p>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/cambo-api.js?v=161"></script>
+<script src="../assets/js/auth.js?v=161"></script>
+<script src="../assets/js/layout.js?v=161"></script>
+<script src="../assets/js/dashboard-layout.js?v=161"></script>
 <script>
 var PRODS = [];
-var activeCat = 'all';
+var activeCat  = 'all';
+var activeStat = 'all';
 
-// Map Sheet type string → category key
 function catKey(type) {
   var t = (type || '').toLowerCase();
   if (t.includes('face'))  return 'face';
@@ -90,66 +286,115 @@ function catKey(type) {
 var CAT_LABEL = { face:'😊 Face', body:'🧴 Body', hair:'💆 Hair', drink:'☕ Drink', other:'📦 Other' };
 
 function normStr(s) { return String(s||'').toLowerCase().replace(/\s+/g,''); }
-function sc(s) { return s===null?'':s===0?'sk-no':s<10?'sk-lo':'sk-ok'; }
-function sl(s) { return s===null?'':s===0?'Out of Stock':s<10?'Low: '+s:'In: '+s; }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+/* Stock helpers */
+function stockStat(s) {
+  if (s === null) return 'unk';
+  if (s === 0)    return 'out';
+  if (s <= 10)    return 'low';
+  return 'ok';
+}
+function stockBadge(s) {
+  var st = stockStat(s);
+  var cls = {ok:'badge-ok',low:'badge-lo',out:'badge-no',unk:'badge-unk'}[st];
+  var lbl = {ok:'មានស្តុក',low:'ស្តុកតិច',out:'អស់ស្តុក',unk:'មិនដឹង'}[st];
+  return '<span class="pc-badge ' + cls + '">' + lbl + '</span>';
+}
+function stockBar(s) {
+  if (s === null) return '';
+  var pct = Math.min(100, s > 0 ? Math.max(4, Math.round(s / 30 * 100)) : 0);
+  var color = s === 0 ? '#f87171' : s <= 10 ? '#fbbf24' : '#4ade80';
+  return '<div class="pc-stk">' +
+    '<div class="pc-stk-bar"><div class="pc-stk-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+    '<span>' + (s === 0 ? 'អស់' : s + ' pcs') + '</span>' +
+  '</div>';
+}
+
+/* Filter & render */
 function fp() {
-  var q   = document.getElementById('srch').value.toLowerCase();
+  var q   = (document.getElementById('srch').value || '').toLowerCase();
   var srt = document.getElementById('srt').value;
+
   var list = PRODS.filter(function(p) {
-    return (!q || p.name.toLowerCase().includes(q)) &&
-           (activeCat === 'all' || p.cat === activeCat);
+    if (q && !p.name.toLowerCase().includes(q)) return false;
+    if (activeCat !== 'all' && p.cat !== activeCat) return false;
+    if (activeStat === 'avail') return p.stock === null || p.stock > 10;
+    if (activeStat === 'low')   return p.stock !== null && p.stock > 0 && p.stock <= 10;
+    if (activeStat === 'out')   return p.stock === 0;
+    return true;
   });
+
   if (srt === 'price')      list.sort(function(a,b){ return a.price - b.price; });
-  else if (srt === 'stock') list.sort(function(a,b){ return (b.stock===null?-1:b.stock) - (a.stock===null?-1:a.stock); });
+  else if (srt === 'stock') list.sort(function(a,b){ return (b.stock===null?Infinity:b.stock) - (a.stock===null?Infinity:a.stock); });
   else                      list.sort(function(a,b){ return a.name.localeCompare(b.name, 'km'); });
 
   var el = document.getElementById('pgrid');
   if (!list.length) {
-    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">មិនមានផលិតផល</div>';
+    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)">មិនមានផលិតផល</div>';
+    el._filteredProds = [];
     return;
   }
-  el.innerHTML = list.map(function(p) {
-    var sClass = sc(p.stock);
-    var sLabel = sl(p.stock);
-    return '<article class="glass-card pc">' +
-      '<div class="pimg"><img src="' + esc(p.img) + '" loading="lazy" onerror="this.parentNode.innerHTML=\'<span style=font-size:48px>\u{1F4E6}</span>\'" alt="' + esc(p.name) + '"></div>' +
-      '<p class="pname">' + esc(p.name) + '</p>' +
-      '<p class="pcat">' + esc(p.type) + '</p>' +
-      '<div class="pfoot">' +
-        '<span class="pprice">$' + p.price.toFixed(2) + '</span>' +
-        (sLabel ? '<span class="stk ' + sClass + '">' + sLabel + '</span>' : '') +
+
+  el.innerHTML = list.map(function(p, i) {
+    var priceHtml = (p.sale && p.sale > 0 && p.sale < p.price)
+      ? '<span class="pc-price">$' + p.sale.toFixed(2) + '</span><span class="pc-sale">Sale</span>'
+      : '<span class="pc-price">$' + p.price.toFixed(2) + '</span>';
+
+    return '<article class="glass-card pc" data-pidx="' + i + '">' +
+      '<div class="pc-img-wrap">' +
+        '<img src="' + esc(p.img) + '" loading="lazy" alt="' + esc(p.name) + '"' +
+          ' onerror="this.parentNode.innerHTML=\'<div class=pc-img-err>📦</div>\'">' +
+        stockBadge(p.stock) +
+      '</div>' +
+      '<div class="pc-body">' +
+        '<p class="pc-name">' + esc(p.name) + '</p>' +
+        '<div class="pc-meta">' +
+          '<span class="pc-type">' + esc(p.type) + '</span>' +
+          '<div style="display:flex;align-items:baseline;gap:5px">' + priceHtml + '</div>' +
+        '</div>' +
+        stockBar(p.stock) +
       '</div>' +
     '</article>';
   }).join('');
+
+  el._filteredProds = list;
 }
 
-function initTabs(cats) {
-  document.getElementById('tabs').innerHTML = ['all'].concat(cats).map(function(c) {
-    return '<button class="ctab' + (c === activeCat ? ' on' : '') + '" onclick="setC(event,\'' + c + '\')">' +
-      (c === 'all' ? 'All Products' : (CAT_LABEL[c] || c)) + '</button>';
-  }).join('');
-}
-
-function setC(e, c) {
-  activeCat = c;
-  document.querySelectorAll('.ctab').forEach(function(b){ b.classList.remove('on'); });
-  e.target.classList.add('on');
+/* Tab: status */
+function setStat(e, s) {
+  activeStat = s;
+  document.querySelectorAll('.stab').forEach(function(b){ b.classList.remove('on'); });
+  e.currentTarget.classList.add('on');
   fp();
 }
 
-function updateStats() {
+/* Tab: category */
+function setCat(e, c) {
+  activeCat = c;
+  document.querySelectorAll('.cpill').forEach(function(b){ b.classList.remove('on'); });
+  e.currentTarget.classList.add('on');
+  fp();
+}
+
+function initCatPills(cats) {
+  document.getElementById('catPills').innerHTML = ['all'].concat(cats).map(function(c) {
+    return '<button class="cpill' + (c === activeCat ? ' on' : '') + '" onclick="setCat(event,\'' + c + '\')">' +
+      (c === 'all' ? '🏷 ទាំងអស់' : (CAT_LABEL[c] || c)) + '</button>';
+  }).join('');
+}
+
+function updateCounts() {
   var withStock = PRODS.filter(function(p){ return p.stock !== null; });
-  document.getElementById('stTot').textContent = PRODS.length;
-  document.getElementById('stOk').textContent  = withStock.filter(function(p){ return p.stock > 10; }).length;
-  document.getElementById('stLo').textContent  = withStock.filter(function(p){ return p.stock > 0 && p.stock <= 10; }).length;
-  document.getElementById('stNo').textContent  = withStock.filter(function(p){ return p.stock === 0; }).length;
+  document.getElementById('cntAll').textContent   = PRODS.length;
+  document.getElementById('cntAvail').textContent = PRODS.filter(function(p){ return p.stock === null || p.stock > 10; }).length;
+  document.getElementById('cntLow').textContent   = withStock.filter(function(p){ return p.stock > 0 && p.stock <= 10; }).length;
+  document.getElementById('cntOut').textContent   = withStock.filter(function(p){ return p.stock === 0; }).length;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('pgrid').innerHTML =
-    '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">⏳ Loading...</div>';
+    '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)">⏳ Loading...</div>';
 
   if (!window.CamboAPI) return;
 
@@ -160,36 +405,107 @@ document.addEventListener('DOMContentLoaded', function() {
     var products = (res[0] && res[0].ok) ? (res[0].products || []) : [];
     var stocks   = (res[1] && res[1].ok) ? (res[1].stroke   || []) : [];
 
-    // Build stock lookup by ID and by name
     var stockById   = {};
     var stockByName = {};
     stocks.forEach(function(s) {
-      if (s.id)      stockById[normStr(s.id)]      = s;
+      if (s.id)      stockById[normStr(s.id)]        = s;
       if (s.product) stockByName[normStr(s.product)] = s;
     });
 
-    var catOrder = ['face','body','hair','drink','other'];
+    var catOrder  = ['face','body','hair','drink','other'];
     var catsFound = {};
 
     PRODS = products.map(function(p) {
       var ck  = catKey(p.type);
       var st  = stockById[normStr(p.id)] || stockByName[normStr(p.name)] || null;
       var qty = st ? (st.qty !== undefined ? st.qty : null) : null;
-      // Image: use Sheet URL if present, else try local file by product name
       var imgUrl = p.url || ('../images/products/' + ck + '/' + p.name + '.png');
       catsFound[ck] = true;
-      return { id:p.id, name:p.name, cat:ck, type:p.type, price:p.price, stock:qty, img:imgUrl };
+      return { id:p.id, name:p.name, cat:ck, type:p.type, price:p.price, sale:p.sale||0, description:p.description||'', stock:qty, img:imgUrl };
     });
 
     var cats = catOrder.filter(function(c){ return catsFound[c]; });
-    initTabs(cats);
-    updateStats();
+    initCatPills(cats);
+    updateCounts();
     fp();
   }).catch(function() {
     document.getElementById('pgrid').innerHTML =
-      '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">⚠️ Load failed — សូម Refresh ម្ដងទៀត</div>';
+      '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)">⚠️ Load failed — សូម Refresh ម្ដងទៀត</div>';
   });
 });
+
+/* ── Product Detail Modal ── */
+(function() {
+  var overlay = document.getElementById('pdOverlay');
+
+  function openModal(p) {
+    var imgWrap = document.getElementById('pdImgWrap');
+    imgWrap.innerHTML = '<img class="pd-img" src="' + esc(p.img) + '" alt="' + esc(p.name) +
+      '" onerror="this.parentNode.innerHTML=\'<div class=pd-img-err>📦</div>\'">';
+
+    // Status
+    var st = stockStat(p.stock);
+    var statusMap = {
+      ok:  { cls:'badge-ok',  lbl:'មានស្តុក' },
+      low: { cls:'badge-lo',  lbl:'ស្តុកតិច'  },
+      out: { cls:'badge-no',  lbl:'អស់ស្តុក' },
+      unk: { cls:'badge-unk', lbl:'មិនដឹង'   }
+    };
+    var sm = statusMap[st];
+    document.getElementById('pdStatus').innerHTML =
+      '<span class="pc-badge ' + sm.cls + '" style="position:static;font-size:12px;padding:5px 13px">' + sm.lbl + '</span>';
+
+    document.getElementById('pdName').textContent = p.name;
+    document.getElementById('pdType').textContent = p.type;
+
+    // Prices
+    var prEl = document.getElementById('pdPrices');
+    if (p.sale && p.sale > 0 && p.sale < p.price) {
+      prEl.innerHTML =
+        '<span class="pd-price">$' + p.sale.toFixed(2) + '</span>' +
+        '<span class="pd-sale-tag">Sale</span>' +
+        '<span class="pd-orig">$' + p.price.toFixed(2) + '</span>';
+    } else {
+      prEl.innerHTML = '<span class="pd-price">$' + p.price.toFixed(2) + '</span>';
+    }
+
+    // Info grid
+    var ig = document.getElementById('pdInfoGrid');
+    var items = [];
+    if (p.id)    items.push(['ID ផលិតផល', esc(String(p.id))]);
+    items.push(['ប្រភេទ', esc(p.type)]);
+    items.push(['ស្តុក', p.stock === null ? 'មិនដឹង' : (p.stock === 0 ? '<span style="color:#f87171">0</span>' : p.stock + ' pcs')]);
+    ig.innerHTML = items.map(function(r){
+      return '<div class="pd-info-item"><div class="pd-info-label">' + r[0] + '</div><div class="pd-info-val">' + r[1] + '</div></div>';
+    }).join('');
+
+    // Description
+    var descEl = document.getElementById('pdDesc');
+    var desc = (p.description || '').trim();
+    if (desc) { descEl.textContent = desc; descEl.style.display = ''; }
+    else       { descEl.style.display = 'none'; }
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('pdClose').addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
+
+  document.getElementById('pgrid').addEventListener('click', function(e) {
+    var card = e.target.closest('.pc');
+    if (!card) return;
+    var idx  = parseInt(card.getAttribute('data-pidx'), 10);
+    var list = document.getElementById('pgrid')._filteredProds;
+    if (list && list[idx]) openModal(list[idx]);
+  });
+})();
 </script>
 <script src="../assets/js/sw-register.js?v=158"></script>
 </body>
