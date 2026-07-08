@@ -73,61 +73,120 @@
 <script src="../assets/js/layout.js?v=158"></script>
 <script src="../assets/js/dashboard-layout.js?v=158"></script>
 <script>
-const CATS={face:'😊 Face',body:'🧴 Body',hair:'💆 Hair',drink:'☕ Drink'};
-const PRODS=[
-  {id:1,name:'សាប៊ូដុសមុខ JELY Gluta',cat:'face',price:8.50,stock:45,img:'../images/products/face/សាប៊ូដុសមុខ JELY Gluta.png'},
-  {id:2,name:'BB Cream CCR',cat:'face',price:12.00,stock:28,img:'../images/products/face/BB Cream.png'},
-  {id:3,name:'CC SERUM JELY',cat:'face',price:15.00,stock:8,img:'../images/products/face/CC SERUM JELY.png'},
-  {id:4,name:'SUNSCREEN CCR',cat:'face',price:10.00,stock:34,img:'../images/products/face/SUNSCREEN CCR.png'},
-  {id:5,name:'ម៉ាស់បិទមុខ 6D CCR',cat:'face',price:6.00,stock:0,img:'../images/products/face/ម៉ាស់បិទមុខ 6D CCR.png'},
-  {id:6,name:'ឈុតមុខស្អាត JELY',cat:'face',price:22.00,stock:12,img:'../images/products/face/ឈុតមុខស្អាត JELY.png'},
-  {id:7,name:'ថ្នាំដុសធ្មេញ CCR',cat:'face',price:4.50,stock:60,img:'../images/products/face/ថ្នាំដុសធ្មេញ CCR.png'},
-  {id:8,name:'ឡេលាបខ្លួន JELY BODY LOTION',cat:'body',price:9.50,stock:32,img:'../images/products/body/ឡេលាបខ្លួន JELY BODY LOTION.png'},
-  {id:9,name:'សាប៊ូដុសខ្លួនកុលាប',cat:'body',price:5.00,stock:50,img:'../images/products/body/សាប៊ូដុសខ្លួនកុលាប.png'},
-  {id:10,name:'ឡេលាបខ្លួន Gluta SUDO',cat:'body',price:11.00,stock:5,img:'../images/products/body/ឡេលាបខ្លួន Gluta SUDO.png'},
-  {id:11,name:'សាប៊ូដុសខ្លួនមាស',cat:'body',price:7.00,stock:25,img:'../images/products/body/សាប៊ូដុសខ្លួនមាសក្លិនទឹកអប់អូតែលផ្កាយ 5.png'},
-  {id:12,name:'សាប៊ូកក់សក់ JELY',cat:'hair',price:7.00,stock:22,img:'../images/products/hair/សាប៊ូកក់សក់ និងស្បាសក់ JELY.png'},
-  {id:13,name:'សក់និងម៉ាស Premium CCR',cat:'hair',price:14.00,stock:15,img:'../images/products/hair/សក់និងម៉ាស Premium CCR.png'},
-  {id:14,name:'ប្រេងលាបសក់ CCR',cat:'hair',price:9.00,stock:3,img:'../images/products/hair/ប្រេងលាបសក់ CCR.png'},
-  {id:15,name:'កាហ្វេសម្រក CCR',cat:'drink',price:18.00,stock:40,img:'../images/products/drink/កាហ្វេសម្រក CCR.png'},
-  {id:16,name:'ហ្វៃប័រផាសសិន CCR',cat:'drink',price:16.00,stock:22,img:'../images/products/drink/ហ្វៃប័រផាសសិន CCR.png'},
-  {id:17,name:'ឈុតស្បែកហ្មត់ JELY',cat:'body',price:22.50,stock:0,img:'../images/products/body/ឈុតស្បែកហ្មត់ JELY.png'},
-];
-let activeCat='all';
-function sc(s){return s===0?'sk-no':s<10?'sk-lo':'sk-ok';}
-function sl(s){return s===0?'Out of Stock':s<10?'Low: '+s:'In: '+s;}
-function fp(){
-  const q=document.getElementById('srch').value.toLowerCase();
-  const srt=document.getElementById('srt').value;
-  let list=PRODS.filter(p=>(!q||p.name.toLowerCase().includes(q))&&(activeCat==='all'||p.cat===activeCat));
-  if(srt==='price')list.sort((a,b)=>a.price-b.price);
-  else if(srt==='stock')list.sort((a,b)=>b.stock-a.stock);
-  else list.sort((a,b)=>a.name.localeCompare(b.name,'km'));
-  const el=document.getElementById('pgrid');
-  if(!list.length){el.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">មិនមានផលិតផល</div>';return;}
-  el.innerHTML=list.map(p=>`
-    <article class="glass-card pc">
-      <div class="pimg"><img src="${p.img}" onerror="this.parentNode.innerHTML='<span style=font-size:48px>📦</span>'" alt="${p.name}"></div>
-      <p class="pname">${p.name}</p>
-      <p class="pcat">${p.cat}</p>
-      <div class="pfoot">
-        <span class="pprice">$${p.price.toFixed(2)}</span>
-        <span class="stk ${sc(p.stock)}">${sl(p.stock)}</span>
-      </div>
-    </article>`).join('');
+var PRODS = [];
+var activeCat = 'all';
+
+// Map Sheet type string → category key
+function catKey(type) {
+  var t = (type || '').toLowerCase();
+  if (t.includes('face'))  return 'face';
+  if (t.includes('body'))  return 'body';
+  if (t.includes('hair'))  return 'hair';
+  if (t.includes('drink')) return 'drink';
+  return 'other';
 }
-function initTabs(){
-  const cats=['all',...Object.keys(CATS)];
-  document.getElementById('tabs').innerHTML=cats.map(c=>`
-    <button class="ctab${c===activeCat?' on':''}" onclick="setC(event,'${c}')">${c==='all'?'All Products':CATS[c]}</button>`).join('');
+var CAT_LABEL = { face:'😊 Face', body:'🧴 Body', hair:'💆 Hair', drink:'☕ Drink', other:'📦 Other' };
+
+function normStr(s) { return String(s||'').toLowerCase().replace(/\s+/g,''); }
+function sc(s) { return s===null?'':s===0?'sk-no':s<10?'sk-lo':'sk-ok'; }
+function sl(s) { return s===null?'':s===0?'Out of Stock':s<10?'Low: '+s:'In: '+s; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function fp() {
+  var q   = document.getElementById('srch').value.toLowerCase();
+  var srt = document.getElementById('srt').value;
+  var list = PRODS.filter(function(p) {
+    return (!q || p.name.toLowerCase().includes(q)) &&
+           (activeCat === 'all' || p.cat === activeCat);
+  });
+  if (srt === 'price')      list.sort(function(a,b){ return a.price - b.price; });
+  else if (srt === 'stock') list.sort(function(a,b){ return (b.stock===null?-1:b.stock) - (a.stock===null?-1:a.stock); });
+  else                      list.sort(function(a,b){ return a.name.localeCompare(b.name, 'km'); });
+
+  var el = document.getElementById('pgrid');
+  if (!list.length) {
+    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">មិនមានផលិតផល</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(p) {
+    var sClass = sc(p.stock);
+    var sLabel = sl(p.stock);
+    return '<article class="glass-card pc">' +
+      '<div class="pimg"><img src="' + esc(p.img) + '" loading="lazy" onerror="this.parentNode.innerHTML=\'<span style=font-size:48px>\u{1F4E6}</span>\'" alt="' + esc(p.name) + '"></div>' +
+      '<p class="pname">' + esc(p.name) + '</p>' +
+      '<p class="pcat">' + esc(p.type) + '</p>' +
+      '<div class="pfoot">' +
+        '<span class="pprice">$' + p.price.toFixed(2) + '</span>' +
+        (sLabel ? '<span class="stk ' + sClass + '">' + sLabel + '</span>' : '') +
+      '</div>' +
+    '</article>';
+  }).join('');
 }
-function setC(e,c){activeCat=c;document.querySelectorAll('.ctab').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');fp();}
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('stTot').textContent=PRODS.length;
-  document.getElementById('stOk').textContent=PRODS.filter(p=>p.stock>10).length;
-  document.getElementById('stLo').textContent=PRODS.filter(p=>p.stock>0&&p.stock<=10).length;
-  document.getElementById('stNo').textContent=PRODS.filter(p=>p.stock===0).length;
-  initTabs();fp();
+
+function initTabs(cats) {
+  document.getElementById('tabs').innerHTML = ['all'].concat(cats).map(function(c) {
+    return '<button class="ctab' + (c === activeCat ? ' on' : '') + '" onclick="setC(event,\'' + c + '\')">' +
+      (c === 'all' ? 'All Products' : (CAT_LABEL[c] || c)) + '</button>';
+  }).join('');
+}
+
+function setC(e, c) {
+  activeCat = c;
+  document.querySelectorAll('.ctab').forEach(function(b){ b.classList.remove('on'); });
+  e.target.classList.add('on');
+  fp();
+}
+
+function updateStats() {
+  var withStock = PRODS.filter(function(p){ return p.stock !== null; });
+  document.getElementById('stTot').textContent = PRODS.length;
+  document.getElementById('stOk').textContent  = withStock.filter(function(p){ return p.stock > 10; }).length;
+  document.getElementById('stLo').textContent  = withStock.filter(function(p){ return p.stock > 0 && p.stock <= 10; }).length;
+  document.getElementById('stNo').textContent  = withStock.filter(function(p){ return p.stock === 0; }).length;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('pgrid').innerHTML =
+    '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">⏳ Loading...</div>';
+
+  if (!window.CamboAPI) return;
+
+  Promise.all([
+    window.CamboAPI.get({ action: 'products' }),
+    window.CamboAPI.get({ action: 'stroke'   })
+  ]).then(function(res) {
+    var products = (res[0] && res[0].ok) ? (res[0].products || []) : [];
+    var stocks   = (res[1] && res[1].ok) ? (res[1].stroke   || []) : [];
+
+    // Build stock lookup by ID and by name
+    var stockById   = {};
+    var stockByName = {};
+    stocks.forEach(function(s) {
+      if (s.id)      stockById[normStr(s.id)]      = s;
+      if (s.product) stockByName[normStr(s.product)] = s;
+    });
+
+    var catOrder = ['face','body','hair','drink','other'];
+    var catsFound = {};
+
+    PRODS = products.map(function(p) {
+      var ck  = catKey(p.type);
+      var st  = stockById[normStr(p.id)] || stockByName[normStr(p.name)] || null;
+      var qty = st ? (st.qty !== undefined ? st.qty : null) : null;
+      // Image: use Sheet URL if present, else try local file by product name
+      var imgUrl = p.url || ('../images/products/' + ck + '/' + p.name + '.png');
+      catsFound[ck] = true;
+      return { id:p.id, name:p.name, cat:ck, type:p.type, price:p.price, stock:qty, img:imgUrl };
+    });
+
+    var cats = catOrder.filter(function(c){ return catsFound[c]; });
+    initTabs(cats);
+    updateStats();
+    fp();
+  }).catch(function() {
+    document.getElementById('pgrid').innerHTML =
+      '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">⚠️ Load failed — សូម Refresh ម្ដងទៀត</div>';
+  });
 });
 </script>
 <script src="../assets/js/sw-register.js?v=158"></script>

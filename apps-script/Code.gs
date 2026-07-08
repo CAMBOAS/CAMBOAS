@@ -620,17 +620,24 @@ function listProducts_() {
   if (!sheet) return [];
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return [];
-  const data = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
+  // Read up to col 10: A=ID B=Name C=Type D=Price E=Sale F=Box/Desc G=Pack H=QTY I=Description J=URL
+  const numCols = Math.min(sheet.getLastColumn(), 10);
+  const data = sheet.getRange(2, 1, lastRow - 1, numCols).getValues();
   return data
     .filter(function(r) { return safe_(r[0]) && safe_(r[1]); })
     .map(function(r) {
+      // col F (r[5]): existing manual rows = Description text; addProduct_ rows = Box number
+      // col I (r[8]): addProduct_ rows = Description; col J (r[9]) = URL
+      const colF = r[5];
+      const isNumF = typeof colF === 'number' || (!isNaN(Number(colF)) && safe_(colF) !== '');
       return {
         id:          safe_(r[0]),
         name:        safe_(r[1]),
         type:        safe_(r[2]),
         price:       toNumber_(r[3]),
         sale:        toNumber_(r[4]),
-        description: safe_(r[5])
+        description: isNumF ? safe_(r[8] || '') : safe_(r[5] || ''), // smart pick based on schema
+        url:         safe_(r[9] || '')  // col J = image URL (if added via addProduct_)
       };
     });
 }
