@@ -89,18 +89,25 @@
       display:flex; flex-direction:column;
     }
     [data-theme="dark"] .pc {
-      background:rgba(20,30,55,.9);
-      border-color:rgba(148,163,200,.12);
-      box-shadow:0 4px 20px rgba(0,0,0,.35);
+      background:rgba(255,255,255,.06);
+      border-color:rgba(255,255,255,.10);
+      box-shadow:0 4px 24px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
     }
     .pc:hover { transform:translateY(-4px); box-shadow:0 12px 36px rgba(0,0,0,.14) }
-    [data-theme="dark"] .pc:hover { box-shadow:0 12px 36px rgba(0,0,0,.4) }
+    [data-theme="dark"] .pc:hover {
+      background:rgba(255,255,255,.09);
+      border-color:rgba(255,255,255,.16);
+      box-shadow:0 16px 48px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
+    }
 
     /* Image area */
     .pc-img-wrap {
       position:relative; width:100%; padding-top:78%;
       background:rgba(255,255,255,.05); overflow:hidden;
     }
+    [data-theme="dark"] .pc-img-wrap { background:rgba(255,255,255,.04) }
     [data-theme="light"] .pc-img-wrap { background:#f8fafc }
     .pc-img-wrap img {
       position:absolute; inset:0; width:100%; height:100%;
