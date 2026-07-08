@@ -64,78 +64,106 @@
     [data-theme="light"] .cpill.on { background:rgba(139,92,246,.08); border-color:rgba(139,92,246,.3); color:#7c3aed }
 
     /* ── Product grid ── */
-    .pg { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:16px }
+    .pg { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px }
 
     /* ── Product card ── */
     .pc {
       border-radius:20px; overflow:hidden; cursor:pointer;
-      transition:transform .2s, box-shadow .2s;
+      transition:transform .18s, box-shadow .18s;
       position:relative;
+      background:#ffffff;
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 2px 12px rgba(0,0,0,.08);
+      display:flex; flex-direction:column;
     }
-    .pc:hover { transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.25) }
-    [data-theme="light"] .pc:hover { box-shadow:0 12px 40px rgba(0,0,0,.12) }
+    [data-theme="dark"] .pc {
+      background:rgba(20,30,55,.9);
+      border-color:rgba(148,163,200,.12);
+      box-shadow:0 4px 20px rgba(0,0,0,.35);
+    }
+    .pc:hover { transform:translateY(-4px); box-shadow:0 12px 36px rgba(0,0,0,.14) }
+    [data-theme="dark"] .pc:hover { box-shadow:0 12px 36px rgba(0,0,0,.4) }
 
     /* Image area */
     .pc-img-wrap {
-      position:relative; width:100%; padding-top:85%;
+      position:relative; width:100%; padding-top:78%;
       background:rgba(255,255,255,.05); overflow:hidden;
     }
-    [data-theme="light"] .pc-img-wrap { background:#f1f5f9 }
+    [data-theme="light"] .pc-img-wrap { background:#f8fafc }
     .pc-img-wrap img {
       position:absolute; inset:0; width:100%; height:100%;
-      object-fit:cover; display:block; transition:transform .3s;
+      object-fit:contain; display:block; transition:transform .3s;
+      padding:8px;
     }
-    .pc:hover .pc-img-wrap img { transform:scale(1.05) }
+    .pc:hover .pc-img-wrap img { transform:scale(1.04) }
     .pc-img-err {
       position:absolute; inset:0; display:flex;
-      align-items:center; justify-content:center; font-size:52px;
+      align-items:center; justify-content:center; font-size:44px;
     }
 
-    /* Status badge top-left */
+    /* Status badge — bottom-right of image, LARGE like mockup */
     .pc-badge {
-      position:absolute; top:10px; left:10px;
-      font-size:11px; font-weight:800; padding:4px 10px;
-      border-radius:999px; letter-spacing:.03em;
-      backdrop-filter:blur(8px);
+      position:absolute; bottom:10px; right:10px;
+      font-size:13px; font-weight:900; padding:8px 18px;
+      border-radius:999px; letter-spacing:.01em;
+      box-shadow:0 4px 16px rgba(0,0,0,.25);
     }
-    .badge-ok  { background:rgba(34,197,94,.85);  color:#fff }
-    .badge-lo  { background:rgba(251,191,36,.85);  color:#1a1a1a }
-    .badge-no  { background:rgba(239,68,68,.85);   color:#fff }
-    .badge-unk { background:rgba(120,120,140,.7);  color:#fff }
-    [data-theme="light"] .badge-ok { background:rgba(22,163,74,.9) }
-    [data-theme="light"] .badge-lo { background:rgba(217,119,6,.9); color:#fff }
-    [data-theme="light"] .badge-no { background:rgba(220,38,38,.9) }
+    .badge-ok  { background:#22c55e; color:#fff }
+    .badge-lo  { background:#f59e0b; color:#fff }
+    .badge-no  { background:#ef4444; color:#fff }
+    .badge-unk { background:rgba(100,116,139,.9); color:#fff }
+
+    /* Stock bar — between image and body */
+    .pc-stk {
+      display:flex; align-items:center; gap:8px;
+      padding:10px 14px 2px;
+    }
+    .pc-stk-bar {
+      flex:1; height:6px; border-radius:999px;
+      background:rgba(0,0,0,.08); overflow:hidden;
+    }
+    [data-theme="dark"] .pc-stk-bar { background:rgba(255,255,255,.12) }
+    .pc-stk-fill { height:100%; border-radius:999px; transition:width .4s }
+    .pc-stk-num {
+      font-size:17px; font-weight:800; color:var(--muted);
+      min-width:22px; text-align:right; flex-shrink:0;
+    }
 
     /* Card body */
-    .pc-body { padding:13px 14px 14px }
+    .pc-img-wrap { flex-shrink:0 }
+    .pc-stk { flex-shrink:0 }
+    .pc-body {
+      padding:6px 14px 14px;
+      display:flex; flex-direction:column; flex:1;
+    }
     .pc-name {
-      font-size:13px; font-weight:700; color:var(--text);
-      margin:0 0 8px; line-height:1.4;
+      font-size:14px; font-weight:800; color:var(--text);
+      margin:4px 0 10px; line-height:1.4;
       display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
-      overflow:hidden;
+      overflow:hidden; flex:1;
     }
     .pc-meta {
-      display:flex; align-items:center; justify-content:space-between;
-      gap:8px; flex-wrap:wrap;
+      display:flex; align-items:center; justify-content:space-between; gap:6px;
+      margin-top:auto; flex-shrink:0;
     }
+    /* Category chip — green text on light bg */
     .pc-type {
-      font-size:11px; color:var(--muted); font-weight:600;
-      text-transform:uppercase; letter-spacing:.04em;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:60%;
+      font-size:12px; font-weight:800; color:#22c55e;
+      background:#f0fdf4; border-radius:999px;
+      padding:6px 13px; white-space:nowrap;
+      overflow:hidden; text-overflow:ellipsis; max-width:50%;
+      border:1.5px solid #bbf7d0;
     }
-    .pc-price { font-size:14px; font-weight:800; color:#7dd3fc; white-space:nowrap }
-    .pc-sale  { font-size:11px; color:#a78bfa; font-weight:700 }
-    [data-theme="light"] .pc-price { color:#0284c7 }
-    [data-theme="light"] .pc-sale  { color:#7c3aed }
-
-    /* Stock mini bar */
-    .pc-stk {
-      display:flex; align-items:center; gap:5px;
-      margin-top:7px; font-size:11px; color:var(--muted); font-weight:600;
+    [data-theme="dark"] .pc-type {
+      background:rgba(34,197,94,.1); color:#4ade80;
+      border-color:rgba(34,197,94,.2);
     }
-    .pc-stk-bar { flex:1; height:3px; border-radius:999px; background:rgba(255,255,255,.1); overflow:hidden }
-    [data-theme="light"] .pc-stk-bar { background:rgba(0,0,0,.08) }
-    .pc-stk-fill { height:100%; border-radius:999px; transition:width .4s }
+    /* Price pill — green */
+    .pc-price {
+      font-size:14px; font-weight:900; color:#fff; white-space:nowrap;
+      background:#22c55e; border-radius:999px; padding:6px 16px;
+      box-shadow:0 3px 12px rgba(34,197,94,.4);
+    }
 
     /* ── Product Detail Modal ── */
     #pdOverlay {
@@ -177,6 +205,16 @@
     .pd-info-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:4px }
     .pd-info-val   { font-size:13px; font-weight:700; color:var(--text) }
     .pd-desc { font-size:13px; color:var(--muted); line-height:1.7; white-space:pre-wrap }
+    .pd-close-btn {
+      display:none; width:100%; margin-top:18px;
+      padding:14px; border-radius:14px; border:none;
+      background:rgba(239,68,68,.12); color:#f87171;
+      font-size:15px; font-weight:800; font-family:inherit;
+      cursor:pointer; letter-spacing:.03em;
+    }
+    .pd-close-btn:active { background:rgba(239,68,68,.22) }
+    [data-theme="light"] .pd-close-btn { background:rgba(239,68,68,.08); color:#dc2626 }
+    @media(max-width:600px){ .pd-close-btn { display:block } }
     @media(max-width:600px){
       #pdOverlay { align-items:flex-end; padding:0 }
       #pdBox { border-radius:24px 24px 0 0; max-height:88vh; animation:pdBs .25s ease }
@@ -263,6 +301,7 @@
       <div class="pd-prices" id="pdPrices"></div>
       <div class="pd-info-grid" id="pdInfoGrid"></div>
       <p class="pd-desc" id="pdDesc" style="display:none"></p>
+      <button class="pd-close-btn" id="pdCloseBtn">✕ បិទ</button>
     </div>
   </div>
 </div>
@@ -308,7 +347,7 @@ function stockBar(s) {
   var color = s === 0 ? '#f87171' : s <= 10 ? '#fbbf24' : '#4ade80';
   return '<div class="pc-stk">' +
     '<div class="pc-stk-bar"><div class="pc-stk-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
-    '<span>' + (s === 0 ? 'អស់' : s + ' pcs') + '</span>' +
+    '<span class="pc-stk-num">' + (s === 0 ? 'អស់' : s) + '</span>' +
   '</div>';
 }
 
@@ -340,19 +379,19 @@ function fp() {
   el.innerHTML = list.map(function(p, i) {
     var priceHtml = '<span class="pc-price">$' + p.price.toFixed(2) + '</span>';
 
-    return '<article class="glass-card pc" data-pidx="' + i + '">' +
+    return '<article class="pc" data-pidx="' + i + '">' +
       '<div class="pc-img-wrap">' +
         '<img src="' + esc(p.img) + '" loading="lazy" alt="' + esc(p.name) + '"' +
           ' onerror="this.parentNode.innerHTML=\'<div class=pc-img-err>📦</div>\'">' +
         stockBadge(p.stock) +
       '</div>' +
+      stockBar(p.stock) +
       '<div class="pc-body">' +
         '<p class="pc-name">' + esc(p.name) + '</p>' +
         '<div class="pc-meta">' +
           '<span class="pc-type">' + esc(p.type) + '</span>' +
-          '<div style="display:flex;align-items:baseline;gap:5px">' + priceHtml + '</div>' +
+          priceHtml +
         '</div>' +
-        stockBar(p.stock) +
       '</div>' +
     '</article>';
   }).join('');
@@ -467,8 +506,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (p.id)    items.push(['ID ផលិតផល', esc(String(p.id))]);
     items.push(['ប្រភេទ', esc(p.type)]);
     items.push(['តម្លៃ', '$' + p.price.toFixed(2)]);
-    if (p.sale && p.sale > 0) items.push(['ចំនួនលក់/ឈុត', p.sale + ' ផ្ដាច់']);
-    items.push(['ស្តុក', p.stock === null ? 'មិនដឹង' : (p.stock === 0 ? '<span style="color:#f87171">អស់ស្តុក</span>' : p.stock + ' pcs')]);
+    if (p.sale && p.sale > 0) items.push(['ចំនួនលក់/ឈុត', p.sale]);
+    items.push(['ស្តុក', p.stock === null ? 'មិនដឹង' : (p.stock === 0 ? '<span style="color:#f87171">អស់ស្តុក</span>' : p.stock)]);
     ig.innerHTML = items.map(function(r){
       return '<div class="pd-info-item"><div class="pd-info-label">' + r[0] + '</div><div class="pd-info-val">' + r[1] + '</div></div>';
     }).join('');
@@ -489,6 +528,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   document.getElementById('pdClose').addEventListener('click', closeModal);
+  document.getElementById('pdCloseBtn').addEventListener('click', closeModal);
   overlay.addEventListener('click', function(e){ if (e.target === overlay) closeModal(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
 
