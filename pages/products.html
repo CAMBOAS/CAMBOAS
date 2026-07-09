@@ -566,7 +566,16 @@
             </div>
             <div class="no-field">
               <label>ថ្ងៃ / ម៉ោង</label>
-              <input id="noDate" type="text" readonly placeholder="DD, MM, YYYY / HH:MM:SS AM/PM" style="cursor:default;">
+              <div style="position:relative;display:flex;align-items:center;">
+                <input id="noDate" type="text" readonly style="flex:1;padding-right:32px;cursor:pointer;" placeholder="DD/MM/YYYY HH:MM AM/PM">
+                <svg style="position:absolute;right:8px;pointer-events:none;color:var(--muted,#aaa);" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <input id="noDatePicker" type="datetime-local"
+                  style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0.005;cursor:pointer;"
+                  onchange="(function(h){if(!h.value)return;var p=h.value.split('T'),d=new Date(h.value);var pad=function(x){return String(x).padStart(2,'0');};var hh=d.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;var dp2=p[0].split('-');var nd=document.getElementById('noDate');if(nd)nd.value=dp2[2]+'/'+dp2[1]+'/'+dp2[0]+' '+pad(h12)+':'+pad(d.getMinutes())+' '+ampm;})(this)">
+              </div>
             </div>
             <div class="no-field">
               <label>PAGES</label>
@@ -1039,6 +1048,9 @@ function toggleOrderMode() {
       var hh = now.getHours(), ampm = hh >= 12 ? 'PM' : 'AM', h12 = hh % 12 || 12;
       el.value = pad(now.getDate())+'/'+pad(now.getMonth()+1)+'/'+now.getFullYear()+
         ' '+pad(h12)+':'+pad(now.getMinutes())+' '+ampm;
+      var picker = document.getElementById('noDatePicker');
+      if (picker) picker.value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+
+        'T'+pad(now.getHours())+':'+pad(now.getMinutes());
     }
     // load SaleInfor data to populate dropdowns
     loadSaleInforData();
