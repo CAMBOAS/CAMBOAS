@@ -1336,34 +1336,59 @@ function calcGrandTotal_(products, deliveryFee) {
   ) + toNumber_(deliveryFee);
 }
 
+/* DateTime output format: "09, 07, 2026 / 10:28:00 AM" */
+const DT_FORMAT = 'dd, MM, yyyy / hh:mm:ss a';
+
 function normalizeDateTime_(value) {
-  if (!value) return Utilities.formatDate(new Date(), TZ, 'dd/MM/yyyy HH:mm');
+  if (!value) return Utilities.formatDate(new Date(), TZ, DT_FORMAT);
   // JS Date object → format in Cambodia TZ
   if (Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value.getTime()))
-    return Utilities.formatDate(value, TZ, 'dd/MM/yyyy HH:mm');
+    return Utilities.formatDate(value, TZ, DT_FORMAT);
   const text = String(value).trim();
-  // Already DD/MM/YYYY → keep as-is
-  if (/^\d{2}\/\d{2}\/\d{4}/.test(text)) return text;
+  // Already new format "dd, MM, yyyy / ..." → keep as-is
+  if (/^\d{2}, \d{2}, \d{4}/.test(text)) return text;
+  // Old format "DD/MM/YYYY HH:mm[ AM/PM]" → re-format to new style
+  if (/^\d{2}\/\d{2}\/\d{4}/.test(text)) {
+    try {
+      // Parse "DD/MM/YYYY HH:mm" or "DD/MM/YYYY HH:mm AM/PM"
+      const parts = text.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
+      if (parts) {
+        let h = parseInt(parts[4], 10);
+        const mi = parts[5], ss = parts[6] || '00', ampm = parts[7];
+        // If 12-hour format was passed in, convert to 24h first for Date parsing
+        if (ampm) {
+          if (ampm.toUpperCase() === 'PM' && h < 12) h += 12;
+          if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+        }
+        const d = new Date(parseInt(parts[3]), parseInt(parts[2])-1, parseInt(parts[1]), h, parseInt(mi), parseInt(ss));
+        if (!isNaN(d.getTime())) return Utilities.formatDate(d, TZ, DT_FORMAT);
+      }
+    } catch(e) {}
+    return text; // fallback: return as-is if parsing fails
+  }
   // ISO UTC string (e.g. "2026-05-31T22:20:00.000Z") → convert to Cambodia local
   if (/^\d{4}-\d{2}-\d{2}T/.test(text)) {
     try {
       const d = new Date(text);
-      if (!isNaN(d.getTime())) return Utilities.formatDate(d, TZ, 'dd/MM/yyyy HH:mm');
+      if (!isNaN(d.getTime())) return Utilities.formatDate(d, TZ, DT_FORMAT);
     } catch(e) {}
   }
   // YYYY-MM-DD only → convert
   if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
     const p = text.split('-');
-    return p[2]+'/'+p[1]+'/'+p[0]+' 00:00';
+    const d = new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
+    if (!isNaN(d.getTime())) return Utilities.formatDate(d, TZ, DT_FORMAT);
   }
   return text;
 }
 
 function formatDateOnly_(value) {
   const text = safe_(value);
-  // DD/MM/YYYY ... → return DD/MM/YYYY
+  // New format "dd, MM, yyyy / ..." → return "dd, MM, yyyy"
+  if (/^\d{2}, \d{2}, \d{4}/.test(text)) return text.substring(0, 12);
+  // Old format "DD/MM/YYYY ..." → return "DD/MM/YYYY"
   if (/^\d{2}\/\d{2}\/\d{4}/.test(text)) return text.substring(0, 10);
-  // YYYY-MM-DD ... → return YYYY-MM-DD (for backwards compat, though new data won't use this)
+  // YYYY-MM-DD ...
   const match = text.match(/^(\d{4}-\d{2}-\d{2})/);
   return match ? match[1] : text;
 }
