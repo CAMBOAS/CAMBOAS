@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="km">
 <head>
   <script>(function(){var r=localStorage.getItem('cambo_login_required');if(r==='false')return;var k='cambo_session';if(sessionStorage.getItem(k)==='1'||localStorage.getItem(k)==='1')return;document.documentElement.style.visibility='hidden';location.replace('../login.html');})();</script>
@@ -49,6 +49,9 @@
     .schange{background:rgba(255,255,255,.06)!important;border:1px solid var(--line)!important;border-radius:8px!important;color:var(--text)!important;padding:4px 8px!important;font-size:11px!important;cursor:pointer;min-height:auto!important}
     .dc-update{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
     .dc-update span{font-size:12px;color:var(--muted)}
+    .btn-refresh{min-height:36px;padding:0 14px;border-radius:10px;font-size:13px;font-weight:700;background:rgba(6,182,212,.12);color:#7dd3fc;border:1px solid rgba(6,182,212,.3);cursor:pointer;font-family:inherit;transition:.15s}
+    .btn-refresh:hover{background:rgba(6,182,212,.2)}
+    .btn-refresh:disabled{opacity:.5;cursor:not-allowed}
     @media(max-width:1000px){.stats-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
     @media(max-width:640px){.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
   </style>
@@ -67,6 +70,7 @@
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <input type="date" id="dDate" onchange="rd()" style="min-height:36px;padding:0 10px;border-radius:10px;font-size:13px">
             <button class="btn btn-secondary" onclick="document.getElementById('dDate').value='';rd()">Clear</button>
+            <button class="btn-refresh" id="btnRefresh" onclick="loadDelivery()">⟳ Refresh</button>
             <button class="btn" id="btnDeliveryReport"
               style="min-height:36px;padding:0 16px;border-radius:10px;font-size:13px;font-weight:700;
                      background:linear-gradient(135deg,#1e3a5f,#1d4ed8);color:#fff;border:none;cursor:pointer;
@@ -97,41 +101,116 @@
 </div>
 <script src="../assets/js/layout.js?v=158"></script>
 <script src="../assets/js/dashboard-layout.js?v=158"></script>
+<script src="../assets/js/cambo-api.js?v=158"></script>
+<script src="../assets/js/orders-data.js?v=158"></script>
 <script src="../assets/js/export-delivery-report.js?v=158"></script>
 <script>
-const STEPS=['Pending','Processing','Shipped','Delivered'];
-const SM={Pending:0,Processing:1,Shipped:2,Delivered:3};
-let active='All';
-let D=[
-  {id:'DEL001',name:'សុខ ដារ៉ា',phone:'012 345 678',addr:'ភ្នំពេញ, ខណ្ឌដូនពេញ',prod:'JELY Gluta x2, BB Cream x1',amt:29,st:'Delivered',date:'2025-04-20'},
-  {id:'DEL002',name:'ចន្ទ លក្ខណា',phone:'078 123 456',addr:'សៀមរាប, ក្រុង',prod:'Body Lotion x3',amt:28.5,st:'Shipped',date:'2025-04-22'},
-  {id:'DEL003',name:'ហេង សុភាព',phone:'096 777 888',addr:'កំពង់ចាម, ស្រុក',prod:'Serum JELY x2',amt:32,st:'Processing',date:'2025-04-23'},
-  {id:'DEL004',name:'ណាត ចន្ទ',phone:'011 999 000',addr:'ភ្នំពេញ, ខណ្ឌចំការមន',prod:'ម៉ាស់ 6D x5',amt:32,st:'Pending',date:'2025-04-25'},
-  {id:'DEL005',name:'ស្រី មាស',phone:'089 654 321',addr:'បាត់ដំបង, ក្រុង',prod:'Fibery x2, Coffee x1',amt:52,st:'Delivered',date:'2025-04-19'},
-  {id:'DEL006',name:'ទន្ត វណ្ណ',phone:'015 333 444',addr:'ភ្នំពេញ, ខណ្ឌបឹងកេងកង',prod:'JELY Gluta x1',amt:10.5,st:'Pending',date:'2025-04-25'},
-  {id:'DEL007',name:'ម៉ករា ចាន់',phone:'012 888 999',addr:'ព្រះសីហនុ, ក្រុង',prod:'CC Serum x1, Sunscreen x1',amt:27,st:'Shipped',date:'2025-04-21'},
-  {id:'DEL008',name:'សុវណ្ណ ពេជ្រ',phone:'077 222 333',addr:'តាកែវ, ស្រុក',prod:'Coffee CCR x2',amt:38,st:'Cancelled',date:'2025-04-18'},
-];
-function sc(si,cur){const ci=SM[cur]??-1;return si<ci?'done':si===ci?'cur':'';}
-function us(){
-  document.getElementById('sTot').textContent=D.length;
-  ['Pending','Processing','Shipped','Delivered'].forEach((s,i)=>{
-    document.getElementById(['sPend','sProc','sShip','sDone'][i]).textContent=D.filter(d=>d.st===s).length;
-  });
+const STEPS = ['Pending','Processing','Shipped','Delivered'];
+const SM    = {Pending:0, Processing:1, Shipped:2, Delivered:3};
+let active  = 'All';
+let D       = [];
+let _loading = false;
+
+/* Map a real order object → delivery card data */
+function mapOrder(o){
+  return {
+    id:          o.id || o.orderId || '',
+    name:        o.customer || '-',
+    phone:       o.phone || '-',
+    addr:        o.province || '-',
+    prod:        (o.products||[]).map(p=>(p.name||'-')+' ×'+(p.qty||1)).join(', ') || '-',
+    amt:         CamboOrdersData.calcOrderTotal(o),
+    st:          o.status || 'Pending',
+    date:        CamboOrdersData.toYMD(o.date) || '',          // YYYY-MM-DD for filter
+    dateDisplay: CamboOrdersData.formatDate(o.date),           // DD/MM/YYYY for display
+    delivery:    CamboOrdersData.normalizeDeliveryName(o.deliveryName||'') || '-',
+    deliveryFee: Number(o.deliveryFee||0),
+    closeBy:     o.closeBy || '-',
+    payment:     o.payment || '-',
+  };
 }
+
+/* Fetch real orders from Apps Script */
+async function loadDelivery(){
+  if(_loading) return;
+  _loading = true;
+  const btn = document.getElementById('btnRefresh');
+  if(btn) btn.disabled = true;
+  document.getElementById('dgrid').innerHTML =
+    '<div style="text-align:center;padding:40px;color:var(--muted)">⏳ កំពុងទាញទិន្នន័យ...</div>';
+  try{
+    const orders = await CamboOrdersData.fetchOrders(2000);
+    D = orders.map(mapOrder);
+    // Sort newest first (YYYY-MM-DD string compare is safe)
+    D.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  }catch(e){
+    document.getElementById('dgrid').innerHTML =
+      '<div style="text-align:center;padding:40px;color:#f87171">⚠️ ទាញទិន្នន័យបានបរាជ័យ — សូម Refresh ម្ដងទៀត</div>';
+    _loading = false;
+    if(btn) btn.disabled = false;
+    return;
+  }
+  _loading = false;
+  if(btn) btn.disabled = false;
+  rd();
+}
+
+function sc(si,cur){ const ci=SM[cur]??-1; return si<ci?'done':si===ci?'cur':''; }
+
+/* Return current filtered list */
+function filteredD(){
+  const q  = (document.getElementById('dsrch').value||'').toLowerCase();
+  const df = document.getElementById('dDate').value;
+  return D.filter(d=>(
+    (!q  || d.name.toLowerCase().includes(q) ||
+             d.id.toLowerCase().includes(q)  ||
+             d.phone.includes(q)             ||
+             d.addr.toLowerCase().includes(q)) &&
+    (active==='All' || d.st===active) &&
+    (!df || d.date===df)
+  ));
+}
+
+/* Update stats KPI cards */
+function us(){
+  const list = filteredD();
+  document.getElementById('sTot').textContent  = list.length;
+  document.getElementById('sPend').textContent = list.filter(d=>d.st==='Pending').length;
+  document.getElementById('sProc').textContent = list.filter(d=>d.st==='Processing').length;
+  document.getElementById('sShip').textContent = list.filter(d=>d.st==='Shipped').length;
+  document.getElementById('sDone').textContent = list.filter(d=>d.st==='Delivered').length;
+}
+
+/* Render delivery cards */
 function rd(){
-  const q=(document.getElementById('dsrch').value||'').toLowerCase();
-  const df=document.getElementById('dDate').value;
-  const list=D.filter(d=>(!q||d.name.toLowerCase().includes(q)||d.id.toLowerCase().includes(q))&&(active==='All'||d.st===active)&&(!df||d.date===df));
-  const el=document.getElementById('dgrid');
-  if(!list.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">មិនមានការដឹកជញ្ជូន</div>';return;}
-  el.innerHTML=list.map(d=>`
+  const list = filteredD();
+  us();
+  const el = document.getElementById('dgrid');
+  if(!list.length){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">មិនមានការដឹកជញ្ជូន</div>';
+    return;
+  }
+  el.innerHTML = list.map(d=>`
     <div class="dc">
       <div class="dc-top">
-        <div><div class="dc-id">${d.id}</div><div class="dc-name">${d.name}</div><div class="dc-addr">📍 ${d.addr} &nbsp;·&nbsp; 📞 ${d.phone}</div></div>
-        <div class="dc-right"><span class="pill p-${d.st.toLowerCase()}">${d.st}</span><div class="dc-amt">$${d.amt.toFixed(2)}</div></div>
+        <div>
+          <div class="dc-id">${d.id}</div>
+          <div class="dc-name">${d.name}</div>
+          <div class="dc-addr">📍 ${d.addr} &nbsp;·&nbsp; 📞 ${d.phone}</div>
+        </div>
+        <div class="dc-right">
+          <span class="pill p-${d.st.toLowerCase()}">${d.st}</span>
+          <div class="dc-amt">$${d.amt.toFixed(2)}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px">📅 ${d.dateDisplay||d.date||'-'}</div>
+        </div>
       </div>
-      <div class="dc-meta"><span>🛍️ ${d.prod}</span><span>📅 ${d.date}</span></div>
+      <div class="dc-meta">
+        <span>🛍️ ${d.prod}</span>
+        ${d.delivery&&d.delivery!=='-'?`<span>🚚 ${d.delivery}</span>`:''}
+        ${d.deliveryFee>0?`<span>ថ្លៃដឹក: $${d.deliveryFee.toFixed(2)}</span>`:''}
+        ${d.closeBy&&d.closeBy!=='-'?`<span>👤 ${d.closeBy}</span>`:''}
+        ${d.payment&&d.payment!=='-'?`<span>💳 ${d.payment}</span>`:''}
+      </div>
       ${d.st!=='Cancelled'?`<div class="track">${STEPS.map((s,i)=>`<div class="ts"><div class="td ${sc(i,d.st)}">${sc(i,d.st)==='done'?'✓':i+1}</div><div class="tl ${sc(i,d.st)?'active':''}">${s}</div></div>`).join('')}</div>`:''}
       <div class="dc-update"><span>Update:</span>
         <select class="schange" onchange="upd('${d.id}',this.value)">
@@ -139,26 +218,42 @@ function rd(){
         </select>
       </div>
     </div>`).join('');
-  us();
 }
-function upd(id,st){const d=D.find(x=>x.id===id);if(d){d.st=st;rd();}}
+
+/* Update status locally */
+function upd(id,st){
+  const d = D.find(x=>x.id===id);
+  if(!d) return;
+  d.st = st;
+  if(window.CamboAPI){
+    CamboAPI.post({action:'updateStatus', orderId:id, status:st}).catch(()=>{});
+  }
+  rd();
+}
+
 function initTabs(){
   const all=['All','Pending','Processing','Shipped','Delivered','Cancelled'];
-  document.getElementById('tabs').innerHTML=all.map(s=>`<button class="stab${s===active?' on':''}" onclick="setT('${s}')">${s}</button>`).join('');
+  document.getElementById('tabs').innerHTML = all.map(s=>
+    `<button class="stab${s===active?' on':''}" onclick="setT('${s}')">${s}</button>`
+  ).join('');
 }
-function setT(s){active=s;initTabs();rd();}
-document.addEventListener('DOMContentLoaded',()=>{initTabs();rd();});
+function setT(s){ active=s; initTabs(); rd(); }
+
+document.addEventListener('DOMContentLoaded',()=>{
+  // Default to today's date so user sees only today's deliveries
+  const todayYMD = (function(){
+    const n=new Date();
+    return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');
+  })();
+  document.getElementById('dDate').value = todayYMD;
+  initTabs();
+  loadDelivery();
+});
 
 /* ── Report Delivery Export ── */
 function exportDeliveryReport(){
-  const q=(document.getElementById('dsrch').value||'').toLowerCase();
-  const df=document.getElementById('dDate').value;
-  const src=D.filter(d=>
-    (!q||d.name.toLowerCase().includes(q)||d.id.toLowerCase().includes(q))&&
-    (active==='All'||d.st===active)&&
-    (!df||d.date===df)
-  );
-  if(!src.length){_dvToast('មិនមានទិន្នន័យ','#fbbf24');return;}
+  const src = filteredD();
+  if(!src.length){ _dvToast('មិនមានទិន្នន័យ','#fbbf24'); return; }
   const delivTitle = active!=='All' ? active : 'ភ្នំពេញ';
   if(typeof window.CamboDeliveryReport==='undefined'){
     _dvToast('CamboDeliveryReport not loaded','#f87171'); return;

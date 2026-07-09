@@ -87,12 +87,18 @@ function mergeOrders(primary, cambo){
 async function loadOrders(){
   var camboLocal = localCamboOrders(); // always read new-order.html orders first
   try{
-    var r = await fetch(SCRIPT_URL+'?action=list&limit=500&_='+Date.now());
-    var d = await r.json();
-    var arr = Array.isArray(d?.orders)      ? d.orders
-            : Array.isArray(d?.data?.orders)? d.data.orders
-            : Array.isArray(d?.rows)        ? d.rows
-            : Array.isArray(d?.data)        ? d.data
+    var d;
+    if(window.CamboAPI){
+      // Use CamboAPI proxy (works on Vercel + avoids CORS)
+      d = await window.CamboAPI.get({action:'list', limit:'500'});
+    } else {
+      var r = await fetch(SCRIPT_URL+'?action=list&limit=500&_='+Date.now());
+      d = await r.json();
+    }
+    var arr = Array.isArray(d?.orders)       ? d.orders
+            : Array.isArray(d?.data?.orders) ? d.data.orders
+            : Array.isArray(d?.rows)         ? d.rows
+            : Array.isArray(d?.data)         ? d.data
             : null;
     if(arr) return mergeOrders(normalizeOrders(arr), camboLocal);
     return mergeOrders(localV3Orders(), camboLocal);
@@ -148,13 +154,13 @@ function toYMD(v){
   }
   // YYYY-MM-DD date only → use as-is (no timezone shift)
   if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // "DD, MM, YYYY / ..." — newest Apps Script format
+  var cm=s.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})/);
+  if(cm) return cm[3]+'-'+pad2(Number(cm[2]))+'-'+pad2(Number(cm[1]));
   // DD/MM/YYYY (with optional time "18/05/2026 10:30") → YYYY-MM-DD
   if(/^\d{2}\/\d{2}\/\d{4}/.test(s)){
     var p=s.split('/'); return p[2].slice(0,4)+'-'+pad2(Number(p[1]))+'-'+pad2(Number(p[0]));
   }
-  // Fallback: parse any other format to local date
-  var d=new Date(s);
-  if(!isNaN(d)) return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
   return '';
 }
 function filtered(){
@@ -200,8 +206,7 @@ function render(){
     const prods=o.products||[];
     const sel=_selected.has(o.id);
     const firstProd = prods[0] || {};
-    const dp=(o.date||'').slice(0,10).split('-');
-    const dateFull=dp.length===3?dp[2]+'/'+dp[1]+'/'+dp[0]:'';
+    const dateFull=formatDate(o.date);
     const total=orderTotal(o);
     const clr=packed?'#10b981':'#ef4444';
     const bg=packed?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)';
