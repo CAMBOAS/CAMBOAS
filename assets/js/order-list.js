@@ -472,11 +472,19 @@ function parseD(s){
   if(!s) return null;
   s = String(s).trim();
   if(!s) return null;
-  // DD/MM/YYYY (optional time after)
-  var m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  // NEW FORMAT: "DD, MM, YYYY / HH:MM:SS AM/PM" (backend format)
+  var m = s.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})(?:[^\d]+(\d{2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?/i);
   if(m){
-    var hh = m[4]||'00', mi = m[5]||'00', ss = m[6]||'00';
-    return new Date(m[3]+'-'+m[2]+'-'+m[1]+'T'+hh+':'+mi+':'+ss);
+    var hh = parseInt(m[4]||'0',10), mi = m[5]||'00', ss = m[6]||'00';
+    if(m[7] && m[7].toUpperCase()==='PM' && hh<12) hh+=12;
+    if(m[7] && m[7].toUpperCase()==='AM' && hh===12) hh=0;
+    return new Date(m[3]+'-'+m[2]+'-'+m[1]+'T'+String(hh).padStart(2,'0')+':'+mi+':'+ss);
+  }
+  // OLD FORMAT: "DD/MM/YYYY" or "DD/MM/YYYY HH:MM"
+  var m2 = s.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  if(m2){
+    var hh2 = m2[4]||'00', mi2 = m2[5]||'00', ss2 = m2[6]||'00';
+    return new Date(m2[3]+'-'+m2[2]+'-'+m2[1]+'T'+hh2+':'+mi2+':'+ss2);
   }
   // YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS or with Z
   if(/^\d{4}-\d{2}-\d{2}/.test(s)){
