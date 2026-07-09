@@ -121,6 +121,11 @@
         </ul>
       </nav>
       <div class="sb-footer">
+        <button class="sb-lang-btn" id="langToggleBtn">
+          <span class="sb-theme-icon">${getLang()==='kh' ? '🇰🇭' : '🌐'}</span>
+          <span>${getLang()==='kh' ? t('ភាសាខ្មែរ','ភាសាខ្មែរ') : t('English','English')}</span>
+          <span class="sb-lang-badge">${getLang()==='kh' ? 'KH' : 'EN'}</span>
+        </button>
         <button class="sb-theme-btn" id="sbThemeBtn">
           <span class="sb-theme-icon">${isDark ? ic.moon : ic.sun}</span>
           <span>${isDark ? t('របៀបងងឹត','Dark Mode') : t('របៀបភ្លឺ','Light Mode')}</span>
@@ -159,9 +164,6 @@
           </div>
         </div>
         <div class="header-actions">
-          <button class="lang-toggle-btn" id="langToggleBtn" title="Switch Language">
-            ${getLang() === 'en' ? 'EN' : 'KH'}
-          </button>
         </div>
       </div>`;
   }
@@ -320,13 +322,14 @@
         const cur = document.documentElement.getAttribute('data-theme');
         const next = cur === 'light' ? 'dark' : 'light';
         applyTheme(next);
-        // Re-render sidebar for toggle visual
-        if (sidebar) {
-          sidebar.innerHTML = buildSidebar();
-          bindThemeBtn();
-          applyCollapse(localStorage.getItem('sb_collapsed') === '1');
-          bindToggleBtn();
-        }
+        // Update toggle pill + icon/label in-place (no sidebar rebuild → pill animates smoothly)
+        const isDark = next !== 'light';
+        const pill = btn.querySelector('.sb-theme-toggle');
+        if (pill) pill.classList.toggle('on', isDark);
+        const iconEl = btn.querySelector('.sb-theme-icon');
+        if (iconEl) iconEl.innerHTML = isDark ? ic.moon : ic.sun;
+        const labelEl = btn.querySelector('span:not(.sb-theme-icon)');
+        if (labelEl) labelEl.textContent = isDark ? t('របៀបងងឹត','Dark Mode') : t('របៀបភ្លឺ','Light Mode');
       });
     }
     bindThemeBtn();
@@ -339,18 +342,18 @@
       if (!btn) return;
       btn.addEventListener('click', function() {
         setLang(getLang() === 'kh' ? 'en' : 'kh');
-        /* Rebuild sidebar */
+        /* Rebuild sidebar (lang button lives here now) */
         if (sidebar) {
           sidebar.innerHTML = buildSidebar();
           bindThemeBtn();
           bindToggleBtn();
+          bindLangBtn();
           applyCollapse(localStorage.getItem('sb_collapsed') === '1');
         }
-        /* Rebuild topbar + rebind all topbar events */
+        /* Rebuild topbar greeting only */
         if (header) {
           header.innerHTML = buildTopbar();
           bindTopbar();
-          bindLangBtn();
           startGreeting();
         }
         /* Notify pages that registered a lang-change callback */
@@ -587,4 +590,62 @@
 
   window.macUI = { toast: macToast, alert: macAlert, confirm: macConfirm };
   window.alert = function(msg){ macAlert(String(msg)); };
+})();
+
+/* ══ Page Transition — smooth curtain ══ */
+(function(){
+  /* Inject styles directly from JS so CSS cache never blocks the effect */
+  var _s = document.getElementById('_pt_css');
+  if(!_s){
+    _s = document.createElement('style');
+    _s.id = '_pt_css';
+    _s.textContent =
+      '#page-curtain{position:fixed;inset:0;z-index:99996;background:var(--bg,#060c1a);' +
+      'opacity:0;pointer-events:none;' +
+      'transition:opacity .3s cubic-bezier(.4,0,.2,1);will-change:opacity}' +
+      '#page-curtain.out{opacity:1!important;pointer-events:all}' +
+      '@keyframes _pageEnter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}' +
+      '.main-content{animation:_pageEnter .4s cubic-bezier(.22,.68,0,1.2) both}';
+    document.head.appendChild(_s);
+  }
+
+  /* Ensure curtain div exists in body */
+  function getCurtain(){
+    var c = document.getElementById('page-curtain');
+    if(!c){
+      c = document.createElement('div');
+      c.id = 'page-curtain';
+      document.body.appendChild(c);
+    }
+    return c;
+  }
+
+  /* Create curtain once DOM is ready */
+  if(document.body){ getCurtain(); }
+  else{ document.addEventListener('DOMContentLoaded', getCurtain); }
+
+  /* Intercept ALL sidebar nav link clicks via event delegation */
+  document.addEventListener('click', function(e){
+    var link = e.target.closest('a.sb-link');
+    if(!link) return;
+    if(link.classList.contains('sb-link-danger')) return; /* logout handles itself */
+    var href = link.getAttribute('href');
+    if(!href || href === '#' || /^javascript/i.test(href)) return;
+    /* Don't animate if already on this page */
+    try{ if(new URL(href, location.href).href === location.href) return; }catch(x){}
+    e.preventDefault();
+    var curtain = getCurtain();
+    /* Force reflow so transition fires reliably */
+    curtain.style.opacity = '0';
+    curtain.classList.remove('out');
+    void curtain.offsetWidth; /* reflow */
+    curtain.classList.add('out');
+    setTimeout(function(){ window.location.href = href; }, 300);
+  }, true); /* capture phase — fires before any inline onclick */
+
+  /* Hide curtain on page show (back/forward cache) */
+  window.addEventListener('pageshow', function(e){
+    var c = document.getElementById('page-curtain');
+    if(c){ c.classList.remove('out'); c.style.opacity = ''; }
+  });
 })();
