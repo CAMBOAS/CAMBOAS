@@ -8,7 +8,7 @@
   'use strict';
 
   const APPS_SCRIPT_URL =
-    'https://script.google.com/macros/s/AKfycbxdmUD-nIeVtiRCNwDW5YijaMPI3y1NGcScth1iLkAsf-u-vacb170wJsHJ5PdPOS3xPw/exec';
+    'https://script.google.com/macros/s/AKfycbz2t7jukYbzVg0R_9AEZr0dQo54P2oR3Ep9vTgdo1yethjXZGy7fLR6ZAZVSMy0bKOLSA/exec';
 
   // Use Vercel proxy only when running on vercel.app domain
   function isVercel() {
