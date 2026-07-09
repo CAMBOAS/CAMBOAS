@@ -690,14 +690,20 @@ function listOrders_() {
   const sheet   = getSheet_();
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return [];
-  const values = sheet.getRange(2, 1, lastRow - 1, HEADER.length).getDisplayValues();
+  // Use getValues() (raw) so Date cells are returned as Date objects,
+  // then format explicitly — avoids Sheet display-format variations.
+  const values = sheet.getRange(2, 1, lastRow - 1, HEADER.length).getValues();
   const groups = {};
   values.forEach(row => {
     const orderId = safe_(row[1]);
     if (!orderId) return;
+    const dtRaw = row[0];
+    const dateTimeStr = (dtRaw instanceof Date && !isNaN(dtRaw.getTime()))
+      ? Utilities.formatDate(dtRaw, TZ, 'dd/MM/yyyy HH:mm')
+      : safe_(dtRaw);
     if (!groups[orderId]) {
       groups[orderId] = {
-        id:orderId, orderId, dateTime:safe_(row[0]), date:formatDateOnly_(row[0]),
+        id:orderId, orderId, dateTime:dateTimeStr, date:formatDateOnly_(dateTimeStr),
         page:safe_(row[2]), closeBy:safe_(row[3]), status:safe_(row[4]),
         customer:safe_(row[5]), phone:safe_(row[6]), province:safe_(row[7]),
         detailAddress:safe_(row[8]), address:safe_(row[8]),
@@ -722,7 +728,18 @@ function listOrders_() {
     const gt = toNumber_(row[20]);
     if (gt > 0) groups[orderId].grandTotal = gt;
   });
-  return Object.values(groups).sort((a,b) => String(b.dateTime).localeCompare(String(a.dateTime)));
+  function parseSortMs_(dt) {
+    if (!dt) return 0;
+    var s = String(dt);
+    // "DD/MM/YYYY HH:MM" — most common format after listOrders_ fix
+    var m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})[^\d]+(\d{1,2}):(\d{2})/);
+    if (m) return new Date(m[3]+'-'+m[2]+'-'+m[1]+'T'+m[4].padStart(2,'0')+':'+m[5]+':00').getTime();
+    // "DD, MM, YYYY / ..." — text-stored format (old entries)
+    var m2 = s.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})(?:[^\d]+(\d{1,2}):(\d{2}))?/);
+    if (m2) return new Date(m2[3]+'-'+m2[2]+'-'+m2[1]+'T'+(m2[4]||'00').padStart(2,'0')+':'+(m2[5]||'00')+':00').getTime();
+    return 0;
+  }
+  return Object.values(groups).sort((a,b) => parseSortMs_(b.dateTime) - parseSortMs_(a.dateTime));
 }
 
 

@@ -2,7 +2,7 @@
 'use strict';
 
 var SCRIPT_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
-  'https://script.google.com/macros/s/AKfycbwGY54fehhigidqu2J_cklHT9ckpohUaMBYdnNmeNCDYr8WSS463ajaGEVxqum8YDvFgQ/exec';
+  'https://script.google.com/macros/s/AKfycbzefJjsVDLZ7YwtzHxIilWyQ8-j6-7sCieD8CmPqvlKVbazr6Jhi7Zj9sjG-MLaHMkQIA/exec';
 /* localStorage cache removed — always fetch direct from Google Sheet */
 
 var _orders = [], _sel = new Set();
@@ -193,55 +193,24 @@ function isDark(){ return document.documentElement.getAttribute('data-theme') !=
 function themeVal(dark, light){ return isDark() ? dark : light; }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-/* Convert any date string → DD/MM/YYYY */
+/* Convert any date string → DD/MM/YYYY (date only) */
 function fmtDisplay(s){
   if(!s) return '';
-  // Already DD/MM/YYYY (with optional time after)
-  if(/^\d{2}\/\d{2}\/\d{4}/.test(s)) return s.slice(0,10);
-  // YYYY-MM-DD (date-only, no timezone) — safe to slice
-  if(/^\d{4}-\d{2}-\d{2}$/.test(s)){ var p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
-  // YYYY-MM-DDTHH:MM with NO timezone suffix — safe to slice (local time)
-  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(s) && !/Z|[+-]\d{2}:?\d{2}$/.test(s)){
-    var p=s.slice(0,10).split('-'); return p[2]+'/'+p[1]+'/'+p[0];
-  }
-  // ISO with Z or +07:00 suffix — MUST parse via Date() to get LOCAL date (not UTC)
-  try{
-    var d = new Date(s);
-    if(!isNaN(d)){
-      return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
-    }
-  }catch(e){}
-  return s;
+  var d = parseD(s);
+  if(d && !isNaN(d)) return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
+  return String(s).slice(0,10);
 }
 
-/* fmtDisplayFull — show date + time when time is available (not midnight 00:00) */
+/* fmtDisplayFull — show DD/MM/YYYY HH:MM AM/PM (hides midnight 00:00 time = date-only) */
 function fmtDisplayFull(s){
   if(!s) return '';
-  var str = String(s).trim();
-  // DD/MM/YYYY HH:MM... → show date + time
-  var m1 = str.match(/^(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})/);
-  if(m1) return m1[1]+' '+m1[2];
-  // ISO with Z or timezone offset — parse via Date() to get LOCAL time
-  if(/^\d{4}-\d{2}-\d{2}T/.test(str) && (/Z$/.test(str) || /[+-]\d{2}:?\d{2}$/.test(str))){
-    try{
-      var d = new Date(str);
-      if(!isNaN(d)){
-        var dateStr = pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
-        var hh2 = d.getHours(), mm2 = d.getMinutes();
-        return (hh2===0 && mm2===0) ? dateStr : dateStr+' '+pad(hh2)+':'+pad(mm2);
-      }
-    }catch(e){}
-  }
-  // YYYY-MM-DDTHH:MM (no timezone, local time) → safe regex parse
-  var m2 = str.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-  if(m2){
-    var dateStr = m2[3]+'/'+m2[2]+'/'+m2[1];
-    var hh = m2[4], mm = m2[5];
-    // Hide midnight (00:00) — date-only orders saved without real time
-    return (hh==='00' && mm==='00') ? dateStr : dateStr+' '+hh+':'+mm;
-  }
-  // Fallback to date-only
-  return fmtDisplay(s);
+  var d = parseD(s);
+  if(!d || isNaN(d)) return fmtDisplay(s);
+  var dateStr = pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
+  var hh = d.getHours(), mm = d.getMinutes();
+  if(hh===0 && mm===0) return dateStr;
+  var ampm = hh>=12 ? 'PM' : 'AM', h12 = hh%12||12;
+  return dateStr+' '+pad(h12)+':'+pad(mm)+' '+ampm;
 }
 
 /* toDatetimeLocalEdit — like toDatetimeLocal but replaces midnight 00:00 with current time
@@ -472,27 +441,28 @@ function parseD(s){
   if(!s) return null;
   s = String(s).trim();
   if(!s) return null;
-  // NEW FORMAT: "DD, MM, YYYY / HH:MM:SS AM/PM" (backend format)
-  var m = s.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})(?:[^\d]+(\d{2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?/i);
+  // FORMAT: "DD, MM, YYYY / HH:MM:SS AM/PM" (newest backend format)
+  var m = s.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})(?:[^\d]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?/i);
   if(m){
     var hh = parseInt(m[4]||'0',10), mi = m[5]||'00', ss = m[6]||'00';
     if(m[7] && m[7].toUpperCase()==='PM' && hh<12) hh+=12;
     if(m[7] && m[7].toUpperCase()==='AM' && hh===12) hh=0;
     return new Date(m[3]+'-'+m[2]+'-'+m[1]+'T'+String(hh).padStart(2,'0')+':'+mi+':'+ss);
   }
-  // OLD FORMAT: "DD/MM/YYYY" or "DD/MM/YYYY HH:MM"
-  var m2 = s.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  // FORMAT: "DD/MM/YYYY ..." — handles space, " / " separator; 12h AM/PM or 24h
+  var m2 = s.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:[^0-9]*(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?/i);
   if(m2){
-    var hh2 = m2[4]||'00', mi2 = m2[5]||'00', ss2 = m2[6]||'00';
-    return new Date(m2[3]+'-'+m2[2]+'-'+m2[1]+'T'+hh2+':'+mi2+':'+ss2);
+    var hh2 = parseInt(m2[4]||'0',10), mi2 = m2[5]||'00', ss2 = m2[6]||'00';
+    if(m2[7] && m2[7].toUpperCase()==='PM' && hh2<12) hh2+=12;
+    if(m2[7] && m2[7].toUpperCase()==='AM' && hh2===12) hh2=0;
+    return new Date(m2[3]+'-'+m2[2]+'-'+m2[1]+'T'+String(hh2).padStart(2,'0')+':'+mi2+':'+ss2);
   }
-  // YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS or with Z
+  // ISO: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
   if(/^\d{4}-\d{2}-\d{2}/.test(s)){
     var d = new Date(s);
     if(!isNaN(d)) return d;
     return new Date(s.slice(0,10)+'T00:00:00');
   }
-  // Try general parse
   var dt = new Date(s);
   return isNaN(dt) ? null : dt;
 }
