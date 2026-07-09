@@ -204,8 +204,8 @@
       border-color: rgba(255,255,255,.12);
       color: #e8e0ff;
     }
-    /* datetime-local unified picker */
-    #dtLocal::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+    /* dtLocal: text display field */
+    #dtLocal { cursor: default !important; }
     /* Phone: hide dtLocal, show separate date+time inputs */
     .od-dtlocal-desk { display: none; }
 
@@ -2653,13 +2653,12 @@
               <div class="od-row">
                 <span class="od-lbl">ថ្ងៃ / ម៉ោង</span>
                 <div class="od-datetime">
-                  <!-- Desktop: single datetime-local; Phone: separate date+time (iOS-safe) -->
-                  <input id="dtLocal" type="datetime-local" class="od-dtlocal-inp od-dtlocal-desk"
-                    oninput="(function(dl){var v=dl.value;if(!v)return;var p=v.split('T');var dp=document.getElementById('datePart');var tp=document.getElementById('timePart');if(dp)dp.value=p[0];if(tp)tp.value=p[1]||'00:00';})(this)">
+                  <!-- Desktop: text display; Phone: separate date+time (iOS-safe) -->
+                  <input id="dtLocal" type="text" readonly class="od-dtlocal-inp od-dtlocal-desk" style="cursor:default;" placeholder="DD/MM/YYYY HH:MM AM/PM">
                   <input id="datePart" type="date" class="od-dtlocal-inp od-date-inp"
-                    oninput="(function(dp,tp,dl){var v=dp+'T'+(tp||'00:00');if(dl)dl.value=v;})(this.value,document.getElementById('timePart').value,document.getElementById('dtLocal'))">
+                    oninput="(function(){var dp=document.getElementById('datePart'),tp=document.getElementById('timePart'),dl=document.getElementById('dtLocal');if(!dp||!dp.value)return;var d=new Date(dp.value+'T'+(tp&&tp.value?tp.value:'00:00'));var pad=function(x){return String(x).padStart(2,'0');};var hh=d.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;if(dl)dl.value=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(h12)+':'+pad(d.getMinutes())+' '+ampm;})()">
                   <input id="timePart" type="time" class="od-dtlocal-inp od-time-inp"
-                    oninput="(function(dp,tp,dl){if(!dp)return;var v=dp+'T'+tp;if(dl)dl.value=v;})(document.getElementById('datePart').value,this.value,document.getElementById('dtLocal'))">
+                    oninput="(function(){var dp=document.getElementById('datePart'),tp=document.getElementById('timePart'),dl=document.getElementById('dtLocal');if(!dp||!dp.value||!tp||!tp.value)return;var d=new Date(dp.value+'T'+tp.value);var pad=function(x){return String(x).padStart(2,'0');};var hh=d.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;if(dl)dl.value=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(h12)+':'+pad(d.getMinutes())+' '+ampm;})()">
                 </div>
               </div>
 
@@ -3331,7 +3330,8 @@ function clearAll(){
     var yy=n.getFullYear(), mo=pad(n.getMonth()+1), dd=pad(n.getDate());
     if(_el('datePart')) _el('datePart').value = yy+'-'+mo+'-'+dd;
     if(_el('timePart')) _el('timePart').value = pad(n.getHours())+':'+pad(n.getMinutes());
-    if(_el('dtLocal'))  _el('dtLocal').value  = yy+'-'+mo+'-'+dd+'T'+pad(n.getHours())+':'+pad(n.getMinutes());
+    var hh=n.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;
+    if(_el('dtLocal'))  _el('dtLocal').value  = dd+'/'+mo+'/'+yy+' '+pad(h12)+':'+pad(n.getMinutes())+' '+ampm;
   })();
   calcTotal();
 }
@@ -3491,7 +3491,8 @@ document.addEventListener('DOMContentLoaded', function(){
     var yy=n.getFullYear(), mo=pad(n.getMonth()+1), dd=pad(n.getDate());
     if(_el('datePart')) _el('datePart').value = yy+'-'+mo+'-'+dd;
     if(_el('timePart')) _el('timePart').value = pad(n.getHours())+':'+pad(n.getMinutes());
-    if(_el('dtLocal'))  _el('dtLocal').value  = yy+'-'+mo+'-'+dd+'T'+pad(n.getHours())+':'+pad(n.getMinutes());
+    var hh=n.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;
+    if(_el('dtLocal'))  _el('dtLocal').value  = dd+'/'+mo+'/'+yy+' '+pad(h12)+':'+pad(n.getMinutes())+' '+ampm;
   })();
 
   /* Payment buttons — event delegation so dynamic buttons work too */
@@ -3951,10 +3952,16 @@ document.addEventListener('DOMContentLoaded', function(){
     /* Time */
     if (d.timeDisplay) setVal('timePart', to24h(d.timeDisplay));
 
-    /* Sync datetime-local picker */
+    /* Sync dtLocal display field (DD/MM/YYYY HH:MM AM/PM) */
     (function(){
       var dl=document.getElementById('dtLocal'),dp=document.getElementById('datePart'),tp=document.getElementById('timePart');
-      if(dl&&dp&&dp.value) dl.value=dp.value+'T'+(tp&&tp.value?tp.value:'00:00');
+      if(dl&&dp&&dp.value){
+        var pad=function(x){return String(x).padStart(2,'0');};
+        var d=new Date(dp.value+'T'+(tp&&tp.value?tp.value:'00:00'));
+        var hh=d.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;
+        var parts=dp.value.split('-');
+        dl.value=parts[2]+'/'+parts[1]+'/'+parts[0]+' '+pad(h12)+':'+pad(d.getMinutes())+' '+ampm;
+      }
     })();
 
     return filled;

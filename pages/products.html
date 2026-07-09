@@ -566,7 +566,7 @@
             </div>
             <div class="no-field">
               <label>ថ្ងៃ / ម៉ោង</label>
-              <input id="noDate" type="datetime-local">
+              <input id="noDate" type="text" readonly placeholder="DD, MM, YYYY / HH:MM:SS AM/PM" style="cursor:default;">
             </div>
             <div class="no-field">
               <label>PAGES</label>
@@ -1032,11 +1032,14 @@ function toggleOrderMode() {
     panel.classList.add('show');
     cartSec.classList.add('show');
     grid.classList.add('order-mode');
-    // set default datetime
+    // set default datetime in DD, MM, YYYY / HH:MM:SS AM/PM format
     var now = new Date(), pad = function(x){ return String(x).padStart(2,'0'); };
-    var dt = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes());
     var el = document.getElementById('noDate');
-    if (el && !el.value) el.value = dt;
+    if (el && !el.value) {
+      var hh = now.getHours(), ampm = hh >= 12 ? 'PM' : 'AM', h12 = hh % 12 || 12;
+      el.value = pad(now.getDate())+'/'+pad(now.getMonth()+1)+'/'+now.getFullYear()+
+        ' '+pad(h12)+':'+pad(now.getMinutes())+' '+ampm;
+    }
     // load SaleInfor data to populate dropdowns
     loadSaleInforData();
     // re-render cards to show add buttons
@@ -1240,14 +1243,10 @@ async function submitNewOrder() {
   btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> រក្សាទុក...';
 
   var now = new Date(), pad = function(x){ return String(x).padStart(2,'0'); };
-  var rawDt = document.getElementById('noDate').value ||
-    (now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes()));
-  var dtStr = rawDt;
-  var m = rawDt.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-  if (m) {
-    var h = parseInt(m[4],10), ampm = h>=12?'PM':'AM', h12 = h%12||12;
-    dtStr = m[3]+'/'+m[2]+'/'+m[1]+' '+String(h12).padStart(2,'0')+':'+m[5]+' '+ampm;
-  }
+  var hh = now.getHours(), ampm = hh>=12?'PM':'AM', h12 = hh%12||12;
+  var fallbackDt = pad(now.getDate())+'/'+pad(now.getMonth()+1)+'/'+now.getFullYear()+
+    ' '+pad(h12)+':'+pad(now.getMinutes())+' '+ampm;
+  var dtStr = document.getElementById('noDate').value || fallbackDt;
   var total = cart.reduce(function(s,c){ return s + c.subtotal; }, 0);
 
   var order = {
