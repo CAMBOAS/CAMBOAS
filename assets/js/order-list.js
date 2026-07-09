@@ -2,7 +2,7 @@
 'use strict';
 
 var SCRIPT_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
-  'https://script.google.com/macros/s/AKfycbzKQzt54VCVI2qVGCNN_LxaTd_2aObFaU6UX6PgWRN0_l2pQ1-1HSGpGFfoH5ZOF_AOeA/exec';
+  'https://script.google.com/macros/s/AKfycbwe1kvmaxIJMlBvZy-Xh3DXaGtcvZ8YCbIkoGWG2DCtE1i57aDMPV-9QNyGapK8rVlW/exec';
 /* localStorage cache removed — always fetch direct from Google Sheet */
 
 var _orders = [], _sel = new Set();
