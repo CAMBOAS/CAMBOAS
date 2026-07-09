@@ -284,15 +284,32 @@ function toDatetimeLocal(s){
   if(/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.replace('Z','').slice(0,16);
   // YYYY-MM-DD only
   if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s+'T00:00';
-  // DD/MM/YYYY HH:MM or DD/MM/YYYY
-  if(/^\d{2}\/\d{2}\/\d{4}/.test(s)){
-    var parts = s.split(' ');
-    var dp = parts[0].split('/');          // [DD, MM, YYYY]
-    var dateStr = dp[2]+'-'+dp[1]+'-'+dp[0];
-    var timeStr = (parts[1]||'00:00').slice(0,5);
-    return dateStr+'T'+timeStr;
+  // New format: "DD, MM, YYYY / HH:MM:SS AM/PM"  ← must check BEFORE fallback
+  if(/^\d{2}, \d{2}, \d{4}/.test(s)){
+    var m2 = s.match(/^(\d{2}), (\d{2}), (\d{4})[^0-9]*(\d{2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
+    if(m2){
+      var hh = parseInt(m2[4],10);
+      if(m2[7] && m2[7].toUpperCase()==='PM' && hh<12) hh+=12;
+      if(m2[7] && m2[7].toUpperCase()==='AM' && hh===12) hh=0;
+      // m2[1]=DD, m2[2]=MM, m2[3]=YYYY
+      return m2[3]+'-'+m2[2]+'-'+m2[1]+'T'+pad(hh)+':'+m2[5];
+    }
   }
-  // Fallback: try JS Date parse
+  // Old format: DD/MM/YYYY HH:MM[ AM/PM]
+  if(/^\d{2}\/\d{2}\/\d{4}/.test(s)){
+    var m3 = s.match(/^(\d{2})\/(\d{2})\/(\d{4})[^0-9]*(\d{2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
+    if(m3){
+      var hh2 = parseInt(m3[4],10);
+      if(m3[7] && m3[7].toUpperCase()==='PM' && hh2<12) hh2+=12;
+      if(m3[7] && m3[7].toUpperCase()==='AM' && hh2===12) hh2=0;
+      // m3[1]=DD, m3[2]=MM, m3[3]=YYYY
+      return m3[3]+'-'+m3[2]+'-'+m3[1]+'T'+pad(hh2)+':'+m3[5];
+    }
+    // fallback: no time part
+    var dp = s.split('/');
+    return dp[2].slice(0,4)+'-'+dp[1]+'-'+dp[0]+'T00:00';
+  }
+  // Last resort: try JS Date parse (avoid — unreliable for DD/MM formats)
   try{
     var d = new Date(s);
     if(!isNaN(d)){
