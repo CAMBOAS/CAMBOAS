@@ -6,14 +6,15 @@ let _dashRows = [];
 function parseOrderDate(value) {
   if (!value) return null;
   const s = String(value).trim();
+  // "DD, MM, YYYY / HH:MM:SS AM/PM" — newest Apps Script format
+  const dm2 = s.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})/);
+  if (dm2) return new Date(+dm2[3], +dm2[2]-1, +dm2[1]);
   // DD/MM/YYYY (Cambodia Sheet format)
   const ddmm = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
   if (ddmm) return new Date(+ddmm[3], +ddmm[2]-1, +ddmm[1]);
   // YYYY-MM-DD
   if (/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s.slice(0,10)+'T00:00:00');
-  // ISO with Z — parse as-is (will give local time via Date())
-  const d = new Date(s);
-  return isNaN(d) ? null : d;
+  return null;
 }
 
 async function fetchDashboardOrders() {
@@ -22,7 +23,7 @@ async function fetchDashboardOrders() {
     if (window.CamboAPI) {
       data = await window.CamboAPI.get({action:'list', limit:'1000'});
     } else {
-      const DIRECT = 'https://script.google.com/macros/s/AKfycbzKQzt54VCVI2qVGCNN_LxaTd_2aObFaU6UX6PgWRN0_l2pQ1-1HSGpGFfoH5ZOF_AOeA/exec';
+      const DIRECT = 'https://script.google.com/macros/s/AKfycbzefJjsVDLZ7YwtzHxIilWyQ8-j6-7sCieD8CmPqvlKVbazr6Jhi7Zj9sjG-MLaHMkQIA/exec';
       const res = await fetch(DIRECT + '?action=list&limit=1000&_=' + Date.now());
       data = await res.json();
     }
