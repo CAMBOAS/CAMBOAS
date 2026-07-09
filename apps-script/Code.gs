@@ -432,12 +432,56 @@ function addOrder_(order, options) {
 function updateOrder_(orderId, order) {
   validateOrder_(order);
   if (!safe_(orderId)) throw new Error('Missing orderId');
+  // ── Backup original rows to SaleOrderO before overwriting ──
+  copyToOriginal_(orderId);
   deleteOrder_(orderId);
   const sheet = getSheet_();
   const rows  = orderToRows_(orderId, order);
   if (sheet.getLastRow() > 1) sheet.insertRowsBefore(2, rows.length);
   sheet.getRange(2, 1, rows.length, HEADER.length).setValues(rows);
   return { orderId, rowsAdded: rows.length };
+}
+
+/**
+ * copyToOriginal_ — Copy rows matching orderId from SaleOrder → SaleOrderO
+ * SaleOrderO = Original Data (backup before any edit)
+ * Newest backup always inserted at TOP (row 2) so row 2 = most recent.
+ */
+function copyToOriginal_(orderId) {
+  if (!safe_(orderId)) return;
+  const ss  = SpreadsheetApp.getActiveSpreadsheet();
+  const src = ss.getSheetByName('SaleOrder');
+  if (!src) return;
+
+  // Get or create SaleOrderO sheet
+  var dst = ss.getSheetByName('SaleOrderO');
+  if (!dst) {
+    dst = ss.insertSheet('SaleOrderO');
+    // Copy header from SaleOrder
+    const srcHeader = src.getRange(1, 1, 1, src.getLastColumn()).getValues();
+    dst.getRange(1, 1, 1, srcHeader[0].length).setValues(srcHeader);
+  }
+
+  const lastRow = src.getLastRow();
+  if (lastRow <= 1) return;
+
+  const numCols = src.getLastColumn();
+  const ids     = src.getRange(2, 2, lastRow - 1, 1).getValues().flat(); // col B = OrderID
+  const rowsToBackup = [];
+
+  for (let i = 0; i < ids.length; i++) {
+    if (safe_(ids[i]) === safe_(orderId)) {
+      rowsToBackup.push(src.getRange(i + 2, 1, 1, numCols).getValues()[0]);
+    }
+  }
+
+  if (!rowsToBackup.length) return;
+
+  // Insert at row 2 (top) — newest backup stays first
+  if (dst.getLastRow() >= 1) {
+    dst.insertRowsBefore(2, rowsToBackup.length);
+  }
+  dst.getRange(2, 1, rowsToBackup.length, numCols).setValues(rowsToBackup);
 }
 
 function deleteOrder_(orderId) {
