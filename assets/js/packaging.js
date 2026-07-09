@@ -485,6 +485,9 @@ function formatDate(raw){
   if(!raw) return '';
   // Already DD/MM/YYYY
   if(/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) return raw;
+  // "DD, MM, YYYY / ..." — newest Apps Script format
+  var cm=String(raw).match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})/);
+  if(cm) return cm[1]+'/'+cm[2]+'/'+cm[3];
   // YYYY-MM-DD
   if(/^\d{4}-\d{2}-\d{2}/.test(raw)){
     var p=raw.slice(0,10).split('-');

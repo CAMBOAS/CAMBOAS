@@ -575,13 +575,15 @@
   }
   function toDate(o){
     var raw=String(_rawDate(o));
-    // Default to today when date is missing (matches normalizeOrder behavior)
     if(!raw) return new Date();
-    var d=new Date(raw);
-    if(!isNaN(d)) return d;
-    // DD/MM/YYYY (Cambodia sheet format)
+    // "DD, MM, YYYY / ..." — newest Apps Script format
+    var m2=raw.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})/);
+    if(m2) return new Date(+m2[3],+m2[2]-1,+m2[1]);
+    // DD/MM/YYYY — regex first to avoid JS new Date() reading as MM/DD (US locale)
     var m=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
     if(m) return new Date(+m[3],+m[2]-1,+m[1]);
+    // YYYY-MM-DD
+    if(/^\d{4}-\d{2}-\d{2}/.test(raw)) return new Date(raw.slice(0,10)+'T00:00:00');
     return new Date();
   }
   function fmtD(o){

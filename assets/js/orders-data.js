@@ -30,6 +30,9 @@
     // DD/MM/YYYY (Cambodia format from Sheet)
     const ddmm = text.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
     if (ddmm) return `${ddmm[3]}-${ddmm[2]}-${ddmm[1]}`;
+    // "DD, MM, YYYY / HH:MM:SS AM/PM" — newest Apps Script format
+    const ddmm2 = text.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})/);
+    if (ddmm2) return `${ddmm2[3]}-${ddmm2[2]}-${ddmm2[1]}`;
     // ISO with Z — parse via Date() to get UTC→local
     if (/^\d{4}-\d{2}-\d{2}T/.test(text)) {
       const d = new Date(text);
