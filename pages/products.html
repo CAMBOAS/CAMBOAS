@@ -331,6 +331,17 @@
     [data-theme="light"] .no-btn { background:rgba(109,40,217,.07); color:#6d28d9; border-color:rgba(109,40,217,.25) }
     [data-theme="light"] .no-btn:hover { background:rgba(109,40,217,.13) }
     [data-theme="light"] .no-btn.active { background:#7c3aed; color:#fff; border-color:#7c3aed }
+    .no-btn-icon {
+      width:42px; height:42px; padding:0; border-radius:14px;
+      display:inline-flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg,#7c5cff,#06b6d4);
+      border-color:transparent; color:#fff; flex-shrink:0;
+      box-shadow:0 4px 14px rgba(124,92,255,.35);
+    }
+    .no-btn-icon:hover { opacity:.88; transform:scale(1.05); background:linear-gradient(135deg,#7c5cff,#06b6d4); }
+    .no-btn-icon.active { background:linear-gradient(135deg,#5b3fd4,#0891b2); border-color:transparent; color:#fff; }
+    [data-theme="light"] .no-btn-icon { background:linear-gradient(135deg,#7c3aed,#0891b2); border-color:transparent; color:#fff; }
+    [data-theme="light"] .no-btn-icon:hover { background:linear-gradient(135deg,#6d28d9,#0e7490); }
 
     /* Order panel */
     .prod-top-card { border-radius:0 !important; margin-left:-14px; margin-right:-14px; width:calc(100% + 28px); box-sizing:border-box; }
@@ -892,9 +903,12 @@
               <p>គ្រប់គ្រងផលិតផល</p>
             </div>
           </div>
-          <button class="no-btn" id="noToggle" onclick="toggleOrderMode()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            New Order
+          <button class="no-btn no-btn-icon" id="noToggle" onclick="toggleOrderMode()" title="New Order">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              <line x1="17" y1="3" x2="17" y2="9"/><line x1="14" y1="6" x2="20" y2="6"/>
+            </svg>
           </button>
         </div>
 
