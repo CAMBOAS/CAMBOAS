@@ -3635,28 +3635,15 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-<!-- Scroll-aware hide/show -->
+<!-- Scroll buttons + layout fix -->
 <script>
 (function(){
   var header = document.getElementById('sharedHeader');
   var bar    = document.getElementById('mobBottomBar');
   var scrollBtns = document.getElementById('scrollBtns');
-  var lastY = window.scrollY, ticking = false, DELTA = 8;
 
-  /* Bottom bar: show on scroll DOWN, hide on scroll UP */
-  function showBars(){ if(bar) bar.classList.remove('bar-hidden'); }
-  function hideBars(){ if(bar) bar.classList.add('bar-hidden'); }
-  function onScroll(){
-    var y = window.scrollY, d = y - lastY;
-    if(y <= 40)                                showBars();   // at top → always show
-    else if(d >= DELTA && !window.__kbFocused) showBars();  // scrolling DOWN → show
-    else if(d <= -DELTA)                       hideBars();  // scrolling UP → hide
-    lastY = y; ticking = false;
-  }
-  window.addEventListener('scroll', function(){
-    if(!ticking){ requestAnimationFrame(onScroll); ticking = true; }
-  }, {passive:true});
-  if(bar) bar.addEventListener('pointerdown', showBars, {passive:true});
+  /* Bottom bar: always visible on mobile */
+  if(bar) bar.classList.remove('bar-hidden');
 
   /* Scroll buttons: smart show/hide per button */
   var btnTop = document.getElementById('scrollTopBtn');
