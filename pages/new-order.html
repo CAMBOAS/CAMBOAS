@@ -60,12 +60,15 @@
       flex-direction: column;
       gap: 0;
       padding: 0 0 calc(72px + env(safe-area-inset-bottom) + 16px);
+      min-height: calc(100dvh - var(--topbar-offset, 68px));
     }
     .no-grid {
       display: flex;
       flex-direction: column;
       gap: 12px;
+      flex: 1;
     }
+    #cartPanel { flex: 1; }
 
     /* ══════════════════════════════════════════════════════
        SECTION CARDS — mobile-first
@@ -1253,7 +1256,7 @@
         scrollbar-width: none;
       }
       #rightCol::-webkit-scrollbar { display: none; }
-      #cartPanel { position: static; }
+      #cartPanel { position: static; flex: none; }
       .mob-bottom-bar {
         position: relative !important;
         bottom: auto !important;
@@ -3643,14 +3646,14 @@ document.addEventListener('DOMContentLoaded', function(){
   var scrollBtns = document.getElementById('scrollBtns');
   var lastY = window.scrollY, ticking = false, DELTA = 8;
 
-  /* Header + bottom bar: hide on scroll down, show on scroll up */
+  /* Header + bottom bar: hide on scroll UP, show on scroll DOWN */
   function showBars(){ if(header) header.classList.remove('header-hidden'); if(bar) bar.classList.remove('bar-hidden'); }
   function hideBars(){ if(header) header.classList.add('header-hidden');    if(bar) bar.classList.add('bar-hidden'); }
   function onScroll(){
     var y = window.scrollY, d = y - lastY;
-    if(y <= 40)        showBars();
-    else if(d >= DELTA && !window.__kbFocused)  hideBars();
-    else if(d <= -DELTA) showBars();
+    if(y <= 40)                                showBars();   // at top → always show
+    else if(d >= DELTA && !window.__kbFocused) showBars();  // scrolling DOWN → show
+    else if(d <= -DELTA)                       hideBars();  // scrolling UP → hide
     lastY = y; ticking = false;
   }
   window.addEventListener('scroll', function(){
