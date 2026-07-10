@@ -60,15 +60,12 @@
       flex-direction: column;
       gap: 0;
       padding: 0 0 calc(72px + env(safe-area-inset-bottom) + 16px);
-      min-height: calc(100dvh - var(--topbar-offset, 68px));
     }
     .no-grid {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      flex: 1;
     }
-    #cartPanel { flex: 1; }
 
     /* ══════════════════════════════════════════════════════
        SECTION CARDS — mobile-first
@@ -1033,7 +1030,7 @@
       box-shadow: 0 -4px 24px rgba(0,0,0,.1);
       transform: translateY(0);
       opacity: 1;
-      transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease, bottom .15s ease;
+      transition: transform .38s cubic-bezier(.4,0,.2,1), opacity .38s ease, bottom .15s ease !important;
     }
     [data-theme="dark"] .mob-bottom-bar { background: rgba(10,8,22,.95); border-top-color: rgba(255,255,255,.09); }
     .mob-bottom-bar.bar-hidden { transform: translateY(110%); opacity: 0; pointer-events: none; }
@@ -1256,7 +1253,7 @@
         scrollbar-width: none;
       }
       #rightCol::-webkit-scrollbar { display: none; }
-      #cartPanel { position: static; flex: none; }
+      #cartPanel { position: static; }
       .mob-bottom-bar {
         position: relative !important;
         bottom: auto !important;
@@ -3644,7 +3641,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var header = document.getElementById('sharedHeader');
   var bar    = document.getElementById('mobBottomBar');
   var scrollBtns = document.getElementById('scrollBtns');
-  var lastY = window.scrollY, ticking = false, DELTA = 8;
+  var lastY = window.scrollY, ticking = false, DELTA = 15;
 
   /* Header + bottom bar: hide on scroll UP, show on scroll DOWN */
   function showBars(){ if(header) header.classList.remove('header-hidden'); if(bar) bar.classList.remove('bar-hidden'); }
