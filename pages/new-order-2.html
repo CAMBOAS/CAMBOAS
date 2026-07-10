@@ -1032,7 +1032,7 @@
       -webkit-backdrop-filter: blur(22px);
       border: 1px solid rgba(148,163,200,.16);
       box-shadow: 0 8px 36px rgba(0,0,0,.16), 0 2px 6px rgba(0,0,0,.07);
-      z-index: 500;
+      z-index: 9000;
     }
     [data-theme="dark"] .mob-bottom-bar {
       background: rgba(14,10,30,.93);
@@ -2865,66 +2865,67 @@
             </div>
           </div><!-- /cartPanel -->
 
-          <!-- Action Bar — TikTok vertical left panel -->
-          <div class="mob-bottom-bar" id="mobBottomBar">
-            <!-- Receipt No -->
-            <div class="tik-receipt">
-              <input type="number" id="receiptNo" placeholder="ប៉ុង" min="0" step="1" inputmode="numeric">
-              <span class="tik-lbl">លេខប៉ុង</span>
-            </div>
-            <div class="tik-div"></div>
-            <!-- QR ON/OFF -->
-            <button id="toggleQrBtn" class="tik-btn toggle-qr-btn" type="button" title="QR ON/OFF">
-              <div class="tik-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
-                  <rect x="5" y="5" width="3" height="3" fill="currentColor" stroke="none"/><rect x="16" y="5" width="3" height="3" fill="currentColor" stroke="none"/><rect x="16" y="16" width="3" height="3" fill="currentColor" stroke="none"/><rect x="5" y="16" width="3" height="3" fill="currentColor" stroke="none"/>
-                </svg>
-              </div>
-              <span class="tik-lbl">QR</span>
-            </button>
-            <!-- Print -->
-            <button id="printBtn" class="tik-btn btn-print" type="button" title="Print">
-              <div class="tik-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
-                </svg>
-              </div>
-              <span class="tik-lbl">Print</span>
-            </button>
-            <!-- Copy -->
-            <button id="copyBtn" class="tik-btn btn-copy" type="button" title="Copy">
-              <div class="tik-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-              </div>
-              <span class="tik-lbl">Copy</span>
-            </button>
-            <!-- Share -->
-            <button id="shareBtn" class="tik-btn btn-share" type="button" title="Share">
-              <div class="tik-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                </svg>
-              </div>
-              <span class="tik-lbl">Share</span>
-            </button>
-            <div class="tik-div"></div>
-            <!-- Save (prominent) -->
-            <button id="saveBtn" class="tik-btn tik-save btn-save" type="button" title="Save">
-              <div class="tik-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
-                </svg>
-              </div>
-              <span class="tik-lbl">រក្សាទុក</span>
-            </button>
-          </div><!-- /mobBottomBar -->
       </div><!-- /no-grid -->
     </div><!-- /no-wrap -->
   </main>
 </div>
+
+<!-- Action Bar — TikTok vertical left panel -->
+<div class="mob-bottom-bar" id="mobBottomBar">
+  <!-- Receipt No -->
+  <div class="tik-receipt">
+    <input type="number" id="receiptNo" placeholder="ប៉ុង" min="0" step="1" inputmode="numeric">
+    <span class="tik-lbl">លេខប៉ុង</span>
+  </div>
+  <div class="tik-div"></div>
+  <!-- QR ON/OFF -->
+  <button id="toggleQrBtn" class="tik-btn toggle-qr-btn" type="button" title="QR ON/OFF">
+    <div class="tik-icon">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
+        <rect x="5" y="5" width="3" height="3" fill="currentColor" stroke="none"/><rect x="16" y="5" width="3" height="3" fill="currentColor" stroke="none"/><rect x="16" y="16" width="3" height="3" fill="currentColor" stroke="none"/><rect x="5" y="16" width="3" height="3" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <span class="tik-lbl">QR</span>
+  </button>
+  <!-- Print -->
+  <button id="printBtn" class="tik-btn btn-print" type="button" title="Print">
+    <div class="tik-icon">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+      </svg>
+    </div>
+    <span class="tik-lbl">Print</span>
+  </button>
+  <!-- Copy -->
+  <button id="copyBtn" class="tik-btn btn-copy" type="button" title="Copy">
+    <div class="tik-icon">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+      </svg>
+    </div>
+    <span class="tik-lbl">Copy</span>
+  </button>
+  <!-- Share -->
+  <button id="shareBtn" class="tik-btn btn-share" type="button" title="Share">
+    <div class="tik-icon">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+    </div>
+    <span class="tik-lbl">Share</span>
+  </button>
+  <div class="tik-div"></div>
+  <!-- Save (prominent) -->
+  <button id="saveBtn" class="tik-btn tik-save btn-save" type="button" title="Save">
+    <div class="tik-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+      </svg>
+    </div>
+    <span class="tik-lbl">រក្សាទុក</span>
+  </button>
+</div><!-- /mobBottomBar -->
 
 <!-- Scroll nav -->
 <div id="scrollBtns">
