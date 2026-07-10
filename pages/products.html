@@ -291,6 +291,7 @@
     [data-theme="light"] .no-btn.active { background:#7c3aed; color:#fff; border-color:#7c3aed }
 
     /* Order panel */
+    .prod-top-card { border-radius:0 !important; margin-left:-14px; margin-right:-14px; width:calc(100% + 28px); box-sizing:border-box; }
     #orderPanel { display:none;width:calc(100% + 28px);margin-left:-14px;margin-right:-14px;padding:0; }
     #orderPanel.show { display:block }
 
@@ -565,6 +566,7 @@
     /* ── Desktop ≥680px: glass card + 3-col label-above grid ── */
     @media (min-width:680px) {
       #orderPanel { width:100% !important; margin-left:0 !important; margin-right:0 !important; }
+      .prod-top-card { border-radius:22px !important; margin-left:0 !important; margin-right:0 !important; width:100% !important; }
       #orderPanel .mob-section {
         background:rgba(255,255,255,.82) !important;
         border:1px solid rgba(255,255,255,.55) !important;
@@ -680,7 +682,7 @@
     <div class="pw">
 
       <!-- Top header -->
-      <div class="glass-card" style="padding:18px 22px;border-radius:22px">
+      <div class="glass-card prod-top-card" style="padding:18px 22px;border-radius:22px">
         <div class="ptop">
           <div class="ptop-left">
             <h2>Products</h2>
