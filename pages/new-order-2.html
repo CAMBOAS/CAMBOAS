@@ -59,7 +59,7 @@
       display: flex;
       flex-direction: column;
       gap: 0;
-      padding: 0 0 calc(114px + env(safe-area-inset-bottom));
+      padding: 0 0 calc(20px + env(safe-area-inset-bottom));
     }
     .no-grid {
       display: flex;
@@ -1011,31 +1011,25 @@
        BOTTOM ACTION BAR
     ══════════════════════════════════════════════════════ */
     .mob-bottom-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 70px;
-      padding-bottom: env(safe-area-inset-bottom);
-      background: rgba(238,243,251,.97);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-top: 1px solid rgba(148,163,200,.18);
+      position: static;
       display: flex;
       align-items: center;
-      gap: 7px;
-      padding-left: 12px;
-      padding-right: 12px;
-      z-index: 500;
-      box-shadow: 0 -4px 24px rgba(0,0,0,.1);
-      transform: translateY(0);
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--card, rgba(255,255,255,.95));
+      border-top: 1px solid rgba(148,163,200,.18);
+      border-bottom: 1px solid rgba(148,163,200,.1);
+      margin-top: 3px;
+      min-height: 64px;
       opacity: 1;
-      transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease, bottom .15s ease;
+      transform: none;
     }
-    [data-theme="dark"] .mob-bottom-bar { background: rgba(10,8,22,.95); border-top-color: rgba(255,255,255,.09); }
-    .mob-bottom-bar.bar-hidden { transform: translateY(110%); opacity: 0; pointer-events: none; }
-
-    @media (min-width: 980px) { .mob-bottom-bar { left: auto; } }
+    [data-theme="dark"] .mob-bottom-bar {
+      background: rgba(10,8,22,.95);
+      border-top-color: rgba(255,255,255,.09);
+      border-bottom-color: rgba(255,255,255,.06);
+    }
+    .mob-bottom-bar.bar-hidden { display: none; }
 
     /* ── Bottom bar: Option A layout ── */
     .mob-bottom-bar {
@@ -1129,65 +1123,12 @@
     /* Action button cluster — styles from shared main.css (iPhone app-icon) */
 
     /* ══════════════════════════════════════════════════════
-       MOBILE SUMMARY STRIP
-    ══════════════════════════════════════════════════════ */
-    #mobSummaryStrip {
-      position: fixed;
-      bottom: calc(70px + env(safe-area-inset-bottom));
-      left: 0;
-      right: 0;
-      height: 44px;
-      background: linear-gradient(135deg, #7c5cff 0%, #a855f7 100%);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      z-index: 499;
-      transform: translateY(100%);
-      opacity: 0;
-      transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .3s ease;
-      pointer-events: none;
-    }
-    #mobSummaryStrip.strip-show {
-      transform: translateY(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .strip-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .strip-count {
-      background: rgba(255,255,255,.22);
-      border-radius: 20px;
-      padding: 2px 10px;
-      font-size: 12px;
-      font-weight: 800;
-      color: #fff;
-    }
-    .strip-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: rgba(255,255,255,.85);
-    }
-    .strip-total {
-      font-size: 17px;
-      font-weight: 900;
-      color: #fff;
-      letter-spacing: .01em;
-    }
-    @media (min-width: 680px) {
-      #mobSummaryStrip { display: none !important; }
-    }
-
-    /* ══════════════════════════════════════════════════════
        SCROLL BUTTONS
     ══════════════════════════════════════════════════════ */
     #scrollBtns {
       position: fixed;
       right: 12px;
-      bottom: calc(114px + env(safe-area-inset-bottom) + 10px);
+      bottom: calc(20px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -2950,15 +2891,6 @@
   </main>
 </div>
 
-<!-- Mobile Summary Strip -->
-<div id="mobSummaryStrip">
-  <div class="strip-left">
-    <span class="strip-count" id="stripCount">0</span>
-    <span class="strip-label">មុខទំនិញ</span>
-  </div>
-  <span class="strip-total" id="stripTotal">$0</span>
-</div>
-
 <!-- Scroll nav -->
 <div id="scrollBtns">
   <button id="scrollTopBtn" title="ឡើងលើ">▲</button>
@@ -3770,28 +3702,6 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Load live prices + products from Google Sheets (async, refreshes grid when done) */
   loadProductsFromSheet();
 });
-</script>
-
-<!-- Mobile Summary Strip updater -->
-<script>
-(function(){
-  var strip     = document.getElementById('mobSummaryStrip');
-  var stripCount= document.getElementById('stripCount');
-  var stripTotal= document.getElementById('stripTotal');
-
-  var _origCalc = window.calcTotal;
-  window.calcTotal = function(){
-    if(_origCalc) _origCalc.apply(this, arguments);
-    if(!strip) return;
-    if(typeof items === 'undefined') return;
-    var count = items.reduce(function(s,c){ return s + (c.qty||1); }, 0);
-    var grand = typeof getGrandTotal === 'function' ? getGrandTotal() : 0;
-    if(stripCount) stripCount.textContent = count;
-    if(stripTotal) stripTotal.textContent = '$' + (Number.isInteger(grand) ? grand : grand.toFixed(2));
-    if(count > 0) strip.classList.add('strip-show');
-    else          strip.classList.remove('strip-show');
-  };
-})();
 </script>
 
 <!-- Scroll-aware hide/show -->
