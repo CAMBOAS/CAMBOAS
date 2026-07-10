@@ -1328,6 +1328,12 @@
       /* TikTok panel is smartphone-only — hide on tablet/desktop */
       #mobBottomBar { display: none !important; }
       .no-wrap { padding-left: 0 !important; }
+      /* Scroll buttons: vertically centered on right side */
+      #scrollBtns {
+        bottom: auto;
+        top: 50%;
+        transform: translateY(-50%);
+      }
       .fgrid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
       .no-wrap { padding: 14px 24px 20px; }
       .fg textarea { min-height: 72px; }
