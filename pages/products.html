@@ -15,56 +15,98 @@
     .pw { display:grid; gap:20px }
 
     /* ── Top bar ── */
-    .ptop { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px }
-    .ptop-left h2 { margin:0 0 2px; font-size:22px; font-weight:800; color:var(--text) }
-    .ptop-left p  { margin:0; font-size:13px; color:var(--muted) }
+    .ptop { display:flex; align-items:center; justify-content:space-between; gap:10px }
+    .ptop-left { display:flex; align-items:center; gap:10px }
+    .ptop-icon {
+      width:40px; height:40px; border-radius:12px; flex-shrink:0;
+      background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(6,182,212,.12));
+      border:1.5px solid rgba(124,92,255,.2);
+      display:flex; align-items:center; justify-content:center;
+    }
+    [data-theme="dark"] .ptop-icon { background:linear-gradient(135deg,rgba(124,92,255,.25),rgba(6,182,212,.15)); border-color:rgba(124,92,255,.3); }
+    .ptop-left h2 { margin:0 0 1px; font-size:18px; font-weight:800; color:var(--text) }
+    .ptop-left p  { margin:0; font-size:11px; color:var(--muted); font-weight:600 }
+
+    /* ── Search row ── */
+    .pbar { display:flex; gap:8px; align-items:center; margin-top:12px }
+    .psearch-wrap { position:relative; flex:1; min-width:0 }
+    .psearch-wrap svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.4; pointer-events:none }
+    #srch {
+      width:100%; height:40px; padding:0 14px 0 38px;
+      border-radius:12px; font-size:13px; box-sizing:border-box;
+      border:1.5px solid var(--line,rgba(148,163,184,.22));
+      background:var(--input,rgba(255,255,255,.9));
+      color:var(--text); font-family:inherit; outline:none;
+      transition:border-color .18s;
+    }
+    #srch:focus { border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,.1); }
+    [data-theme="dark"] #srch { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.1); color:#e8e0ff; }
+    #srt {
+      height:40px; padding:0 10px; border-radius:12px; font-size:12px;
+      font-family:inherit; white-space:nowrap; flex-shrink:0;
+      border:1.5px solid var(--line,rgba(148,163,184,.22));
+      background:var(--input,rgba(255,255,255,.9)); color:var(--text); cursor:pointer;
+    }
+    [data-theme="dark"] #srt { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.1); color:#e8e0ff; }
 
     /* ── Status tabs ── */
-    .stab-row { display:flex; gap:6px; flex-wrap:wrap }
+    .stab-row {
+      display:flex; gap:0; margin-top:12px;
+      background:rgba(0,0,0,.04); border-radius:12px; padding:3px;
+      overflow-x:auto; scrollbar-width:none;
+    }
+    .stab-row::-webkit-scrollbar { display:none }
+    [data-theme="dark"] .stab-row { background:rgba(255,255,255,.06); }
     .stab {
-      display:inline-flex; align-items:center; gap:7px;
-      padding:8px 16px; border-radius:999px;
-      border:1.5px solid var(--line);
-      background:transparent; color:var(--muted);
-      font-size:13px; font-weight:700; cursor:pointer;
-      transition:.15s; font-family:inherit; white-space:nowrap;
+      flex:1; display:inline-flex; align-items:center; justify-content:center; gap:5px;
+      padding:7px 8px; border-radius:9px;
+      border:none; background:transparent; color:var(--muted,#6b7898);
+      font-size:12px; font-weight:700; cursor:pointer;
+      transition:.18s; font-family:inherit; white-space:nowrap; min-width:0;
     }
     .stab .stab-cnt {
-      font-size:11px; font-weight:800;
-      background:rgba(255,255,255,.12); color:var(--muted);
-      border-radius:999px; padding:1px 7px; min-width:20px; text-align:center;
+      font-size:10px; font-weight:800;
+      background:rgba(0,0,0,.08); color:var(--muted);
+      border-radius:999px; padding:1px 6px; min-width:18px; text-align:center;
     }
+    [data-theme="dark"] .stab .stab-cnt { background:rgba(255,255,255,.1); }
     .stab.on {
-      background:rgba(6,182,212,.12); border-color:rgba(6,182,212,.4);
-      color:#7dd3fc;
+      background:var(--card,#fff);
+      box-shadow:0 1px 6px rgba(0,0,0,.1), 0 0 0 1px rgba(0,0,0,.04);
+      color:var(--text,#18213a);
     }
-    .stab.on .stab-cnt { background:rgba(6,182,212,.18); color:#7dd3fc }
-    [data-theme="light"] .stab { background:rgba(0,0,0,.03); color:#64748b; border-color:#e2e8f0 }
-    [data-theme="light"] .stab.on { background:rgba(6,182,212,.08); border-color:rgba(6,182,212,.4); color:#0891b2 }
-    [data-theme="light"] .stab .stab-cnt { background:rgba(0,0,0,.06); color:#64748b }
-    [data-theme="light"] .stab.on .stab-cnt { background:rgba(6,182,212,.15); color:#0891b2 }
-
-    /* ── Search + filter bar ── */
-    .pbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center }
-    .psearch-wrap { position:relative; flex:1; min-width:180px }
-    .psearch-wrap svg { position:absolute; left:11px; top:50%; transform:translateY(-50%); opacity:.4; pointer-events:none }
-    #srch { width:100%; min-height:40px; padding:0 12px 0 36px; border-radius:12px; font-size:13px; box-sizing:border-box }
-    #srt  { min-height:40px; padding:0 12px; border-radius:12px; font-size:13px; font-family:inherit }
+    [data-theme="dark"] .stab.on {
+      background:rgba(255,255,255,.12);
+      box-shadow:0 1px 8px rgba(0,0,0,.3);
+      color:#e8e0ff;
+    }
+    .stab.on .stab-cnt { background:rgba(124,92,255,.15); color:#7c5cff; }
+    [data-theme="dark"] .stab.on .stab-cnt { color:#c4b5fd; background:rgba(124,92,255,.2); }
 
     /* ── Category pills ── */
-    .cat-pills { display:flex; gap:6px; flex-wrap:wrap }
-    .cpill {
-      display:inline-flex; align-items:center; gap:5px;
-      padding:5px 14px; border-radius:999px;
-      border:1px solid var(--line); background:rgba(255,255,255,.04);
-      color:var(--muted); font-size:12px; font-weight:700;
-      cursor:pointer; transition:.15s; font-family:inherit;
+    .cat-pills {
+      display:flex; gap:6px; flex-wrap:nowrap; margin-top:10px;
+      overflow-x:auto; scrollbar-width:none; padding-bottom:2px;
     }
-    .cpill svg { flex-shrink:0; opacity:.75 }
+    .cat-pills::-webkit-scrollbar { display:none }
+    .cpill {
+      display:inline-flex; align-items:center; gap:5px; flex-shrink:0;
+      padding:6px 14px; border-radius:999px;
+      border:1.5px solid var(--line,rgba(148,163,184,.22));
+      background:transparent; color:var(--muted,#6b7898);
+      font-size:12px; font-weight:700; cursor:pointer;
+      transition:.15s; font-family:inherit;
+    }
+    .cpill svg { flex-shrink:0; opacity:.7 }
+    .cpill.on {
+      background:rgba(124,92,255,.12); border-color:rgba(124,92,255,.4);
+      color:#7c5cff;
+    }
     .cpill.on svg { opacity:1 }
-    .cpill.on { background:rgba(139,92,246,.12); border-color:rgba(139,92,246,.35); color:#c4b5fd }
-    [data-theme="light"] .cpill { background:#f8fafc; color:#64748b; border-color:#e2e8f0 }
-    [data-theme="light"] .cpill.on { background:rgba(139,92,246,.08); border-color:rgba(139,92,246,.3); color:#7c3aed }
+    [data-theme="light"] .cpill { background:rgba(0,0,0,.03); color:#64748b; border-color:#e2e8f0 }
+    [data-theme="light"] .cpill.on { background:rgba(124,92,255,.08); border-color:rgba(124,92,255,.3); color:#6d28d9 }
+    [data-theme="dark"] .cpill { border-color:rgba(255,255,255,.1); }
+    [data-theme="dark"] .cpill.on { color:#c4b5fd; border-color:rgba(124,92,255,.4); background:rgba(124,92,255,.15); }
 
     /* ── Product grid — responsive columns ── */
     .pg { display:grid; grid-template-columns:repeat(4,1fr); gap:14px }
@@ -838,33 +880,39 @@
       </div>
 
       <!-- Top header -->
-      <div class="glass-card prod-top-card" style="padding:18px 22px;border-radius:22px">
+      <div class="glass-card prod-top-card" style="padding:16px 18px 14px;border-radius:22px">
+        <!-- Row 1: Title + New Order button -->
         <div class="ptop">
           <div class="ptop-left">
-            <h2>Products</h2>
-            <p>គ្រប់គ្រងផលិតផល CAMBO MINI</p>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <div class="pbar">
-              <div class="psearch-wrap">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" id="srch" placeholder="ស្វែងរកផលិតផល..." oninput="fp()">
-              </div>
-              <select id="srt" onchange="fp()">
-                <option value="name">ឈ្មោះ A→Z</option>
-                <option value="price">តម្លៃ ទាប→ខ្ពស់</option>
-                <option value="stock">ស្តុក ច្រើន→តិច</option>
-              </select>
+            <div class="ptop-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#8b5cf6"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
             </div>
-            <button class="no-btn" id="noToggle" onclick="toggleOrderMode()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              New Order
-            </button>
+            <div>
+              <h2>Products</h2>
+              <p>គ្រប់គ្រងផលិតផល</p>
+            </div>
           </div>
+          <button class="no-btn" id="noToggle" onclick="toggleOrderMode()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Order
+          </button>
         </div>
 
-        <!-- Status tabs -->
-        <div class="stab-row" id="stabRow" style="margin-top:16px">
+        <!-- Row 2: Search + Sort -->
+        <div class="pbar">
+          <div class="psearch-wrap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="srch" placeholder="ស្វែងរកផលិតផល..." oninput="fp()">
+          </div>
+          <select id="srt" onchange="fp()">
+            <option value="name">ឈ្មោះ A→Z</option>
+            <option value="price">តម្លៃ ទាប→ខ្ពស់</option>
+            <option value="stock">ស្តុក ច្រើន→តិច</option>
+          </select>
+        </div>
+
+        <!-- Row 3: Status tabs -->
+        <div class="stab-row" id="stabRow">
           <button class="stab on" data-stab="all" onclick="setStat(event,'all')">
             ទាំងអស់ <span class="stab-cnt" id="cntAll">0</span>
           </button>
@@ -879,8 +927,8 @@
           </button>
         </div>
 
-        <!-- Category pills -->
-        <div class="cat-pills" id="catPills" style="margin-top:10px"></div>
+        <!-- Row 4: Category pills -->
+        <div class="cat-pills" id="catPills"></div>
       </div>
 
       <!-- Grid -->
