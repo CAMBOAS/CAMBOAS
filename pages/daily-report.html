@@ -32,13 +32,16 @@
   .dr-btn.open .chev { transform:rotate(180deg) }
 
   /* ── Date Input ── */
-  #drDateInput {
-    height:38px; padding:0 12px; border-radius:12px; border:1px solid var(--line);
+  .dr-date-range { display:flex; align-items:center; gap:6px; flex-wrap:nowrap }
+  .dr-date-range input[type="date"] {
+    height:38px; padding:0 10px; border-radius:12px; border:1px solid var(--line);
     background:rgba(255,255,255,.04); color:var(--text); font-size:12px; font-weight:700;
-    font-family:inherit; cursor:pointer; outline:none;
+    font-family:inherit; cursor:pointer; outline:none; min-width:0; width:140px;
   }
-  [data-theme="light"] #drDateInput { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06) }
-  #drDateInput:focus { border-color:#8b5cf6 }
+  [data-theme="light"] .dr-date-range input[type="date"] { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06) }
+  .dr-date-range input[type="date"]:focus { border-color:#8b5cf6 }
+  .dr-date-sep { font-size:12px; font-weight:700; color:var(--muted); flex-shrink:0 }
+  @media(max-width:600px) { .dr-date-range input[type="date"] { width:120px } }
 
   /* ── Page dropdown ── */
   .dr-page-wrap { position:relative; }
@@ -285,8 +288,12 @@
           <p id="drSubtitle">របាយការណ៍ប្រចាំថ្ងៃ — ជ្រើសរើសកាលបរិច្ឆេទ និង Page</p>
         </div>
         <div class="dr-filter-right">
-          <!-- Date picker -->
-          <input type="date" id="drDateInput" title="ជ្រើសរើសថ្ងៃ">
+          <!-- Date range picker -->
+          <div class="dr-date-range">
+            <input type="date" id="drDateFrom" title="ចាប់ពីថ្ងៃ">
+            <span class="dr-date-sep">→</span>
+            <input type="date" id="drDateTo" title="រហូតដល់ថ្ងៃ">
+          </div>
 
           <!-- Page multi-select -->
           <div class="dr-page-wrap">
@@ -405,10 +412,11 @@
   var KHR_RATE = (function(){ try { var r = Number(localStorage.getItem('cambo_khr_rate')); return r > 0 ? r : 4100; } catch(e) { return 4100; } })();
 
   /* ── State ── */
-  var allOrders     = [];
+  var allOrders      = [];
   var filteredOrders = [];
   var selectedPages  = [];   /* empty = all */
-  var selectedDate   = '';
+  var dateFrom       = '';
+  var dateTo         = '';
   var searchQuery    = '';
 
   /* ── Helpers ── */
@@ -434,12 +442,22 @@
     return 'st-other';
   }
 
-  /* ── Init date ── */
-  var dateInput = document.getElementById('drDateInput');
-  selectedDate = todayYMD();
-  dateInput.value = selectedDate;
-  dateInput.addEventListener('change', function(){
-    selectedDate = this.value;
+  /* ── Init date range ── */
+  var inputFrom = document.getElementById('drDateFrom');
+  var inputTo   = document.getElementById('drDateTo');
+  dateFrom = dateTo = todayYMD();
+  inputFrom.value = dateFrom;
+  inputTo.value   = dateTo;
+  inputFrom.addEventListener('change', function(){
+    dateFrom = this.value;
+    /* auto-correct: if From > To, pull To forward */
+    if (dateTo && dateFrom > dateTo) { dateTo = dateFrom; inputTo.value = dateTo; }
+    applyFilters();
+  });
+  inputTo.addEventListener('change', function(){
+    dateTo = this.value;
+    /* auto-correct: if To < From, push From back */
+    if (dateFrom && dateTo < dateFrom) { dateFrom = dateTo; inputFrom.value = dateFrom; }
     applyFilters();
   });
 
@@ -536,10 +554,17 @@
   });
   pageMenu.addEventListener('click', function(e){ e.stopPropagation(); });
 
+  /* ── Date range label helper ── */
+  function fmtRange() {
+    if (dateFrom === dateTo) return fmtDate(dateFrom);
+    return fmtDate(dateFrom) + ' → ' + fmtDate(dateTo);
+  }
+
   /* ── Filter & Render ── */
   function applyFilters() {
     var byDate = allOrders.filter(function(o){
-      return CamboOrdersData.toYMD(o.date) === selectedDate;
+      var d = CamboOrdersData.toYMD(o.date);
+      return d >= dateFrom && d <= dateTo;
     });
     var byPage = selectedPages.length === 0 ? byDate : byDate.filter(function(o){
       return selectedPages.some(function(pg){ return String(o.page||'').toLowerCase() === pg.toLowerCase(); });
@@ -568,12 +593,12 @@
     document.getElementById('kpiRevenue').textContent = fmtMoney(revenue);
     document.getElementById('kpiKhr').textContent     = Math.round(revenue * KHR_RATE).toLocaleString() + '៛';
     document.getElementById('kpiAvg').textContent     = fmtMoney(avg);
-    document.getElementById('kpiOrdersNote').textContent  = fmtDate(selectedDate);
+    document.getElementById('kpiOrdersNote').textContent  = fmtRange();
     document.getElementById('kpiItemsNote').textContent   = 'ទំនិញ ' + items + ' ឯកតា';
     document.getElementById('kpiRevenueNote').textContent = 'Rate: ' + KHR_RATE.toLocaleString() + '៛/$1';
     document.getElementById('kpiAvgNote').textContent     = orders + ' orders';
-    document.getElementById('drOrdersSubtitle').textContent = orders + ' orders · ' + fmtDate(selectedDate);
-    document.getElementById('drSubtitle').textContent = 'ថ្ងៃ ' + fmtDate(selectedDate) + (selectedPages.length ? ' · ' + selectedPages.join(', ') : ' · ទំព័រទាំងអស់');
+    document.getElementById('drOrdersSubtitle').textContent = orders + ' orders · ' + fmtRange();
+    document.getElementById('drSubtitle').textContent = fmtRange() + (selectedPages.length ? ' · ' + selectedPages.join(', ') : ' · ទំព័រទាំងអស់');
   }
 
   /* ── Order List ── */
@@ -585,7 +610,7 @@
           '<table class="dr-table">' + drTableHead() + '<tbody>' +
             '<tr><td colspan="8" class="dr-orders-empty">' +
               '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.3;display:block;margin:0 auto 10px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' +
-              'គ្មាន Order នៅថ្ងៃ ' + fmtDate(selectedDate) +
+              'គ្មាន Order · ' + fmtRange() +
             '</td></tr>' +
           '</tbody></table>' +
         '</div>';
@@ -656,7 +681,7 @@
           '<tbody>' + rows + '</tbody>' +
         '</table>' +
       '</div>' +
-      '<div class="dr-table-footer">បង្ហាញ ' + filteredOrders.length + ' orders · ' + fmtDate(selectedDate) + '</div>';
+      '<div class="dr-table-footer">បង្ហាញ ' + filteredOrders.length + ' orders · ' + fmtRange() + '</div>';
   }
 
   function drTableHead() {
@@ -696,7 +721,7 @@
     var sorted = Object.values(prodMap).sort(function(a,b){ return b.qty - a.qty; });
     var maxQty = sorted.length ? sorted[0].qty : 1;
     var grid = document.getElementById('drProdGrid');
-    document.getElementById('drProdSubtitle').textContent = sorted.length + ' ប្រភេទផលិតផល · ' + fmtDate(selectedDate);
+    document.getElementById('drProdSubtitle').textContent = sorted.length + ' ប្រភេទផលិតផល · ' + fmtRange();
 
     if (!sorted.length) {
       grid.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">គ្មានទិន្នន័យ</div>';
