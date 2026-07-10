@@ -128,6 +128,36 @@
   .dr-page-count { display:none; background:#8b5cf6; color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:999px; margin-left:2px }
   .dr-page-count.show { display:inline-flex }
 
+  /* ── Actions button ── */
+  .dr-act-wrap { position:relative }
+  .dr-act-btn {
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    height:38px; padding:0 14px; border-radius:12px;
+    border:1px solid var(--line); background:rgba(255,255,255,.04);
+    color:var(--text); font-size:13px; font-weight:700;
+    cursor:pointer; font-family:inherit; transition:border-color .15s, background .15s; white-space:nowrap;
+  }
+  .dr-act-btn:hover,.dr-act-btn.open { border-color:#8b5cf6; background:rgba(139,92,246,.08) }
+  [data-theme="light"] .dr-act-btn { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06) }
+  [data-theme="light"] .dr-act-btn:hover,[data-theme="light"] .dr-act-btn.open { background:rgba(109,40,217,.06) }
+  .dr-act-drop {
+    position:fixed; z-index:9999; background:#1a2235; border:1px solid rgba(139,92,246,.25);
+    border-radius:14px; padding:6px; box-shadow:0 12px 36px rgba(0,0,0,.5);
+    display:none; flex-direction:column; gap:2px; min-width:200px;
+  }
+  .dr-act-drop.show { display:flex }
+  [data-theme="light"] .dr-act-drop { background:#fff; border-color:rgba(109,40,217,.15); box-shadow:0 6px 24px rgba(0,0,0,.12) }
+  .dr-act-item {
+    display:flex; align-items:center; gap:10px; padding:9px 12px;
+    border-radius:9px; border:none; background:none;
+    color:#e2e8f0; font-size:13px; font-weight:600; font-family:inherit;
+    cursor:pointer; text-align:left; width:100%; transition:background .1s;
+  }
+  [data-theme="light"] .dr-act-item { color:#1e293b }
+  .dr-act-item:hover { background:rgba(139,92,246,.15); color:#c4b5fd }
+  [data-theme="light"] .dr-act-item:hover { background:rgba(109,40,217,.08); color:#6d28d9 }
+  .dr-act-item svg { flex-shrink:0; opacity:.7 }
+
   /* ── Refresh ── */
   .dr-refresh {
     display:flex; align-items:center; gap:6px; height:38px; padding:0 16px;
@@ -405,6 +435,13 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
             Refresh
           </button>
+          <!-- Actions -->
+          <div class="dr-act-wrap">
+            <button class="dr-act-btn" id="drActBtn" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"/></svg>
+              Actions
+            </button>
+          </div>
         </div>
       </section>
 
@@ -946,6 +983,183 @@
 
   /* ── Refresh button ── */
   document.getElementById('drRefreshBtn').addEventListener('click', loadData);
+
+  /* ── Actions dropdown ── */
+  (function(){
+    var actBtn  = document.getElementById('drActBtn');
+    var actDrop = document.createElement('div');
+    actDrop.className = 'dr-act-drop';
+    var svgDl = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+    var svgPdf= '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
+    actDrop.innerHTML =
+      '<button class="dr-act-item" id="drExportImg">'+svgDl+' Export as Image (PNG)</button>' +
+      '<button class="dr-act-item" id="drExportPdf">'+svgPdf+' Export as PDF</button>';
+    document.body.appendChild(actDrop);
+
+    function openAct() {
+      var r = actBtn.getBoundingClientRect();
+      var w = 200;
+      var left = r.right - w;
+      if(left < 8) left = 8;
+      actDrop.style.top  = (r.bottom + 6) + 'px';
+      actDrop.style.left = left + 'px';
+      actDrop.classList.add('show');
+      actBtn.classList.add('open');
+    }
+    function closeAct() { actDrop.classList.remove('show'); actBtn.classList.remove('open'); }
+
+    actBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      actDrop.classList.contains('show') ? closeAct() : openAct();
+    });
+    actDrop.addEventListener('click', function(e){ e.stopPropagation(); });
+    document.addEventListener('click', closeAct);
+
+    /* ── Shared: build rows per day ── */
+    function buildDayRows() {
+      var days = {};
+      filteredOrders.forEach(function(o){
+        var d = (CamboOrdersData.toYMD(o.date)||'').slice(0,10);
+        if(!d || d.length < 10) return;
+        if(!days[d]) days[d] = { orders:0, itemsTotal:0 };
+        days[d].orders++;
+        days[d].itemsTotal += totalItems(o);
+      });
+      return Object.keys(days).sort().map(function(d){
+        var p = d.split('-');
+        return {
+          date: p[2]+'/'+p[1]+'/'+p[0].slice(2),
+          orders: days[d].orders,
+          items: days[d].itemsTotal
+        };
+      });
+    }
+
+    /* ── Truncate canvas text safely ── */
+    function truncate(ctx, text, maxW) {
+      if(ctx.measureText(text).width <= maxW) return text;
+      var out = '';
+      for(var i=0; i<text.length; i++){
+        if(ctx.measureText(out+text[i]+'…').width > maxW) break;
+        out += text[i];
+      }
+      return out + '…';
+    }
+
+    /* ── Export PNG ── */
+    document.getElementById('drExportImg').addEventListener('click', function(){
+      closeAct();
+      try {
+        var rows = buildDayRows();
+        // Layout constants — white background, blue header like screenshot
+        var scale=2, pad=40, titleH=70, colH=44, rowH=40;
+        var W=560, colDate=180, colOrd=140, colItem=W-colDate-colOrd;
+        var H = titleH + colH + rows.length*rowH + 40;
+
+        var canvas=document.createElement('canvas');
+        canvas.width=W*scale; canvas.height=H*scale;
+        var ctx=canvas.getContext('2d');
+        ctx.scale(scale,scale);
+
+        // White background
+        ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+
+        // Title "Daily Report"
+        ctx.fillStyle='#1a1a2e'; ctx.font='bold 22px system-ui,sans-serif';
+        ctx.fillText('Daily Report', pad, 38);
+
+        // Subtitle date range
+        var r0=rows[0], rN=rows[rows.length-1];
+        ctx.fillStyle='#6b7280'; ctx.font='12px system-ui,sans-serif';
+        var sub = r0 ? (r0.date+(rows.length>1?' → '+rN.date:'')) : '';
+        ctx.fillText(sub, pad, 58);
+
+        // Header row — blue background
+        ctx.fillStyle='#4285f4';
+        ctx.fillRect(pad, titleH, W-pad*2, colH);
+
+        ctx.fillStyle='#ffffff'; ctx.font='bold 13px system-ui,sans-serif';
+        var x1=pad+16, x2=pad+colDate+20, x3=pad+colDate+colOrd+20;
+        ctx.fillText('Date',   x1, titleH+colH/2+5);
+        ctx.fillText('Orders', x2, titleH+colH/2+5);
+        ctx.fillText('Items',  x3, titleH+colH/2+5);
+
+        // Data rows
+        rows.forEach(function(row,i){
+          var y = titleH+colH + i*rowH;
+          // alternate row bg
+          ctx.fillStyle = i%2===0 ? '#ffffff' : '#f9fafb';
+          ctx.fillRect(pad, y, W-pad*2, rowH);
+
+          // bottom border
+          ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(pad,y+rowH); ctx.lineTo(W-pad,y+rowH); ctx.stroke();
+
+          var cy = y+rowH/2+5;
+          // Date
+          ctx.fillStyle='#111827'; ctx.font='600 13px system-ui,sans-serif';
+          ctx.fillText(row.date, x1, cy);
+          // Orders — centered
+          ctx.fillStyle='#374151'; ctx.font='13px system-ui,sans-serif';
+          ctx.fillText(String(row.orders), x2, cy);
+          // Items — centered
+          ctx.fillText(String(row.items), x3, cy);
+        });
+
+        // Outer border
+        ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=1;
+        ctx.strokeRect(pad, titleH, W-pad*2, colH+rows.length*rowH);
+
+        // Footer
+        ctx.fillStyle='#9ca3af'; ctx.font='10px system-ui,sans-serif';
+        ctx.fillText('CAMBO MINI  ·  '+new Date().toLocaleDateString(), pad, H-12);
+
+        var link=document.createElement('a');
+        link.download='daily-report-'+dateFrom+(dateFrom!==dateTo?'_'+dateTo:'')+'.png';
+        link.href=canvas.toDataURL('image/png'); link.click();
+      } catch(e){ alert('Export error: '+e.message); }
+    });
+
+    /* ── Export PDF (print) ── */
+    document.getElementById('drExportPdf').addEventListener('click', function(){
+      closeAct();
+      var rows = buildDayRows();
+      var r0=rows[0], rN=rows[rows.length-1];
+      var sub = r0 ? (r0.date+(rows.length>1?' → '+rN.date:'')) : '';
+      var trs = rows.map(function(row,i){
+        return '<tr style="background:'+(i%2===0?'#fff':'#f9fafb')+'">' +
+          '<td>'+row.date+'</td>' +
+          '<td class="num">'+row.orders+'</td>' +
+          '<td class="num">'+row.items+'</td>' +
+        '</tr>';
+      }).join('');
+
+      var win=window.open('','_blank','width=700,height=900');
+      win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Daily Report</title><style>' +
+        '*{box-sizing:border-box;margin:0;padding:0}' +
+        'body{font-family:system-ui,sans-serif;padding:32px;color:#111827;background:#fff}' +
+        'h1{font-size:22px;font-weight:700;margin-bottom:4px}' +
+        '.sub{font-size:12px;color:#6b7280;margin-bottom:24px}' +
+        'table{width:100%;border-collapse:collapse;font-size:13px}' +
+        'thead tr{background:#4285f4}' +
+        'thead th{color:#fff;padding:11px 16px;text-align:left;font-size:13px;font-weight:700}' +
+        'td{padding:10px 16px;border-bottom:1px solid #e5e7eb;color:#374151}' +
+        'td.num{text-align:left;font-weight:600}' +
+        '.footer{margin-top:24px;font-size:10px;color:#9ca3af}' +
+        '@media print{@page{margin:20mm}body{padding:0}}' +
+        '</style></head><body>' +
+        '<h1>Daily Report</h1>' +
+        '<div class="sub">'+sub+'</div>' +
+        '<table>' +
+          '<thead><tr><th>Date</th><th>Orders</th><th>Items</th></tr></thead>' +
+          '<tbody>'+trs+'</tbody>' +
+        '</table>' +
+        '<div class="footer">CAMBO MINI &nbsp;·&nbsp; Generated '+new Date().toLocaleString()+'</div>' +
+        '<script>window.onload=function(){setTimeout(function(){window.print();},300);}<\/script>' +
+        '</body></html>');
+      win.document.close();
+    });
+  })();
 
   /* ── Spin animation ── */
   var style = document.createElement('style');
