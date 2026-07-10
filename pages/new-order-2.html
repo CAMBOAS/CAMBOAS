@@ -1325,38 +1325,8 @@
       }
       #rightCol::-webkit-scrollbar { display: none; }
       #cartPanel { position: static; }
-      .mob-bottom-bar {
-        position: relative !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        width: auto !important;
-        bottom: auto !important;
-        left: auto !important;
-        right: auto !important;
-        top: auto !important;
-        height: auto !important;
-        min-height: 60px;
-        gap: 8px !important;
-        border-radius: 18px !important;
-        border: 1px solid var(--line, rgba(0,0,0,.08)) !important;
-        box-shadow: 0 4px 24px rgba(0,0,0,.07) !important;
-        padding: 10px 14px !important;
-        transform: none !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        background: var(--card, rgba(255,255,255,.92)) !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-      }
-      .mob-bottom-bar.bar-hidden {
-        display: none !important;
-        transform: none !important;
-      }
-      /* Desktop: restore horizontal button styles */
-      .tik-btn { width: auto; min-width: 42px; padding: 8px 10px; }
-      .tik-receipt { flex-direction: row; width: auto; align-items: center; gap: 6px; }
-      #receiptNo { width: 100px; height: 40px; font-size: 14px; }
-      .tik-div { width: 1px; height: 32px; }
+      /* TikTok panel is smartphone-only — hide on tablet/desktop */
+      #mobBottomBar { display: none !important; }
       .no-wrap { padding-left: 0 !important; }
       .fgrid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
       .no-wrap { padding: 14px 24px 20px; }
