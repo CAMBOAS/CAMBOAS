@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <script>(function(){var r=localStorage.getItem('cambo_login_required');if(r==='false')return;var k='cambo_session';if(sessionStorage.getItem(k)==='1'||localStorage.getItem(k)==='1')return;document.documentElement.style.visibility='hidden';location.replace('../login.html');})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+  <title>Daily Report - CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="apple-touch-icon" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=158">
+  <link rel="stylesheet" href="../assets/css/main.css?v=158">
+  <style>
+  .dr-wrap { display:grid; gap:18px; padding:4px 0 12px }
+
+  /* ── Filter Bar ── */
+  .dr-filter { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:14px 20px; border-radius:20px }
+  .dr-filter-left { display:flex; flex-direction:column; gap:2px }
+  .dr-filter-left h2 { margin:0; font-size:17px; font-weight:800; color:var(--text) }
+  .dr-filter-left p { margin:0; font-size:11px; color:var(--muted) }
+  .dr-filter-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+
+  /* ── Filter Buttons ── */
+  .dr-btn { display:inline-flex; align-items:center; gap:6px; height:38px; padding:0 14px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--text); font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; transition:background .12s; white-space:nowrap }
+  .dr-btn:hover { background:rgba(255,255,255,.08) }
+  [data-theme="light"] .dr-btn { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06) }
+  [data-theme="light"] .dr-btn:hover { background:#f1f5f9 }
+  .dr-btn svg { opacity:.55; flex-shrink:0 }
+  .dr-btn .chev { transition:transform .2s }
+  .dr-btn.open .chev { transform:rotate(180deg) }
+
+  /* ── Date Input ── */
+  #drDateInput {
+    height:38px; padding:0 12px; border-radius:12px; border:1px solid var(--line);
+    background:rgba(255,255,255,.04); color:var(--text); font-size:12px; font-weight:700;
+    font-family:inherit; cursor:pointer; outline:none;
+  }
+  [data-theme="light"] #drDateInput { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06) }
+  #drDateInput:focus { border-color:#8b5cf6 }
+
+  /* ── Float Menus ── */
+  .dr-float-menu {
+    display:none; position:fixed; z-index:9999;
+    background:#1e1b2e; border:1px solid rgba(139,92,246,.25); border-radius:14px;
+    padding:6px; box-shadow:0 12px 40px rgba(0,0,0,.45);
+    min-width:190px; max-width:240px; max-height:320px; overflow-y:auto;
+    flex-direction:column; gap:2px;
+  }
+  [data-theme="light"] .dr-float-menu { background:#fff; border-color:rgba(0,0,0,.1); box-shadow:0 8px 32px rgba(0,0,0,.15) }
+  .dr-float-menu.show { display:flex }
+  .dr-menu-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:9px 12px; border-radius:10px; border:none; background:none;
+    color:#e2e8f0; font-size:13px; font-family:inherit; cursor:pointer;
+    transition:background .12s; text-align:left; width:100%; gap:8px;
+  }
+  [data-theme="light"] .dr-menu-item { color:#1e293b }
+  .dr-menu-item:hover { background:rgba(139,92,246,.15) }
+  .dr-menu-item.active { background:rgba(139,92,246,.2); color:#c4b5fd; font-weight:700 }
+  [data-theme="light"] .dr-menu-item.active { background:rgba(139,92,246,.1); color:#7c3aed }
+  .dr-menu-chk { opacity:0; font-size:12px; color:#a78bfa; flex-shrink:0 }
+  .dr-menu-item.active .dr-menu-chk { opacity:1 }
+  .dr-menu-divider { height:1px; background:rgba(148,163,184,.15); margin:4px 6px }
+
+  /* ── Refresh ── */
+  .dr-refresh {
+    display:flex; align-items:center; gap:6px; height:38px; padding:0 16px;
+    border-radius:12px; background:linear-gradient(135deg,#8b5cf6,#06b6d4);
+    border:none; color:#fff; font-size:13px; font-weight:700;
+    cursor:pointer; font-family:inherit; transition:opacity .15s; white-space:nowrap;
+  }
+  .dr-refresh:hover { opacity:.88 }
+  .dr-refresh.loading { opacity:.6; pointer-events:none }
+  .dr-refresh svg { flex-shrink:0 }
+
+  /* ── KPI Cards ── */
+  .dr-kpi { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px }
+  .kpi-c { padding:18px 20px; border-radius:20px; position:relative; overflow:hidden }
+  .kpi-c::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:20px 20px 0 0 }
+  .kpi-c.kc1::before { background:linear-gradient(90deg,#06b6d4,#22d3ee) }
+  .kpi-c.kc2::before { background:linear-gradient(90deg,#8b5cf6,#a78bfa) }
+  .kpi-c.kc3::before { background:linear-gradient(90deg,#10b981,#34d399) }
+  .kpi-c.kc4::before { background:linear-gradient(90deg,#f59e0b,#fbbf24) }
+  .kpi-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:10px }
+  .kpi-ico { width:40px; height:40px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0 }
+  .kc1 .kpi-ico { background:rgba(6,182,212,.15); color:#22d3ee }
+  .kc2 .kpi-ico { background:rgba(139,92,246,.15); color:#a78bfa }
+  .kc3 .kpi-ico { background:rgba(16,185,129,.15); color:#34d399 }
+  .kc4 .kpi-ico { background:rgba(245,158,11,.15); color:#fbbf24 }
+  .kpi-lbl { font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--muted) }
+  .kpi-val { font-size:26px; font-weight:800; color:var(--text); line-height:1; margin-top:2px }
+  .kpi-note { font-size:11px; color:var(--muted); margin-top:6px }
+
+  /* ── Order List ── */
+  .dr-orders-card { padding:16px 20px; border-radius:20px }
+  .dr-orders-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px }
+  .dr-orders-head h3 { margin:0; font-size:15px; font-weight:800; color:var(--text) }
+  .dr-orders-head p { margin:0; font-size:11px; color:var(--muted) }
+  .dr-orders-search { display:flex; align-items:center; gap:8px }
+  .dr-search-box {
+    position:relative; width:200px;
+  }
+  .dr-search-box input {
+    width:100%; height:34px; padding:0 12px 0 32px; border-radius:10px;
+    border:1px solid var(--line); background:rgba(255,255,255,.05);
+    color:var(--text); font-size:12px; font-family:inherit; outline:none; box-sizing:border-box;
+  }
+  [data-theme="light"] .dr-search-box input { background:#fff }
+  .dr-search-box svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); opacity:.4; pointer-events:none }
+
+  .dr-orders-empty { text-align:center; padding:40px 20px; color:var(--muted); font-size:13px }
+  .dr-orders-empty svg { opacity:.3; margin-bottom:12px }
+
+  /* ── Order Row ── */
+  .dr-order-row {
+    border:1px solid var(--line); border-radius:14px; margin-bottom:8px;
+    overflow:hidden; transition:box-shadow .15s;
+  }
+  .dr-order-row:hover { box-shadow:0 2px 12px rgba(0,0,0,.08) }
+  [data-theme="dark"] .dr-order-row:hover { box-shadow:0 2px 12px rgba(0,0,0,.25) }
+  .dr-order-head {
+    display:flex; align-items:center; gap:10px; padding:11px 14px;
+    cursor:pointer; background:rgba(255,255,255,.02); transition:background .12s;
+    flex-wrap:wrap;
+  }
+  .dr-order-head:hover { background:rgba(139,92,246,.05) }
+  [data-theme="light"] .dr-order-head { background:rgba(0,0,0,.01) }
+  [data-theme="light"] .dr-order-head:hover { background:rgba(139,92,246,.04) }
+
+  .dr-order-num { font-size:11px; font-weight:800; color:var(--muted); min-width:24px }
+  .dr-order-id { font-size:10px; font-weight:700; color:var(--muted); background:rgba(148,163,184,.12); padding:2px 7px; border-radius:6px; flex-shrink:0; font-family:monospace }
+  .dr-order-cust { font-size:13px; font-weight:700; color:var(--text); flex:1; min-width:100px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .dr-order-page { font-size:11px; font-weight:700; padding:2px 8px; border-radius:6px; background:rgba(139,92,246,.12); color:#a78bfa; flex-shrink:0; white-space:nowrap }
+  [data-theme="light"] .dr-order-page { color:#7c3aed; background:rgba(124,58,237,.1) }
+  .dr-order-items-badge {
+    display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:800;
+    padding:2px 8px; border-radius:6px; background:rgba(6,182,212,.1); color:#22d3ee;
+    flex-shrink:0;
+  }
+  [data-theme="light"] .dr-order-items-badge { color:#0891b2; background:rgba(6,182,212,.1) }
+  .dr-order-total { font-size:13px; font-weight:800; color:#10b981; flex-shrink:0 }
+  [data-theme="light"] .dr-order-total { color:#059669 }
+  .dr-order-status {
+    font-size:10px; font-weight:700; padding:2px 8px; border-radius:6px; flex-shrink:0;
+    white-space:nowrap;
+  }
+  .dr-order-status.st-done { background:rgba(16,185,129,.12); color:#34d399 }
+  .dr-order-status.st-pending { background:rgba(245,158,11,.12); color:#fbbf24 }
+  .dr-order-status.st-cancel { background:rgba(239,68,68,.12); color:#f87171 }
+  .dr-order-status.st-other { background:rgba(148,163,184,.1); color:var(--muted) }
+  [data-theme="light"] .dr-order-status.st-done { color:#059669 }
+  [data-theme="light"] .dr-order-status.st-pending { color:#d97706 }
+  [data-theme="light"] .dr-order-status.st-cancel { color:#dc2626 }
+  .dr-chevron { margin-left:auto; transition:transform .2s; opacity:.5; flex-shrink:0 }
+  .dr-order-row.open .dr-chevron { transform:rotate(180deg) }
+
+  /* ── Order Detail (expanded) ── */
+  .dr-order-detail { display:none; border-top:1px solid var(--line); padding:12px 14px 14px; background:rgba(0,0,0,.02) }
+  [data-theme="light"] .dr-order-detail { background:rgba(0,0,0,.015) }
+  .dr-order-row.open .dr-order-detail { display:block }
+
+  /* Order meta row */
+  .dr-meta-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:12px }
+  .dr-meta-item { display:flex; flex-direction:column; gap:2px }
+  .dr-meta-lbl { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--muted) }
+  .dr-meta-val { font-size:12px; font-weight:700; color:var(--text) }
+
+  /* Items table */
+  .dr-items-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:8px }
+  .dr-item-row {
+    display:grid; grid-template-columns:1fr auto auto auto;
+    gap:8px; align-items:center;
+    padding:8px 10px; border-radius:10px; margin-bottom:4px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(148,163,184,.1);
+  }
+  [data-theme="light"] .dr-item-row { background:#f8fafc; border-color:#e2e8f0 }
+  .dr-item-name { font-size:13px; font-weight:700; color:var(--text) }
+  .dr-item-qty { font-size:12px; font-weight:700; color:var(--muted); background:rgba(148,163,184,.12); padding:2px 8px; border-radius:6px; text-align:center }
+  .dr-item-price { font-size:12px; font-weight:700; color:var(--muted); text-align:right }
+  .dr-item-sub { font-size:13px; font-weight:800; color:#10b981; text-align:right }
+  [data-theme="light"] .dr-item-sub { color:#059669 }
+  .dr-items-total { display:flex; justify-content:flex-end; gap:12px; align-items:center; margin-top:8px; padding-top:8px; border-top:1px dashed rgba(148,163,184,.2) }
+  .dr-items-total-lbl { font-size:11px; font-weight:700; color:var(--muted) }
+  .dr-items-total-val { font-size:15px; font-weight:800; color:#8b5cf6 }
+
+  /* Note */
+  .dr-note { margin-top:8px; padding:8px 10px; border-radius:8px; font-size:12px; color:var(--muted); background:rgba(245,158,11,.06); border:1px solid rgba(245,158,11,.15) }
+
+  /* ── Product Summary ── */
+  .dr-prod-card { padding:16px 20px; border-radius:20px }
+  .dr-prod-head { margin-bottom:14px }
+  .dr-prod-head h3 { margin:0 0 2px; font-size:15px; font-weight:800; color:var(--text) }
+  .dr-prod-head p { margin:0; font-size:11px; color:var(--muted) }
+  .dr-prod-grid { display:grid; gap:8px }
+  .dr-prod-row {
+    display:flex; align-items:center; gap:10px; padding:10px 12px;
+    border-radius:12px; background:rgba(255,255,255,.03); border:1px solid rgba(148,163,184,.1);
+  }
+  [data-theme="light"] .dr-prod-row { background:#f8fafc; border-color:#e2e8f0 }
+  .dr-prod-rank { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; background:rgba(139,92,246,.15); color:#a78bfa }
+  .dr-prod-rank.r1 { background:linear-gradient(135deg,#f59e0b,#fde68a); color:#78350f }
+  .dr-prod-rank.r2 { background:linear-gradient(135deg,#94a3b8,#e2e8f0); color:#1e293b }
+  .dr-prod-rank.r3 { background:linear-gradient(135deg,#b45309,#fbbf24); color:#fff }
+  .dr-prod-info { flex:1; min-width:0 }
+  .dr-prod-name { font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+  .dr-prod-sub { font-size:11px; color:var(--muted); margin-top:2px }
+  .dr-prod-bar-wrap { margin-top:5px; height:4px; border-radius:4px; background:rgba(148,163,184,.14); overflow:hidden }
+  .dr-prod-bar { height:100%; border-radius:4px; background:linear-gradient(90deg,#8b5cf6,#06b6d4); transition:width .5s ease }
+  .dr-prod-rev { font-size:13px; font-weight:800; color:#7dd3fc; flex-shrink:0 }
+  [data-theme="light"] .dr-prod-rev { color:#4f46e5 }
+
+  /* ── Two-col bottom layout ── */
+  .dr-bottom { display:grid; grid-template-columns:1fr 320px; gap:18px; align-items:start }
+  @media(max-width:900px) { .dr-bottom { grid-template-columns:1fr } }
+
+  /* ── Responsive ── */
+  @media(max-width:1100px) { .dr-kpi { grid-template-columns:repeat(2,minmax(0,1fr)) } }
+  @media(max-width:600px) {
+    .dr-kpi { grid-template-columns:1fr }
+    .dr-filter { flex-direction:column; align-items:stretch }
+    .dr-filter-right { flex-wrap:wrap }
+    .dr-btn, .dr-refresh { flex:1; justify-content:center }
+    .dr-search-box { width:100% }
+    .dr-orders-head { flex-direction:column; align-items:stretch }
+    .dr-item-row { grid-template-columns:1fr auto auto }
+    .dr-item-price { display:none }
+  }
+
+  /* ── Skeleton ── */
+  .dr-skeleton { animation:dr-pulse 1.5s ease-in-out infinite }
+  @keyframes dr-pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+  .dr-skel-bar { height:14px; border-radius:7px; background:rgba(148,163,184,.15); margin-bottom:8px }
+
+  /* ── KHR Badge ── */
+  .kpi-khr { font-size:13px; font-weight:800; color:#f59e0b; margin-top:4px }
+  </style>
+</head>
+<body>
+<div class="background"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+<div class="dashboard">
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar" id="sharedSidebar"></aside>
+  <main class="main-content">
+    <div class="shared-topbar" id="sharedHeader"></div>
+    <div class="dr-wrap">
+
+      <!-- Filter Bar -->
+      <section class="glass-card dr-filter">
+        <div class="dr-filter-left">
+          <h2>📊 Daily Report</h2>
+          <p id="drSubtitle">របាយការណ៍ប្រចាំថ្ងៃ — ជ្រើសរើសកាលបរិច្ឆេទ និង Page</p>
+        </div>
+        <div class="dr-filter-right">
+          <!-- Date picker -->
+          <input type="date" id="drDateInput" title="ជ្រើសរើសថ្ងៃ">
+
+          <!-- Page multi-select -->
+          <button class="dr-btn" id="drPageBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span class="lbl" id="drPageLabel">ទំព័រទាំងអស់</span>
+            <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="dr-float-menu" id="drPageMenu"></div>
+
+          <!-- Refresh -->
+          <button class="dr-refresh" id="drRefreshBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+      </section>
+
+      <!-- KPI -->
+      <section class="dr-kpi">
+        <article class="glass-card kpi-c kc1">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-lbl">Orders</div>
+              <div class="kpi-val" id="kpiOrders">—</div>
+            </div>
+            <div class="kpi-ico">📋</div>
+          </div>
+          <div class="kpi-note" id="kpiOrdersNote">ចំនួន Order ប្រចាំថ្ងៃ</div>
+        </article>
+        <article class="glass-card kpi-c kc2">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-lbl">Items Sold</div>
+              <div class="kpi-val" id="kpiItems">—</div>
+            </div>
+            <div class="kpi-ico">📦</div>
+          </div>
+          <div class="kpi-note" id="kpiItemsNote">ផលិតផលសរុបទំនិញ</div>
+        </article>
+        <article class="glass-card kpi-c kc3">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-lbl">Revenue</div>
+              <div class="kpi-val" id="kpiRevenue">—</div>
+            </div>
+            <div class="kpi-ico">💵</div>
+          </div>
+          <div class="kpi-khr" id="kpiKhr">—</div>
+          <div class="kpi-note" id="kpiRevenueNote">ចំណូលសរុប</div>
+        </article>
+        <article class="glass-card kpi-c kc4">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-lbl">Avg / Order</div>
+              <div class="kpi-val" id="kpiAvg">—</div>
+            </div>
+            <div class="kpi-ico">📈</div>
+          </div>
+          <div class="kpi-note" id="kpiAvgNote">មធ្យមក្នុងមួយ Order</div>
+        </article>
+      </section>
+
+      <!-- Bottom: Orders + Product Summary -->
+      <div class="dr-bottom">
+
+        <!-- Order List -->
+        <section class="glass-card dr-orders-card">
+          <div class="dr-orders-head">
+            <div>
+              <h3>បញ្ជី Orders</h3>
+              <p id="drOrdersSubtitle">Order list for the selected date</p>
+            </div>
+            <div class="dr-orders-search">
+              <div class="dr-search-box">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="drSearchInput" placeholder="ស្វែងរកអតិថិជន...">
+              </div>
+            </div>
+          </div>
+          <div id="drOrderList">
+            <div class="dr-orders-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <div style="margin-top:8px">ចុច Refresh ដើម្បីទាញទិន្នន័យ</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Product Summary -->
+        <section class="glass-card dr-prod-card">
+          <div class="dr-prod-head">
+            <h3>ផលិតផលលក់ច្រើន</h3>
+            <p id="drProdSubtitle">ក្នុងថ្ងៃនេះ</p>
+          </div>
+          <div class="dr-prod-grid" id="drProdGrid">
+            <div class="dr-skeleton" style="height:120px;border-radius:12px;background:rgba(148,163,184,.1)"></div>
+          </div>
+        </section>
+
+      </div>
+    </div><!-- /dr-wrap -->
+  </main>
+</div>
+
+<script src="../assets/js/layout.js?v=158"></script>
+<script src="../assets/js/orders-data.js?v=158"></script>
+<script src="../assets/js/cambo-api.js?v=164"></script>
+<script src="../assets/js/sw-register.js?v=158"></script>
+<script>
+(function(){
+  'use strict';
+
+  /* ── KHR Rate (shared with products page) ── */
+  var KHR_RATE = (function(){ try { var r = Number(localStorage.getItem('cambo_khr_rate')); return r > 0 ? r : 4100; } catch(e) { return 4100; } })();
+
+  /* ── State ── */
+  var allOrders     = [];
+  var filteredOrders = [];
+  var selectedPages  = [];   /* empty = all */
+  var selectedDate   = '';
+  var searchQuery    = '';
+
+  /* ── Helpers ── */
+  function pad(n) { return String(n).padStart(2,'0'); }
+  function todayYMD() {
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
+  function fmtMoney(v) { var n = Number(v||0); return '$' + n.toFixed(2).replace(/\.00$/,''); }
+  function fmtMoneyFull(v) { var n = Number(v||0); return '$' + n.toFixed(2); }
+  function fmtDate(ymd) { if(!ymd) return '-'; var p=ymd.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function calcOrderTotal(o) {
+    var prod = (o.products||[]).reduce(function(s,p){ return s + (Number(p.qty||0)*Number(p.price||0)) - Number(p.discount||0); }, 0);
+    return prod + Number(o.deliveryFee||0);
+  }
+  function totalItems(o) { return (o.products||[]).reduce(function(s,p){ return s + Number(p.qty||0); }, 0); }
+  function statusClass(s) {
+    var lower = String(s||'').toLowerCase();
+    if (lower.includes('done') || lower.includes('delivered') || lower.includes('success')) return 'st-done';
+    if (lower.includes('cancel') || lower.includes('reject')) return 'st-cancel';
+    if (lower.includes('pending') || lower.includes('wait')) return 'st-pending';
+    return 'st-other';
+  }
+
+  /* ── Init date ── */
+  var dateInput = document.getElementById('drDateInput');
+  selectedDate = todayYMD();
+  dateInput.value = selectedDate;
+  dateInput.addEventListener('change', function(){
+    selectedDate = this.value;
+    applyFilters();
+  });
+
+  /* ── Page menu ── */
+  var pageBtn  = document.getElementById('drPageBtn');
+  var pageMenu = document.getElementById('drPageMenu');
+  var pageLbl  = document.getElementById('drPageLabel');
+
+  function buildPageMenu(pages) {
+    pageMenu.innerHTML = '';
+    /* "All" option */
+    var allBtn = document.createElement('button');
+    allBtn.className = 'dr-menu-item' + (selectedPages.length === 0 ? ' active' : '');
+    allBtn.innerHTML = '<span>ទំព័រទាំងអស់</span><span class="dr-menu-chk">✓</span>';
+    allBtn.addEventListener('click', function(){
+      selectedPages = [];
+      updatePageLabel();
+      buildPageMenu(pages);
+      applyFilters();
+    });
+    pageMenu.appendChild(allBtn);
+    var div = document.createElement('div'); div.className = 'dr-menu-divider';
+    pageMenu.appendChild(div);
+
+    pages.forEach(function(pg){
+      var isActive = selectedPages.includes(pg);
+      var btn = document.createElement('button');
+      btn.className = 'dr-menu-item' + (isActive ? ' active' : '');
+      btn.innerHTML = '<span>' + esc(pg) + '</span><span class="dr-menu-chk">✓</span>';
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var idx = selectedPages.indexOf(pg);
+        if (idx >= 0) selectedPages.splice(idx, 1);
+        else selectedPages.push(pg);
+        updatePageLabel();
+        buildPageMenu(pages);
+        applyFilters();
+      });
+      pageMenu.appendChild(btn);
+    });
+  }
+
+  function updatePageLabel() {
+    if (selectedPages.length === 0) pageLbl.textContent = 'ទំព័រទាំងអស់';
+    else if (selectedPages.length === 1) pageLbl.textContent = selectedPages[0];
+    else pageLbl.textContent = selectedPages.length + ' Pages';
+  }
+
+  /* float menu toggle */
+  pageBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    var isOpen = pageMenu.classList.contains('show');
+    closeAllMenus();
+    if (!isOpen) {
+      var r = pageBtn.getBoundingClientRect();
+      pageMenu.style.top  = (r.bottom + 6) + 'px';
+      pageMenu.style.left = Math.min(r.left, window.innerWidth - 250) + 'px';
+      pageMenu.classList.add('show');
+      pageBtn.classList.add('open');
+    }
+  });
+
+  function closeAllMenus() {
+    pageMenu.classList.remove('show');
+    pageBtn.classList.remove('open');
+  }
+  document.addEventListener('click', closeAllMenus);
+
+  /* ── Filter & Render ── */
+  function applyFilters() {
+    var byDate = allOrders.filter(function(o){
+      return CamboOrdersData.toYMD(o.date) === selectedDate;
+    });
+    var byPage = selectedPages.length === 0 ? byDate : byDate.filter(function(o){
+      return selectedPages.some(function(pg){ return String(o.page||'').toLowerCase() === pg.toLowerCase(); });
+    });
+    var q = searchQuery.trim().toLowerCase();
+    filteredOrders = q ? byPage.filter(function(o){
+      return String(o.customer||'').toLowerCase().includes(q) ||
+             String(o.id||'').toLowerCase().includes(q) ||
+             String(o.phone||'').toLowerCase().includes(q);
+    }) : byPage;
+
+    renderKPI();
+    renderOrders();
+    renderProducts();
+  }
+
+  /* ── KPI ── */
+  function renderKPI() {
+    var orders  = filteredOrders.length;
+    var items   = filteredOrders.reduce(function(s,o){ return s + totalItems(o); }, 0);
+    var revenue = filteredOrders.reduce(function(s,o){ return s + calcOrderTotal(o); }, 0);
+    var avg     = orders ? revenue / orders : 0;
+
+    document.getElementById('kpiOrders').textContent  = orders;
+    document.getElementById('kpiItems').textContent   = items;
+    document.getElementById('kpiRevenue').textContent = fmtMoney(revenue);
+    document.getElementById('kpiKhr').textContent     = Math.round(revenue * KHR_RATE).toLocaleString() + '៛';
+    document.getElementById('kpiAvg').textContent     = fmtMoney(avg);
+    document.getElementById('kpiOrdersNote').textContent  = fmtDate(selectedDate);
+    document.getElementById('kpiItemsNote').textContent   = 'ទំនិញ ' + items + ' ឯកតា';
+    document.getElementById('kpiRevenueNote').textContent = 'Rate: ' + KHR_RATE.toLocaleString() + '៛/$1';
+    document.getElementById('kpiAvgNote').textContent     = orders + ' orders';
+    document.getElementById('drOrdersSubtitle').textContent = orders + ' orders · ' + fmtDate(selectedDate);
+    document.getElementById('drSubtitle').textContent = 'ថ្ងៃ ' + fmtDate(selectedDate) + (selectedPages.length ? ' · ' + selectedPages.join(', ') : ' · ទំព័រទាំងអស់');
+  }
+
+  /* ── Order List ── */
+  function renderOrders() {
+    var container = document.getElementById('drOrderList');
+    if (!filteredOrders.length) {
+      container.innerHTML = '<div class="dr-orders-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div style="margin-top:8px">គ្មាន Order នៅថ្ងៃ ' + fmtDate(selectedDate) + '</div></div>';
+      return;
+    }
+    container.innerHTML = filteredOrders.map(function(o, i){
+      var total = calcOrderTotal(o);
+      var items = totalItems(o);
+      var stCls = statusClass(o.status);
+      var products = (o.products||[]);
+
+      var itemsHtml = products.length ? products.map(function(p){
+        var sub = (Number(p.qty||0)*Number(p.price||0)) - Number(p.discount||0);
+        return '<div class="dr-item-row">' +
+          '<div class="dr-item-name">' + esc(p.name) + '</div>' +
+          '<div class="dr-item-qty">× ' + (p.qty||1) + '</div>' +
+          '<div class="dr-item-price">' + fmtMoneyFull(p.price) + '/pc</div>' +
+          '<div class="dr-item-sub">' + fmtMoneyFull(sub) + '</div>' +
+        '</div>';
+      }).join('') : '<div style="font-size:12px;color:var(--muted);padding:8px 0">គ្មានផលិតផល</div>';
+
+      var metaHtml = [
+        o.phone     ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ទូរស័ព្ទ</div><div class="dr-meta-val">' + esc(o.phone) + '</div></div>' : '',
+        o.province  ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ខេត្ត</div><div class="dr-meta-val">' + esc(o.province) + '</div></div>' : '',
+        o.deliveryName ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ដឹកជញ្ជូន</div><div class="dr-meta-val">' + esc(o.deliveryName) + '</div></div>' : '',
+        o.deliveryFee  ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ថ្លៃដឹក</div><div class="dr-meta-val">$' + Number(o.deliveryFee).toFixed(2) + '</div></div>' : '',
+        o.payment   ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ការទូទាត់</div><div class="dr-meta-val">' + esc(o.payment) + '</div></div>' : '',
+        o.closeBy   ? '<div class="dr-meta-item"><div class="dr-meta-lbl">CloseBy</div><div class="dr-meta-val">' + esc(o.closeBy) + '</div></div>' : '',
+        o.receiptNo ? '<div class="dr-meta-item"><div class="dr-meta-lbl">លេខប៉ុង</div><div class="dr-meta-val">#' + esc(o.receiptNo) + '</div></div>' : '',
+      ].filter(Boolean).join('');
+
+      var noteHtml = o.note ? '<div class="dr-note">📝 ' + esc(o.note) + '</div>' : '';
+
+      return '<div class="dr-order-row" id="dr-row-' + i + '">' +
+        '<div class="dr-order-head" onclick="drToggleRow(' + i + ')">' +
+          '<span class="dr-order-num">' + (i+1) + '</span>' +
+          '<span class="dr-order-id">#' + esc(o.id) + '</span>' +
+          '<span class="dr-order-cust">' + (o.customer ? esc(o.customer) : '<em style="opacity:.5">Unknown</em>') + '</span>' +
+          (o.page ? '<span class="dr-order-page">' + esc(o.page) + '</span>' : '') +
+          '<span class="dr-order-items-badge">📦 ' + items + ' item' + (items !== 1 ? 's' : '') + '</span>' +
+          '<span class="dr-order-total">' + fmtMoneyFull(total) + '</span>' +
+          '<span class="dr-order-status ' + stCls + '">' + esc(o.status||'Pending') + '</span>' +
+          '<svg class="dr-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+        '</div>' +
+        '<div class="dr-order-detail">' +
+          (metaHtml ? '<div class="dr-meta-row">' + metaHtml + '</div>' : '') +
+          '<div class="dr-items-title">ផលិតផល</div>' +
+          itemsHtml +
+          '<div class="dr-items-total">' +
+            '<span class="dr-items-total-lbl">Grand Total</span>' +
+            '<span class="dr-items-total-val">' + fmtMoneyFull(total) + ' · ' + Math.round(total * KHR_RATE).toLocaleString() + '៛</span>' +
+          '</div>' +
+          noteHtml +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  window.drToggleRow = function(i){
+    var row = document.getElementById('dr-row-' + i);
+    if (row) row.classList.toggle('open');
+  };
+
+  /* ── Product Summary ── */
+  function renderProducts() {
+    var prodMap = {};
+    filteredOrders.forEach(function(o){
+      (o.products||[]).forEach(function(p){
+        var key = String(p.name||'').trim();
+        if (!key) return;
+        if (!prodMap[key]) prodMap[key] = { name:key, qty:0, revenue:0, orders:0 };
+        prodMap[key].qty     += Number(p.qty||0);
+        prodMap[key].revenue += (Number(p.qty||0)*Number(p.price||0)) - Number(p.discount||0);
+        prodMap[key].orders  += 1;
+      });
+    });
+    var sorted = Object.values(prodMap).sort(function(a,b){ return b.qty - a.qty; });
+    var maxQty = sorted.length ? sorted[0].qty : 1;
+    var grid = document.getElementById('drProdGrid');
+    document.getElementById('drProdSubtitle').textContent = sorted.length + ' ប្រភេទផលិតផល · ' + fmtDate(selectedDate);
+
+    if (!sorted.length) {
+      grid.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">គ្មានទិន្នន័យ</div>';
+      return;
+    }
+    grid.innerHTML = sorted.map(function(p, i){
+      var rankCls = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
+      var pct = maxQty > 0 ? (p.qty / maxQty * 100) : 0;
+      return '<div class="dr-prod-row">' +
+        '<div class="dr-prod-rank ' + rankCls + '">' + (i+1) + '</div>' +
+        '<div class="dr-prod-info">' +
+          '<div class="dr-prod-name">' + esc(p.name) + '</div>' +
+          '<div class="dr-prod-sub">' + p.qty + ' ឯកតា · ' + p.orders + ' order' + (p.orders !== 1 ? 's' : '') + '</div>' +
+          '<div class="dr-prod-bar-wrap"><div class="dr-prod-bar" style="width:' + pct + '%"></div></div>' +
+        '</div>' +
+        '<div class="dr-prod-rev">' + fmtMoney(p.revenue) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ── Load Data ── */
+  async function loadData() {
+    var btn = document.getElementById('drRefreshBtn');
+    btn.classList.add('loading');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .8s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Loading...';
+    try {
+      allOrders = await CamboOrdersData.fetchOrders(5000);
+
+      /* Build page list */
+      var pages = {};
+      allOrders.forEach(function(o){ if(o.page) pages[o.page] = true; });
+      var pageList = Object.keys(pages).sort();
+      buildPageMenu(pageList);
+
+      applyFilters();
+    } catch(e) {
+      document.getElementById('drOrderList').innerHTML = '<div class="dr-orders-empty" style="color:#f87171">Error loading data: ' + esc(String(e.message||e)) + '</div>';
+    } finally {
+      btn.classList.remove('loading');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Refresh';
+    }
+  }
+
+  /* ── Search ── */
+  document.getElementById('drSearchInput').addEventListener('input', function(){
+    searchQuery = this.value;
+    applyFilters();
+  });
+
+  /* ── Refresh button ── */
+  document.getElementById('drRefreshBtn').addEventListener('click', loadData);
+
+  /* ── Spin animation ── */
+  var style = document.createElement('style');
+  style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+  document.head.appendChild(style);
+
+  /* ── Auto load ── */
+  loadData();
+})();
+</script>
+</body>
+</html>
