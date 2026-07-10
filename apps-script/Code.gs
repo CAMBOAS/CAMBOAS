@@ -1716,7 +1716,10 @@ function sendTelegramMessageFromOrder_(orderId, order) {
       const timePart = text.substring(11,16);
       return timePart ? datePart + ' ' + to12h(timePart) : datePart;
     }
-    // DD/MM/YYYY HH:MM → DD/MM/YYYY HH:MM AM/PM
+    // DD/MM/YYYY HH:MM AM/PM — already 12h, preserve as-is
+    const dtWithAmPm = text.match(/^(\d{2}\/\d{2}\/\d{4})\s+(\d{1,2}:\d{2})\s+(AM|PM)/i);
+    if (dtWithAmPm) return dtWithAmPm[1] + ' ' + dtWithAmPm[2] + ' ' + dtWithAmPm[3].toUpperCase();
+    // DD/MM/YYYY HH:MM — 24h format, convert to 12h
     const dtMatch = text.match(/^(\d{2}\/\d{2}\/\d{4})\s+(\d{1,2}:\d{2})/);
     if (dtMatch) return dtMatch[1] + ' ' + to12h(dtMatch[2]);
     return text;
