@@ -15,7 +15,7 @@
       'pages/orders-details.html':{ title: t('Smart Orders','Smart Orders'),     subtitle: t('បង្កើតបញ្ជាទិញបានលឿន និងឆ្លាតវៃ','Create orders quickly and smartly') },
       'pages/order-list.html':    { title: t('បញ្ជីបញ្ជាទិញ','Order List'),      subtitle: t('មើល និងគ្រប់គ្រងបញ្ជាទិញទាំងអស់','View and manage all orders in one place') },
       'pages/new-order.html':     { title: t('បញ្ជាទិញថ្មី','New Order'),        subtitle: t('បង្កើតបញ្ជាទិញថ្មី','Create a new order') },
-      'pages/new-order.html':           { title: t('បញ្ជាទិញថ្មី','New Order'),  subtitle: t('បង្កើតបញ្ជាទិញថ្មី','Create a new order') },
+      'pages/new-order-2.html':   { title: t('បញ្ជាទិញថ្មី II','New Order II'),  subtitle: t('បង្កើតបញ្ជាទិញថ្មី','Create a new order') },
       'pages/customers.html':     { title: t('អតិថិជន','Customers'),             subtitle: t('គ្រប់គ្រងបញ្ជីអតិថិជន','Manage your customer base') },
       'pages/products.html':      { title: t('ផលិតផល','Products'),               subtitle: t('រក្សាទុក និងគ្រប់គ្រងផលិតផល','Browse and manage products') },
       'pages/stock.html':         { title: t('ស្តុក','Stock'),                    subtitle: t('តាមដានស្តុក និងការផ្លាស់ប្ដូរ','Track inventory levels and stock movements') },
@@ -95,7 +95,8 @@
         <ul class="sb-list">
           ${link('index.html',                ic.dashboard, t('ផ្ទាំងគ្រប់គ្រង','Dashboard'))}
           ${link('pages/analytics.html',      ic.analytics, t('វិភាគទិន្នន័យ','Analytics'))}
-          ${link('pages/new-order.html',            ic.neworder,  t('បញ្ជាទិញថ្មី','New Order'))}
+          ${link('pages/new-order.html',      ic.neworder,  t('បញ្ជាទិញថ្មី','New Order'))}
+          ${link('pages/new-order-2.html',    ic.neworder,  t('បញ្ជាទិញថ្មី II','New Order II'))}
           ${link('pages/order-list.html',     ic.orderlist, t('បញ្ជីបញ្ជាទិញ','Order List'))}
         </ul>
         <div class="sb-divider sb-divider-sm"></div>
