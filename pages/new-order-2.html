@@ -1335,9 +1335,15 @@
       }
       #rightCol::-webkit-scrollbar { display: none; }
       #cartPanel { position: static; }
-      /* TikTok panel is smartphone-only — hide on tablet/desktop */
-      #mobBottomBar { display: none !important; }
-      .no-wrap { padding-right: 0 !important; }
+      /* Action panel: show on desktop too, fixed right side same as scroll buttons */
+      #mobBottomBar {
+        display: flex !important;
+        right: 14px !important;
+        left: auto !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 64px !important;
+      }
       .fgrid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
       .no-wrap { padding: 14px 24px 20px; }
       .fg textarea { min-height: 72px; }
