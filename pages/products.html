@@ -291,16 +291,16 @@
     [data-theme="light"] .no-btn.active { background:#7c3aed; color:#fff; border-color:#7c3aed }
 
     /* Order panel */
-    #orderPanel { display:none }
+    #orderPanel { display:none;width:calc(100% + 28px);margin-left:-14px;margin-right:-14px;padding:0; }
     #orderPanel.show { display:block }
 
-    /* ── Section card (same as new-order-2.html) ── */
+    /* ── Section card — full width edge-to-edge (same as new-order-2.html mobile) ── */
     #orderPanel .mob-section {
       background:var(--card,rgba(255,255,255,.92));
       border-top:1px solid rgba(0,0,0,.06);
       border-bottom:1px solid rgba(0,0,0,.06);
       overflow:hidden; width:100%; margin-bottom:3px;
-      border-radius:22px;
+      border-radius:0;
     }
     [data-theme="dark"] #orderPanel .mob-section { background:rgba(22,18,42,.92); border-color:rgba(255,255,255,.07); }
     .od-sect-badge { width:34px;height:34px;border-radius:9px;background:rgba(124,92,255,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
@@ -564,6 +564,7 @@
 
     /* ── Desktop ≥680px: glass card + 3-col label-above grid ── */
     @media (min-width:680px) {
+      #orderPanel { width:100% !important; margin-left:0 !important; margin-right:0 !important; }
       #orderPanel .mob-section {
         background:rgba(255,255,255,.82) !important;
         border:1px solid rgba(255,255,255,.55) !important;
