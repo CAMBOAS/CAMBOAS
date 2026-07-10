@@ -185,6 +185,7 @@ function _loadPrintStatusesFromSheet(){
 window._loadPrintStatusesFromSheet = _loadPrintStatusesFromSheet;
 var _sort = {col:'date', dir:'desc'};
 var _q = '', _f = {};
+var _selectedOlPages = [], _olPageMaster = [];
 var _date = {preset:'today', start:'', end:'', label:'Today'}; // start/end filled on DOMContentLoaded
 
 /* ── helpers ── */
@@ -533,9 +534,9 @@ function getFiltered(){
       }
     }
     if(_f.status   && (o.status||o.orderStatus||'')!==_f.status) return false;
-    if(_f.pages){
+    if(_f.pagesArr && _f.pagesArr.length){
       var pg=(o.page||o.pages||'').trim();
-      if(pg!==_f.pages) return false;
+      if(!_f.pagesArr.includes(pg)) return false;
     }
     if(_f.priority && (o.priority||'')!==_f.priority) return false;
     if(_f.closeBy){
@@ -1731,10 +1732,86 @@ function loadSaleInforFilters(){
     el.value = cur; // restore selection
   }
 
+  /* ── Page dropdown (position:fixed, appended to body) ── */
+  var _olPageMenu = null;
+  function _initOlPageMenu(){
+    if(_olPageMenu) return;
+    _olPageMenu = document.createElement('div');
+    _olPageMenu.className = 'ol-page-drop';
+    document.body.appendChild(_olPageMenu);
+    var btn = $id('olPageBtn');
+    if(btn){
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var isOpen = _olPageMenu.classList.contains('show');
+        if(isOpen){ _olPageMenu.classList.remove('show'); btn.classList.remove('open'); return; }
+        _renderOlPageDrop();
+        var r = btn.getBoundingClientRect();
+        var menuW = Math.max(btn.offsetWidth, 220);
+        var left = r.left + window.scrollX;
+        if(left + menuW > window.innerWidth - 8) left = window.innerWidth - menuW - 8;
+        if(left < 8) left = 8;
+        _olPageMenu.style.width = menuW + 'px';
+        _olPageMenu.style.top  = (r.bottom + window.scrollY + 4) + 'px';
+        _olPageMenu.style.left = left + 'px';
+        _olPageMenu.classList.add('show');
+        btn.classList.add('open');
+      });
+    }
+    document.addEventListener('click', function(){ _olPageMenu.classList.remove('show'); $id('olPageBtn')?.classList.remove('open'); });
+    _olPageMenu.addEventListener('click', function(e){ e.stopPropagation(); });
+  }
+  function _renderOlPageDrop(){
+    if(!_olPageMenu) return;
+    _olPageMenu.innerHTML = _olPageMaster.map(function(p){
+      var active = _selectedOlPages.includes(p);
+      return '<div class="ol-page-chk'+(active?' active':'')+'" data-page="'+p.replace(/"/g,'&quot;')+'">' +
+        '<span class="ol-page-chk-box">'+(active?'✓':'')+'</span>' +
+        '<span>'+p+'</span></div>';
+    }).join('');
+    _olPageMenu.querySelectorAll('.ol-page-chk').forEach(function(el){
+      el.addEventListener('click', function(){
+        var p = this.getAttribute('data-page');
+        var idx = _selectedOlPages.indexOf(p);
+        if(idx === -1) _selectedOlPages.push(p); else _selectedOlPages.splice(idx, 1);
+        _f.pagesArr = _selectedOlPages.slice();
+        var any = Object.values(_f).some(function(v){ return Array.isArray(v)?v.length>0:!!v; });
+        $id('olFilterDot')?.classList.toggle('show', any);
+        _updateOlPageBtn();
+        _renderOlPageDrop();
+        render();
+      });
+    });
+  }
+  function _updateOlPageBtn(){
+    var lbl = $id('olPageBtnLabel'); if(!lbl) return;
+    var btn = $id('olPageBtn');
+    var n = _selectedOlPages.length;
+    if(n === 0){
+      lbl.textContent = 'All Pages';
+      if(btn) btn.querySelector('.ol-page-btn-badge')?.remove();
+    } else {
+      lbl.textContent = n === 1 ? _selectedOlPages[0] : n + ' Pages';
+      if(btn && !btn.querySelector('.ol-page-btn-badge')){
+        var b = document.createElement('span');
+        b.className = 'ol-page-btn-badge';
+        b.textContent = n;
+        btn.insertBefore(b, btn.querySelector('.ol-page-btn-arrow'));
+      } else if(btn){
+        btn.querySelector('.ol-page-btn-badge').textContent = n;
+      }
+    }
+  }
+  function buildOlPageChecks(pages){
+    if(pages) _olPageMaster = pages;
+    _initOlPageMenu();
+    _updateOlPageBtn();
+  }
+
   function applyData(d){
     if(d.closeby  && d.closeby.length)  fillSelect('olCloseBy',  d.closeby);
     if(d.delivery && d.delivery.length) fillSelect('olDelivery', d.delivery);
-    if(d.pages    && d.pages.length)    fillSelect('olPages',    d.pages);
+    if(d.pages    && d.pages.length)    buildOlPageChecks(d.pages);
     // Province is NOT loaded from SaleInfor — it uses 2 groups (ភ្នំពេញ / ខេត្ត) from order data
     // Store status options globally for use in order detail panel Status dropdown
     if(d.status && d.status.length) window._olStatusOptions = d.status;
@@ -1836,18 +1913,19 @@ async function init(){
   /* Filter selects */
   $id('olClearFilter')?.addEventListener('click', function(e){
     e.stopPropagation();
-    ['olDelivery','olProvince','olStatus','olPages','olPriority','olCloseBy'].forEach(function(id){ var el=$id(id); if(el) el.value=''; });
+    ['olDelivery','olProvince','olStatus','olPriority','olCloseBy'].forEach(function(id){ var el=$id(id); if(el) el.value=''; });
+    _selectedOlPages=[]; _updateOlPageBtn();
     _f={}; $id('olFilterDot')?.classList.remove('show'); render();
   });
-  ['olDelivery','olProvince','olStatus','olPages','olPriority','olCloseBy'].forEach(function(id){
+  ['olDelivery','olProvince','olStatus','olPriority','olCloseBy'].forEach(function(id){
     $id(id)?.addEventListener('change', function(){
       _f.delivery=$id('olDelivery')?.value||'';
       _f.province=$id('olProvince')?.value||'';
       _f.status  =$id('olStatus')?.value  ||'';
-      _f.pages   =$id('olPages')?.value   ||'';
+      _f.pagesArr=_selectedOlPages.slice();
       _f.priority=$id('olPriority')?.value||'';
       _f.closeBy =$id('olCloseBy')?.value ||'';
-      var any=Object.values(_f).some(function(v){return !!v;});
+      var any=Object.values(_f).some(function(v){return Array.isArray(v)?v.length>0:!!v;});
       $id('olFilterDot')?.classList.toggle('show', any);
       render();
     });
