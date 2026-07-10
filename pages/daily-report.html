@@ -16,11 +16,11 @@
   .dr-wrap { display:grid; gap:18px; padding:4px 0 12px }
 
   /* ── Filter Bar ── */
-  .dr-filter { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:14px 20px; border-radius:20px }
+  .dr-filter { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:14px 20px; border-radius:20px; overflow:visible !important }
   .dr-filter-left { display:flex; flex-direction:column; gap:2px }
   .dr-filter-left h2 { margin:0; font-size:17px; font-weight:800; color:var(--text) }
   .dr-filter-left p { margin:0; font-size:11px; color:var(--muted) }
-  .dr-filter-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+  .dr-filter-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; overflow:visible }
 
   /* ── Filter Buttons ── */
   .dr-btn { display:inline-flex; align-items:center; gap:6px; height:38px; padding:0 14px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--text); font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; transition:background .12s; white-space:nowrap }
@@ -40,29 +40,39 @@
   [data-theme="light"] #drDateInput { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06) }
   #drDateInput:focus { border-color:#8b5cf6 }
 
-  /* ── Float Menus ── */
-  .dr-float-menu {
-    display:none; position:fixed; z-index:9999;
+  /* ── Page dropdown ── */
+  .dr-page-wrap { position:relative; }
+  .dr-page-menu {
+    display:none; position:fixed; z-index:99999;
     background:#1e1b2e; border:1px solid rgba(139,92,246,.25); border-radius:14px;
     padding:6px; box-shadow:0 12px 40px rgba(0,0,0,.45);
-    min-width:190px; max-width:240px; max-height:320px; overflow-y:auto;
+    min-width:200px; max-width:260px; max-height:340px; overflow-y:auto;
     flex-direction:column; gap:2px;
   }
-  [data-theme="light"] .dr-float-menu { background:#fff; border-color:rgba(0,0,0,.1); box-shadow:0 8px 32px rgba(0,0,0,.15) }
-  .dr-float-menu.show { display:flex }
+  [data-theme="light"] .dr-page-menu { background:#fff; border-color:rgba(0,0,0,.1); box-shadow:0 8px 32px rgba(0,0,0,.15) }
+  .dr-page-menu.show { display:flex }
   .dr-menu-item {
-    display:flex; align-items:center; justify-content:space-between;
+    display:flex; align-items:center; gap:10px;
     padding:9px 12px; border-radius:10px; border:none; background:none;
     color:#e2e8f0; font-size:13px; font-family:inherit; cursor:pointer;
-    transition:background .12s; text-align:left; width:100%; gap:8px;
+    transition:background .12s; text-align:left; width:100%;
   }
   [data-theme="light"] .dr-menu-item { color:#1e293b }
   .dr-menu-item:hover { background:rgba(139,92,246,.15) }
   .dr-menu-item.active { background:rgba(139,92,246,.2); color:#c4b5fd; font-weight:700 }
   [data-theme="light"] .dr-menu-item.active { background:rgba(139,92,246,.1); color:#7c3aed }
-  .dr-menu-chk { opacity:0; font-size:12px; color:#a78bfa; flex-shrink:0 }
-  .dr-menu-item.active .dr-menu-chk { opacity:1 }
+  /* Checkbox visual */
+  .dr-menu-cb {
+    width:16px; height:16px; border-radius:5px; border:1.5px solid rgba(148,163,184,.4);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px;
+  }
+  .dr-menu-item.active .dr-menu-cb { background:#8b5cf6; border-color:#8b5cf6; color:#fff; }
+  [data-theme="light"] .dr-menu-item.active .dr-menu-cb { background:#7c3aed; border-color:#7c3aed; }
+  .dr-menu-pg-name { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
   .dr-menu-divider { height:1px; background:rgba(148,163,184,.15); margin:4px 6px }
+  /* Selected count badge on button */
+  .dr-page-count { display:none; background:#8b5cf6; color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:999px; margin-left:2px }
+  .dr-page-count.show { display:inline-flex }
 
   /* ── Refresh ── */
   .dr-refresh {
@@ -257,12 +267,15 @@
           <input type="date" id="drDateInput" title="ជ្រើសរើសថ្ងៃ">
 
           <!-- Page multi-select -->
-          <button class="dr-btn" id="drPageBtn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <span class="lbl" id="drPageLabel">ទំព័រទាំងអស់</span>
-            <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <div class="dr-float-menu" id="drPageMenu"></div>
+          <div class="dr-page-wrap">
+            <button class="dr-btn" id="drPageBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <span id="drPageLabel">ទំព័រទាំងអស់</span>
+              <span class="dr-page-count" id="drPageCount"></span>
+              <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="dr-page-menu" id="drPageMenu"></div>
+          </div>
 
           <!-- Refresh -->
           <button class="dr-refresh" id="drRefreshBtn">
@@ -408,32 +421,46 @@
     applyFilters();
   });
 
-  /* ── Page menu ── */
-  var pageBtn  = document.getElementById('drPageBtn');
-  var pageMenu = document.getElementById('drPageMenu');
-  var pageLbl  = document.getElementById('drPageLabel');
+  /* ── Page dropdown ── */
+  var pageBtn   = document.getElementById('drPageBtn');
+  var pageMenu  = document.getElementById('drPageMenu');
+  var pageLbl   = document.getElementById('drPageLabel');
+  var pageCnt   = document.getElementById('drPageCount');
+  var _allPages = [];
 
   function buildPageMenu(pages) {
+    _allPages = pages;
     pageMenu.innerHTML = '';
-    /* "All" option */
+
+    /* "All" row */
+    var allIsActive = selectedPages.length === 0;
     var allBtn = document.createElement('button');
-    allBtn.className = 'dr-menu-item' + (selectedPages.length === 0 ? ' active' : '');
-    allBtn.innerHTML = '<span>ទំព័រទាំងអស់</span><span class="dr-menu-chk">✓</span>';
-    allBtn.addEventListener('click', function(){
+    allBtn.className = 'dr-menu-item' + (allIsActive ? ' active' : '');
+    allBtn.innerHTML =
+      '<span class="dr-menu-cb">' + (allIsActive ? '✓' : '') + '</span>' +
+      '<span class="dr-menu-pg-name">ទំព័រទាំងអស់</span>';
+    allBtn.addEventListener('click', function(e){
+      e.stopPropagation();
       selectedPages = [];
       updatePageLabel();
       buildPageMenu(pages);
       applyFilters();
     });
     pageMenu.appendChild(allBtn);
-    var div = document.createElement('div'); div.className = 'dr-menu-divider';
-    pageMenu.appendChild(div);
+
+    if (pages.length) {
+      var div = document.createElement('div');
+      div.className = 'dr-menu-divider';
+      pageMenu.appendChild(div);
+    }
 
     pages.forEach(function(pg){
-      var isActive = selectedPages.includes(pg);
+      var isActive = selectedPages.indexOf(pg) >= 0;
       var btn = document.createElement('button');
       btn.className = 'dr-menu-item' + (isActive ? ' active' : '');
-      btn.innerHTML = '<span>' + esc(pg) + '</span><span class="dr-menu-chk">✓</span>';
+      btn.innerHTML =
+        '<span class="dr-menu-cb">' + (isActive ? '✓' : '') + '</span>' +
+        '<span class="dr-menu-pg-name">' + esc(pg) + '</span>';
       btn.addEventListener('click', function(e){
         e.stopPropagation();
         var idx = selectedPages.indexOf(pg);
@@ -448,30 +475,44 @@
   }
 
   function updatePageLabel() {
-    if (selectedPages.length === 0) pageLbl.textContent = 'ទំព័រទាំងអស់';
-    else if (selectedPages.length === 1) pageLbl.textContent = selectedPages[0];
-    else pageLbl.textContent = selectedPages.length + ' Pages';
+    if (selectedPages.length === 0) {
+      pageLbl.textContent = 'ទំព័រទាំងអស់';
+      pageCnt.classList.remove('show');
+    } else {
+      pageLbl.textContent = 'Pages';
+      pageCnt.textContent = selectedPages.length;
+      pageCnt.classList.add('show');
+    }
   }
 
-  /* float menu toggle */
+  /* Move menu to body so CSS transform on .main-content doesn't trap position:fixed */
+  document.body.appendChild(pageMenu);
+
+  /* toggle open/close */
   pageBtn.addEventListener('click', function(e){
     e.stopPropagation();
     var isOpen = pageMenu.classList.contains('show');
-    closeAllMenus();
-    if (!isOpen) {
+    if (isOpen) {
+      pageMenu.classList.remove('show');
+      pageBtn.classList.remove('open');
+    } else {
       var r = pageBtn.getBoundingClientRect();
-      pageMenu.style.top  = (r.bottom + 6) + 'px';
-      pageMenu.style.left = Math.min(r.left, window.innerWidth - 250) + 'px';
+      pageMenu.style.top  = (r.bottom + window.scrollY + 6) + 'px';
+      var menuW = 220;
+      var left = r.right + window.scrollX - menuW;
+      if (left < 8) left = 8;
+      pageMenu.style.left = left + 'px';
       pageMenu.classList.add('show');
       pageBtn.classList.add('open');
     }
   });
 
-  function closeAllMenus() {
+  /* close on outside click */
+  document.addEventListener('click', function(){
     pageMenu.classList.remove('show');
     pageBtn.classList.remove('open');
-  }
-  document.addEventListener('click', closeAllMenus);
+  });
+  pageMenu.addEventListener('click', function(e){ e.stopPropagation(); });
 
   /* ── Filter & Render ── */
   function applyFilters() {
@@ -623,10 +664,10 @@
     try {
       allOrders = await CamboOrdersData.fetchOrders(5000);
 
-      /* Build page list */
-      var pages = {};
-      allOrders.forEach(function(o){ if(o.page) pages[o.page] = true; });
-      var pageList = Object.keys(pages).sort();
+      /* Build page list from real API data — names come directly from Google Sheet */
+      var pagesMap = {};
+      allOrders.forEach(function(o){ if(o.page) pagesMap[o.page] = true; });
+      var pageList = Object.keys(pagesMap).sort();
       buildPageMenu(pageList);
 
       applyFilters();
