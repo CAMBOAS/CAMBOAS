@@ -355,6 +355,26 @@
 
     /* ── Datetime ── */
     .od-datetime { flex:1;display:flex;align-items:center;gap:8px;min-width:0;position:relative; }
+    .od-dtlocal-desk { display:none; }
+    .od-dtlocal-inp { flex:1;width:100%;height:44px;border-radius:12px;border:1.5px solid rgba(148,163,184,.22);background:var(--input,rgba(255,255,255,.95));padding:0 14px;font-size:15px;font-family:inherit;color:var(--text,#18213a);outline:none;cursor:pointer;box-sizing:border-box;-webkit-appearance:none;appearance:none; }
+    .od-dtlocal-inp:focus { border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.12); }
+    [data-theme="dark"] .od-dtlocal-inp { border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#e8e0ff;color-scheme:dark; }
+    .od-date-inp,.od-time-inp { flex:1; }
+    /* Carrier badge */
+    #carrierBadgeMobile { display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);align-items:center;gap:5px;padding:4px 9px 4px 6px;border-radius:20px;font-size:11px;font-weight:800;border:1.5px solid;pointer-events:none;white-space:nowrap;z-index:2; }
+    #carrierBadgeMobile.show { display:flex; }
+    #carrierBadgeMobile img { height:15px;width:auto;border-radius:2px; }
+    #carrierBadgeMobile.c-cellcard { border-color:#d97706;color:#92400e;background:rgba(217,119,6,.1); }
+    #carrierBadgeMobile.c-smart    { border-color:#00a651;color:#065f46;background:rgba(0,166,81,.1); }
+    #carrierBadgeMobile.c-metfone  { border-color:#e30613;color:#991b1b;background:rgba(227,6,19,.1); }
+    [data-theme="dark"] #carrierBadgeMobile.c-cellcard { color:#fcd34d;background:rgba(217,119,6,.18); }
+    [data-theme="dark"] #carrierBadgeMobile.c-smart    { color:#34d399;background:rgba(0,166,81,.18); }
+    [data-theme="dark"] #carrierBadgeMobile.c-metfone  { color:#fca5a5;background:rgba(227,6,19,.18); }
+    /* Combo inside od-row */
+    .od-combo { flex:1;min-width:0; }
+    .od-combo .combo-input { height:44px!important;border-radius:12px!important;border:1.5px solid rgba(148,163,184,.22)!important;background:var(--input,rgba(255,255,255,.95))!important;padding:0 14px!important;font-size:15px!important;font-family:inherit!important;color:var(--text,#18213a)!important;outline:none!important;width:100%!important;box-sizing:border-box!important; }
+    .od-combo .combo-input:focus { border-color:#8b5cf6!important;box-shadow:0 0 0 3px rgba(139,92,246,.12)!important; }
+    [data-theme="dark"] .od-combo .combo-input { border-color:rgba(255,255,255,.12)!important;background:rgba(255,255,255,.07)!important;color:#e8e0ff!important; }
 
     /* Add-to-cart button on card */
     .pc-add-row { display:none; padding:0 12px 12px }
@@ -505,6 +525,16 @@
       #prodCustHead.is-open .od-chevron-pill { transform:rotate(180deg); }
       #prodCustHead:hover { background:rgba(124,92,255,.04) !important; }
       #prodCustBody.is-hidden { display:none !important; }
+      /* Show desktop datetime, hide mobile split inputs */
+      #prodCustBody .od-dtlocal-desk { display:block !important; }
+      #prodCustBody .od-date-inp { display:none !important; }
+      #prodCustBody .od-time-inp { display:none !important; }
+      #prodCustBody .od-dtlocal-inp { width:100% !important; height:42px !important; border:1.5px solid #e4e9f5 !important; border-radius:10px !important; padding:0 10px !important; font-size:13px !important; background:#f8faff !important; }
+      [data-theme="dark"] #prodCustBody .od-dtlocal-inp { border-color:rgba(255,255,255,.12) !important; background:rgba(255,255,255,.07) !important; color-scheme:dark !important; }
+      /* Combo on desktop */
+      #prodCustBody .od-combo { flex:none !important; width:100% !important; }
+      #prodCustBody .od-combo .combo-input { height:42px !important; padding:0 12px !important; border:1.5px solid #e4e9f5 !important; background:#f8faff !important; border-radius:12px !important; font-size:13.5px !important; }
+      [data-theme="dark"] #prodCustBody .od-combo .combo-input { background:rgba(255,255,255,.07) !important; border-color:rgba(255,255,255,.12) !important; }
 
       /* 3-column grid, label above input */
       #prodCustBody {
@@ -576,7 +606,7 @@
         border:none !important; gap:6px !important;
       }
       #prodCustBody .od-row-note .od-note-head { padding:0 !important; }
-      #prodCustBody #noNote { min-height:36px !important; height:36px !important; font-size:13px !important; line-height:36px !important; padding:0 12px !important; }
+      #prodCustBody #note { min-height:36px !important; height:36px !important; font-size:13px !important; line-height:36px !important; padding:0 12px !important; }
     }
   </style>
 </head>
@@ -635,11 +665,11 @@
         <div class="cat-pills" id="catPills" style="margin-top:10px"></div>
       </div>
 
-      <!-- New Order Panel (customer form) -->
+      <!-- New Order Panel — exact same form as New Order II -->
       <div id="orderPanel">
-        <div class="mob-section">
+        <div class="mob-section" id="prodCustSection">
           <!-- Header -->
-          <div class="no-mob-sect-head is-open" id="prodCustHead" onclick="prodCustCollapse()">
+          <div class="mob-sect-head is-open" id="prodCustHead" onclick="prodCustCollapse()">
             <div class="od-sect-badge">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c5cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
@@ -649,91 +679,139 @@
               <h3>ព័ត៌មានអតិថិជន</h3>
               <span>Customer Information</span>
             </div>
-            <div class="od-chevron-pill">
+            <div class="od-chevron-pill mob-sect-chevron">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
             </div>
           </div>
           <!-- Body -->
-          <div class="no-mob-sect-body" id="prodCustBody">
+          <div class="mob-sect-body" id="prodCustBody">
 
             <!-- ឈ្មោះអតិថិជន -->
             <div class="od-row">
               <span class="od-lbl">ឈ្មោះអតិថិជន</span>
-              <input id="noCust" type="text" class="od-inp" placeholder="Customer..." autocomplete="off">
+              <input id="customer" type="text" class="od-inp" placeholder="Customer..." autocomplete="off">
             </div>
+
             <!-- លេខទូរសព្ទ -->
             <div class="od-row">
               <span class="od-lbl">លេខទូរសព្ទ</span>
-              <input id="noPhone" type="tel" class="od-inp" placeholder="0xx xxx xxx">
+              <div style="flex:1;min-width:0;position:relative;">
+                <input id="phone" type="tel" class="od-inp" placeholder="0xx xxx xxx" style="padding-right:100px;">
+                <span id="carrierBadgeDesktop" style="display:none;position:absolute;right:0;top:50%;transform:translateY(-50%);pointer-events:none;align-items:center;gap:4px;font-size:11px;font-weight:700;">
+                  <img id="carrierLogoDesktop" src="" alt="" style="height:16px;width:auto;border-radius:2px;">
+                  <span id="carrierNameDesktop"></span>
+                </span>
+                <span id="carrierBadgeMobile">
+                  <img id="carrierLogoMobile" src="" alt="">
+                  <span id="carrierNameMobile"></span>
+                </span>
+              </div>
             </div>
+
             <!-- ទីតាំងតំបន់ -->
             <div class="od-row">
               <span class="od-lbl">ទីតាំងតំបន់</span>
-              <input id="noAddr" type="text" class="od-inp" placeholder="ភូមិ / ឃុំ / ផ្លូវ...">
+              <input id="addressDetail" type="text" class="od-inp" placeholder="ភូមិ / ផ្លូវ / ផ្ទះលេខ..." autocomplete="off">
             </div>
+
             <!-- ខេត្ត/ក្រុង -->
             <div class="od-row">
               <span class="od-lbl">ខេត្ត/ក្រុង</span>
-              <input id="noProv" type="text" class="od-inp" placeholder="ខេត្ត..." list="noProvList" autocomplete="off">
-              <datalist id="noProvList"></datalist>
-            </div>
-            <!-- Status -->
-            <div class="od-row">
-              <span class="od-lbl">Status</span>
-              <select id="noStatus" class="od-inp" style="cursor:pointer;">
-                <option>មិនទាន់គ្រប</option>
-                <option>Pending</option>
-              </select>
-            </div>
-            <!-- ថ្ងៃ / ម៉ោង -->
-            <div class="od-row">
-              <span class="od-lbl">ថ្ងៃ / ម៉ោង</span>
-              <div class="od-datetime">
-                <input id="noDate" type="text" class="od-inp" readonly style="padding-right:32px;" placeholder="DD/MM/YYYY HH:MM AM/PM">
-                <svg style="position:absolute;right:8px;pointer-events:none;color:var(--accent,#7c3aed);" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
-                  <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                <input id="noDatePicker" type="datetime-local"
-                  style="position:absolute;inset:0;opacity:0;cursor:pointer;z-index:10;"
-                  onchange="(function(h){if(!h.value)return;var p=h.value.split('T'),d=new Date(h.value);var pad=function(x){return String(x).padStart(2,'0');};var hh=d.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;var dp2=p[0].split('-');var nd=document.getElementById('noDate');if(nd)nd.value=dp2[2]+'/'+dp2[1]+'/'+dp2[0]+' '+pad(h12)+':'+pad(d.getMinutes())+' '+ampm;})(this)">
+              <div class="od-combo searchable-select" id="provinceCombo">
+                <input type="text" class="combo-input" id="provinceInput" placeholder="ខេត្ត..." autocomplete="off">
+                <input type="hidden" id="province">
               </div>
             </div>
+
+            <!-- ដឹកជញ្ជូន -->
+            <div class="od-row">
+              <span class="od-lbl">ដឹកជញ្ជូន</span>
+              <div class="od-combo searchable-select" id="deliveryCombo">
+                <input type="text" class="combo-input" id="deliveryInput" placeholder="ដឹកជញ្ជូន..." autocomplete="off">
+                <input type="hidden" id="deliveryName">
+              </div>
+            </div>
+
+            <!-- ថ្លៃដឹក -->
+            <div class="od-row">
+              <span class="od-lbl">ថ្លៃដឹក ($)</span>
+              <input id="deliveryFee" type="number" class="od-inp" value="0" min="0" step="0.5" inputmode="decimal">
+            </div>
+
             <!-- Pages -->
             <div class="od-row">
               <span class="od-lbl">Pages</span>
-              <select id="noPage" class="od-inp" style="cursor:pointer;"><option value="">Pages...</option></select>
+              <div class="od-combo searchable-select" id="pagesCombo">
+                <input type="text" class="combo-input" id="pagesInput" placeholder="Pages..." autocomplete="off">
+                <input type="hidden" id="page">
+              </div>
             </div>
+
             <!-- CloseBy -->
             <div class="od-row">
               <span class="od-lbl">CloseBy</span>
-              <select id="noCloseby" class="od-inp" style="cursor:pointer;"><option value="">CloseBy...</option></select>
-            </div>
-            <!-- Delivery -->
-            <div class="od-row">
-              <span class="od-lbl">ដឹកជញ្ជូន</span>
-              <select id="noDelivery" class="od-inp" style="cursor:pointer;"><option value="">Delivery...</option></select>
-            </div>
-            <!-- Payment -->
-            <div class="od-row od-row-pay">
-              <span class="od-lbl">បង់ប្រាក់</span>
-              <div class="payment-opts" id="noPayOpts">
-                <button class="pay-btn" data-val="AC"       onclick="setPayment(this)">AC</button>
-                <button class="pay-btn" data-val="ABA"      onclick="setPayment(this)">ABA</button>
-                <button class="pay-btn" data-val="Wing"     onclick="setPayment(this)">Wing</button>
-                <button class="pay-btn" data-val="Delivery" onclick="setPayment(this)">Delivery</button>
-                <button class="pay-btn" data-val="Others"   onclick="setPayment(this)">Others</button>
+              <div class="od-combo searchable-select" id="closeByCombo">
+                <input type="text" class="combo-input" id="closeByInput" placeholder="CloseBy..." autocomplete="off">
+                <input type="hidden" id="closeBy">
               </div>
             </div>
+
+            <!-- Status -->
+            <div class="od-row">
+              <span class="od-lbl">Status</span>
+              <select id="status" class="od-inp" style="cursor:pointer;">
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Done">Done</option>
+                <option value="Cancel">Cancel</option>
+              </select>
+            </div>
+
+            <!-- ថ្ងៃ / ម៉ោង (iOS-safe) -->
+            <div class="od-row">
+              <span class="od-lbl">ថ្ងៃ / ម៉ោង</span>
+              <div class="od-datetime">
+                <input id="dtLocal" type="text" class="od-dtlocal-inp od-dtlocal-desk" readonly style="padding-right:30px;" placeholder="DD/MM/YYYY HH:MM AM/PM">
+                <svg class="od-dtlocal-desk" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;z-index:5;color:var(--accent,#7c3aed);" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <input id="dtLocalPicker" type="datetime-local" class="od-dtlocal-desk"
+                  style="position:absolute;inset:0;opacity:0;cursor:pointer;z-index:10;"
+                  onchange="(function(h){if(!h.value)return;var p=h.value.split('T'),d=new Date(h.value);var pad=function(x){return String(x).padStart(2,'0');};var hh=d.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;var dp2=p[0].split('-');var dl=document.getElementById('dtLocal');if(dl)dl.value=dp2[2]+'/'+dp2[1]+'/'+dp2[0]+' '+pad(h12)+':'+pad(d.getMinutes())+' '+ampm;var dpe=document.getElementById('datePart'),tpe=document.getElementById('timePart');if(dpe)dpe.value=p[0];if(tpe)tpe.value=p[1];})(this)">
+                <input id="datePart" type="date" class="od-dtlocal-inp od-date-inp"
+                  oninput="(function(){var dp=document.getElementById('datePart'),tp=document.getElementById('timePart'),dl=document.getElementById('dtLocal');if(!dp||!dp.value)return;var pad=function(x){return String(x).padStart(2,'0');};var d=new Date(dp.value+'T'+(tp&&tp.value?tp.value:'00:00'));var hh=d.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;var parts=dp.value.split('-');if(dl)dl.value=parts[2]+'/'+parts[1]+'/'+parts[0]+' '+pad(h12)+':'+pad(d.getMinutes())+' '+ampm;})()">
+                <input id="timePart" type="time" class="od-dtlocal-inp od-time-inp"
+                  oninput="(function(){var dp=document.getElementById('datePart'),tp=document.getElementById('timePart'),dl=document.getElementById('dtLocal');if(!dp||!dp.value||!tp||!tp.value)return;var pad=function(x){return String(x).padStart(2,'0');};var d=new Date(dp.value+'T'+tp.value);var hh=d.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;var parts=dp.value.split('-');if(dl)dl.value=parts[2]+'/'+parts[1]+'/'+parts[0]+' '+pad(h12)+':'+pad(d.getMinutes())+' '+ampm;})()">
+              </div>
+            </div>
+
+            <!-- បង់ប្រាក់ -->
+            <div class="od-row od-row-pay">
+              <span class="od-lbl">បង់ប្រាក់</span>
+              <div class="payment-opts" id="paymentOptions">
+                <button type="button" class="pay-btn" data-value="AC">AC</button>
+                <button type="button" class="pay-btn" data-value="ABA">ABA</button>
+                <button type="button" class="pay-btn" data-value="Wing">Wing</button>
+                <button type="button" class="pay-btn" data-value="Delivery">Delivery</button>
+                <button type="button" class="pay-btn" data-value="Other">Other</button>
+              </div>
+              <input type="hidden" id="payment" value="">
+            </div>
+
             <!-- Note -->
             <div class="od-row od-row-note">
               <div class="od-note-head">
                 <span class="od-note-label">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
                   Note
                 </span>
+                <button type="button" class="od-note-invoice" id="prodInvoiceBtn" title="Invoice">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>
+                  Invoice
+                </button>
               </div>
-              <textarea id="noNote" placeholder="..."></textarea>
+              <textarea id="note" style="width:100%;min-height:72px;border:none;background:transparent;font-size:15px;font-family:inherit;color:var(--text,#18213a);outline:none;resize:none;padding:0;line-height:1.55;" placeholder="..."></textarea>
             </div>
 
           </div><!-- /prodCustBody -->
@@ -1087,75 +1165,50 @@ var cart = [];
 var acProd = null;
 var acQtyNum = 1;
 var acUnit = 'ចំណែក';
-var _saleInforLoaded = false;
-
-/* ── Load SaleInfor from API and populate form dropdowns ── */
+/* ── Load SaleInfor (same logic as New Order II) ── */
 function loadSaleInforData() {
   var CACHE_KEY = 'cambo_saleinfor_v1';
 
   function applyData(d) {
-    // Province → datalist
-    var provList = document.getElementById('noProvList');
-    if (provList && d.provinces && d.provinces.length) {
-      provList.innerHTML = d.provinces.map(function(v){ return '<option value="' + esc(v) + '">'; }).join('');
+    // SearchableCombo dropdowns
+    var c = window.SearchableCombo && window.SearchableCombo.combos;
+    if (c) {
+      if (c.province && d.provinces && d.provinces.length) c.province.update(d.provinces);
+      if (c.delivery && d.delivery  && d.delivery.length)  c.delivery.update(d.delivery);
+      if (c.pages    && d.pages     && d.pages.length)     c.pages.update(d.pages);
+      if (c.closeby  && d.closeby   && d.closeby.length)   c.closeby.update(d.closeby);
     }
-
-    // Status → select
-    var statusSel = document.getElementById('noStatus');
-    if (statusSel && d.status && d.status.length) {
-      var cur = statusSel.value;
-      statusSel.innerHTML = d.status.map(function(v){
-        return '<option value="' + esc(v) + '"' + (v === cur ? ' selected' : '') + '>' + esc(v) + '</option>';
-      }).join('');
-    }
-
-    // Pages → select
-    var pageSel = document.getElementById('noPage');
-    if (pageSel && d.pages && d.pages.length) {
-      var curP = pageSel.value;
-      pageSel.innerHTML = '<option value="">Pages...</option>' +
-        d.pages.map(function(v){ return '<option value="' + esc(v) + '"' + (v === curP ? ' selected' : '') + '>' + esc(v) + '</option>'; }).join('');
-    }
-
-    // CloseBy → select
-    var cbSel = document.getElementById('noCloseby');
-    if (cbSel && d.closeby && d.closeby.length) {
-      var curC = cbSel.value;
-      cbSel.innerHTML = '<option value="">CloseBy...</option>' +
-        d.closeby.map(function(v){ return '<option value="' + esc(v) + '"' + (v === curC ? ' selected' : '') + '>' + esc(v) + '</option>'; }).join('');
-    }
-
-    // Delivery → select
-    var delSel = document.getElementById('noDelivery');
-    if (delSel && d.delivery && d.delivery.length) {
-      var curD = delSel.value;
-      delSel.innerHTML = '<option value="">Delivery...</option>' +
-        d.delivery.map(function(v){ return '<option value="' + esc(v) + '"' + (v === curD ? ' selected' : '') + '>' + esc(v) + '</option>'; }).join('');
-    }
-
-    // Payment → buttons
+    // Payment buttons
     if (d.payment && d.payment.length) {
-      var row = document.getElementById('noPayOpts');
-      if (row) {
-        row.innerHTML = d.payment.map(function(v){
-          return '<button class="pay-btn' + (v === noPayment ? ' active' : '') + '" data-val="' + esc(v) + '" onclick="setPayment(this)">' + esc(v) + '</button>';
+      var cur = (document.getElementById('payment') && document.getElementById('payment').value) || '';
+      var payEl = document.getElementById('paymentOptions');
+      if (payEl) payEl.innerHTML = d.payment.map(function(v){
+        return '<button type="button" class="pay-btn' + (v===cur?' active':'') + '" data-value="' + esc(v) + '">' + esc(v) + '</button>';
+      }).join('');
+      if (cur && document.getElementById('payment')) document.getElementById('payment').value = cur;
+    }
+    // Status dropdown
+    if (d.status && d.status.length) {
+      var sel = document.getElementById('status');
+      if (sel) {
+        var curSt = sel.value || 'Pending';
+        sel.innerHTML = d.status.map(function(v){
+          return '<option value="'+esc(v)+'"'+(v===curSt?' selected':'')+'>'+esc(v)+'</option>';
         }).join('');
+        if (!d.status.includes(curSt)) sel.value = d.status[0];
       }
     }
   }
 
-  // Apply cached immediately
   try {
     var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
-    if (cached) { applyData(cached); _saleInforLoaded = true; }
+    if (cached) applyData(cached);
   } catch(_) {}
 
-  // Fetch fresh in background
   if (window.CamboAPI) {
     window.CamboAPI.get({ action: 'saleinfor' }).then(function(res) {
       if (res && res.ok && res.saleinfor) {
         applyData(res.saleinfor);
-        _saleInforLoaded = true;
         try { localStorage.setItem(CACHE_KEY, JSON.stringify(res.saleinfor)); } catch(_) {}
       }
     }).catch(function(){});
@@ -1175,16 +1228,16 @@ function toggleOrderMode() {
     panel.classList.add('show');
     cartSec.classList.add('show');
     grid.classList.add('order-mode');
-    // set default datetime in DD, MM, YYYY / HH:MM:SS AM/PM format
+    // set default datetime
     var now = new Date(), pad = function(x){ return String(x).padStart(2,'0'); };
-    var el = document.getElementById('noDate');
-    if (el && !el.value) {
-      var hh = now.getHours(), ampm = hh >= 12 ? 'PM' : 'AM', h12 = hh % 12 || 12;
-      el.value = pad(now.getDate())+'/'+pad(now.getMonth()+1)+'/'+now.getFullYear()+
-        ' '+pad(h12)+':'+pad(now.getMinutes())+' '+ampm;
-      var picker = document.getElementById('noDatePicker');
-      if (picker) picker.value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+
-        'T'+pad(now.getHours())+':'+pad(now.getMinutes());
+    var dp = document.getElementById('datePart'), tp = document.getElementById('timePart');
+    var dl = document.getElementById('dtLocal'), pk = document.getElementById('dtLocalPicker');
+    if (dp && !dp.value) {
+      dp.value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+      tp.value = pad(now.getHours())+':'+pad(now.getMinutes());
+      var hh = now.getHours(), ampm = hh>=12?'PM':'AM', h12 = hh%12||12;
+      if (dl) dl.value = pad(now.getDate())+'/'+pad(now.getMonth()+1)+'/'+now.getFullYear()+' '+pad(h12)+':'+pad(now.getMinutes())+' '+ampm;
+      if (pk) pk.value = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes());
     }
     // load SaleInfor data to populate dropdowns
     loadSaleInforData();
@@ -1199,11 +1252,6 @@ function toggleOrderMode() {
   }
 }
 
-function setPayment(el) {
-  document.querySelectorAll('#noPayOpts .pay-btn').forEach(function(b){ b.classList.remove('active'); });
-  el.classList.add('active');
-  noPayment = el.getAttribute('data-val');
-}
 function prodCustCollapse() {
   var head = document.getElementById('prodCustHead');
   var body = document.getElementById('prodCustBody');
@@ -1400,25 +1448,39 @@ async function submitNewOrder() {
   var hh = now.getHours(), ampm = hh>=12?'PM':'AM', h12 = hh%12||12;
   var fallbackDt = pad(now.getDate())+'/'+pad(now.getMonth()+1)+'/'+now.getFullYear()+
     ' '+pad(h12)+':'+pad(now.getMinutes())+' '+ampm;
-  var dtStr = document.getElementById('noDate').value || fallbackDt;
+
+  // Build date string from datePart + timePart (same as new-order-2.html)
+  var dtStr = (function(){
+    var dp = document.getElementById('datePart'), tp = document.getElementById('timePart');
+    if (dp && dp.value && tp && tp.value) {
+      var parts = dp.value.split('-'), tParts = tp.value.split(':');
+      var d2 = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]),
+                        parseInt(tParts[0]), parseInt(tParts[1]));
+      var hh2=d2.getHours(), ap2=hh2>=12?'PM':'AM', h122=hh2%12||12;
+      return pad(d2.getDate())+'/'+pad(d2.getMonth()+1)+'/'+d2.getFullYear()+' '+pad(h122)+':'+pad(d2.getMinutes())+' '+ap2;
+    }
+    return document.getElementById('dtLocal') && document.getElementById('dtLocal').value || fallbackDt;
+  })();
+
   var total = cart.reduce(function(s,c){ return s + c.subtotal; }, 0);
+  var deliveryFeeVal = parseFloat((document.getElementById('deliveryFee') && document.getElementById('deliveryFee').value) || 0) || 0;
 
   var order = {
     id: Date.now(), createdAt: now.toISOString(),
-    status:       document.getElementById('noStatus').value  || 'Pending',
-    page:         document.getElementById('noPage').value    || '',
-    closeBy:      document.getElementById('noCloseby').value || '',
-    customer:     document.getElementById('noCust').value    || '',
-    phone:        document.getElementById('noPhone').value   || '',
+    status:       (document.getElementById('status') && document.getElementById('status').value) || 'Pending',
+    page:         (document.getElementById('page') && document.getElementById('page').value)     || '',
+    closeBy:      (document.getElementById('closeBy') && document.getElementById('closeBy').value) || '',
+    customer:     (document.getElementById('customer') && document.getElementById('customer').value) || '',
+    phone:        (document.getElementById('phone') && document.getElementById('phone').value)   || '',
     date:         dtStr,
-    province:     document.getElementById('noProv').value    || '',
-    addressDetail:document.getElementById('noAddr').value    || '',
-    delivery:     (document.getElementById('noDelivery') && document.getElementById('noDelivery').value) || '',
-    deliveryFee: 0,
-    payment:      noPayment,
-    note:         document.getElementById('noNote').value    || '',
+    province:     (document.getElementById('province') && document.getElementById('province').value) || '',
+    addressDetail:(document.getElementById('addressDetail') && document.getElementById('addressDetail').value) || '',
+    delivery:     (document.getElementById('deliveryName') && document.getElementById('deliveryName').value) || '',
+    deliveryFee:  deliveryFeeVal,
+    payment:      (document.getElementById('payment') && document.getElementById('payment').value) || '',
+    note:         (document.getElementById('note') && document.getElementById('note').value)     || '',
     items:        cart.map(function(c){ return { id:c.id, name:c.name, type:c.type, price:c.unitPrice, qty:c.qty, unit:c.unit, subtotal:c.subtotal }; }),
-    itemsTotal:   total, total: total, totalRiel: Math.round(total * 4100)
+    itemsTotal:   total, total: total + deliveryFeeVal, totalRiel: Math.round((total + deliveryFeeVal) * 4100)
   };
 
   try {
@@ -1426,7 +1488,6 @@ async function submitNewOrder() {
       var data = await window.CamboAPI.post(order);
       if (!data.ok) throw new Error(data.message || 'Save failed.');
     }
-    // Save to localStorage like new-order.html
     try {
       var saved = JSON.parse(localStorage.getItem('camboOrders') || '[]');
       saved.push(order);
@@ -1434,12 +1495,19 @@ async function submitNewOrder() {
     } catch(e) {}
     showNoToast('✅ Order saved successfully!');
     clearCart();
-    // clear form
-    ['noCust','noPhone','noAddr','noProv','noPage','noCloseby','noNote'].forEach(function(id){
+    // reset form fields
+    ['customer','phone','addressDetail','note'].forEach(function(id){
       var el = document.getElementById(id); if(el) el.value = '';
     });
-    document.querySelectorAll('#noPayOpts .pay-btn').forEach(function(b){ b.classList.remove('active'); });
-    noPayment = '';
+    var feeEl = document.getElementById('deliveryFee'); if(feeEl) feeEl.value = '0';
+    // reset searchable combos
+    ['provinceInput','deliveryInput','pagesInput','closeByInput'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.value = '';
+    });
+    ['province','deliveryName','page','closeBy','payment'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.value = '';
+    });
+    document.querySelectorAll('#paymentOptions .pay-btn').forEach(function(b){ b.classList.remove('active'); });
   } catch(err) {
     showNoToast('⚠ ' + (err.message || 'Save failed.'));
   } finally {
@@ -1452,7 +1520,32 @@ async function submitNewOrder() {
 document.getElementById('acOverlay').addEventListener('click', function(e){
   if (e.target === this) closeAcDialog();
 });
+
+// Payment button delegation (same as new-order-2.html)
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.pay-btn');
+  if (!btn) return;
+  var container = btn.closest('#paymentOptions');
+  if (!container) return;
+  container.querySelectorAll('.pay-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var payHidden = document.getElementById('payment');
+  if (payHidden) payHidden.value = btn.getAttribute('data-value') || '';
+});
+
+// saleInforLoaded event (for dynamic payment buttons populated by external data)
+document.addEventListener('saleInforLoaded', function(e) {
+  var d = e.detail;
+  if (!d || !d.payment || !d.payment.length) return;
+  var cur = (document.getElementById('payment') && document.getElementById('payment').value) || '';
+  var payEl = document.getElementById('paymentOptions');
+  if (payEl) payEl.innerHTML = d.payment.map(function(v){
+    return '<button type="button" class="pay-btn' + (v===cur?' active':'') + '" data-value="' + esc(v) + '">' + esc(v) + '</button>';
+  }).join('');
+});
 </script>
+<script src="../assets/js/phone-carrier.js?v=164"></script>
+<script src="../assets/js/searchable-combo.js?v=169"></script>
 <script src="../assets/js/sw-register.js?v=158"></script>
 </body>
 </html>
