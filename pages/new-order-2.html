@@ -1133,22 +1133,13 @@
     ══════════════════════════════════════════════════════ */
     #scrollBtns {
       position: fixed;
-      left: 10px;
-      right: auto;
+      right: 12px;
+      left: auto;
       bottom: calc(20px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       gap: 6px;
       z-index: 400;
-    }
-    @media (min-width: 680px) {
-      #scrollBtns {
-        left: auto;
-        right: 12px;
-        bottom: calc(20px + env(safe-area-inset-bottom));
-        top: auto;
-        transform: none;
-      }
     }
     #scrollTopBtn, #scrollBotBtn {
       width: 40px;
