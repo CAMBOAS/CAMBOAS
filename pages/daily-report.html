@@ -32,16 +32,67 @@
   .dr-btn.open .chev { transform:rotate(180deg) }
 
   /* ── Date Input ── */
-  .dr-date-range { display:flex; align-items:center; gap:6px; flex-wrap:nowrap }
-  .dr-date-range input[type="date"] {
-    height:38px; padding:0 10px; border-radius:12px; border:1px solid var(--line);
-    background:rgba(255,255,255,.04); color:var(--text); font-size:12px; font-weight:700;
-    font-family:inherit; cursor:pointer; outline:none; min-width:0; width:140px;
+  /* ── Date range pill button ── */
+  .dr-date-pill { position:relative; display:inline-flex; align-items:center }
+  .dr-date-pill-btn {
+    display:inline-flex; align-items:center; gap:8px; height:38px; padding:0 14px;
+    border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.04);
+    color:var(--text); font-size:12px; font-weight:700; font-family:inherit;
+    cursor:pointer; outline:none; white-space:nowrap; transition:border-color .15s, background .15s;
   }
-  [data-theme="light"] .dr-date-range input[type="date"] { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06) }
-  .dr-date-range input[type="date"]:focus { border-color:#8b5cf6 }
-  .dr-date-sep { font-size:12px; font-weight:700; color:var(--muted); flex-shrink:0 }
-  @media(max-width:600px) { .dr-date-range input[type="date"] { width:120px } }
+  .dr-date-pill-btn:hover,.dr-date-pill-btn.open { border-color:#8b5cf6; background:rgba(139,92,246,.08) }
+  [data-theme="light"] .dr-date-pill-btn { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06) }
+  [data-theme="light"] .dr-date-pill-btn:hover,[data-theme="light"] .dr-date-pill-btn.open { background:rgba(109,40,217,.06) }
+  .dr-date-pill-icon { opacity:.55; flex-shrink:0 }
+  .dr-date-pill-label { font-weight:800; color:var(--text) }
+  .dr-date-pill-sub { font-size:10px; font-weight:600; opacity:.5; margin-left:2px }
+  /* Popup — compact single column */
+  .dr-date-pop {
+    position:fixed; z-index:9999; background:#1a2235; border:1px solid rgba(139,92,246,.25);
+    border-radius:16px; padding:12px; box-shadow:0 12px 36px rgba(0,0,0,.5);
+    display:none; flex-direction:column; gap:10px; width:290px;
+  }
+  .dr-date-pop.show { display:flex }
+  [data-theme="light"] .dr-date-pop { background:#fff; border-color:rgba(109,40,217,.15); box-shadow:0 6px 24px rgba(0,0,0,.12) }
+  /* Presets grid */
+  .dr-date-presets { display:grid; grid-template-columns:1fr 1fr; gap:4px }
+  .dr-preset-btn {
+    padding:6px 10px; border-radius:8px; border:1px solid transparent;
+    background:rgba(255,255,255,.05); color:#94a3b8;
+    font-size:11.5px; font-weight:600; font-family:inherit;
+    cursor:pointer; text-align:center; transition:all .12s; white-space:nowrap;
+  }
+  [data-theme="light"] .dr-preset-btn { background:#f1f5f9; color:#475569 }
+  .dr-preset-btn:hover { background:rgba(139,92,246,.15); color:#c4b5fd; border-color:rgba(139,92,246,.2) }
+  [data-theme="light"] .dr-preset-btn:hover { background:rgba(109,40,217,.08); color:#6d28d9 }
+  .dr-preset-btn.active { background:rgba(139,92,246,.22); color:#c4b5fd; border-color:rgba(139,92,246,.4); font-weight:700 }
+  [data-theme="light"] .dr-preset-btn.active { background:rgba(109,40,217,.1); color:#6d28d9; border-color:rgba(109,40,217,.25) }
+  .dr-preset-btn.full { grid-column:span 2 }
+  /* Divider */
+  .dr-date-pop-div { height:1px; background:rgba(148,163,200,.12) }
+  /* Custom inputs row */
+  .dr-date-inputs { display:flex; align-items:center; gap:6px }
+  .dr-date-inputs input[type="date"] {
+    flex:1; height:34px; padding:0 8px; border-radius:9px; border:1px solid rgba(148,163,200,.2);
+    background:rgba(255,255,255,.06); color:var(--text); font-size:12px; font-weight:700;
+    font-family:inherit; cursor:pointer; outline:none; box-sizing:border-box; min-width:0;
+  }
+  [data-theme="light"] .dr-date-inputs input[type="date"] { background:#f8fafc; border-color:#e2e8f0; color:#0f172a }
+  .dr-date-inputs input[type="date"]:focus { border-color:#8b5cf6 }
+  .dr-date-inputs-sep { font-size:11px; font-weight:700; color:var(--muted); flex-shrink:0 }
+  /* Footer */
+  .dr-date-pop-foot { display:flex; justify-content:flex-end; gap:6px }
+  .dr-date-pop-apply {
+    height:32px; padding:0 16px; border-radius:8px; border:none;
+    background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff;
+    font-size:12px; font-weight:700; font-family:inherit; cursor:pointer;
+  }
+  .dr-date-pop-apply:hover { opacity:.88 }
+  .dr-date-pop-cancel {
+    height:32px; padding:0 10px; border-radius:8px; border:1px solid rgba(148,163,200,.2);
+    background:transparent; color:var(--muted); font-size:12px; font-weight:600;
+    font-family:inherit; cursor:pointer;
+  }
 
   /* ── Page dropdown ── */
   .dr-page-wrap { position:relative; }
@@ -97,7 +148,8 @@
   .kpi-c.kc3::before { background:linear-gradient(90deg,#10b981,#34d399) }
   .kpi-c.kc4::before { background:linear-gradient(90deg,#f59e0b,#fbbf24) }
   .kpi-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:10px }
-  .kpi-ico { width:40px; height:40px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0 }
+  .kpi-ico { width:40px; height:40px; border-radius:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0 }
+  .kpi-ico svg { width:20px; height:20px }
   .kc1 .kpi-ico { background:rgba(6,182,212,.15); color:#22d3ee }
   .kc2 .kpi-ico { background:rgba(139,92,246,.15); color:#a78bfa }
   .kc3 .kpi-ico { background:rgba(16,185,129,.15); color:#34d399 }
@@ -281,39 +333,6 @@
     <div class="shared-topbar" id="sharedHeader"></div>
     <div class="dr-wrap">
 
-      <!-- Filter Bar -->
-      <section class="glass-card dr-filter">
-        <div class="dr-filter-left">
-          <h2>📊 Daily Report</h2>
-          <p id="drSubtitle">របាយការណ៍ប្រចាំថ្ងៃ — ជ្រើសរើសកាលបរិច្ឆេទ និង Page</p>
-        </div>
-        <div class="dr-filter-right">
-          <!-- Date range picker -->
-          <div class="dr-date-range">
-            <input type="date" id="drDateFrom" title="ចាប់ពីថ្ងៃ">
-            <span class="dr-date-sep">→</span>
-            <input type="date" id="drDateTo" title="រហូតដល់ថ្ងៃ">
-          </div>
-
-          <!-- Page multi-select -->
-          <div class="dr-page-wrap">
-            <button class="dr-btn" id="drPageBtn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <span id="drPageLabel">ទំព័រទាំងអស់</span>
-              <span class="dr-page-count" id="drPageCount"></span>
-              <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="dr-page-menu" id="drPageMenu"></div>
-          </div>
-
-          <!-- Refresh -->
-          <button class="dr-refresh" id="drRefreshBtn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Refresh
-          </button>
-        </div>
-      </section>
-
       <!-- KPI -->
       <section class="dr-kpi">
         <article class="glass-card kpi-c kc1">
@@ -322,7 +341,7 @@
               <div class="kpi-lbl">Orders</div>
               <div class="kpi-val" id="kpiOrders">—</div>
             </div>
-            <div class="kpi-ico">📋</div>
+            <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
           </div>
           <div class="kpi-note" id="kpiOrdersNote">ចំនួន Order ប្រចាំថ្ងៃ</div>
         </article>
@@ -332,7 +351,7 @@
               <div class="kpi-lbl">Items Sold</div>
               <div class="kpi-val" id="kpiItems">—</div>
             </div>
-            <div class="kpi-ico">📦</div>
+            <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
           </div>
           <div class="kpi-note" id="kpiItemsNote">ផលិតផលសរុបទំនិញ</div>
         </article>
@@ -342,7 +361,7 @@
               <div class="kpi-lbl">Revenue</div>
               <div class="kpi-val" id="kpiRevenue">—</div>
             </div>
-            <div class="kpi-ico">💵</div>
+            <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
           </div>
           <div class="kpi-khr" id="kpiKhr">—</div>
           <div class="kpi-note" id="kpiRevenueNote">ចំណូលសរុប</div>
@@ -353,10 +372,40 @@
               <div class="kpi-lbl">Avg / Order</div>
               <div class="kpi-val" id="kpiAvg">—</div>
             </div>
-            <div class="kpi-ico">📈</div>
+            <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
           </div>
           <div class="kpi-note" id="kpiAvgNote">មធ្យមក្នុងមួយ Order</div>
         </article>
+      </section>
+
+      <!-- Filter Bar -->
+      <section class="glass-card dr-filter">
+        <div class="dr-filter-left">
+          <h2>📊 Daily Report</h2>
+          <p id="drSubtitle">របាយការណ៍ប្រចាំថ្ងៃ — ជ្រើសរើសកាលបរិច្ឆេទ និង Page</p>
+        </div>
+        <div class="dr-filter-right">
+          <div class="dr-date-pill" id="drDatePill">
+            <button class="dr-date-pill-btn" id="drDatePillBtn" type="button">
+              <svg class="dr-date-pill-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span class="dr-date-pill-label" id="drPillLabel">Today</span>
+              <span class="dr-date-pill-sub" id="drPillSub"></span>
+            </button>
+          </div>
+          <div class="dr-page-wrap">
+            <button class="dr-btn" id="drPageBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <span id="drPageLabel">ទំព័រទាំងអស់</span>
+              <span class="dr-page-count" id="drPageCount"></span>
+              <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="dr-page-menu" id="drPageMenu"></div>
+          </div>
+          <button class="dr-refresh" id="drRefreshBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
       </section>
 
       <!-- Bottom: Orders + Product Summary -->
@@ -365,15 +414,9 @@
         <!-- Order List -->
         <section class="glass-card dr-orders-card">
           <div class="dr-orders-head">
-            <div>
-              <h3>បញ្ជី Orders</h3>
-              <p id="drOrdersSubtitle">Order list for the selected date</p>
-            </div>
-            <div class="dr-orders-search">
-              <div class="dr-search-box">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" id="drSearchInput" placeholder="ស្វែងរកអតិថិជន...">
-              </div>
+            <div class="dr-search-box">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="drSearchInput" placeholder="ស្វែងរកអតិថិជន...">
             </div>
           </div>
           <div id="drOrderList">
@@ -442,24 +485,139 @@
     return 'st-other';
   }
 
-  /* ── Init date range ── */
-  var inputFrom = document.getElementById('drDateFrom');
-  var inputTo   = document.getElementById('drDateTo');
+  /* ── Date pill popup with presets ── */
   dateFrom = dateTo = todayYMD();
-  inputFrom.value = dateFrom;
-  inputTo.value   = dateTo;
-  inputFrom.addEventListener('change', function(){
-    dateFrom = this.value;
-    /* auto-correct: if From > To, pull To forward */
-    if (dateTo && dateFrom > dateTo) { dateTo = dateFrom; inputTo.value = dateTo; }
-    applyFilters();
+  var _activePreset = 'today';
+
+  // Helper: add/subtract days from YYYY-MM-DD
+  function _addDays(ymd, n) {
+    var d = new Date(ymd + 'T00:00:00'); d.setDate(d.getDate() + n);
+    return d.toISOString().slice(0,10);
+  }
+  function _startOfWeek(ymd) {
+    var d = new Date(ymd + 'T00:00:00'), day = d.getDay();
+    d.setDate(d.getDate() - (day === 0 ? 6 : day - 1)); // Mon
+    return d.toISOString().slice(0,10);
+  }
+  function _startOfMonth(ymd) { return ymd.slice(0,7) + '-01'; }
+  function _endOfMonth(ymd) {
+    var p = ymd.split('-'), d = new Date(+p[0], +p[1], 0);
+    return d.toISOString().slice(0,10);
+  }
+
+  var _PRESETS = [
+    { id:'today',      label:'Today',        fn: function(t){ return {f:t,to:t}; } },
+    { id:'yesterday',  label:'Yesterday',    fn: function(t){ var y=_addDays(t,-1); return {f:y,to:y}; } },
+    { id:'last7',      label:'Last 7 Days',  fn: function(t){ return {f:_addDays(t,-6),to:t}; } },
+    { id:'last14',     label:'Last 14 Days', fn: function(t){ return {f:_addDays(t,-13),to:t}; } },
+    { id:'last28',     label:'Last 28 Days', fn: function(t){ return {f:_addDays(t,-27),to:t}; } },
+    { id:'last30',     label:'Last 30 Days', fn: function(t){ return {f:_addDays(t,-29),to:t}; } },
+    { id:'thisweek',   label:'This Week',    fn: function(t){ return {f:_startOfWeek(t),to:t}; } },
+    { id:'thismonth',  label:'This Month',   fn: function(t){ return {f:_startOfMonth(t),to:t}; } },
+    { id:'lastmonth',  label:'Last Month',   fn: function(t){
+      var p=t.split('-'),y=+p[0],m=+p[1]-1;
+      if(m<1){m=12;y--;} var my=y+'-'+(m<10?'0':'')+m;
+      return {f:_startOfMonth(my+'-01'),to:_endOfMonth(my+'-01')};
+    }},
+  ];
+
+  // Build compact popup HTML
+  var _datePop = document.createElement('div');
+  _datePop.className = 'dr-date-pop';
+  var presetsHTML = '<div class="dr-date-presets">';
+  _PRESETS.forEach(function(p){
+    var full = (p.id==='thisweek'||p.id==='thismonth'||p.id==='lastmonth') ? ' full' : '';
+    presetsHTML += '<button class="dr-preset-btn'+full+(p.id==='today'?' active':'')+'" data-preset="'+p.id+'">'+p.label+'</button>';
   });
-  inputTo.addEventListener('change', function(){
-    dateTo = this.value;
-    /* auto-correct: if To < From, push From back */
-    if (dateFrom && dateTo < dateFrom) { dateFrom = dateTo; inputFrom.value = dateFrom; }
+  presetsHTML += '</div>';
+  var customHTML =
+    '<div class="dr-date-pop-div"></div>' +
+    '<div class="dr-date-inputs">' +
+      '<input type="date" id="drDateFrom">' +
+      '<span class="dr-date-inputs-sep">→</span>' +
+      '<input type="date" id="drDateTo">' +
+    '</div>' +
+    '<div class="dr-date-pop-foot">' +
+      '<button class="dr-date-pop-cancel" id="drDateCancel">Cancel</button>' +
+      '<button class="dr-date-pop-apply" id="drDateApply">Apply</button>' +
+    '</div>';
+  _datePop.innerHTML = presetsHTML + customHTML;
+  document.body.appendChild(_datePop);
+
+  var _pillBtn   = document.getElementById('drDatePillBtn');
+  var _pillLabel = document.getElementById('drPillLabel');
+  var _pillSub   = document.getElementById('drPillSub');
+  var inputFrom  = document.getElementById('drDateFrom');
+  var inputTo    = document.getElementById('drDateTo');
+
+  function _fmtShort(ymd) {
+    if(!ymd) return '—';
+    var p=ymd.split('-'); return p[2]+'/'+p[1];
+  }
+  function _updatePill() {
+    var preset = _PRESETS.find(function(p){ return p.id===_activePreset; });
+    if(preset) {
+      _pillLabel.textContent = preset.label;
+      _pillSub.textContent = (dateFrom===dateTo) ? _fmtShort(dateFrom) : _fmtShort(dateFrom)+' → '+_fmtShort(dateTo);
+    } else {
+      _pillLabel.textContent = (dateFrom===dateTo) ? _fmtShort(dateFrom) : _fmtShort(dateFrom)+' → '+_fmtShort(dateTo);
+      _pillSub.textContent = '';
+    }
+  }
+  function _applyPreset(id) {
+    var today = todayYMD();
+    var preset = _PRESETS.find(function(p){ return p.id===id; });
+    if(!preset) return;
+    var r = preset.fn(today);
+    dateFrom=r.f; dateTo=r.to;
+    _activePreset=id;
+    inputFrom.value=dateFrom; inputTo.value=dateTo;
+    _datePop.querySelectorAll('.dr-preset-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-preset')===id);
+    });
+    _updatePill();
     applyFilters();
+  }
+  function _openDatePop() {
+    inputFrom.value=dateFrom; inputTo.value=dateTo;
+    var r=_pillBtn.getBoundingClientRect(), popW=290;
+    var left=r.right-popW;
+    if(left<8) left=8;
+    if(left+popW>window.innerWidth-8) left=window.innerWidth-popW-8;
+    _datePop.style.top=(r.bottom+6)+'px';
+    _datePop.style.left=left+'px';
+    _datePop.classList.add('show');
+    _pillBtn.classList.add('open');
+  }
+  function _closeDatePop() {
+    _datePop.classList.remove('show');
+    _pillBtn.classList.remove('open');
+  }
+
+  // Init: Today
+  _applyPreset('today');
+
+  _pillBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    _datePop.classList.contains('show') ? _closeDatePop() : _openDatePop();
   });
+  _datePop.querySelectorAll('.dr-preset-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      _applyPreset(this.getAttribute('data-preset'));
+    });
+  });
+  document.getElementById('drDateCancel').addEventListener('click', _closeDatePop);
+  document.getElementById('drDateApply').addEventListener('click', function(){
+    var f=inputFrom.value, t=inputTo.value;
+    if(!f||!t){ _closeDatePop(); return; }
+    if(f>t) t=f;
+    dateFrom=f; dateTo=t; _activePreset=null;
+    _updatePill(); _closeDatePop(); applyFilters();
+  });
+  inputFrom.addEventListener('change', function(){ _activePreset=null; });
+  inputTo.addEventListener('change',   function(){ _activePreset=null; });
+  _datePop.addEventListener('click', function(e){ e.stopPropagation(); });
+  document.addEventListener('click', _closeDatePop);
 
   /* ── Page dropdown ── */
   var pageBtn   = document.getElementById('drPageBtn');
@@ -597,7 +755,7 @@
     document.getElementById('kpiItemsNote').textContent   = 'ទំនិញ ' + items + ' ឯកតា';
     document.getElementById('kpiRevenueNote').textContent = 'Rate: ' + KHR_RATE.toLocaleString() + '៛/$1';
     document.getElementById('kpiAvgNote').textContent     = orders + ' orders';
-    document.getElementById('drOrdersSubtitle').textContent = orders + ' orders · ' + fmtRange();
+    var _sub = document.getElementById('drOrdersSubtitle'); if(_sub) _sub.textContent = orders + ' orders · ' + fmtRange();
     document.getElementById('drSubtitle').textContent = fmtRange() + (selectedPages.length ? ' · ' + selectedPages.join(', ') : ' · ទំព័រទាំងអស់');
   }
 
