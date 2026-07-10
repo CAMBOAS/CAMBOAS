@@ -681,53 +681,7 @@
     <div class="shared-topbar" id="sharedHeader"></div>
     <div class="pw">
 
-      <!-- Top header -->
-      <div class="glass-card prod-top-card" style="padding:18px 22px;border-radius:22px">
-        <div class="ptop">
-          <div class="ptop-left">
-            <h2>Products</h2>
-            <p>គ្រប់គ្រងផលិតផល CAMBO MINI</p>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <div class="pbar">
-              <div class="psearch-wrap">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" id="srch" placeholder="ស្វែងរកផលិតផល..." oninput="fp()">
-              </div>
-              <select id="srt" onchange="fp()">
-                <option value="name">ឈ្មោះ A→Z</option>
-                <option value="price">តម្លៃ ទាប→ខ្ពស់</option>
-                <option value="stock">ស្តុក ច្រើន→តិច</option>
-              </select>
-            </div>
-            <button class="no-btn" id="noToggle" onclick="toggleOrderMode()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              New Order
-            </button>
-          </div>
-        </div>
-
-        <!-- Status tabs -->
-        <div class="stab-row" id="stabRow" style="margin-top:16px">
-          <button class="stab on" data-stab="all" onclick="setStat(event,'all')">
-            ទាំងអស់ <span class="stab-cnt" id="cntAll">0</span>
-          </button>
-          <button class="stab" data-stab="avail" onclick="setStat(event,'avail')">
-            មានស្តុក <span class="stab-cnt" id="cntAvail">0</span>
-          </button>
-          <button class="stab" data-stab="low" onclick="setStat(event,'low')">
-            ស្តុកតិច <span class="stab-cnt" id="cntLow">0</span>
-          </button>
-          <button class="stab" data-stab="out" onclick="setStat(event,'out')">
-            អស់ស្តុក <span class="stab-cnt" id="cntOut">0</span>
-          </button>
-        </div>
-
-        <!-- Category pills -->
-        <div class="cat-pills" id="catPills" style="margin-top:10px"></div>
-      </div>
-
-      <!-- New Order Panel — exact same form as New Order II -->
+      <!-- New Order Panel — above products header -->
       <div id="orderPanel">
         <div class="mob-section" id="prodCustSection">
           <!-- Header -->
@@ -881,6 +835,52 @@
 
           </div><!-- /prodCustBody -->
         </div><!-- /mob-section -->
+      </div>
+
+      <!-- Top header -->
+      <div class="glass-card prod-top-card" style="padding:18px 22px;border-radius:22px">
+        <div class="ptop">
+          <div class="ptop-left">
+            <h2>Products</h2>
+            <p>គ្រប់គ្រងផលិតផល CAMBO MINI</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div class="pbar">
+              <div class="psearch-wrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="srch" placeholder="ស្វែងរកផលិតផល..." oninput="fp()">
+              </div>
+              <select id="srt" onchange="fp()">
+                <option value="name">ឈ្មោះ A→Z</option>
+                <option value="price">តម្លៃ ទាប→ខ្ពស់</option>
+                <option value="stock">ស្តុក ច្រើន→តិច</option>
+              </select>
+            </div>
+            <button class="no-btn" id="noToggle" onclick="toggleOrderMode()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Order
+            </button>
+          </div>
+        </div>
+
+        <!-- Status tabs -->
+        <div class="stab-row" id="stabRow" style="margin-top:16px">
+          <button class="stab on" data-stab="all" onclick="setStat(event,'all')">
+            ទាំងអស់ <span class="stab-cnt" id="cntAll">0</span>
+          </button>
+          <button class="stab" data-stab="avail" onclick="setStat(event,'avail')">
+            មានស្តុក <span class="stab-cnt" id="cntAvail">0</span>
+          </button>
+          <button class="stab" data-stab="low" onclick="setStat(event,'low')">
+            ស្តុកតិច <span class="stab-cnt" id="cntLow">0</span>
+          </button>
+          <button class="stab" data-stab="out" onclick="setStat(event,'out')">
+            អស់ស្តុក <span class="stab-cnt" id="cntOut">0</span>
+          </button>
+        </div>
+
+        <!-- Category pills -->
+        <div class="cat-pills" id="catPills" style="margin-top:10px"></div>
       </div>
 
       <!-- Grid -->
