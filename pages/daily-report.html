@@ -662,12 +662,27 @@
     btn.classList.add('loading');
     btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .8s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Loading...';
     try {
-      allOrders = await CamboOrdersData.fetchOrders(5000);
+      /* Fetch pages list directly from SaleInfor sheet (column C) + orders in parallel */
+      var [ordersResult, inforResult] = await Promise.all([
+        CamboOrdersData.fetchOrders(5000),
+        window.CamboAPI
+          ? window.CamboAPI.get({ action: 'saleinfor' })
+          : fetch('https://script.google.com/macros/s/AKfycbwOGbB79rXs56U6uAq18w0jg-3NvXtWVC3DuOx4hb-W9PPzE4021Q4B-00q8dKmwtgS4g/exec?action=saleinfor&_=' + Date.now()).then(function(r){ return r.json(); })
+      ]);
+      allOrders = ordersResult;
 
-      /* Build page list from real API data — names come directly from Google Sheet */
-      var pagesMap = {};
-      allOrders.forEach(function(o){ if(o.page) pagesMap[o.page] = true; });
-      var pageList = Object.keys(pagesMap).sort();
+      /* Pages: SaleInfor column C is the master list (exact Sheet order) */
+      var masterPages = (inforResult && Array.isArray(inforResult.pages))
+        ? inforResult.pages
+        : (inforResult && inforResult.saleinfor && Array.isArray(inforResult.saleinfor.pages))
+          ? inforResult.saleinfor.pages
+          : [];
+      /* Merge: master first, then any extra from orders not yet in Sheet */
+      var masterSet = {};
+      masterPages.forEach(function(p){ masterSet[p] = true; });
+      var extraPages = {};
+      allOrders.forEach(function(o){ if(o.page && !masterSet[o.page]) extraPages[o.page] = true; });
+      var pageList = masterPages.concat(Object.keys(extraPages).sort());
       buildPageMenu(pageList);
 
       applyFilters();
