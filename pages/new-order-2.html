@@ -2324,16 +2324,18 @@
       #cartPanel .srow.total span:last-child { color: #7c5cff !important; font-size: 20px !important; }
       #cartPanel .khr-row { border-top: none !important; padding: 0 0 0 20px !important; margin: 0 !important; border-left: 1px solid rgba(0,0,0,0.07) !important; }
 
-      /* ── ACTION BAR: fixed, always visible, scroll-hide disabled ── */
+      /* ── ACTION BAR: TikTok right panel on desktop ── */
       #mobBottomBar,
       #mobBottomBar.bar-hidden {
         position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        border-radius: 0 !important;
-        z-index: 300 !important;
-        transform: none !important;
+        right: 14px !important;
+        left: auto !important;
+        bottom: auto !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 64px !important;
+        border-radius: 22px !important;
+        z-index: 9000 !important;
         opacity: 1 !important;
         pointer-events: auto !important;
         display: flex !important;
@@ -2518,23 +2520,20 @@
       [data-theme="dark"] #cartPanel .khr-val { color: #a78bfa !important; }
       [data-theme="dark"] #cartPanel .srow.total span:last-child { color: #a78bfa !important; }
 
-      /* ── Action bar: in-flow card, full width ── */
+      /* ── Action bar: TikTok right panel (same as above, ensure override) ── */
       #mobBottomBar,
       #mobBottomBar.bar-hidden {
-        position: relative !important;
-        bottom: auto !important; left: auto !important; right: auto !important;
-        width: 100% !important;
-        height: auto !important;
-        border-radius: 18px !important;
-        border: 1px solid rgba(0,0,0,0.08) !important;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.07) !important;
-        padding: 12px 16px !important;
-        transform: none !important;
+        position: fixed !important;
+        right: 14px !important;
+        left: auto !important;
+        bottom: auto !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        width: 64px !important;
+        border-radius: 22px !important;
+        z-index: 9000 !important;
         opacity: 1 !important;
         pointer-events: auto !important;
-        background: var(--card, rgba(255,255,255,0.92)) !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
         display: flex !important;
       }
     }
