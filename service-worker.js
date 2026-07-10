@@ -67,7 +67,7 @@ self.addEventListener('install', function(e) {
   );
 });
 
-/* ── Activate: remove old caches ── */
+/* ── Activate: remove old caches + force all clients to reload ── */
 self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
@@ -77,6 +77,11 @@ self.addEventListener('activate', function(e) {
       );
     }).then(function() {
       return self.clients.claim();
+    }).then(function() {
+      /* Tell all open tabs to reload so they use the new SW immediately */
+      return self.clients.matchAll({ type: 'window' }).then(function(clients) {
+        clients.forEach(function(client) { client.navigate(client.url); });
+      });
     })
   );
 });
