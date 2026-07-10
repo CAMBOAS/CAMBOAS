@@ -1018,30 +1018,12 @@
       <div class="pg" id="pgrid"></div>
 
       <!-- Cart Section -->
-      <div id="cartSection">
-        <div class="glass-card no-card">
-          <div class="no-sect-head">
-            <div class="no-sect-badge">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            </div>
-            <h3>ផលិតផលដែលបានជ្រើស <span class="cart-badge" id="cartBadge">0</span></h3>
-          </div>
-          <div id="cartEmpty" style="padding:28px 20px;text-align:center;color:var(--muted);font-size:13px">
-            សូមចុច <strong>+ បន្ថែម</strong> នៅលើផលិតផលដើម្បីបន្ថែមទៅ Order
-          </div>
-          <div id="cartList" style="display:none"></div>
-          <div class="cart-total-row" id="cartTotalRow" style="display:none">
-            <span class="cart-total-lbl">សរុបទឹកប្រាក់</span>
-            <span class="cart-total-val" id="cartTotal">$0.00</span>
-          </div>
-          <div class="no-submit-bar">
-            <button class="no-clear-btn" onclick="clearCart()">Clear</button>
-            <button class="no-submit-btn" id="noSubmitBtn" onclick="submitNewOrder()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              រក្សាទុក Order
-            </button>
-          </div>
-        </div>
+      <!-- hidden cart state elements (needed by JS) -->
+      <div id="cartSection" style="display:none">
+        <span id="cartBadge">0</span>
+        <div id="cartEmpty"></div>
+        <div id="cartList"></div>
+        <div id="cartTotalRow"><span id="cartTotal">$0.00</span></div>
       </div>
 
     </div>
