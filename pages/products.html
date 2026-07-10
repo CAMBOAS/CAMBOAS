@@ -497,6 +497,58 @@
     }
     .ac-add-btn:hover { background:#6d28d9 }
 
+    /* ── del-modal (SaleInfor Settings) ── */
+    .del-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:9998;display:none;align-items:center;justify-content:center}
+    .del-modal.show{display:flex}
+    .del-box{background:var(--card);border:1px solid rgba(148,163,200,.15);border-radius:16px;padding:24px;width:min(340px,90vw);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+    #saleInforModal .del-box{display:flex;flex-direction:column}
+    #saleInforList{flex:1;overflow-y:auto}
+    #saleInforModal{opacity:0;transition:opacity .2s ease}
+    #saleInforModal.show{opacity:1}
+    #saleInforModal .del-box{transform:scale(.96) translateY(8px);transition:transform .22s cubic-bezier(.34,1.26,.64,1),opacity .2s ease;opacity:0}
+    #saleInforModal.show .del-box{transform:scale(1) translateY(0);opacity:1}
+    @media(max-width:768px){
+      #saleInforModal{align-items:flex-end;background:rgba(0,0,0,.4)}
+      #saleInforModal .del-box{width:100%!important;max-width:100%!important;border-radius:20px 20px 0 0!important;border-bottom:none!important;height:75vh;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);opacity:1}
+      #saleInforModal.show .del-box{transform:translateY(0)}
+      #saleInforList{max-height:none!important;flex:1;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+    }
+
+    /* ── Invoice Paste Modal ── */
+    #invoiceModal{position:fixed;inset:0;z-index:18000;display:flex;align-items:flex-end;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:ivFadeIn .22s ease}
+    #invoiceModal[hidden]{display:none!important}
+    @keyframes ivFadeIn{from{opacity:0}to{opacity:1}}
+    .iv-sheet{width:100%;background:var(--card,#fff);border-radius:22px 22px 0 0;padding:0 0 env(safe-area-inset-bottom);box-shadow:0 -8px 40px rgba(0,0,0,.18);animation:ivSlideUp .28s cubic-bezier(.22,.68,0,1.2);max-height:82vh;display:flex;flex-direction:column}
+    [data-theme="dark"] .iv-sheet{background:#0e0b1e}
+    @keyframes ivSlideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .iv-handle{width:40px;height:4px;border-radius:2px;background:rgba(0,0,0,.12);margin:10px auto 0;flex-shrink:0}
+    [data-theme="dark"] .iv-handle{background:rgba(255,255,255,.15)}
+    @media(min-width:680px){
+      #invoiceModal{align-items:center;justify-content:center;padding:24px}
+      .iv-sheet{width:100%;max-width:560px;border-radius:24px;padding:0;box-shadow:0 24px 80px rgba(0,0,0,.28),0 8px 24px rgba(139,92,246,.15);animation:ivPopIn .26s cubic-bezier(.22,.68,0,1.2);max-height:88vh}
+      .iv-handle{display:none}
+      .iv-textarea{min-height:180px;max-height:260px}
+    }
+    @keyframes ivPopIn{from{opacity:0;transform:scale(.93) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .iv-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;flex-shrink:0}
+    .iv-title{font-size:16px;font-weight:800;color:var(--text,#18213a);display:flex;align-items:center;gap:8px}
+    [data-theme="dark"] .iv-title{color:#e8e0ff}
+    .iv-close-btn{width:30px;height:30px;border-radius:8px;border:none;background:rgba(239,68,68,.1);color:#ef4444;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .iv-textarea{flex:1;min-height:150px;max-height:300px;margin:0 18px;border-radius:14px;border:1.5px solid rgba(0,0,0,.12);background:var(--input,rgba(255,255,255,.95));padding:12px 14px;font-size:14px;font-family:inherit;color:var(--text,#18213a);outline:none;resize:none;line-height:1.5;overflow-y:auto}
+    .iv-textarea:focus{border-color:#8b5cf6}
+    [data-theme="dark"] .iv-textarea{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#e8e0ff}
+    .iv-preview{margin:10px 18px 0;padding:10px 14px;border-radius:12px;background:rgba(124,92,255,.06);border:1px solid rgba(124,92,255,.15);font-size:12px;color:var(--muted,#6b7898);line-height:1.7;display:none;max-height:120px;overflow-y:auto;flex-shrink:0}
+    [data-theme="dark"] .iv-preview{background:rgba(124,92,255,.1);border-color:rgba(124,92,255,.2)}
+    .iv-preview.show{display:block}
+    .iv-preview b{color:var(--text,#18213a);font-weight:700}
+    [data-theme="dark"] .iv-preview b{color:#e8e0ff}
+    .iv-actions{display:flex;gap:10px;padding:14px 18px 16px;flex-shrink:0}
+    .iv-cancel-btn{flex:1;height:46px;border-radius:13px;border:1.5px solid rgba(0,0,0,.12);background:transparent;font-size:14px;font-weight:700;color:var(--muted,#6b7898);cursor:pointer;font-family:inherit}
+    [data-theme="dark"] .iv-cancel-btn{border-color:rgba(255,255,255,.12)}
+    .iv-apply-btn{flex:2;height:46px;border-radius:13px;border:none;background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(139,92,246,.35);transition:opacity .15s}
+    .iv-apply-btn:disabled{opacity:.45;cursor:not-allowed}
+    .iv-apply-btn:not(:disabled):active{opacity:.82}
+
     /* Toast */
     #noToast {
       position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(10px);
@@ -1529,7 +1581,12 @@ document.getElementById('acOverlay').addEventListener('click', function(e){
 });
 
 function openSaleInforSettings() {
-  window.location.href = 'new-order-2.html#settings';
+  document.getElementById('saleInforModal').classList.add('show');
+  _loadSaleInforForSettings();
+}
+function closeSaleInforSettings() {
+  document.getElementById('saleInforModal').classList.remove('show');
+  document.getElementById('saleInforNewVal').value = '';
 }
 
 // Payment button delegation (same as new-order-2.html)
@@ -1558,5 +1615,223 @@ document.addEventListener('saleInforLoaded', function(e) {
 <script src="../assets/js/phone-carrier.js?v=164"></script>
 <script src="../assets/js/searchable-combo.js?v=169"></script>
 <script src="../assets/js/sw-register.js?v=158"></script>
+
+<!-- ══ SaleInfor Settings Modal ══ -->
+<div class="del-modal" id="saleInforModal" onclick="if(event.target===this)closeSaleInforSettings()">
+  <div class="del-box" style="max-width:400px;width:94%;text-align:left;padding:0;overflow:hidden;border-color:rgba(99,102,241,.3)">
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(148,163,200,.12)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span style="font-size:15px;font-weight:700;color:var(--text);flex:1">គ្រប់គ្រងព័ត៌មាន Sale</span>
+      <button onclick="closeSaleInforSettings()" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;font-size:18px;line-height:1">✕</button>
+    </div>
+    <div style="display:flex;gap:0;padding:10px 16px 0;overflow-x:auto;scrollbar-width:none" id="saleInforTabs">
+      <button onclick="switchSaleInforTab('provinces')" id="siTab_provinces" class="si-tab si-tab-active" style="font-size:12px;padding:6px 10px;border-radius:6px 6px 0 0;border:1px solid rgba(99,102,241,.3);border-bottom:none;background:rgba(99,102,241,.15);color:#6366f1;cursor:pointer;white-space:nowrap;font-weight:700">Province</button>
+      <button onclick="switchSaleInforTab('delivery')"  id="siTab_delivery"  class="si-tab" style="font-size:12px;padding:6px 10px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;white-space:nowrap;font-weight:600">Delivery</button>
+      <button onclick="switchSaleInforTab('pages')"     id="siTab_pages"     class="si-tab" style="font-size:12px;padding:6px 10px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;white-space:nowrap;font-weight:600">Pages</button>
+      <button onclick="switchSaleInforTab('closeby')"   id="siTab_closeby"   class="si-tab" style="font-size:12px;padding:6px 10px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;white-space:nowrap;font-weight:600">CloseBy</button>
+      <button onclick="switchSaleInforTab('payment')"   id="siTab_payment"   class="si-tab" style="font-size:12px;padding:6px 10px;border-radius:6px 6px 0 0;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;white-space:nowrap;font-weight:600">Payment</button>
+    </div>
+    <div id="saleInforList" style="max-height:220px;overflow-y:auto;padding:8px 0;border-top:1px solid rgba(99,102,241,.2)"></div>
+    <div style="display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(148,163,200,.12)">
+      <input id="saleInforNewVal" type="text" placeholder="បញ្ចូលឈ្មោះថ្មី..." style="flex:1;border:1px solid rgba(148,163,200,.2);border-radius:8px;padding:8px 12px;background:var(--input-bg,rgba(255,255,255,.06));color:var(--text);font-size:13px;outline:none">
+      <button onclick="addSaleInforItem()" style="background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);border-radius:8px;padding:8px 14px;color:#6366f1;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">+ បន្ថែម</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Invoice Paste Modal ══ -->
+<div id="invoiceModal" hidden>
+  <div class="iv-sheet">
+    <div class="iv-handle"></div>
+    <div class="iv-head">
+      <span class="iv-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="13" y2="15"/></svg>
+        Paste Receipt → Fill Form
+      </span>
+      <button type="button" class="iv-close-btn" id="ivCloseBtn">✕</button>
+    </div>
+    <textarea class="iv-textarea" id="ivTextarea" placeholder="Paste receipt text នៅទីនេះ...&#10;&#10;🧾 វិក័យប័ត្រ  Date: ...&#10;👤 ឈ្មោះ: ...&#10;📞 លេខទូរសព្ទ: ..."></textarea>
+    <div class="iv-preview" id="ivPreview"></div>
+    <div class="iv-actions">
+      <button type="button" class="iv-cancel-btn" id="ivCancelBtn">បោះបង់</button>
+      <button type="button" class="iv-apply-btn" id="ivApplyBtn" disabled>✓ Fill Form</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ SaleInfor Settings (Products page) ══ */
+(function(){
+  var siTab = 'provinces';
+  var siData = { provinces:[], delivery:[], pages:[], closeby:[], payment:[] };
+
+  window._loadSaleInforForSettings = function() {
+    document.getElementById('saleInforList').innerHTML = '<div style="padding:14px 16px;color:var(--muted);font-size:13px">កំពុងទាញទិន្នន័យ...</div>';
+    var base = (window.CamboAPI && window.CamboAPI.getBase) ? window.CamboAPI.getBase() : '';
+    fetch(base + (base.includes('?') ? '&' : '?') + 'action=saleinfor&_=' + Date.now(), { redirect:'follow' })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        if (res.ok && res.saleinfor) {
+          siData.provinces = res.saleinfor.provinces || [];
+          siData.delivery  = res.saleinfor.delivery  || [];
+          siData.pages     = res.saleinfor.pages     || [];
+          siData.closeby   = res.saleinfor.closeby   || [];
+          siData.payment   = res.saleinfor.payment   || [];
+        }
+        renderSaleInforList();
+      })
+      .catch(function(){ renderSaleInforList(); });
+  };
+
+  window.switchSaleInforTab = function(tab) {
+    siTab = tab;
+    ['provinces','delivery','pages','closeby','payment'].forEach(function(t) {
+      var btn = document.getElementById('siTab_' + t);
+      if (!btn) return;
+      if (t === tab) {
+        btn.style.background = 'rgba(99,102,241,.15)'; btn.style.color = '#6366f1';
+        btn.style.border = '1px solid rgba(99,102,241,.3)'; btn.style.borderBottom = 'none'; btn.style.fontWeight = '700';
+      } else {
+        btn.style.background = 'none'; btn.style.color = 'var(--muted)';
+        btn.style.border = '1px solid transparent'; btn.style.borderBottom = ''; btn.style.fontWeight = '600';
+      }
+    });
+    renderSaleInforList();
+  };
+
+  function renderSaleInforList() {
+    var items = siData[siTab] || [];
+    var html = items.length ? items.map(function(v){
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-bottom:1px solid rgba(148,163,200,.07)">' +
+        '<span style="font-size:13px;color:var(--text)">' + v + '</span>' +
+        '<button onclick="deleteSaleInforItem(\'' + v.replace(/'/g,"\\'") + '\')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:6px;padding:4px 10px;color:#ef4444;font-size:12px;cursor:pointer">លុប</button>' +
+      '</div>';
+    }).join('') : '<div style="padding:14px 16px;color:var(--muted);font-size:13px">មិនមានទិន្នន័យ</div>';
+    document.getElementById('saleInforList').innerHTML = html;
+  }
+
+  window.addSaleInforItem = async function() {
+    var val = (document.getElementById('saleInforNewVal').value || '').trim();
+    if (!val) { showNoToast('⚠️ សូមបញ្ចូលឈ្មោះ!'); return; }
+    if (!confirm('បន្ថែម "' + val + '" ?\nតើអ្នកប្រាកដឬ?')) return;
+    try {
+      var res = await CamboAPI.post({ action:'saleinfor_add', type:siTab, value:val });
+      if (res.ok) {
+        siData[siTab].push(val);
+        document.getElementById('saleInforNewVal').value = '';
+        renderSaleInforList();
+        _applySaleInforToForm(siData);
+        showNoToast('✅ បន្ថែមបានជោគជ័យ!');
+      } else { showNoToast('❌ ' + (res.message || 'Error')); }
+    } catch(e) { showNoToast('❌ Server error'); }
+  };
+
+  window.deleteSaleInforItem = async function(val) {
+    if (!confirm('លុប "' + val + '" ចេញ?\nតើអ្នកប្រាកដឬ?')) return;
+    try {
+      var res = await CamboAPI.post({ action:'saleinfor_delete', type:siTab, value:val });
+      if (res.ok) {
+        siData[siTab] = siData[siTab].filter(function(x){ return x !== val; });
+        renderSaleInforList();
+        _applySaleInforToForm(siData);
+        showNoToast('🗑️ លុបបានជោគជ័យ!');
+      } else { showNoToast('❌ ' + (res.message || 'Error')); }
+    } catch(e) { showNoToast('❌ Server error'); }
+  };
+
+  window._applySaleInforToForm = function(d) {
+    var c = window.SearchableCombo && window.SearchableCombo.combos;
+    if (c) {
+      if (c.province && d.provinces) c.province.update(d.provinces);
+      if (c.delivery && d.delivery)  c.delivery.update(d.delivery);
+      if (c.pages    && d.pages)     c.pages.update(d.pages);
+      if (c.closeby  && d.closeby)   c.closeby.update(d.closeby);
+    }
+    if (d.payment && d.payment.length) {
+      var payEl = document.getElementById('paymentOptions');
+      var cur = (document.getElementById('payment') && document.getElementById('payment').value) || '';
+      if (payEl) payEl.innerHTML = d.payment.map(function(v){
+        return '<button type="button" class="pay-btn'+(v===cur?' active':'')+'" data-value="'+v+'">'+v+'</button>';
+      }).join('');
+    }
+  };
+})();
+
+/* ══ Invoice Paste Feature (Products page) ══ */
+(function(){
+  'use strict';
+  function parseReceipt(text) {
+    var d = {};
+    function afterColon(line) { var idx=line.lastIndexOf(':'); return idx<0?'':line.slice(idx+1).replace(/^[\t ]+/,'').trim(); }
+    function clean(s){ return (s==='-'||s==='–'||s==='')?'':s; }
+    var lines = text.split(/\r?\n/);
+    lines.forEach(function(raw){
+      var line=raw.trim(); if(!line||line.replace(/\./g,'')==='') return;
+      var val=clean(afterColon(line));
+      if      (line.includes('ឈ្មោះ'))        { if(val) d.customer=val; }
+      else if (line.includes('លេខទូរ'))        { if(val) d.phone=val; }
+      else if (line.includes('ទីតាំង'))        { if(val) d.address=val; }
+      else if (line.includes('ខេត្ត'))         { if(val) d.province=val; }
+      else if (line.includes('ដឹកជញ្ជូន')&&!line.includes('សេវា')) { if(val) d.deliveryName=val; }
+      else if (line.includes('Note'))          { if(val) d.note=val; }
+      else if (line.includes('ការទូទាត់'))     { if(val) d.payment=val; }
+      else if (line.includes('Page')&&line.includes('CloseBy')) {
+        var pm=line.match(/Page:\s*([^|]+)/), cm=line.match(/CloseBy:\s*(.+)/);
+        if(pm) d.page=clean(pm[1].trim()); if(cm) d.closeBy=clean(cm[1].trim());
+      }
+      else if (line.includes('សេវាដឹក')) {
+        var fs=val; d.deliveryFee=(!fs||/ហ្វ្រី|free/i.test(fs))?0:(parseFloat(fs.replace(/[$,]/g,''))||0);
+      }
+    });
+    var dt=text.match(/(\d{2}\/\d{2}\/\d{4})\s+(\d{1,2}:\d{2}\s*(?:AM|PM)?)/i);
+    if(dt){ d.dateDisplay=dt[1].trim(); d.timeDisplay=dt[2].trim(); }
+    return d;
+  }
+  function to24h(t){ var m=t.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i); if(!m) return t; var h=parseInt(m[1],10),min=m[2],ap=(m[3]||'').toUpperCase(); if(ap==='PM'&&h!==12)h+=12; if(ap==='AM'&&h===12)h=0; return (h<10?'0':'')+h+':'+min; }
+  function fillForm(d) {
+    var filled=0;
+    function setVal(id,val){ if(!val&&val!==0) return; var el=document.getElementById(id); if(el){el.value=val;el.dispatchEvent(new Event('input',{bubbles:true}));filled++;} }
+    setVal('customer',d.customer); setVal('phone',d.phone); setVal('addressDetail',d.address);
+    setVal('deliveryInput',d.deliveryName); setVal('deliveryFee',d.deliveryFee!==undefined?d.deliveryFee:'');
+    setVal('pagesInput',d.page); setVal('closeByInput',d.closeBy);
+    if(d.province){ setVal('provinceInput',d.province); var ph=document.getElementById('province'); if(ph) ph.value=d.province; }
+    if(d.deliveryName){ var h=document.getElementById('deliveryName'); if(h) h.value=d.deliveryName; }
+    if(d.page){ var h=document.getElementById('page'); if(h) h.value=d.page; }
+    if(d.closeBy){ var h=document.getElementById('closeBy'); if(h) h.value=d.closeBy; }
+    if(d.note&&d.note!=='-') setVal('note',d.note);
+    if(d.payment){ var ph=document.getElementById('payment'); if(ph){ph.value=d.payment;filled++;} document.querySelectorAll('.pay-btn').forEach(function(btn){btn.classList.toggle('active',btn.dataset.value===d.payment);}); }
+    if(d.dateDisplay){ var parts=d.dateDisplay.split('/'); if(parts.length===3){ var iso=parts[2]+'-'+parts[1]+'-'+parts[0]; var de=document.getElementById('datePart'); if(de){de.value=iso;de.dispatchEvent(new Event('input',{bubbles:true}));filled++;} } }
+    if(d.timeDisplay) setVal('timePart',to24h(d.timeDisplay));
+    (function(){ var dl=document.getElementById('dtLocal'),dlp=document.getElementById('dtLocalPicker'),dp=document.getElementById('datePart'),tp=document.getElementById('timePart'); if(dp&&dp.value){var pad=function(x){return String(x).padStart(2,'0');}; var dd=new Date(dp.value+'T'+(tp&&tp.value?tp.value:'00:00')); var hh=dd.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12; var pp=dp.value.split('-'); if(dl) dl.value=pp[2]+'/'+pp[1]+'/'+pp[0]+' '+pad(h12)+':'+pad(dd.getMinutes())+' '+ampm; if(dlp) dlp.value=dp.value+'T'+(tp&&tp.value?tp.value:'00:00');} })();
+    return filled;
+  }
+  function buildPreview(d) {
+    var rows=[]; function row(icon,label,val){if(val||val===0)rows.push(icon+' <b>'+label+'</b>: '+val);}
+    row('👤','ឈ្មោះ',d.customer); row('📞','ទូរស័ព្ទ',d.phone); row('📍','ទីតំណាំ',d.address);
+    row('🗺️','ខេត្ត/ក្រុង',d.province); row('🚚','ដឹកជញ្ជូន',d.deliveryName); row('💳','បង់ប្រាក់',d.payment);
+    row('📅','ថ្ងៃ',d.dateDisplay?(d.dateDisplay+' '+(d.timeDisplay||'')):'');
+    row('📄','Page',d.page); row('🤝','CloseBy',d.closeBy); row('🚛','ថ្លៃដឹក',d.deliveryFee!==undefined?'$'+d.deliveryFee:'');
+    return rows.join('<br>');
+  }
+  var modal=document.getElementById('invoiceModal'), textarea=document.getElementById('ivTextarea'),
+      preview=document.getElementById('ivPreview'), applyBtn=document.getElementById('ivApplyBtn'),
+      closeBtn=document.getElementById('ivCloseBtn'), cancelBtn=document.getElementById('ivCancelBtn');
+  var _parsed=null;
+  function openModal(){ if(!modal)return; textarea.value=''; preview.innerHTML=''; preview.classList.remove('show'); applyBtn.disabled=true; _parsed=null; modal.hidden=false; setTimeout(function(){textarea.focus();},120); }
+  function closeModal(){ if(modal) modal.hidden=true; }
+  function onInput(){ var txt=textarea.value.trim(); if(!txt){preview.classList.remove('show');applyBtn.disabled=true;_parsed=null;return;} _parsed=parseReceipt(txt); var prev=buildPreview(_parsed); if(prev){preview.innerHTML=prev;preview.classList.add('show');applyBtn.disabled=false;}else{preview.innerHTML='<span style="color:#ef4444">⚠️ មិនរកឃើញទិន្នន័យ — សូម Paste text receipt ត្រឹមត្រូវ</span>';preview.classList.add('show');applyBtn.disabled=true;} }
+  function onApply(){ if(!_parsed)return; var n=fillForm(_parsed); closeModal(); showNoToast('✅ បំពេញ '+n+' ចន្លោះដោយជោគជ័យ!'); var s=document.getElementById('prodCustSection'); if(s) s.scrollIntoView({behavior:'smooth',block:'start'}); }
+  if(textarea){ textarea.addEventListener('input',onInput); textarea.addEventListener('paste',function(){setTimeout(onInput,30);}); }
+  if(applyBtn)  applyBtn.addEventListener('click',onApply);
+  if(closeBtn)  closeBtn.addEventListener('click',closeModal);
+  if(cancelBtn) cancelBtn.addEventListener('click',closeModal);
+  if(modal) modal.addEventListener('click',function(e){if(e.target===modal)closeModal();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal&&!modal.hidden)closeModal();});
+  /* Wire Invoice button */
+  var ivBtn=document.getElementById('prodInvoiceBtn');
+  if(ivBtn) ivBtn.addEventListener('click',openModal);
+  else document.addEventListener('DOMContentLoaded',function(){var b=document.getElementById('prodInvoiceBtn');if(b)b.addEventListener('click',openModal);});
+})();
+</script>
 </body>
 </html>
