@@ -314,13 +314,16 @@
     #prodCustHead.is-open .od-chevron-pill { transform:rotate(180deg); }
     .mob-sect-head {
       display:flex;align-items:center;
-      padding:10px 14px;cursor:pointer;user-select:none;gap:10px;
-      min-height:44px;border-bottom:1px solid var(--line,rgba(0,0,0,.06));
+      padding:12px 16px;cursor:pointer;user-select:none;gap:10px;
+      min-height:auto;border-bottom:1px solid rgba(0,0,0,.08);
       transition:background .18s;
+      background:var(--card,rgba(255,255,255,.95));
     }
+    [data-theme="dark"] .mob-sect-head { background:rgba(18,14,36,.95);border-bottom-color:rgba(255,255,255,.08); }
     .mob-sect-head:hover { background:rgba(124,92,255,.04); }
-    .no-mob-sect-body { padding:8px 14px 10px; }
-    .no-mob-sect-body.is-hidden { display:none; }
+    .od-sect-info span { display:none; }
+    .mob-sect-body { padding:8px 14px 12px; }
+    .mob-sect-body.is-hidden { display:none; }
 
     /* ── Each form row ── */
     .od-row { display:flex;align-items:center;gap:6px;margin-bottom:6px;min-height:auto;padding:0;border-bottom:none;position:static; }
@@ -376,7 +379,7 @@
     [data-theme="dark"] #carrierBadgeMobile.c-metfone  { color:#fca5a5;background:rgba(227,6,19,.18); }
     /* Combo inside od-row */
     .od-combo { flex:1;min-width:0; }
-    .od-combo .combo-input { height:44px!important;border-radius:12px!important;border:1.5px solid rgba(148,163,184,.22)!important;background:var(--input,rgba(255,255,255,.95))!important;padding:0 14px!important;font-size:15px!important;font-family:inherit!important;color:var(--text,#18213a)!important;outline:none!important;width:100%!important;box-sizing:border-box!important; }
+    .od-combo .combo-input { height:48px!important;border-radius:12px!important;border:1.5px solid rgba(148,163,184,.22)!important;background:var(--input,rgba(255,255,255,.95))!important;padding:0 14px!important;font-size:15px!important;font-family:inherit!important;color:var(--text,#18213a)!important;outline:none!important;text-align:left!important;width:100%!important;box-shadow:none!important;box-sizing:border-box!important; }
     .od-combo .combo-input:focus { border-color:#8b5cf6!important;box-shadow:0 0 0 3px rgba(139,92,246,.12)!important; }
     [data-theme="dark"] .od-combo .combo-input { border-color:rgba(255,255,255,.12)!important;background:rgba(255,255,255,.07)!important;color:#e8e0ff!important; }
 
