@@ -293,59 +293,68 @@
     /* Order panel */
     #orderPanel { display:none }
     #orderPanel.show { display:block }
-    .no-card { border-radius:22px; overflow:hidden; padding:0 }
-    .no-sect-head {
-      display:flex; align-items:center; gap:10px;
-      padding:14px 20px 13px; border-bottom:1px solid var(--line);
-    }
-    .no-sect-head h3 { font-size:14px; font-weight:800; color:var(--text); margin:0; flex:1 }
-    .no-sect-badge {
-      width:30px; height:30px; border-radius:8px;
-      background:rgba(124,92,255,.12); display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    }
-    [data-theme="dark"] .no-sect-badge { background:rgba(124,92,255,.22) }
 
-    /* Customer form grid */
-    .no-form-grid {
-      display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
-      padding:16px 20px 10px;
+    /* ── Section card (same as new-order-2.html) ── */
+    #orderPanel .mob-section {
+      background:var(--card,rgba(255,255,255,.92));
+      border-top:1px solid rgba(0,0,0,.06);
+      border-bottom:1px solid rgba(0,0,0,.06);
+      overflow:hidden; width:100%; margin-bottom:3px;
+      border-radius:22px;
     }
-    @media(max-width:1023px){ .no-form-grid { grid-template-columns:repeat(2,1fr) } }
-    @media(max-width:540px){ .no-form-grid { grid-template-columns:1fr } }
-    .no-field label { font-size:11px; font-weight:800; color:var(--muted); display:block; margin-bottom:5px; text-transform:uppercase; letter-spacing:.05em }
-    .no-field input, .no-field select {
-      width:100%; padding:9px 12px; border-radius:10px;
-      border:1.5px solid var(--line); background:var(--card);
-      color:var(--text); font-size:13px; font-family:inherit;
-      outline:none; transition:.15s; box-sizing:border-box;
+    [data-theme="dark"] #orderPanel .mob-section { background:rgba(22,18,42,.92); border-color:rgba(255,255,255,.07); }
+    .od-sect-badge { width:34px;height:34px;border-radius:9px;background:rgba(124,92,255,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    [data-theme="dark"] .od-sect-badge { background:rgba(124,92,255,.22); }
+    .od-sect-info { flex:1;min-width:0; }
+    .od-sect-info h3 { font-size:15px;font-weight:800;color:var(--text,#18213a);margin:0; }
+    [data-theme="dark"] .od-sect-info h3 { color:#e8e0ff; }
+    .od-sect-info span { font-size:11px;color:var(--muted);display:block; }
+    .od-chevron-pill { width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted,#6b7898);transition:transform .28s cubic-bezier(.4,0,.2,1);pointer-events:none; }
+    [data-theme="dark"] .od-chevron-pill { background:rgba(255,255,255,.08);color:#a0aabf; }
+    #prodCustHead.is-open .od-chevron-pill { transform:rotate(180deg); }
+    .no-mob-sect-head {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:15px 16px 14px;cursor:pointer;user-select:none;gap:10px;
+      min-height:54px;border-bottom:1px solid var(--line,rgba(0,0,0,.06));
     }
-    .no-field input:focus, .no-field select:focus {
-      border-color:rgba(124,92,255,.5); box-shadow:0 0 0 3px rgba(124,92,255,.1);
-    }
+    .no-mob-sect-body { padding:8px 14px 10px; }
+    .no-mob-sect-body.is-hidden { display:none; }
 
-    /* Payment row */
-    .no-pay-sect { padding:0 20px 14px }
-    .no-pay-lbl { font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px }
-    .no-pay-row { display:flex; gap:6px; flex-wrap:wrap }
-    .nopay-btn {
-      padding:7px 16px; border-radius:9px;
-      border:1.5px solid var(--line); background:transparent;
-      color:var(--muted); font-size:12px; font-weight:800;
-      cursor:pointer; transition:.15s; font-family:inherit;
-    }
-    .nopay-btn:hover { border-color:rgba(124,92,255,.4); color:#7c5cff }
-    .nopay-btn.on { background:rgba(124,92,255,.12); border-color:rgba(124,92,255,.5); color:#7c5cff }
-    [data-theme="light"] .nopay-btn.on { background:rgba(109,40,217,.08); color:#6d28d9; border-color:rgba(109,40,217,.4) }
+    /* ── Each form row ── */
+    .od-row { display:flex;align-items:center;gap:6px;margin-bottom:6px;min-height:auto;padding:0;border-bottom:none;position:static; }
+    .od-row:last-child { margin-bottom:0; }
+    .od-lbl { flex:0 0 88px;font-size:14px;font-weight:700;color:var(--text,#18213a);white-space:nowrap; }
+    [data-theme="dark"] .od-lbl { color:#e8e0ff; }
+    .od-inp { flex:1;height:44px;border-radius:12px;border:1.5px solid rgba(148,163,184,.22);background:var(--input,rgba(255,255,255,.95));padding:0 14px;font-size:15px;font-family:inherit;color:var(--text,#18213a);outline:none;text-align:left;-webkit-appearance:none;appearance:none;width:100%;min-width:0;box-sizing:border-box; }
+    .od-inp:focus { border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.12); }
+    .od-inp::placeholder { color:rgba(107,120,152,.5); }
+    [data-theme="dark"] .od-inp { border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#e8e0ff; }
+    [data-theme="dark"] .od-inp:focus { border-color:#8b5cf6; }
 
-    /* Note */
-    .no-note-wrap { padding:0 20px 16px }
-    .no-note-wrap textarea {
-      width:100%; padding:9px 12px; border-radius:10px;
-      border:1.5px solid var(--line); background:var(--card);
-      color:var(--text); font-size:13px; font-family:inherit;
-      resize:vertical; min-height:52px; outline:none; transition:.15s; box-sizing:border-box;
-    }
-    .no-note-wrap textarea:focus { border-color:rgba(124,92,255,.5); box-shadow:0 0 0 3px rgba(124,92,255,.1) }
+    /* ── Payment row ── */
+    .od-row-pay { flex-direction:column;align-items:flex-start;gap:6px;margin-bottom:10px; }
+    .od-row-pay .od-lbl { flex:0 0 auto; }
+    .od-row-pay .payment-opts { width:100%;padding-bottom:0;margin-top:0; }
+    .od-row-pay .pay-btn { flex:1;height:44px;border-radius:12px;font-size:14px; }
+    .payment-opts { display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;margin-top:2px; }
+    .payment-opts::-webkit-scrollbar { display:none; }
+    .pay-btn { flex:1;min-width:54px;height:50px;border-radius:13px;border:1.5px solid var(--line,rgba(0,0,0,.12));background:transparent;color:var(--muted,#6b7898);font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;font-family:inherit; }
+    .pay-btn.active { background:rgba(124,92,255,.18);border-color:rgba(124,92,255,.5);color:var(--text,#18213a); }
+    .pay-btn:active { transform:scale(.95); }
+    [data-theme="dark"] .pay-btn { border-color:rgba(255,255,255,.12);color:#a0aabf; }
+    [data-theme="dark"] .pay-btn.active { color:#e8e0ff; }
+
+    /* ── Note row ── */
+    .od-row-note { flex-direction:column;align-items:stretch;gap:8px;padding:0;border-bottom:none;margin-bottom:0; }
+    .od-note-head { display:flex;align-items:center;justify-content:space-between;gap:8px; }
+    .od-note-label { display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--text,#18213a);padding:6px 12px;border:1.5px solid rgba(0,0,0,.13);border-radius:10px; }
+    [data-theme="dark"] .od-note-label { color:#e8e0ff;border-color:rgba(255,255,255,.12); }
+    #noNote { width:100%;min-height:64px;border:1.5px solid rgba(148,163,184,.22);border-radius:12px;background:var(--input,rgba(255,255,255,.95));font-size:15px;font-family:inherit;color:var(--text,#18213a);padding:10px 14px;box-sizing:border-box;resize:vertical;outline:none; }
+    #noNote:focus { border-color:#8b5cf6;box-shadow:0 0 0 3px rgba(139,92,246,.12); }
+    [data-theme="dark"] #noNote { border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#e8e0ff; }
+
+    /* ── Datetime ── */
+    .od-datetime { flex:1;display:flex;align-items:center;gap:8px;min-width:0;position:relative; }
 
     /* Add-to-cart button on card */
     .pc-add-row { display:none; padding:0 12px 12px }
@@ -532,78 +541,107 @@
 
       <!-- New Order Panel (customer form) -->
       <div id="orderPanel">
-        <div class="glass-card no-card">
-          <div class="no-sect-head">
-            <div class="no-sect-badge">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <div class="mob-section">
+          <!-- Header -->
+          <div class="no-mob-sect-head is-open" id="prodCustHead" onclick="prodCustCollapse()">
+            <div class="od-sect-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c5cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
             </div>
-            <h3>ចតិមានអតិថិជន</h3>
+            <div class="od-sect-info">
+              <h3>ព័ត៌មានអតិថិជន</h3>
+              <span>Customer Information</span>
+            </div>
+            <div class="od-chevron-pill">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
           </div>
-          <div class="no-form-grid">
-            <div class="no-field">
-              <label>ឈ្មោះអតិថិជន</label>
-              <input id="noCust" placeholder="Customer..." type="text" autocomplete="off">
+          <!-- Body -->
+          <div class="no-mob-sect-body" id="prodCustBody">
+
+            <!-- ឈ្មោះអតិថិជន -->
+            <div class="od-row">
+              <span class="od-lbl">ឈ្មោះអតិថិជន</span>
+              <input id="noCust" type="text" class="od-inp" placeholder="Customer..." autocomplete="off">
             </div>
-            <div class="no-field">
-              <label>លេខទូរសព្ទ</label>
-              <input id="noPhone" placeholder="0xx xxx xxx" type="tel" autocomplete="off">
+            <!-- លេខទូរសព្ទ -->
+            <div class="od-row">
+              <span class="od-lbl">លេខទូរសព្ទ</span>
+              <input id="noPhone" type="tel" class="od-inp" placeholder="0xx xxx xxx">
             </div>
-            <div class="no-field">
-              <label>វីតាំងលក់</label>
-              <input id="noAddr" placeholder="ភូមិ / ឃុំ / ផ្លូវ..." type="text">
+            <!-- ទីតាំងតំបន់ -->
+            <div class="od-row">
+              <span class="od-lbl">ទីតាំងតំបន់</span>
+              <input id="noAddr" type="text" class="od-inp" placeholder="ភូមិ / ឃុំ / ផ្លូវ...">
             </div>
-            <div class="no-field">
-              <label>ខេត្ត/ក្រុម</label>
-              <input id="noProv" placeholder="ខេត្ត..." type="text" list="noProvList" autocomplete="off">
+            <!-- ខេត្ត/ក្រុង -->
+            <div class="od-row">
+              <span class="od-lbl">ខេត្ត/ក្រុង</span>
+              <input id="noProv" type="text" class="od-inp" placeholder="ខេត្ត..." list="noProvList" autocomplete="off">
               <datalist id="noProvList"></datalist>
             </div>
-            <div class="no-field">
-              <label>STATUS</label>
-              <select id="noStatus">
+            <!-- Status -->
+            <div class="od-row">
+              <span class="od-lbl">Status</span>
+              <select id="noStatus" class="od-inp" style="cursor:pointer;">
                 <option>មិនទាន់គ្រប</option>
                 <option>Pending</option>
               </select>
             </div>
-            <div class="no-field">
-              <label>ថ្ងៃ / ម៉ោង</label>
-              <div style="position:relative;display:flex;align-items:center;">
-                <input id="noDate" type="text" readonly style="flex:1;padding-right:32px;pointer-events:none;" placeholder="DD/MM/YYYY HH:MM AM/PM">
-                <svg style="position:absolute;right:8px;pointer-events:none;color:var(--muted,#aaa);" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- ថ្ងៃ / ម៉ោង -->
+            <div class="od-row">
+              <span class="od-lbl">ថ្ងៃ / ម៉ោង</span>
+              <div class="od-datetime">
+                <input id="noDate" type="text" class="od-inp" readonly style="padding-right:32px;" placeholder="DD/MM/YYYY HH:MM AM/PM">
+                <svg style="position:absolute;right:8px;pointer-events:none;color:var(--accent,#7c3aed);" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
                   <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
                 </svg>
                 <input id="noDatePicker" type="datetime-local"
-                  style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10;"
+                  style="position:absolute;inset:0;opacity:0;cursor:pointer;z-index:10;"
                   onchange="(function(h){if(!h.value)return;var p=h.value.split('T'),d=new Date(h.value);var pad=function(x){return String(x).padStart(2,'0');};var hh=d.getHours(),ampm=hh>=12?'PM':'AM',h12=hh%12||12;var dp2=p[0].split('-');var nd=document.getElementById('noDate');if(nd)nd.value=dp2[2]+'/'+dp2[1]+'/'+dp2[0]+' '+pad(h12)+':'+pad(d.getMinutes())+' '+ampm;})(this)">
               </div>
             </div>
-            <div class="no-field">
-              <label>PAGES</label>
-              <select id="noPage"><option value="">Pages...</option></select>
+            <!-- Pages -->
+            <div class="od-row">
+              <span class="od-lbl">Pages</span>
+              <select id="noPage" class="od-inp" style="cursor:pointer;"><option value="">Pages...</option></select>
             </div>
-            <div class="no-field">
-              <label>CLOSEBY</label>
-              <select id="noCloseby"><option value="">CloseBy...</option></select>
+            <!-- CloseBy -->
+            <div class="od-row">
+              <span class="od-lbl">CloseBy</span>
+              <select id="noCloseby" class="od-inp" style="cursor:pointer;"><option value="">CloseBy...</option></select>
             </div>
-            <div class="no-field">
-              <label>DELIVERY</label>
-              <select id="noDelivery"><option value="">Delivery...</option></select>
+            <!-- Delivery -->
+            <div class="od-row">
+              <span class="od-lbl">ដឹកជញ្ជូន</span>
+              <select id="noDelivery" class="od-inp" style="cursor:pointer;"><option value="">Delivery...</option></select>
             </div>
-          </div>
-          <div class="no-pay-sect">
-            <div class="no-pay-lbl">បង់ប្រាក់</div>
-            <div class="no-pay-row">
-              <button class="nopay-btn" data-val="AC"       onclick="setPayment(this)">AC</button>
-              <button class="nopay-btn" data-val="ABA"      onclick="setPayment(this)">ABA</button>
-              <button class="nopay-btn" data-val="Wing"     onclick="setPayment(this)">Wing</button>
-              <button class="nopay-btn" data-val="Delivery" onclick="setPayment(this)">Delivery</button>
-              <button class="nopay-btn" data-val="Others"   onclick="setPayment(this)">Others</button>
+            <!-- Payment -->
+            <div class="od-row od-row-pay">
+              <span class="od-lbl">បង់ប្រាក់</span>
+              <div class="payment-opts" id="noPayOpts">
+                <button class="pay-btn" data-val="AC"       onclick="setPayment(this)">AC</button>
+                <button class="pay-btn" data-val="ABA"      onclick="setPayment(this)">ABA</button>
+                <button class="pay-btn" data-val="Wing"     onclick="setPayment(this)">Wing</button>
+                <button class="pay-btn" data-val="Delivery" onclick="setPayment(this)">Delivery</button>
+                <button class="pay-btn" data-val="Others"   onclick="setPayment(this)">Others</button>
+              </div>
             </div>
-          </div>
-          <div class="no-note-wrap">
-            <textarea id="noNote" placeholder="..."></textarea>
-          </div>
-        </div>
+            <!-- Note -->
+            <div class="od-row od-row-note">
+              <div class="od-note-head">
+                <span class="od-note-label">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                  Note
+                </span>
+              </div>
+              <textarea id="noNote" placeholder="..."></textarea>
+            </div>
+
+          </div><!-- /prodCustBody -->
+        </div><!-- /mob-section -->
       </div>
 
       <!-- Grid -->
@@ -1001,10 +1039,10 @@ function loadSaleInforData() {
 
     // Payment → buttons
     if (d.payment && d.payment.length) {
-      var row = document.getElementById('noPayRow');
+      var row = document.getElementById('noPayOpts');
       if (row) {
         row.innerHTML = d.payment.map(function(v){
-          return '<button class="nopay-btn' + (v === noPayment ? ' on' : '') + '" data-val="' + esc(v) + '" onclick="setPayment(this)">' + esc(v) + '</button>';
+          return '<button class="pay-btn' + (v === noPayment ? ' active' : '') + '" data-val="' + esc(v) + '" onclick="setPayment(this)">' + esc(v) + '</button>';
         }).join('');
       }
     }
@@ -1066,9 +1104,17 @@ function toggleOrderMode() {
 }
 
 function setPayment(el) {
-  document.querySelectorAll('.nopay-btn').forEach(function(b){ b.classList.remove('on'); });
-  el.classList.add('on');
+  document.querySelectorAll('#noPayOpts .pay-btn').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
   noPayment = el.getAttribute('data-val');
+}
+function prodCustCollapse() {
+  var head = document.getElementById('prodCustHead');
+  var body = document.getElementById('prodCustBody');
+  if (!head || !body) return;
+  var open = head.classList.contains('is-open');
+  if (open) { head.classList.remove('is-open'); body.classList.add('is-hidden'); }
+  else       { head.classList.add('is-open');    body.classList.remove('is-hidden'); }
 }
 
 /* ── Add-to-cart dialog ── */
@@ -1296,7 +1342,7 @@ async function submitNewOrder() {
     ['noCust','noPhone','noAddr','noProv','noPage','noCloseby','noNote'].forEach(function(id){
       var el = document.getElementById(id); if(el) el.value = '';
     });
-    document.querySelectorAll('.nopay-btn').forEach(function(b){ b.classList.remove('on'); });
+    document.querySelectorAll('#noPayOpts .pay-btn').forEach(function(b){ b.classList.remove('active'); });
     noPayment = '';
   } catch(err) {
     showNoToast('⚠ ' + (err.message || 'Save failed.'));
