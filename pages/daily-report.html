@@ -41,7 +41,7 @@
     cursor:pointer; outline:none; white-space:nowrap; transition:border-color .15s, background .15s;
   }
   .dr-date-pill-btn:hover,.dr-date-pill-btn.open { border-color:#8b5cf6; background:rgba(139,92,246,.08) }
-  [data-theme="light"] .dr-date-pill-btn { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06) }
+  [data-theme="light"] .dr-date-pill-btn { background:#fff }
   [data-theme="light"] .dr-date-pill-btn:hover,[data-theme="light"] .dr-date-pill-btn.open { background:rgba(109,40,217,.06) }
   .dr-date-pill-icon { opacity:.55; flex-shrink:0 }
   .dr-date-pill-label { font-weight:800; color:var(--text) }
@@ -138,7 +138,7 @@
     cursor:pointer; font-family:inherit; transition:border-color .15s, background .15s; white-space:nowrap;
   }
   .dr-act-btn:hover,.dr-act-btn.open { border-color:#8b5cf6; background:rgba(139,92,246,.08) }
-  [data-theme="light"] .dr-act-btn { background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.06) }
+  [data-theme="light"] .dr-act-btn { background:#fff }
   [data-theme="light"] .dr-act-btn:hover,[data-theme="light"] .dr-act-btn.open { background:rgba(109,40,217,.06) }
   .dr-act-drop {
     position:fixed; z-index:9999; background:#1a2235; border:1px solid rgba(139,92,246,.25);
@@ -825,14 +825,14 @@
       var r = pageBtn.getBoundingClientRect();
       var menuW = 220;
       var menuH = 340;
-      var left = r.right + window.scrollX - menuW;
+      var left = r.right - menuW;
       if (left < 8) left = 8;
       pageMenu.style.left = left + 'px';
       /* open upward if not enough space below */
       if (r.bottom + menuH + 6 > window.innerHeight) {
-        pageMenu.style.top = (r.top + window.scrollY - menuH - 6) + 'px';
+        pageMenu.style.top = (r.top - menuH - 6) + 'px';
       } else {
-        pageMenu.style.top = (r.bottom + window.scrollY + 6) + 'px';
+        pageMenu.style.top = (r.bottom + 6) + 'px';
       }
       pageMenu.classList.add('show');
       pageBtn.classList.add('open');
