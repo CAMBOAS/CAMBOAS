@@ -1079,11 +1079,12 @@
         ctx.fillStyle='#1a1a2e'; ctx.font='bold 22px system-ui,sans-serif';
         ctx.fillText('Daily Report', pad, 38);
 
-        // Subtitle date range
+        // Subtitle date range + selected pages
         var r0=rows[0], rN=rows[rows.length-1];
         ctx.fillStyle='#6b7280'; ctx.font='12px system-ui,sans-serif';
         var sub = r0 ? (r0.date+(rows.length>1?' → '+rN.date:'')) : '';
-        ctx.fillText(sub, pad, 58);
+        var pageSub = selectedPages.length ? '   |   '+selectedPages.join(', ') : '';
+        ctx.fillText(sub+pageSub, pad, 58);
 
         // Header row — blue background
         ctx.fillStyle='#4285f4';
@@ -1137,6 +1138,7 @@
       var rows = buildDayRows();
       var r0=rows[0], rN=rows[rows.length-1];
       var sub = r0 ? (r0.date+(rows.length>1?' → '+rN.date:'')) : '';
+      if(selectedPages.length) sub += '   |   ' + selectedPages.join(', ');
       var trs = rows.map(function(row,i){
         return '<tr style="background:'+(i%2===0?'#fff':'#f9fafb')+'">' +
           '<td>'+row.date+'</td>' +
