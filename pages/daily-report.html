@@ -518,7 +518,6 @@
           <div class="dr-act-wrap">
             <button class="dr-act-btn" id="drActBtn" type="button">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"/></svg>
-              <span class="act-lbl">Actions</span>
             </button>
           </div>
         </div>
@@ -745,6 +744,7 @@
   inputTo.addEventListener('change',   function(){ _activePreset=null; });
   _datePop.addEventListener('click', function(e){ e.stopPropagation(); });
   document.addEventListener('click', _closeDatePop);
+  window.addEventListener('scroll', _closeDatePop, true);
 
   /* ── Page dropdown ── */
   var pageBtn   = document.getElementById('drPageBtn');
@@ -839,11 +839,15 @@
     }
   });
 
-  /* close on outside click */
+  /* close on outside click or scroll */
   document.addEventListener('click', function(){
     pageMenu.classList.remove('show');
     pageBtn.classList.remove('open');
   });
+  window.addEventListener('scroll', function(){
+    pageMenu.classList.remove('show');
+    pageBtn.classList.remove('open');
+  }, true);
   pageMenu.addEventListener('click', function(e){ e.stopPropagation(); });
 
   /* ── Date range label helper ── */
@@ -1123,6 +1127,7 @@
     });
     actDrop.addEventListener('click', function(e){ e.stopPropagation(); });
     document.addEventListener('click', closeAct);
+    window.addEventListener('scroll', closeAct, true);
 
     /* ── Shared: build rows per day ── */
     function buildDayRows() {
