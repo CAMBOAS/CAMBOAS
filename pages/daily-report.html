@@ -1017,6 +1017,7 @@
     var svgPdf= '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
     actDrop.innerHTML =
       '<button class="dr-act-item" id="drExportImg">'+svgDl+' Export as Image (PNG)</button>' +
+      '<button class="dr-act-item" id="drExportImgRev">'+svgDl+' Export as Image + Revenue</button>' +
       '<button class="dr-act-item" id="drExportPdf">'+svgPdf+' Export as PDF</button>';
     document.body.appendChild(actDrop);
 
@@ -1046,16 +1047,18 @@
       filteredOrders.forEach(function(o){
         var d = (CamboOrdersData.toYMD(o.date)||'').slice(0,10);
         if(!d || d.length < 10) return;
-        if(!days[d]) days[d] = { orders:0, itemsTotal:0 };
+        if(!days[d]) days[d] = { orders:0, itemsTotal:0, revenue:0 };
         days[d].orders++;
         days[d].itemsTotal += totalItems(o);
+        days[d].revenue += calcOrderTotal(o);
       });
       return Object.keys(days).sort().map(function(d){
         var p = d.split('-');
         return {
           date: p[2]+'/'+p[1]+'/'+p[0].slice(2),
           orders: days[d].orders,
-          items: days[d].itemsTotal
+          items: days[d].itemsTotal,
+          revenue: days[d].revenue
         };
       });
     }
@@ -1113,23 +1116,18 @@
         // Data rows
         rows.forEach(function(row,i){
           var y = titleH+colH + i*rowH;
-          // alternate row bg
           ctx.fillStyle = i%2===0 ? '#ffffff' : '#f9fafb';
           ctx.fillRect(pad, y, W-pad*2, rowH);
 
-          // bottom border
           ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=1;
           ctx.beginPath(); ctx.moveTo(pad,y+rowH); ctx.lineTo(W-pad,y+rowH); ctx.stroke();
 
           var cy = y+rowH/2+5;
-          // Date
           ctx.fillStyle='#111827'; ctx.font='600 13px system-ui,sans-serif';
           ctx.fillText(row.date, x1, cy);
-          // Orders — centered
           ctx.fillStyle='#374151'; ctx.font='13px system-ui,sans-serif';
           ctx.fillText(String(row.orders), x2, cy);
-          // Items — centered
-          ctx.fillText(String(row.items), x3, cy);
+          ctx.fillText(String(row.items),  x3, cy);
         });
 
         // Outer border
@@ -1146,6 +1144,71 @@
       } catch(e){ alert('Export error: '+e.message); }
     });
 
+    /* ── Export PNG + Revenue ── */
+    document.getElementById('drExportImgRev').addEventListener('click', function(){
+      closeAct();
+      try {
+        var rows = buildDayRows();
+        var scale=2, pad=40, titleH=70, colH=44, rowH=40;
+        var W=640, colDate=160, colOrd=110, colItem=110, colRev=W-pad*2-colDate-colOrd-colItem;
+        var H = titleH + colH + rows.length*rowH + 40;
+
+        var canvas=document.createElement('canvas');
+        canvas.width=W*scale; canvas.height=H*scale;
+        var ctx=canvas.getContext('2d');
+        ctx.scale(scale,scale);
+
+        ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+
+        ctx.fillStyle='#1a1a2e'; ctx.font='bold 22px system-ui,sans-serif';
+        ctx.fillText('Daily Report', pad, 38);
+
+        var r0=rows[0], rN=rows[rows.length-1];
+        ctx.fillStyle='#6b7280'; ctx.font='12px system-ui,sans-serif';
+        var sub = r0 ? (r0.date+(rows.length>1?' → '+rN.date:'')) : '';
+        var pageSub = '   |   ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
+        ctx.fillText(sub+pageSub, pad, 58);
+
+        ctx.fillStyle='#4285f4';
+        ctx.fillRect(pad, titleH, W-pad*2, colH);
+
+        ctx.fillStyle='#ffffff'; ctx.font='bold 13px system-ui,sans-serif';
+        var x1=pad+16, x2=pad+colDate+16, x3=pad+colDate+colOrd+16, x4=pad+colDate+colOrd+colItem+16;
+        ctx.fillText('Date',    x1, titleH+colH/2+5);
+        ctx.fillText('Orders',  x2, titleH+colH/2+5);
+        ctx.fillText('Items',   x3, titleH+colH/2+5);
+        ctx.fillText('Revenue', x4, titleH+colH/2+5);
+
+        rows.forEach(function(row,i){
+          var y = titleH+colH + i*rowH;
+          ctx.fillStyle = i%2===0 ? '#ffffff' : '#f9fafb';
+          ctx.fillRect(pad, y, W-pad*2, rowH);
+
+          ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(pad,y+rowH); ctx.lineTo(W-pad,y+rowH); ctx.stroke();
+
+          var cy = y+rowH/2+5;
+          ctx.fillStyle='#111827'; ctx.font='600 13px system-ui,sans-serif';
+          ctx.fillText(row.date, x1, cy);
+          ctx.fillStyle='#374151'; ctx.font='13px system-ui,sans-serif';
+          ctx.fillText(String(row.orders), x2, cy);
+          ctx.fillText(String(row.items),  x3, cy);
+          ctx.fillStyle='#111827'; ctx.font='700 13px system-ui,sans-serif';
+          ctx.fillText('$'+row.revenue.toFixed(2), x4, cy);
+        });
+
+        ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=1;
+        ctx.strokeRect(pad, titleH, W-pad*2, colH+rows.length*rowH);
+
+        ctx.fillStyle='#9ca3af'; ctx.font='10px system-ui,sans-serif';
+        ctx.fillText('CAMBO MINI  ·  '+new Date().toLocaleDateString(), pad, H-12);
+
+        var link=document.createElement('a');
+        link.download='daily-report-revenue-'+dateFrom+(dateFrom!==dateTo?'_'+dateTo:'')+'.png';
+        link.href=canvas.toDataURL('image/png'); link.click();
+      } catch(e){ alert('Export error: '+e.message); }
+    });
+
     /* ── Export PDF (print) ── */
     document.getElementById('drExportPdf').addEventListener('click', function(){
       closeAct();
@@ -1158,6 +1221,7 @@
           '<td>'+row.date+'</td>' +
           '<td class="num">'+row.orders+'</td>' +
           '<td class="num">'+row.items+'</td>' +
+          '<td class="num rev">$'+row.revenue.toFixed(2)+'</td>' +
         '</tr>';
       }).join('');
 
@@ -1172,13 +1236,14 @@
         'thead th{color:#fff;padding:11px 16px;text-align:left;font-size:13px;font-weight:700}' +
         'td{padding:10px 16px;border-bottom:1px solid #e5e7eb;color:#374151}' +
         'td.num{text-align:left;font-weight:600}' +
+        'td.rev{color:#111827;font-weight:700}' +
         '.footer{margin-top:24px;font-size:10px;color:#9ca3af}' +
         '@media print{@page{margin:20mm}body{padding:0}}' +
         '</style></head><body>' +
         '<h1>Daily Report</h1>' +
         '<div class="sub">'+sub+'</div>' +
         '<table>' +
-          '<thead><tr><th>Date</th><th>Orders</th><th>Items</th></tr></thead>' +
+          '<thead><tr><th>Date</th><th>Orders</th><th>Items</th><th>Revenue</th></tr></thead>' +
           '<tbody>'+trs+'</tbody>' +
         '</table>' +
         '<div class="footer">CAMBO MINI &nbsp;·&nbsp; Generated '+new Date().toLocaleString()+'</div>' +
