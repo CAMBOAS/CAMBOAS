@@ -499,6 +499,7 @@
   var dateFrom       = '';
   var dateTo         = '';
   var searchQuery    = '';
+  var _dataReady     = false;
 
   /* ── Helpers ── */
   function pad(n) { return String(n).padStart(2,'0'); }
@@ -758,6 +759,7 @@
 
   /* ── Filter & Render ── */
   function applyFilters() {
+    if (!_dataReady) return;
     var byDate = allOrders.filter(function(o){
       var d = CamboOrdersData.toYMD(o.date);
       return d >= dateFrom && d <= dateTo;
@@ -939,8 +941,10 @@
   /* ── Load Data ── */
   async function loadData() {
     var btn = document.getElementById('drRefreshBtn');
+    var container = document.getElementById('drOrderList');
     btn.classList.add('loading');
     btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .8s linear infinite"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Loading...';
+    if (_dataReady && container) container.style.opacity = '0.45';
     try {
       /* Fetch pages list directly from SaleInfor sheet (column C) + orders in parallel */
       var [ordersResult, inforResult] = await Promise.all([
@@ -950,6 +954,7 @@
           : fetch('https://script.google.com/macros/s/AKfycbwOGbB79rXs56U6uAq18w0jg-3NvXtWVC3DuOx4hb-W9PPzE4021Q4B-00q8dKmwtgS4g/exec?action=saleinfor&_=' + Date.now()).then(function(r){ return r.json(); })
       ]);
       allOrders = ordersResult;
+      _dataReady = true;
 
       /* Pages: SaleInfor column C is the master list (exact Sheet order) */
       var masterPages = (inforResult && Array.isArray(inforResult.pages))
@@ -969,6 +974,7 @@
     } catch(e) {
       document.getElementById('drOrderList').innerHTML = '<div class="dr-orders-empty" style="color:#f87171">Error loading data: ' + esc(String(e.message||e)) + '</div>';
     } finally {
+      if (container) container.style.opacity = '';
       btn.classList.remove('loading');
       btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Refresh';
     }
