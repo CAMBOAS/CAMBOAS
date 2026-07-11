@@ -633,7 +633,7 @@ function render(keepPage){
             : displayDate(_date.start) + ' → ' + displayDate(_date.end));
     tbody.innerHTML = '<tr><td colspan="11" class="ol-empty">' + emptyMsg + '</td></tr>';
     // Clear mobile card view too
-    try { if(typeof window._olRenderCards==='function') window._olRenderCards([]); } catch(e){}
+    try { if(typeof window._olRenderCards==='function') window._olRenderCards([], 0); } catch(e){}
     return;
   }
 
@@ -674,8 +674,8 @@ function render(keepPage){
   }
   tbody.innerHTML = rowHtml;
 
-  // Sync card view (wrapped so any error doesn't prevent row-click setup below)
-  try { if(typeof window._olRenderCards==='function') window._olRenderCards(rows); } catch(e) { console.warn('Card render error:', e); }
+  // Sync card view — pass already-sliced visible rows + remaining count
+  try { if(typeof window._olRenderCards==='function') window._olRenderCards(visible, rows.length - visible.length); } catch(e) { console.warn('Card render error:', e); }
 
   // Row click → open drawer
   // Checkbox click → toggle selection
@@ -2178,9 +2178,10 @@ window._getPrintMark = function(id){ return _printMarks[String(id)] || ''; };
   var _dtTime  = 0;
   var DT_MS    = 300; // double-tap window ms
 
-  var _renderCards = function(rows){
+  var _renderCards = function(rows, remaining){
     var cardList = document.getElementById('olCardList');
     if(!cardList) return;
+    remaining = remaining || 0;
     if(!rows || !rows.length){
       var emptyCard = _date && _date.preset === 'today'
         ? '📭 គ្មាន Order ថ្ងៃនេះ (' + displayDate(todayYMD()) + ')'
@@ -2192,9 +2193,7 @@ window._getPrintMark = function(id){ return _printMarks[String(id)] || ''; };
     }
     var selMode = !!window._cardSelMode;
     var olSel   = window._olSel;
-    var visible = rows.slice(0, _olRenderCount);
-    var cardHasMore = rows.length > _olRenderCount;
-    var cardHtml = visible.map(function(o, idx){
+    var cardHtml = rows.map(function(o, idx){
       var total = orderTotal(o);
       var prodList = getProds(o);
       var itemCount = prodList.length;
@@ -2241,9 +2240,9 @@ window._getPrintMark = function(id){ return _printMarks[String(id)] || ''; };
         +(itemCount>0?'<span class="ol-item-badge">'+itemCount+'</span>':'')
         +'</div>';
     }).join('');
-    if(cardHasMore){
+    if(remaining > 0){
       cardHtml += '<div onclick="window.olLoadMore()" style="text-align:center;padding:16px;margin:4px 0 8px;border-radius:14px;border:1px solid rgba(139,92,246,.3);background:rgba(139,92,246,.08);color:#a78bfa;font-size:14px;font-weight:600;cursor:pointer">'
-        +'បន្ថែម... ('+(rows.length-_olRenderCount)+' នៅសល់)'
+        +'បន្ថែម... ('+remaining+' នៅសល់)'
         +'</div>';
     }
     cardList.innerHTML = cardHtml;
