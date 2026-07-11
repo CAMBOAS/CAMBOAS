@@ -844,7 +844,9 @@
     pageMenu.classList.remove('show');
     pageBtn.classList.remove('open');
   });
-  window.addEventListener('scroll', function(){
+  window.addEventListener('scroll', function(e){
+    /* ignore scroll inside the dropdown itself */
+    if (pageMenu.contains(e.target)) return;
     pageMenu.classList.remove('show');
     pageBtn.classList.remove('open');
   }, true);
