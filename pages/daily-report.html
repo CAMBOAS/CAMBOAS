@@ -238,7 +238,7 @@
   .dr-table .dr-col-prod    { width:160px; white-space:normal !important; line-height:1.4 }
   .dr-table .dr-col-page    { width:100px }
   .dr-table .dr-col-closeby { width:90px }
-  .dr-table .dr-col-delfee  { width:72px; text-align:right }
+  .dr-table .dr-col-delfee  { width:72px }
   .dr-table .dr-col-tot     { width:80px; text-align:right; padding-right:16px !important }
   .dr-table .dr-col-st      { width:80px }
   .dr-th-inner { display:inline-flex; align-items:center; gap:5px; line-height:1 }
@@ -854,7 +854,7 @@
           '<td class="dr-col-prod"><span class="dr-tc-prod-main">' + first + '</span>' + more + '</td>' +
           '<td class="dr-col-page">' + (o.page ? '<span class="dr-tc-page">' + esc(o.page) + '</span>' : '—') + '</td>' +
           '<td class="dr-col-closeby" style="font-size:12px;color:var(--muted)">' + esc(o.closeBy||o.closeby||'—') + '</td>' +
-          '<td class="dr-col-delfee" style="text-align:right;font-size:12px;color:var(--muted)">' + (Number(o.deliveryFee||0) > 0 ? '$' + Number(o.deliveryFee).toFixed(2) : '—') + '</td>' +
+          '<td class="dr-col-delfee" style="font-size:12px;color:var(--muted)">' + (Number(o.deliveryFee||0) > 0 ? '$' + Number(o.deliveryFee).toFixed(2) : '—') + '</td>' +
           '<td class="dr-col-tot"><span class="dr-tc-tot">' + fmtMoneyFull(total) + '</span></td>' +
           '<td style="width:30px;text-align:center"><svg class="dr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></td>' +
         '</tr>';
@@ -893,7 +893,7 @@
       '<th class="dr-col-prod"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Product</span></th>' +
       '<th class="dr-col-page"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Pages</span></th>' +
       '<th class="dr-col-closeby"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>CloseBy</span></th>' +
-      '<th class="dr-col-delfee" style="text-align:right"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Delivery</span></th>' +
+      '<th class="dr-col-delfee"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Delivery</span></th>' +
       '<th class="dr-col-tot" style="text-align:right"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Total</span></th>' +
       '<th style="width:30px"></th>' +
     '</tr></thead>';
