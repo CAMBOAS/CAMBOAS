@@ -531,19 +531,22 @@
   var _activePreset = 'today';
 
   // Helper: add/subtract days from YYYY-MM-DD
+  function _ymdLocal(d) {
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
   function _addDays(ymd, n) {
     var d = new Date(ymd + 'T00:00:00'); d.setDate(d.getDate() + n);
-    return d.toISOString().slice(0,10);
+    return _ymdLocal(d);
   }
   function _startOfWeek(ymd) {
     var d = new Date(ymd + 'T00:00:00'), day = d.getDay();
     d.setDate(d.getDate() - (day === 0 ? 6 : day - 1)); // Mon
-    return d.toISOString().slice(0,10);
+    return _ymdLocal(d);
   }
   function _startOfMonth(ymd) { return ymd.slice(0,7) + '-01'; }
   function _endOfMonth(ymd) {
     var p = ymd.split('-'), d = new Date(+p[0], +p[1], 0);
-    return d.toISOString().slice(0,10);
+    return _ymdLocal(d);
   }
 
   var _PRESETS = [
@@ -620,6 +623,7 @@
     applyFilters();
   }
   function _openDatePop() {
+    _drCloseAllPopups();
     inputFrom.value=dateFrom; inputTo.value=dateTo;
     var r=_pillBtn.getBoundingClientRect(), popW=290;
     var left=r.right-popW;
@@ -633,6 +637,13 @@
   function _closeDatePop() {
     _datePop.classList.remove('show');
     _pillBtn.classList.remove('open');
+  }
+  function _drCloseAllPopups() {
+    _closeDatePop();
+    var pm = document.getElementById('drPageMenu'), pb = document.getElementById('drPageBtn');
+    if(pm){ pm.classList.remove('show'); } if(pb){ pb.classList.remove('open'); }
+    var ad = document.getElementById('drActDrop'), ab = document.getElementById('drActBtn');
+    if(ad){ ad.classList.remove('show'); } if(ab){ ab.classList.remove('open'); }
   }
 
   // Init: Today
@@ -735,6 +746,7 @@
       pageMenu.classList.remove('show');
       pageBtn.classList.remove('open');
     } else {
+      _drCloseAllPopups();
       var r = pageBtn.getBoundingClientRect();
       pageMenu.style.top  = (r.bottom + window.scrollY + 6) + 'px';
       var menuW = 220;
@@ -1000,6 +1012,7 @@
     var actBtn  = document.getElementById('drActBtn');
     var actDrop = document.createElement('div');
     actDrop.className = 'dr-act-drop';
+    actDrop.id = 'drActDrop';
     var svgDl = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
     var svgPdf= '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
     actDrop.innerHTML =
@@ -1008,6 +1021,7 @@
     document.body.appendChild(actDrop);
 
     function openAct() {
+      _drCloseAllPopups();
       var r = actBtn.getBoundingClientRect();
       var w = 200;
       var left = r.right - w;
@@ -1083,7 +1097,7 @@
         var r0=rows[0], rN=rows[rows.length-1];
         ctx.fillStyle='#6b7280'; ctx.font='12px system-ui,sans-serif';
         var sub = r0 ? (r0.date+(rows.length>1?' → '+rN.date:'')) : '';
-        var pageSub = selectedPages.length ? '   |   '+selectedPages.join(', ') : '';
+        var pageSub = '   |   ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
         ctx.fillText(sub+pageSub, pad, 58);
 
         // Header row — blue background
@@ -1138,7 +1152,7 @@
       var rows = buildDayRows();
       var r0=rows[0], rN=rows[rows.length-1];
       var sub = r0 ? (r0.date+(rows.length>1?' → '+rN.date:'')) : '';
-      if(selectedPages.length) sub += '   |   ' + selectedPages.join(', ');
+      sub += '   |   ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
       var trs = rows.map(function(row,i){
         return '<tr style="background:'+(i%2===0?'#fff':'#f9fafb')+'">' +
           '<td>'+row.date+'</td>' +
