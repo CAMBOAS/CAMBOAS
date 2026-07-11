@@ -2618,7 +2618,7 @@
               <!-- ── ថ្លៃដឹក ── -->
               <div class="od-row">
                 <span class="od-lbl">ថ្លៃដឹក ($)</span>
-                <input id="deliveryFee" type="number" class="od-inp" value="0" min="0" step="0.5" inputmode="decimal">
+                <input id="deliveryFee" type="number" class="od-inp" value="2" min="0" step="0.5" inputmode="decimal">
               </div>
 
               <!-- ── Pages ── -->
@@ -2994,6 +2994,7 @@ function _allProducts(){ return (window.__camboProducts && window.__camboProduct
 window.renderProductGrid = function(){ renderPList(getFiltered()); };
 
 var items = [];
+var _deliveryFeeManual = false; /* true = user typed a value; false = auto-calculate */
 var activeCategory = 'All';
 var els = null;
 
@@ -3101,7 +3102,11 @@ function getDeliveryFeeValue(){ return Math.max(0, Number((_el('deliveryFee') &&
 function getGrandTotal(){ return getItemsTotal() + getDeliveryFeeValue(); }
 
 function calcTotal(){
-  var sub   = getItemsTotal();
+  var sub = getItemsTotal();
+  /* auto-set delivery fee unless user manually typed a value */
+  if (!_deliveryFeeManual && _el('deliveryFee')) {
+    _el('deliveryFee').value = sub >= 40 ? '0' : '2';
+  }
   var grand = getGrandTotal();
   var riel  = Math.round(grand * KHR_RATE);
   if(_el('subTotal'))        _el('subTotal').textContent        = fmt(sub);
@@ -3333,7 +3338,8 @@ function clearAll(){
   ['customer','phone','addressDetail','note'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
   ['page','province','deliveryName','closeBy'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
   ['pagesInput','provinceInput','deliveryInput','closeByInput'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
-  if(_el('deliveryFee'))  _el('deliveryFee').value  = '0';
+  _deliveryFeeManual = false;
+  if(_el('deliveryFee'))  _el('deliveryFee').value  = '2';
   if(_el('status'))       _el('status').value       = 'Pending';
   if(_el('payment'))      _el('payment').value      = '';
   _el('paymentOptions').querySelectorAll('.pay-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -3580,7 +3586,10 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
 
-  _el('deliveryFee').addEventListener('input', calcTotal);
+  _el('deliveryFee').addEventListener('input', function(){
+    _deliveryFeeManual = _el('deliveryFee').value !== '';
+    calcTotal();
+  });
   _initKHR();
 
   /* QR toggle */
