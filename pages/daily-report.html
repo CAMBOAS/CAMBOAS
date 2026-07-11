@@ -624,7 +624,8 @@
   }
   function _openDatePop() {
     _drCloseAllPopups();
-    inputFrom.value=dateFrom; inputTo.value=dateTo;
+    inputFrom.value = _activePreset ? '' : dateFrom;
+    inputTo.value   = _activePreset ? '' : dateTo;
     var r=_pillBtn.getBoundingClientRect(), popW=290;
     var left=r.right-popW;
     if(left<8) left=8;
@@ -661,7 +662,8 @@
   document.getElementById('drDateCancel').addEventListener('click', _closeDatePop);
   document.getElementById('drDateApply').addEventListener('click', function(){
     var f=inputFrom.value, t=inputTo.value;
-    if(!f||!t){ _closeDatePop(); return; }
+    if(!f){ _closeDatePop(); return; }
+    if(!t) t=f;          // To empty → same day as From
     if(f>t) t=f;
     dateFrom=f; dateTo=t; _activePreset=null;
     _updatePill(); _closeDatePop(); applyFilters();
