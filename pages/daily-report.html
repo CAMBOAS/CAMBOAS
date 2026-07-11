@@ -1131,8 +1131,9 @@
     document.addEventListener('click', closeAct);
     window.addEventListener('scroll', closeAct, true);
 
-    /* ── Shared: build rows per day ── */
+    /* ── Shared: build rows per day (all dates in range, even empty ones) ── */
     function buildDayRows() {
+      /* aggregate orders by date */
       var days = {};
       filteredOrders.forEach(function(o){
         var d = (CamboOrdersData.toYMD(o.date)||'').slice(0,10);
@@ -1142,15 +1143,30 @@
         days[d].itemsTotal += totalItems(o);
         days[d].revenue += calcOrderTotal(o);
       });
-      return Object.keys(days).sort().map(function(d){
-        var p = d.split('-');
-        return {
-          date: p[2]+'/'+p[1]+'/'+p[0].slice(2),
-          orders: days[d].orders,
-          items: days[d].itemsTotal,
-          revenue: days[d].revenue
-        };
-      });
+
+      /* fill every date in the selected range */
+      var rows = [];
+      if (dateFrom && dateTo) {
+        var cur = new Date(dateFrom + 'T00:00:00');
+        var end = new Date(dateTo  + 'T00:00:00');
+        while (cur <= end) {
+          var ymd = cur.getFullYear() + '-' +
+                    String(cur.getMonth()+1).padStart(2,'0') + '-' +
+                    String(cur.getDate()).padStart(2,'0');
+          var p   = ymd.split('-');
+          var lbl = p[2]+'/'+p[1]+'/'+p[0].slice(2);
+          var data = days[ymd] || { orders:0, itemsTotal:0, revenue:0 };
+          rows.push({ date:lbl, orders:data.orders, items:data.itemsTotal, revenue:data.revenue });
+          cur.setDate(cur.getDate() + 1);
+        }
+      } else {
+        /* fallback: only dates with data (original behaviour) */
+        rows = Object.keys(days).sort().map(function(d){
+          var p = d.split('-');
+          return { date:p[2]+'/'+p[1]+'/'+p[0].slice(2), orders:days[d].orders, items:days[d].itemsTotal, revenue:days[d].revenue };
+        });
+      }
+      return rows;
     }
 
     /* ── Truncate canvas text safely ── */
@@ -1189,8 +1205,8 @@
         // Subtitle date range + selected pages
         var r0=rows[0], rN=rows[rows.length-1];
         ctx.fillStyle='#6b7280'; ctx.font='12px system-ui,sans-serif';
-        var sub = r0 ? (r0.date+(rows.length>1?' → '+rN.date:'')) : '';
-        var pageSub = '   |   ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
+        var sub = r0 ? (r0.date+(rows.length>1?' -> '+rN.date:'')) : '';
+        var pageSub = '   |   Page: ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
         ctx.fillText(sub+pageSub, pad, 58);
 
         // Header row — blue background
@@ -1226,7 +1242,7 @@
 
         // Footer
         ctx.fillStyle='#9ca3af'; ctx.font='10px system-ui,sans-serif';
-        ctx.fillText('CAMBO MINI  ·  '+new Date().toLocaleDateString(), pad, H-12);
+        ctx.fillText('CAMBO MINI  Export Date: '+(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})(), pad, H-12);
 
         var link=document.createElement('a');
         link.download='daily-report-'+dateFrom+(dateFrom!==dateTo?'_'+dateTo:'')+'.png';
@@ -1255,8 +1271,8 @@
 
         var r0=rows[0], rN=rows[rows.length-1];
         ctx.fillStyle='#6b7280'; ctx.font='12px system-ui,sans-serif';
-        var sub = r0 ? (r0.date+(rows.length>1?' → '+rN.date:'')) : '';
-        var pageSub = '   |   ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
+        var sub = r0 ? (r0.date+(rows.length>1?' -> '+rN.date:'')) : '';
+        var pageSub = '   |   Page: ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
         ctx.fillText(sub+pageSub, pad, 58);
 
         ctx.fillStyle='#4285f4';
@@ -1291,7 +1307,7 @@
         ctx.strokeRect(pad, titleH, W-pad*2, colH+rows.length*rowH);
 
         ctx.fillStyle='#9ca3af'; ctx.font='10px system-ui,sans-serif';
-        ctx.fillText('CAMBO MINI  ·  '+new Date().toLocaleDateString(), pad, H-12);
+        ctx.fillText('CAMBO MINI  Export Date: '+(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})(), pad, H-12);
 
         var link=document.createElement('a');
         link.download='daily-report-revenue-'+dateFrom+(dateFrom!==dateTo?'_'+dateTo:'')+'.png';
@@ -1304,8 +1320,8 @@
       closeAct();
       var rows = buildDayRows();
       var r0=rows[0], rN=rows[rows.length-1];
-      var sub = r0 ? (r0.date+(rows.length>1?' → '+rN.date:'')) : '';
-      sub += '   |   ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
+      var sub = r0 ? (r0.date+(rows.length>1?' -> '+rN.date:'')) : '';
+      sub += '   |   Page: ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
       var trs = rows.map(function(row,i){
         return '<tr style="background:'+(i%2===0?'#fff':'#f9fafb')+'">' +
           '<td>'+row.date+'</td>' +
@@ -1336,7 +1352,7 @@
           '<thead><tr><th>Date</th><th>Orders</th><th>Items</th><th>Revenue</th></tr></thead>' +
           '<tbody>'+trs+'</tbody>' +
         '</table>' +
-        '<div class="footer">CAMBO MINI &nbsp;·&nbsp; Generated '+new Date().toLocaleString()+'</div>' +
+        '<div class="footer">CAMBO MINI &nbsp; Export Date: '+(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})()+'</div>' +
         '<script>window.onload=function(){setTimeout(function(){window.print();},300);}<\/script>' +
         '</body></html>');
       win.document.close();
