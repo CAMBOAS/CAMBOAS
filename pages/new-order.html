@@ -3335,7 +3335,7 @@ function clearOrderForm(){ clearAll(); }
 function clearAll(){
   items = [];
   renderCart();
-  ['customer','phone','addressDetail','note'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
+  ['customer','phone','addressDetail','note','receiptNo'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
   ['page','province','deliveryName','closeBy'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
   ['pagesInput','provinceInput','deliveryInput','closeByInput'].forEach(function(id){ if(_el(id)) _el(id).value=''; });
   _deliveryFeeManual = false;
