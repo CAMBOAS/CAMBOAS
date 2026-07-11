@@ -279,10 +279,11 @@
   @media(max-width:500px) { .dr-col-phone { display:none } }
 
   /* Order meta row */
-  .dr-meta-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:12px }
-  .dr-meta-item { display:flex; flex-direction:column; gap:2px }
-  .dr-meta-lbl { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--muted) }
-  .dr-meta-val { font-size:12px; font-weight:700; color:var(--text) }
+  .dr-meta-row { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:14px; padding:10px 14px; border-radius:10px; background:rgba(148,163,184,.06); border:1px solid rgba(148,163,184,.1) }
+  [data-theme="light"] .dr-meta-row { background:rgba(0,0,0,.03); border-color:rgba(0,0,0,.06) }
+  .dr-meta-item { display:flex; flex-direction:column; gap:3px; min-width:70px }
+  .dr-meta-lbl { font-size:10px; font-weight:700; color:var(--muted); opacity:.75 }
+  .dr-meta-val { font-size:13px; font-weight:700; color:var(--text) }
 
   /* Items table */
   .dr-items-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:8px }
@@ -854,8 +855,8 @@
 
       var detailRow =
         '<tr class="dr-tr-detail" id="dr-detail-' + i + '">' +
-          '<td colspan="8">' +
-            (metaHtml ? '<div class="dr-meta-row" style="margin-bottom:12px">' + metaHtml + '</div>' : '') +
+          '<td colspan="7">' +
+            (metaHtml ? '<div class="dr-meta-row">' + metaHtml + '</div>' : '') +
             '<div class="dr-items-title">ផលិតផល</div>' +
             itemsHtml +
             '<div class="dr-items-total">' +
