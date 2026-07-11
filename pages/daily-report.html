@@ -849,7 +849,6 @@
           '<td class="dr-col-prod"><span class="dr-tc-prod-main">' + first + '</span>' + more + '</td>' +
           '<td class="dr-col-page">' + (o.page ? '<span class="dr-tc-page">' + esc(o.page) + '</span>' : '—') + '</td>' +
           '<td class="dr-col-tot"><span class="dr-tc-tot">' + fmtMoneyFull(total) + '</span></td>' +
-          '<td class="dr-col-st"><span class="dr-tc-badge ' + stCls + '">' + esc(o.status||'Pending') + '</span></td>' +
           '<td style="width:30px;text-align:center"><svg class="dr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></td>' +
         '</tr>';
 
@@ -887,7 +886,6 @@
       '<th class="dr-col-prod"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Product</span></th>' +
       '<th class="dr-col-page"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Pages</span></th>' +
       '<th class="dr-col-tot" style="text-align:right"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Total</span></th>' +
-      '<th class="dr-col-st"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Print</span></th>' +
       '<th style="width:30px"></th>' +
     '</tr></thead>';
   }
