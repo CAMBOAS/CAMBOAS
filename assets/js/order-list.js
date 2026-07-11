@@ -187,6 +187,7 @@ var _sort = {col:'date', dir:'desc'};
 var _q = '', _f = {};
 var _selectedOlPages = [], _olPageMaster = [];
 var _date = {preset:'today', start:'', end:'', label:'Today'}; // start/end filled on DOMContentLoaded
+var _olPageSize = 100, _olRenderCount = 100;
 
 /* ── helpers ── */
 function $id(id){ return document.getElementById(id); }
@@ -601,8 +602,12 @@ function updateStats(rows){
   var lt = $id('olLatestTotal'); if(lt) lt.textContent = latestTotal;
 }
 
+/* ── Load More ── */
+window.olLoadMore = function(){ _olRenderCount += _olPageSize; render(true); };
+
 /* ── render ── */
-function render(){
+function render(keepPage){
+  if(!keepPage) _olRenderCount = _olPageSize;
   var rows = getFiltered();
   updateStats(rows);
 
@@ -632,7 +637,9 @@ function render(){
     return;
   }
 
-  tbody.innerHTML = rows.map(function(o, idx){
+  var visible = rows.slice(0, _olRenderCount);
+  var hasMore = rows.length > _olRenderCount;
+  var rowHtml = visible.map(function(o, idx){
     var total = orderTotal(o);
     var prods = getProds(o);
     // Show first product + (+N) for rest
@@ -641,7 +648,6 @@ function render(){
     if(prods.length > 1){
       ptxt += ' <span style="color:#8b5cf6;font-weight:700;background:rgba(139,92,246,.1);padding:1px 6px;border-radius:6px;font-size:11px;margin-left:4px">+'+(prods.length-1)+'</span>';
     }
-    var pmore = '';
     var selected  = _sel.has(String(o.id));
     var markGreen = _printMarks[String(o.id)] === 'green' || (o.status||o.orderStatus) === 'ព្រីនហើយ';
     var printed   = markGreen;
@@ -660,6 +666,13 @@ function render(){
       +(function(){ var m=markGreen?'green':(_printMarks[String(o.id)]||''); var lbl=m==='green'?'Print ហើយ ✓':'គ្មានចំណាំ'; return '<td class="ol-col-print" onclick="event.stopPropagation();window.olCyclePrint(\''+o.id+'\')"><span class="ol-print-dot'+(m?' '+m:'')+'" data-id="'+o.id+'" title="'+lbl+'"></span></td>'; })()
       +'</tr>';
   }).join('');
+  if(hasMore){
+    rowHtml += '<tr><td colspan="11" style="text-align:center;padding:14px 0">'
+      +'<button onclick="window.olLoadMore()" style="padding:8px 24px;border-radius:20px;border:1px solid rgba(139,92,246,.4);background:rgba(139,92,246,.12);color:#a78bfa;font-size:13px;font-weight:600;cursor:pointer">'
+      +'បន្ថែម... ('+(rows.length-_olRenderCount)+' នៅសល់)'
+      +'</button></td></tr>';
+  }
+  tbody.innerHTML = rowHtml;
 
   // Sync card view (wrapped so any error doesn't prevent row-click setup below)
   try { if(typeof window._olRenderCards==='function') window._olRenderCards(rows); } catch(e) { console.warn('Card render error:', e); }
@@ -2179,7 +2192,9 @@ window._getPrintMark = function(id){ return _printMarks[String(id)] || ''; };
     }
     var selMode = !!window._cardSelMode;
     var olSel   = window._olSel;
-    cardList.innerHTML = rows.map(function(o, idx){
+    var visible = rows.slice(0, _olRenderCount);
+    var cardHasMore = rows.length > _olRenderCount;
+    var cardHtml = visible.map(function(o, idx){
       var total = orderTotal(o);
       var prodList = getProds(o);
       var itemCount = prodList.length;
@@ -2226,6 +2241,12 @@ window._getPrintMark = function(id){ return _printMarks[String(id)] || ''; };
         +(itemCount>0?'<span class="ol-item-badge">'+itemCount+'</span>':'')
         +'</div>';
     }).join('');
+    if(cardHasMore){
+      cardHtml += '<div onclick="window.olLoadMore()" style="text-align:center;padding:16px;margin:4px 0 8px;border-radius:14px;border:1px solid rgba(139,92,246,.3);background:rgba(139,92,246,.08);color:#a78bfa;font-size:14px;font-weight:600;cursor:pointer">'
+        +'បន្ថែម... ('+(rows.length-_olRenderCount)+' នៅសល់)'
+        +'</div>';
+    }
+    cardList.innerHTML = cardHtml;
 
     cardList.querySelectorAll('.ol-card').forEach(function(c){
       c.addEventListener('click', function(){
