@@ -2675,7 +2675,7 @@
               <!-- ── ថ្លៃដឹក ── -->
               <div class="od-row">
                 <span class="od-lbl">ថ្លៃដឹក ($)</span>
-                <input id="deliveryFee" type="number" class="od-inp" value="2" min="0" step="0.5" inputmode="decimal">
+                <input id="deliveryFee" type="number" class="od-inp" value="2" min="0" step="0.5" inputmode="decimal" autocomplete="off">
               </div>
 
               <!-- ── Pages ── -->
@@ -3667,8 +3667,7 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 
   _el('deliveryFee').addEventListener('input', function(){
-    /* if user clears the field → revert to auto mode; otherwise lock to manual */
-    _deliveryFeeManual = _el('deliveryFee').value !== '';
+    _deliveryFeeManual = true;
     calcTotal();
   });
   _initKHR();
