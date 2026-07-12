@@ -59,7 +59,7 @@ function updateStats(rows) {
 
   const totalRevenue = filtered.reduce((s,o) => s + orderTotal(o), 0);
   const totalOrders  = filtered.length;
-  const pending      = filtered.filter(o => String(o.status||'').toLowerCase() === 'pending').length;
+  const totalItems   = filtered.reduce((s,o) => s + (o.products||[]).reduce((ps,p) => ps + Number(p.qty||0), 0), 0);
 
   const stats = document.querySelectorAll('.stat-value');
   if (stats[0]) stats[0].textContent = `$${totalRevenue.toFixed(2).replace(/\.00$/, '')}`;
@@ -67,7 +67,7 @@ function updateStats(rows) {
   if (stats[2]) stats[2].textContent = String(totalOrders);
 
   const pendBadge = document.getElementById('pendingBadge');
-  if (pendBadge) pendBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${pending} Pending`;
+  if (pendBadge) pendBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> ${totalItems.toLocaleString()} Items`;
 
   if (_globalDateFrom || _globalDateTo) {
     /* Date range selected — show filtered data on sub-labels */
