@@ -421,6 +421,13 @@
 
   /* ── KHR Badge ── */
   .kpi-khr { font-size:13px; font-weight:800; color:#f59e0b; margin-top:4px }
+
+  /* ── Product Highlight ── */
+  .dr-prod-row { cursor:pointer }
+  .dr-prod-row.dr-prod-active { background:rgba(139,92,246,.14) !important; border-color:rgba(139,92,246,.35) !important }
+  [data-theme="light"] .dr-prod-row.dr-prod-active { background:rgba(109,40,217,.08) !important; border-color:rgba(109,40,217,.25) !important }
+  .dr-tr-main.dr-hl > td { background:rgba(139,92,246,.1); transition:background .25s }
+  [data-theme="light"] .dr-tr-main.dr-hl > td { background:rgba(109,40,217,.07) }
   </style>
 </head>
 <body>
@@ -554,6 +561,7 @@
     </div><!-- /dr-wrap -->
   </main>
 </div>
+
 
 <script src="../assets/js/layout.js?v=158"></script>
 <script src="../assets/js/orders-data.js?v=158"></script>
@@ -1007,19 +1015,23 @@
   };
 
   /* ── Product Summary ── */
+  var _drProdList = [];
+
   function renderProducts() {
     var prodMap = {};
     filteredOrders.forEach(function(o){
       (o.products||[]).forEach(function(p){
         var key = String(p.name||'').trim();
         if (!key) return;
-        if (!prodMap[key]) prodMap[key] = { name:key, qty:0, revenue:0, orders:0 };
+        if (!prodMap[key]) prodMap[key] = { name:key, qty:0, revenue:0, orders:0, customers:[] };
         prodMap[key].qty     += Number(p.qty||0);
         prodMap[key].revenue += (Number(p.qty||0)*Number(p.price||0)) - Number(p.discount||0);
         prodMap[key].orders  += 1;
+        prodMap[key].customers.push({ name: o.customer||'—', phone: o.phone||'—', qty: Number(p.qty||0) });
       });
     });
     var sorted = Object.values(prodMap).sort(function(a,b){ return b.qty - a.qty; });
+    _drProdList = sorted;
     var maxQty = sorted.length ? sorted[0].qty : 1;
     var grid = document.getElementById('drProdGrid');
     document.getElementById('drProdSubtitle').textContent = sorted.length + ' ប្រភេទផលិតផល · ' + fmtRange();
@@ -1031,7 +1043,7 @@
     grid.innerHTML = sorted.map(function(p, i){
       var rankCls = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
       var pct = maxQty > 0 ? (p.qty / maxQty * 100) : 0;
-      return '<div class="dr-prod-row">' +
+      return '<div class="dr-prod-row" onclick="drShowProdModal(' + i + ')">' +
         '<div class="dr-prod-top">' +
           '<div class="dr-prod-rank ' + rankCls + '">' + (i+1) + '</div>' +
           '<div class="dr-prod-name">' + esc(p.name) + '</div>' +
@@ -1044,6 +1056,40 @@
       '</div>';
     }).join('');
   }
+
+  var _drActiveProd = null;
+
+  window.drShowProdModal = function(idx) {
+    var p = _drProdList[idx];
+    if (!p) return;
+
+    /* clear all previous highlights */
+    document.querySelectorAll('.dr-prod-row').forEach(function(el){ el.classList.remove('dr-prod-active'); });
+    document.querySelectorAll('.dr-tr-main.dr-hl').forEach(function(el){ el.classList.remove('dr-hl'); });
+
+    /* toggle: click same product again → clear */
+    if (_drActiveProd === p.name) { _drActiveProd = null; return; }
+    _drActiveProd = p.name;
+
+    /* highlight active product card */
+    var cards = document.querySelectorAll('.dr-prod-row');
+    if (cards[idx]) cards[idx].classList.add('dr-prod-active');
+
+    /* highlight matching order rows */
+    var firstEl = null;
+    filteredOrders.forEach(function(o, i){
+      var match = (o.products||[]).some(function(pr){
+        return String(pr.name||'').trim() === p.name;
+      });
+      if (match) {
+        var rowEl = document.getElementById('dr-row-' + i);
+        if (rowEl) { rowEl.classList.add('dr-hl'); if (!firstEl) firstEl = rowEl; }
+      }
+    });
+
+    /* scroll to first highlighted row */
+    if (firstEl) firstEl.scrollIntoView({ behavior:'smooth', block:'center' });
+  };
 
   /* ── Load Data ── */
   async function loadData() {
