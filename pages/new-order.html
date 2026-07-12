@@ -301,17 +301,20 @@
     }
     /* Light mode overrides */
     [data-theme="light"] .pay-btn {
-      background: rgba(100,116,139,.1);
-      border-color: rgba(100,116,139,.22);
-      color: #64748b;
+      background: #e8ecf4;
+      border-color: #c5ccda;
+      color: #3d4f6b;
     }
     [data-theme="light"] .pay-btn:not(.active):hover {
-      background: rgba(124,92,255,.1);
-      border-color: rgba(124,92,255,.35);
-      color: #5b21b6;
+      background: #dde2f5;
+      border-color: rgba(124,92,255,.5);
+      color: #4c1d95;
     }
     [data-theme="light"] .pay-btn.active {
-      box-shadow: 0 4px 14px rgba(124,92,255,.35);
+      background: linear-gradient(135deg, #7c5cff, #5c7cfa);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(124,92,255,.4);
     }
 
     /* ══════════════════════════════════════════════════════
@@ -353,19 +356,20 @@
     }
     [data-theme="dark"] .ptab { background: rgba(255,255,255,.09); color: #a0aabf; }
     [data-theme="light"] .ptab {
-      background: rgba(100,116,139,.1);
-      border: 1.5px solid rgba(100,116,139,.2);
-      color: #475569;
+      background: #e8ecf4;
+      border: 1.5px solid #c5ccda;
+      color: #3d4f6b;
     }
     [data-theme="light"] .ptab:hover {
-      background: rgba(124,92,255,.1);
-      border-color: rgba(124,92,255,.35);
-      color: #5b21b6;
+      background: #dde2f5;
+      border-color: rgba(124,92,255,.5);
+      color: #4c1d95;
     }
     [data-theme="light"] .ptab.active {
-      background: #7c5cff;
-      border-color: #7c5cff;
+      background: linear-gradient(135deg, #7c5cff, #5c7cfa);
+      border-color: transparent;
       color: #fff;
+      box-shadow: 0 4px 12px rgba(124,92,255,.35);
     }
     .ptab.active { background: #7c5cff; color: #fff; }
     .ptab:active { opacity: .78; }
@@ -2117,17 +2121,20 @@
         box-shadow: 0 4px 14px rgba(124,92,255,.5) !important;
       }
       [data-theme="light"] #custBody .od-row-pay .pay-btn {
-        border-color: rgba(100,116,139,.22) !important;
-        background: rgba(100,116,139,.1) !important;
-        color: #64748b !important;
+        background: #e8ecf4 !important;
+        border-color: #c5ccda !important;
+        color: #3d4f6b !important;
       }
       [data-theme="light"] #custBody .od-row-pay .pay-btn:not(.active):hover {
-        background: rgba(124,92,255,.1) !important;
-        border-color: rgba(124,92,255,.35) !important;
-        color: #5b21b6 !important;
+        background: #dde2f5 !important;
+        border-color: rgba(124,92,255,.5) !important;
+        color: #4c1d95 !important;
       }
       [data-theme="light"] #custBody .od-row-pay .pay-btn.active {
-        box-shadow: 0 4px 14px rgba(124,92,255,.35) !important;
+        background: linear-gradient(135deg, #7c5cff, #5c7cfa) !important;
+        border-color: transparent !important;
+        color: #fff !important;
+        box-shadow: 0 4px 14px rgba(124,92,255,.4) !important;
       }
 
       /* Note: full-width at bottom */
@@ -2160,25 +2167,41 @@
       .ptab {
         height: auto !important;
         padding: 8px 16px !important;
-        border: 1.5px solid rgba(100,116,139,.22) !important;
+        border: 1.5px solid #c5ccda !important;
         border-radius: 8px !important;
-        background: rgba(100,116,139,.09) !important;
-        color: #475569 !important;
+        background: #e8ecf4 !important;
+        color: #3d4f6b !important;
         font-size: 13px !important;
         font-weight: 700 !important;
         white-space: nowrap !important;
         transition: all 0.15s ease !important;
       }
       .ptab:hover {
-        border-color: rgba(124,92,255,.45) !important;
-        color: #5b21b6 !important;
-        background: rgba(124,92,255,.1) !important;
+        background: #dde2f5 !important;
+        border-color: rgba(124,92,255,.5) !important;
+        color: #4c1d95 !important;
       }
       .ptab.active {
         background: linear-gradient(135deg, #7c5cff, #5c7cfa) !important;
         border-color: transparent !important;
         color: #fff !important;
-        box-shadow: 0 4px 12px rgba(124,92,255,0.24) !important;
+        box-shadow: 0 4px 12px rgba(124,92,255,.35) !important;
+      }
+      [data-theme="dark"] .ptab {
+        border-color: rgba(255,255,255,.12) !important;
+        background: rgba(255,255,255,.07) !important;
+        color: #a0aabf !important;
+      }
+      [data-theme="dark"] .ptab:hover {
+        border-color: rgba(124,92,255,.4) !important;
+        color: #c4b5fd !important;
+        background: rgba(124,92,255,.12) !important;
+      }
+      [data-theme="dark"] .ptab.active {
+        background: linear-gradient(135deg, #7c5cff, #5c7cfa) !important;
+        border-color: transparent !important;
+        color: #fff !important;
+        box-shadow: 0 4px 12px rgba(124,92,255,.35) !important;
       }
       [data-theme="dark"] .ptab {
         border-color: rgba(255,255,255,.12) !important;
