@@ -5,8 +5,9 @@
 (function(){
 'use strict';
 
-var _cachedOrders = null;
-var _globalDate   = '';
+var _cachedOrders  = null;
+var _globalDateFrom = '';
+var _globalDateTo   = '';
 
 function parseOrderDate(value) {
   if (!value) return null;
@@ -49,23 +50,21 @@ function orderTotal(o) {
   return items + Number(o.deliveryFee||0);
 }
 
-function filterByDate(orders, dateStr) {
-  if (!dateStr) {
-    /* No date → show current month */
-    const now  = new Date();
-    const ms   = new Date(now.getFullYear(), now.getMonth(), 1);
-    const me   = new Date(now.getFullYear(), now.getMonth()+1, 0, 23, 59, 59, 999);
-    return orders.filter(o => { const d = parseOrderDate(o.date); return d && d >= ms && d <= me; });
-  }
-  const [yr, mo, dy] = dateStr.split('-').map(Number);
+function filterByDate(orders, dateFrom, dateTo) {
+  if (!dateFrom && !dateTo) return orders;
+  const fromD = dateFrom ? new Date(dateFrom + 'T00:00:00') : null;
+  const toD   = dateTo   ? new Date(dateTo   + 'T23:59:59') : null;
   return orders.filter(o => {
     const d = parseOrderDate(o.date);
-    return d && d.getFullYear()===yr && d.getMonth()===mo-1 && d.getDate()===dy;
+    if (!d) return false;
+    if (fromD && d < fromD) return false;
+    if (toD   && d > toD)   return false;
+    return true;
   });
 }
 
 function getTopCustomers(orders) {
-  const filtered = filterByDate(orders, _globalDate);
+  const filtered = filterByDate(orders, _globalDateFrom, _globalDateTo);
   const map = {};
   filtered.forEach(o => {
     const name  = (o.customer || o.customerName || 'Unknown').trim();
@@ -129,7 +128,9 @@ async function init() {
 }
 
 window.addEventListener('cambo-global-date', e => {
-  _globalDate = (e.detail && e.detail.date) || '';
+  const d = (e && e.detail) || {};
+  _globalDateFrom = d.dateFrom || '';
+  _globalDateTo   = d.dateTo   || '';
   if (_cachedOrders) render(_cachedOrders);
 });
 

@@ -293,20 +293,25 @@
   }
 
   /* ─── GLOBAL DATE FILTER ───────────────────────────────── */
-  let _widgetGlobalDate = '';
-  let _allDashRows      = [];
+  let _widgetGlobalDateFrom = '';
+  let _widgetGlobalDateTo   = '';
+  let _allDashRows          = [];
 
-  function filterRecentByDate(rows, dateStr) {
-    if (!dateStr) return rows;
-    const [yr, mo, dy] = dateStr.split('-').map(Number);
+  function filterRecentByDate(rows, dateFrom, dateTo) {
+    if (!dateFrom && !dateTo) return rows;
+    const fromD = dateFrom ? new Date(dateFrom + 'T00:00:00') : null;
+    const toD   = dateTo   ? new Date(dateTo   + 'T23:59:59') : null;
     return rows.filter(o => {
       const d = typeof parseOrderDate === 'function' ? parseOrderDate(o.date) : null;
-      return d && d.getFullYear()===yr && d.getMonth()===mo-1 && d.getDate()===dy;
+      if (!d) return false;
+      if (fromD && d < fromD) return false;
+      if (toD   && d > toD)   return false;
+      return true;
     });
   }
 
   function refreshRecent() {
-    const rows = filterRecentByDate(_allDashRows, _widgetGlobalDate);
+    const rows = filterRecentByDate(_allDashRows, _widgetGlobalDateFrom, _widgetGlobalDateTo);
     renderRecentOrders(rows);
   }
 
@@ -335,7 +340,9 @@
   });
 
   window.addEventListener('cambo-global-date', e => {
-    _widgetGlobalDate = (e.detail && e.detail.date) || '';
+    const d = (e && e.detail) || {};
+    _widgetGlobalDateFrom = d.dateFrom || '';
+    _widgetGlobalDateTo   = d.dateTo   || '';
     refreshRecent();
   });
 

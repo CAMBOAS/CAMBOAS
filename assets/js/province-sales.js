@@ -8,25 +8,21 @@
     '#c084fc','#e879f9','#fb7185','#94a3b8','#64748b',
   ];
 
-  let _allRows    = [];
-  let _globalDate = '';
+  let _allRows        = [];
+  let _globalDateFrom = '';
+  let _globalDateTo   = '';
   let currentSort = 'desc';
 
-  function filterByDate(rows, dateStr) {
-    if (!dateStr) {
-      /* No date → current month */
-      const now        = new Date();
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      const monthEnd   = new Date(now.getFullYear(), now.getMonth()+1, 0, 23, 59, 59, 999);
-      return rows.filter(o => {
-        const d = typeof parseOrderDate === 'function' ? parseOrderDate(o.date) : null;
-        return d && d >= monthStart && d <= monthEnd;
-      });
-    }
-    const [yr, mo, dy] = dateStr.split('-').map(Number);
+  function filterByDate(rows, dateFrom, dateTo) {
+    if (!dateFrom && !dateTo) return rows;
+    const fromD = dateFrom ? new Date(dateFrom + 'T00:00:00') : null;
+    const toD   = dateTo   ? new Date(dateTo   + 'T23:59:59') : null;
     return rows.filter(o => {
       const d = typeof parseOrderDate === 'function' ? parseOrderDate(o.date) : null;
-      return d && d.getFullYear()===yr && d.getMonth()===mo-1 && d.getDate()===dy;
+      if (!d) return false;
+      if (fromD && d < fromD) return false;
+      if (toD   && d > toD)   return false;
+      return true;
     });
   }
 
@@ -47,7 +43,7 @@
     const el = document.getElementById('provList');
     if (!el) return;
 
-    const filtered = filterByDate(_allRows, _globalDate);
+    const filtered = filterByDate(_allRows, _globalDateFrom, _globalDateTo);
     let list = groupByProvince(filtered);
 
     if (currentSort === 'asc')       list.sort((a,b) => a.amount - b.amount);
@@ -101,7 +97,9 @@
   });
 
   window.addEventListener('cambo-global-date', e => {
-    _globalDate = (e.detail && e.detail.date) || '';
+    const d = (e && e.detail) || {};
+    _globalDateFrom = d.dateFrom || '';
+    _globalDateTo   = d.dateTo   || '';
     render();
   });
 
