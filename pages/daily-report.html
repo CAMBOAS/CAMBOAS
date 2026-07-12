@@ -893,7 +893,7 @@
     document.getElementById('kpiKhr').textContent     = Math.round(revenue * KHR_RATE).toLocaleString() + '៛';
     document.getElementById('kpiAvg').textContent     = fmtMoney(avg);
     document.getElementById('kpiOrdersNote').textContent  = fmtRange();
-    document.getElementById('kpiItemsNote').textContent   = 'ទំនិញ ' + items + ' ឯកតា';
+    document.getElementById('kpiItemsNote').textContent   = items + ' items';
     document.getElementById('kpiRevenueNote').textContent = 'Rate: ' + KHR_RATE.toLocaleString() + '៛/$1';
     document.getElementById('kpiAvgNote').textContent     = orders + ' orders';
     var _sub = document.getElementById('drOrdersSubtitle'); if(_sub) _sub.textContent = orders + ' orders · ' + fmtRange();
@@ -1038,7 +1038,7 @@
         '</div>' +
         '<div class="dr-prod-bar-wrap"><div class="dr-prod-bar" style="width:' + pct + '%"></div></div>' +
         '<div class="dr-prod-footer">' +
-          '<div class="dr-prod-sub">' + p.qty + ' ឯកតា · ' + p.orders + ' order' + (p.orders !== 1 ? 's' : '') + '</div>' +
+          '<div class="dr-prod-sub">' + p.orders + ' order' + (p.orders !== 1 ? 's' : '') + ' · ' + p.qty + ' items</div>' +
           '<div class="dr-prod-rev">' + fmtMoney(p.revenue) + '</div>' +
         '</div>' +
       '</div>';
