@@ -292,6 +292,24 @@
     setTimeout(() => { overlay.style.display = 'none'; }, 280);
   }
 
+  /* ─── GLOBAL DATE FILTER ───────────────────────────────── */
+  let _widgetGlobalDate = '';
+  let _allDashRows      = [];
+
+  function filterRecentByDate(rows, dateStr) {
+    if (!dateStr) return rows;
+    const [yr, mo, dy] = dateStr.split('-').map(Number);
+    return rows.filter(o => {
+      const d = typeof parseOrderDate === 'function' ? parseOrderDate(o.date) : null;
+      return d && d.getFullYear()===yr && d.getMonth()===mo-1 && d.getDate()===dy;
+    });
+  }
+
+  function refreshRecent() {
+    const rows = filterRecentByDate(_allDashRows, _widgetGlobalDate);
+    renderRecentOrders(rows);
+  }
+
   /* ─── INIT & REFRESH ────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', () => {
     initCalendar();
@@ -301,17 +319,24 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOrderDrawer(); });
 
     if (typeof _dashRows !== 'undefined' && _dashRows.length) {
+      _allDashRows = _dashRows;
       buildOrderDays(_dashRows);
       renderCalendar();
-      renderRecentOrders(_dashRows);
+      refreshRecent();
     }
   });
 
   window.addEventListener('cambo-dash-refreshed', e => {
     const rows = Array.isArray(e.detail) ? e.detail : [];
+    _allDashRows = rows;
     buildOrderDays(rows);
     renderCalendar();
-    renderRecentOrders(rows);
+    refreshRecent();
+  });
+
+  window.addEventListener('cambo-global-date', e => {
+    _widgetGlobalDate = (e.detail && e.detail.date) || '';
+    refreshRecent();
   });
 
 })();

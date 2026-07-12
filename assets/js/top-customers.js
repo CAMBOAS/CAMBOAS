@@ -1,18 +1,18 @@
-﻿/**
+/**
  * Top Customers Widget — CAMBO MINI Dashboard
- * Uses same data source as dashboard-live.js (Google Apps Script + localStorage fallback)
+ * Controlled by global date filter (cambo-global-date event)
  */
 (function(){
 'use strict';
 
-var DIRECT_URL = 'https://script.google.com/macros/s/AKfycbzefJjsVDLZ7YwtzHxIilWyQ8-j6-7sCieD8CmPqvlKVbazr6Jhi7Zj9sjG-MLaHMkQIA/exec';
-var currentPeriod = 'monthly';
 var _cachedOrders = null;
+var _globalDate   = '';
 
-/* ── Parse DD/MM/YYYY or YYYY-MM-DD correctly ── */
 function parseOrderDate(value) {
   if (!value) return null;
   const s = String(value).trim();
+  const dm2 = s.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})/);
+  if (dm2) return new Date(+dm2[3], +dm2[2]-1, +dm2[1]);
   const ddmm = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
   if (ddmm) return new Date(+ddmm[3], +ddmm[2]-1, +ddmm[1]);
   if (/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s.slice(0,10)+'T00:00:00');
@@ -20,7 +20,6 @@ function parseOrderDate(value) {
   return isNaN(d) ? null : d;
 }
 
-/* ── Fetch orders ── */
 async function fetchOrders() {
   if (_cachedOrders) return _cachedOrders;
   try {
@@ -28,7 +27,8 @@ async function fetchOrders() {
     if (window.CamboAPI) {
       data = await window.CamboAPI.get({action:'list', limit:'1000'});
     } else {
-      const res = await fetch(DIRECT_URL + '?action=list&limit=1000&_=' + Date.now());
+      const DIRECT = 'https://script.google.com/macros/s/AKfycbzefJjsVDLZ7YwtzHxIilWyQ8-j6-7sCieD8CmPqvlKVbazr6Jhi7Zj9sjG-MLaHMkQIA/exec';
+      const res = await fetch(DIRECT + '?action=list&limit=1000&_=' + Date.now());
       data = await res.json();
     }
     const rows = Array.isArray(data?.orders)       ? data.orders
@@ -43,42 +43,29 @@ async function fetchOrders() {
   }
 }
 
-/* ── Order total ── */
 function orderTotal(o) {
   const items = (o.products||[]).reduce((s,p) =>
     s + (Number(p.qty||0) * Number(p.price||0) - Number(p.discount||0)), 0);
   return items + Number(o.deliveryFee||0);
 }
 
-/* ── Date range filter ── */
-function getRange(period) {
-  const now   = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  if (period === 'daily') return { start: today, end: today };
-  if (period === 'weekly') {
-    const s = new Date(today); s.setDate(today.getDate() - today.getDay());
-    const e = new Date(s); e.setDate(s.getDate() + 6);
-    return { start: s, end: e };
+function filterByDate(orders, dateStr) {
+  if (!dateStr) {
+    /* No date → show current month */
+    const now  = new Date();
+    const ms   = new Date(now.getFullYear(), now.getMonth(), 1);
+    const me   = new Date(now.getFullYear(), now.getMonth()+1, 0, 23, 59, 59, 999);
+    return orders.filter(o => { const d = parseOrderDate(o.date); return d && d >= ms && d <= me; });
   }
-  // monthly
-  return {
-    start: new Date(now.getFullYear(), now.getMonth(), 1),
-    end:   new Date(now.getFullYear(), now.getMonth()+1, 0)
-  };
+  const [yr, mo, dy] = dateStr.split('-').map(Number);
+  return orders.filter(o => {
+    const d = parseOrderDate(o.date);
+    return d && d.getFullYear()===yr && d.getMonth()===mo-1 && d.getDate()===dy;
+  });
 }
 
-function inRange(dateStr, range) {
-  const d = parseOrderDate(dateStr);
-  if (!d) return false;
-  const t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  return t >= range.start && t <= range.end;
-}
-
-/* ── Aggregate top customers ── */
-function getTopCustomers(orders, period) {
-  const range = getRange(period);
-  const filtered = orders.filter(o => inRange(o.date, range));
-
+function getTopCustomers(orders) {
+  const filtered = filterByDate(orders, _globalDate);
   const map = {};
   filtered.forEach(o => {
     const name  = (o.customer || o.customerName || 'Unknown').trim();
@@ -87,13 +74,9 @@ function getTopCustomers(orders, period) {
     map[name].total  += total;
     map[name].orders += 1;
   });
-
-  return Object.values(map)
-    .sort((a,b) => b.total - a.total)
-    .slice(0, 10);
+  return Object.values(map).sort((a,b) => b.total - a.total).slice(0, 10);
 }
 
-/* ── Colors & avatar ── */
 const COLORS = [
   'linear-gradient(135deg,#8b5cf6,#06b6d4)',
   'linear-gradient(135deg,#10b981,#22d3ee)',
@@ -107,12 +90,11 @@ function initials(name) {
   return p.length >= 2 ? (p[0][0]+p[1][0]).toUpperCase() : name.slice(0,2).toUpperCase();
 }
 
-/* ── Render ── */
-function render(orders, period) {
+function render(orders) {
   const el = document.getElementById('tcList');
   if (!el) return;
 
-  const customers = getTopCustomers(orders, period);
+  const customers = getTopCustomers(orders);
 
   if (!customers.length) {
     el.innerHTML = '<div class="tc-empty">🏆 មិនមានទិន្នន័យ<br><small>Save orders ពី Smart Orderer ជាមុន</small></div>';
@@ -139,33 +121,24 @@ function render(orders, period) {
   }).join('');
 }
 
-/* ── Init ── */
 async function init() {
   const el = document.getElementById('tcList');
   if (el) el.innerHTML = '<div class="tc-loading">Loading...</div>';
-
   const orders = await fetchOrders();
-  render(orders, currentPeriod);
-
-  // Tab buttons
-  document.querySelectorAll('.tc-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tc-tab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentPeriod = btn.dataset.period;
-      render(orders, currentPeriod);
-    });
-  });
-
-  // Listen for new orders saved (same event as dashboard)
-  window.addEventListener('cambo-orders-updated', async () => {
-    _cachedOrders = null;
-    const fresh = await fetchOrders();
-    render(fresh, currentPeriod);
-  });
+  render(orders);
 }
+
+window.addEventListener('cambo-global-date', e => {
+  _globalDate = (e.detail && e.detail.date) || '';
+  if (_cachedOrders) render(_cachedOrders);
+});
+
+window.addEventListener('cambo-orders-updated', async () => {
+  _cachedOrders = null;
+  const fresh = await fetchOrders();
+  render(fresh);
+});
 
 document.addEventListener('DOMContentLoaded', init);
 
 })();
-

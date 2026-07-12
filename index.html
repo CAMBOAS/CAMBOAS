@@ -56,6 +56,17 @@
 
 @media(max-width:1080px){.qa-row{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:640px){.qa-row{grid-template-columns:repeat(2,1fr)}}
+
+/* ── Stock Sales Filter Card ── */
+.ssf-date-input{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:10px;color:var(--text);padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;height:32px;outline:none;transition:border-color .15s}
+.ssf-date-input:focus{border-color:rgba(139,92,246,.6)}
+.ssf-date-input::-webkit-calendar-picker-indicator{filter:invert(1) opacity(.45);cursor:pointer}
+[data-theme="light"] .ssf-date-input{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.15);color:#1e293b}
+[data-theme="light"] .ssf-date-input::-webkit-calendar-picker-indicator{filter:none;opacity:.55}
+.ssf-btn{min-height:32px;padding:0 14px;border-radius:10px;border:none;background:linear-gradient(135deg,#8b5cf6,#06b6d4);color:#fff;font-weight:700;cursor:pointer;font-size:12px;font-family:inherit;white-space:nowrap;transition:opacity .15s}
+.ssf-btn:hover{opacity:.85}
+.ssf-btn:disabled{opacity:.45;cursor:default}
+.ssf-empty{text-align:center;padding:28px 16px;color:var(--muted);font-size:13px}
 </style>
 </head>
 <body>
@@ -167,9 +178,7 @@
                             <p class="card-subtitle">Monthly revenue overview</p>
                         </div>
                         <div class="card-actions">
-                            <button class="card-btn active">Monthly</button>
-                            <button class="card-btn">Weekly</button>
-                            <button class="card-btn">Daily</button>
+                            <span id="chartDateLabel" style="font-size:11px;color:var(--muted)">Monthly overview</span>
                         </div>
                     </div>
                     <div class="chart-wrapper">
@@ -207,11 +216,6 @@
                             <h2 class="card-title">Top Customers</h2>
                             <p class="card-subtitle">អតិថិជនទិញច្រើនជាងគេ</p>
                         </div>
-                        <div class="tc-period-tabs">
-                            <button class="tc-tab active" data-period="monthly">Monthly</button>
-                            <button class="tc-tab" data-period="weekly">Weekly</button>
-                            <button class="tc-tab" data-period="daily">Daily</button>
-                        </div>
                     </div>
                     <div class="tc-list" id="tcList">
                         <div class="tc-loading">Loading...</div>
@@ -220,7 +224,28 @@
 
             </section>
 
-            <!-- Row 2: Stock Overview -->
+            <!-- Row 2: Stock Sales Filter -->
+            <section class="tx-full-section">
+                <div class="glass-card" style="padding:12px 18px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <!-- Left: Realtime Data Sync + Refresh -->
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <div id="realtimePill" style="display:flex;align-items:center;gap:7px;padding:6px 14px;border-radius:12px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.35);font-size:11px;font-weight:700;color:var(--text);letter-spacing:.04em;pointer-events:none;user-select:none;white-space:nowrap">
+                                <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;box-shadow:0 0 6px rgba(34,197,94,.8);animation:livePulse 2s infinite"></span>
+                                Realtime Data Sync
+                            </div>
+                        </div>
+                        <!-- Right: Filter Date input -->
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <span style="font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap">Filter Date:</span>
+                            <input type="date" id="ssfDateInput" class="ssf-date-input" style="max-width:160px">
+                        </div>
+                    </div>
+                    <div id="ssfList" style="overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,.2) transparent"></div>
+                </div>
+            </section>
+
+            <!-- Row 3: Stock Overview -->
             <section class="tx-full-section">
                 <div class="glass-card">
                     <div class="card-header">
@@ -277,12 +302,6 @@
                                 <option value="asc">Low → High</option>
                                 <option value="name">A → Z</option>
                             </select>
-                        </div>
-                        <!-- Period filter row -->
-                        <div class="prov-period-tabs" id="provPeriodTabs">
-                            <button class="prov-period-btn active" data-period="monthly">Monthly</button>
-                            <button class="prov-period-btn" data-period="weekly">Weekly</button>
-                            <button class="prov-period-btn" data-period="daily">Daily</button>
                         </div>
                     </div>
                     <div class="prov-list" id="provList"></div>
@@ -460,6 +479,8 @@
     el.innerHTML = html;
   }
 
+  window._camboGetStock = getStock;
+
   document.addEventListener('DOMContentLoaded', renderStockOverview);
   window.addEventListener('storage', function(e){
     if(e.key==='cambo_stock_v2') renderStockOverview();
@@ -467,32 +488,162 @@
 })();
 </script>
 <script src="assets/js/sw-register.js?v=158"></script>
+<script>
+/* ── Stock Sales Filter standalone card ── */
+(function(){
+  function ssfParseDate(s){
+    if(!s) return null;
+    s = String(s).trim();
+    var m = s.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})/);
+    if(m) return new Date(m[3]+'-'+m[2]+'-'+m[1]+'T00:00:00');
+    var m2 = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if(m2) return new Date(m2[3]+'-'+m2[2]+'-'+m2[1]+'T00:00:00');
+    if(/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s.slice(0,10)+'T00:00:00');
+    var d = new Date(s); return isNaN(d) ? null : d;
+  }
 
-<!-- Realtime Data Sync — fixed bottom-right status pill -->
-<div id="realtimePill" style="
-  position:fixed; bottom:24px; right:28px; z-index:9000;
-  display:flex; align-items:center; gap:8px;
-  padding:9px 18px; border-radius:16px;
-  background:rgba(255,255,255,.12);
-  backdrop-filter:blur(20px) saturate(1.8);
-  -webkit-backdrop-filter:blur(20px) saturate(1.8);
-  border:1px solid rgba(255,255,255,.28);
-  box-shadow:
-    0 8px 32px rgba(0,0,0,.18),
-    0 1px 0 rgba(255,255,255,.35) inset,
-    0 -1px 0 rgba(0,0,0,.08) inset;
-  font-size:11px; font-weight:700;
-  color:rgba(255,255,255,.9);
-  letter-spacing:.04em;
-  pointer-events:none; user-select:none;
-">
-  <span style="
-    width:8px;height:8px;border-radius:50%;
-    background:#22c55e;flex-shrink:0;
-    box-shadow:0 0 6px rgba(34,197,94,.8);
-    animation:livePulse 2s infinite;
-  "></span>
-  Realtime Data Sync
-</div>
+  function ssfGetSoldMap(dateStr){
+    var sold = {};
+    try {
+      var raw = JSON.parse(localStorage.getItem('cambo_saleinfor_v1') || 'null');
+      if(!raw || !raw.orders) return sold;
+      var target = new Date(dateStr + 'T00:00:00');
+      var ty = target.getFullYear(), tm = target.getMonth(), td = target.getDate();
+      raw.orders.forEach(function(o){
+        var d = ssfParseDate(o.date);
+        if(!d || d.getFullYear()!==ty || d.getMonth()!==tm || d.getDate()!==td) return;
+        var prods = (Array.isArray(o.items) && o.items.length ? o.items : null)
+                 || (Array.isArray(o.products) && o.products.length ? o.products : null)
+                 || [];
+        prods.forEach(function(p){
+          var name = String(p.name||'').replace(/\([^)]*\)\s*$/,'').trim().toLowerCase();
+          if(!name) return;
+          var qty = parseInt(p.qty||p.quantity||1, 10) || 1;
+          sold[name] = (sold[name]||0) + qty;
+        });
+      });
+    } catch(_){}
+    return sold;
+  }
+
+  var CAT_COLORS_SSF = {
+    'Face Care':  {bg:'rgba(139,92,246,.15)', color:'#8b5cf6'},
+    'Body Care':  {bg:'rgba(6,182,212,.15)',  color:'#06b6d4'},
+    'Hair Care':  {bg:'rgba(16,185,129,.15)', color:'#10b981'},
+    'Drinks':     {bg:'rgba(245,158,11,.15)', color:'#f59e0b'},
+    'Drink':      {bg:'rgba(245,158,11,.15)', color:'#f59e0b'}
+  };
+  function ssfCatStyle(cat){
+    var c = CAT_COLORS_SSF[cat] || {bg:'rgba(148,163,184,.15)',color:'#94a3b8'};
+    return 'background:'+c.bg+';color:'+c.color;
+  }
+
+  function ssfGetStock(){
+    if(window._camboGetStock) return window._camboGetStock();
+    try{
+      var s = JSON.parse(localStorage.getItem('cambo_stock_v2')||'null');
+      if(s && Array.isArray(s) && s.length) return s;
+    }catch(e){}
+    return [];
+  }
+  function ssfGetStatus(p){
+    var box = p.box !== undefined ? p.box : (p.qty||0);
+    if(box===0) return 'out';
+    if(box<=2)  return 'low';
+    return 'ok';
+  }
+
+  function ssfRender(){
+    var el = document.getElementById('ssfList');
+    if(!el) return;
+    var inp     = document.getElementById('ssfDateInput');
+    var dateStr = inp ? inp.value : '';
+    if(!dateStr){
+      el.innerHTML = '';
+      return;
+    }
+    var soldMap = ssfGetSoldMap(dateStr);
+    var stockItems = ssfGetStock();
+
+    /* Match stock items to sold products */
+    var matched = [];
+    stockItems.forEach(function(p){
+      var key = String(p.name||'').replace(/\([^)]*\)\s*$/,'').trim().toLowerCase();
+      var soldQty = soldMap[key];
+      if(!soldQty){
+        Object.keys(soldMap).forEach(function(k){
+          if(!soldQty && (k.indexOf(key)!==-1 || key.indexOf(k)!==-1)) soldQty = soldMap[k];
+        });
+      }
+      if(soldQty) matched.push({p:p, soldQty:soldQty});
+    });
+
+    if(matched.length === 0){
+      /* Format date for display */
+      var dp = dateStr.split('-');
+      var label = dp[2]+'/'+dp[1]+'/'+dp[0];
+      el.innerHTML = '';
+      return;
+    }
+
+    /* Sort by qty sold desc, then by status priority */
+    matched.sort(function(a,b){
+      if(b.soldQty !== a.soldQty) return b.soldQty - a.soldQty;
+      var ord = {out:0,low:1,ok:2};
+      return ord[ssfGetStatus(a.p)] - ord[ssfGetStatus(b.p)];
+    });
+
+    var html = matched.map(function(item){
+      var p = item.p, soldQty = item.soldQty;
+      var st  = ssfGetStatus(p);
+      var box = p.box !== undefined ? p.box : (p.qty||0);
+      var pct = Math.min(box * 10, 100);
+      var stBg    = st==='ok'?'rgba(16,185,129,.15)':st==='low'?'rgba(245,158,11,.15)':'rgba(239,68,68,.15)';
+      var stColor = st==='ok'?'#10b981':st==='low'?'#f59e0b':'#ef4444';
+      var stLabel = st==='ok'?'In Stock':st==='low'?'Low Stock':'Out of Stock';
+      var barColor= st==='ok'?'#10b981':st==='low'?'#f59e0b':'#ef4444';
+      var borderLeft = st==='ok'?'3px solid #10b981':st==='low'?'3px solid #f59e0b':'3px solid #ef4444';
+      var cat = p.cat || '?';
+      return '<a class="tx-stroke-item" href="pages/stock.html" style="border-left:'+borderLeft+';border-radius:0 10px 10px 0;gap:10px;padding:10px 12px;align-items:center">'
+        +'<div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;'+ssfCatStyle(cat)+'">'+(cat[0]||'?')+'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +  '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px">'
+        +    '<span style="font-size:12px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">'+p.name+'</span>'
+        +    '<span style="font-size:10px;padding:1px 7px;border-radius:8px;'+ssfCatStyle(cat)+';font-weight:700;flex-shrink:0;white-space:nowrap">'+cat+'</span>'
+        +  '</div>'
+        +  '<div style="display:flex;align-items:center;gap:7px">'
+        +    '<div style="flex:1;height:5px;border-radius:3px;background:rgba(148,163,184,.18);overflow:hidden">'
+        +      '<div style="height:100%;width:'+pct+'%;border-radius:3px;background:'+barColor+'"></div>'
+        +    '</div>'
+        +    '<span style="font-size:10px;color:var(--muted);flex-shrink:0;white-space:nowrap">Box: '+box+'</span>'
+        +    '<span style="font-size:10px;padding:1px 7px;border-radius:8px;background:rgba(139,92,246,.18);color:#a78bfa;font-weight:700;flex-shrink:0;white-space:nowrap">Sold: '+soldQty+'</span>'
+        +    '<span style="font-size:10px;padding:1px 7px;border-radius:8px;background:'+stBg+';color:'+stColor+';font-weight:700;flex-shrink:0;white-space:nowrap">'+stLabel+'</span>'
+        +  '</div>'
+        +'</div>'
+        +'</a>';
+    }).join('');
+
+    /* Count summary */
+    var total = matched.reduce(function(s,i){ return s + i.soldQty; }, 0);
+    html += '<div style="padding:10px 14px;font-size:11px;color:var(--muted);text-align:right">'
+          + 'សរុប: <strong style="color:var(--text)">'+matched.length+' ផលិតផល</strong> · Sold: <strong style="color:#a78bfa">'+total+' items</strong></div>';
+
+    el.innerHTML = html;
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var inp = document.getElementById('ssfDateInput');
+    var btn = document.getElementById('ssfRefreshBtn');
+    function fireGlobal(){
+      var dateVal = inp ? inp.value : '';
+      window.dispatchEvent(new CustomEvent('cambo-global-date', { detail: { date: dateVal } }));
+      ssfRender();
+    }
+    if(inp) inp.addEventListener('change', fireGlobal);
+    if(btn) btn.addEventListener('click', fireGlobal);
+  });
+})();
+</script>
+
 </body>
 </html>
