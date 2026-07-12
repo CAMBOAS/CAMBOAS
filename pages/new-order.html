@@ -283,32 +283,55 @@
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      transition: background .15s, border-color .15s, color .15s;
+      transition: background .18s, border-color .18s, color .18s, box-shadow .18s, transform .12s;
       white-space: nowrap;
+      position: relative;
+      overflow: visible;
     }
+    /* Selected payment button — very obvious gradient + glow + badge */
     .pay-btn.active {
-      background: rgba(124,92,255,.18);
-      border-color: rgba(124,92,255,.5);
-      color: var(--text, #18213a);
+      background: linear-gradient(135deg, #7c5cff, #5c7cfa);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(124,92,255,.55), 0 0 0 2.5px rgba(124,92,255,.3);
+      transform: translateY(-1px);
     }
-    .pay-btn:active { transform: scale(.95); }
-    [data-theme="dark"] .pay-btn { border-color: rgba(255,255,255,.12); color: #a0aabf; }
-    [data-theme="dark"] .pay-btn.active { color: #e8e0ff; }
-    /* Light mode — give buttons visible but soft background */
+    /* Green ✓ badge — top-right corner */
+    .pay-btn.active::after {
+      content: '✓';
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      width: 17px;
+      height: 17px;
+      background: #22c55e;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 17px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(34,197,94,.5);
+      border: 1.5px solid rgba(255,255,255,.8);
+    }
+    .pay-btn:not(.active):hover { opacity: .85; }
+    .pay-btn:active:not(.active) { transform: scale(.95); }
+    [data-theme="dark"] .pay-btn { border-color: rgba(255,255,255,.14); color: #a0aabf; background: rgba(255,255,255,.07); }
+    [data-theme="dark"] .pay-btn.active { box-shadow: 0 4px 20px rgba(124,92,255,.6), 0 0 0 2.5px rgba(124,92,255,.35); }
+    /* Light mode */
     [data-theme="light"] .pay-btn {
       background: rgba(100,116,139,.08);
       border-color: rgba(100,116,139,.22);
       color: #475569;
     }
-    [data-theme="light"] .pay-btn:hover {
+    [data-theme="light"] .pay-btn:not(.active):hover {
       background: rgba(124,92,255,.08);
       border-color: rgba(124,92,255,.35);
       color: #5b21b6;
+      opacity: 1;
     }
     [data-theme="light"] .pay-btn.active {
-      background: rgba(124,92,255,.14);
-      border-color: rgba(124,92,255,.55);
-      color: #5b21b6;
+      box-shadow: 0 4px 18px rgba(124,92,255,.4), 0 0 0 2.5px rgba(124,92,255,.25);
     }
 
     /* ══════════════════════════════════════════════════════
@@ -2111,7 +2134,25 @@
         background: linear-gradient(135deg, #7c5cff, #5c7cfa) !important;
         color: #fff !important;
         border-color: transparent !important;
-        box-shadow: 0 6px 16px rgba(124,92,255,0.28) !important;
+        box-shadow: 0 4px 20px rgba(124,92,255,.55), 0 0 0 2.5px rgba(124,92,255,.3) !important;
+        transform: translateY(-1px) !important;
+      }
+      #custBody .od-row-pay .pay-btn.active::after {
+        content: '✓' !important;
+        position: absolute !important;
+        top: -7px !important;
+        right: -7px !important;
+        width: 17px !important;
+        height: 17px !important;
+        background: #22c55e !important;
+        color: #fff !important;
+        border-radius: 50% !important;
+        font-size: 10px !important;
+        font-weight: 900 !important;
+        line-height: 17px !important;
+        text-align: center !important;
+        box-shadow: 0 2px 6px rgba(34,197,94,.5) !important;
+        border: 1.5px solid rgba(255,255,255,.8) !important;
       }
       [data-theme="dark"] #custBody .od-row-pay .pay-btn {
         border-color: rgba(255,255,255,.14) !important;
