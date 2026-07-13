@@ -2035,6 +2035,8 @@ async function init(){
       return; // don't close panel
     }
     if(a==='cardselect') { if(typeof window.olEnterCardSel==='function') window.olEnterCardSel(); }
+    if(a==='loado') { $id('olActDrop')?.classList.remove('open'); olLoadSheetO(); return; }
+    if(a==='loadt') { $id('olActDrop')?.classList.remove('open'); olLoadSheetT(); return; }
     if(a==='shareimg') shareImg();
     if(a==='export')   exportCSV();
     if(a==='printall') printTable();
