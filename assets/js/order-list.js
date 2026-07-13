@@ -387,18 +387,22 @@ window.olLoadSheetO = async function(){
   if(btn){ btn.style.opacity='0.5'; btn.disabled=true; }
   var rows = await loadOrdersFromSheet('list_o');
   _orders = rows;
+  _date = {preset:'all', start:'', end:'', label:'All Time'};
+  updateDateBtn();
   render();
   if(btn){ btn.style.opacity=''; btn.disabled=false; }
-  _olShowToast('SaleOrderO — ' + rows.length + ' orders', '#22d3ee');
+  _olShowToast('Data Original — ' + rows.length + ' orders', '#06b6d4');
 };
 window.olLoadSheetT = async function(){
   var btn = $id('olSheetTBtn');
   if(btn){ btn.style.opacity='0.5'; btn.disabled=true; }
   var rows = await loadOrdersFromSheet('list_t');
   _orders = rows;
+  _date = {preset:'all', start:'', end:'', label:'All Time'};
+  updateDateBtn();
   render();
   if(btn){ btn.style.opacity=''; btn.disabled=false; }
-  _olShowToast('SaleOrderT — ' + rows.length + ' orders', '#f59e0b');
+  _olShowToast('Data Trash — ' + rows.length + ' orders', '#f97316');
 };
 function fixPhone(v){
   var ph = String(v||'').trim();
