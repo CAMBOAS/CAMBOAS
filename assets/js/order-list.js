@@ -391,6 +391,16 @@ async function loadOrdersFromSheet(action){
     return [];
   }catch(e){ return []; }
 }
+function _setDataSourceChip(label, bg, color, border){
+  var chip = $id('olDataSourceChip');
+  if(!chip) return;
+  if(!label){ chip.style.display='none'; chip.textContent=''; return; }
+  chip.textContent = label;
+  chip.style.display = 'inline-block';
+  chip.style.background = bg;
+  chip.style.color = color;
+  chip.style.border = '1px solid ' + border;
+}
 window.olLoadSheetDefault = async function(){
   var btn = $id('olSheetDefaultBtn');
   if(btn){ btn.style.opacity='0.5'; btn.disabled=true; }
@@ -401,6 +411,7 @@ window.olLoadSheetDefault = async function(){
   updateDateBtn();
   render();
   if(btn){ btn.style.opacity=''; btn.disabled=false; }
+  _setDataSourceChip(null);
   _olShowToast('Default Data — Today', '#6366f1');
 };
 window.olLoadSheetO = async function(){
@@ -412,6 +423,7 @@ window.olLoadSheetO = async function(){
   updateDateBtn();
   render();
   if(btn){ btn.style.opacity=''; btn.disabled=false; }
+  _setDataSourceChip('Data Original', 'rgba(6,182,212,.15)', '#06b6d4', 'rgba(6,182,212,.4)');
   _olShowToast('Data Original — ' + rows.length + ' orders', '#06b6d4');
 };
 window.olLoadSheetT = async function(){
@@ -423,6 +435,7 @@ window.olLoadSheetT = async function(){
   updateDateBtn();
   render();
   if(btn){ btn.style.opacity=''; btn.disabled=false; }
+  _setDataSourceChip('Data Trash', 'rgba(249,115,22,.15)', '#f97316', 'rgba(249,115,22,.4)');
   _olShowToast('Data Trash — ' + rows.length + ' orders', '#f97316');
 };
 function fixPhone(v){
@@ -800,6 +813,7 @@ async function refreshFromSheet(){
   populateFilterOptions();
   render();
   hideBadge();
+  _setDataSourceChip(null);
 }
 
 /* ── Auto-refresh (silent background poll every 30s) ── */
