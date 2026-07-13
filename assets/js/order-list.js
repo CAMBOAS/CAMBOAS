@@ -382,6 +382,18 @@ async function loadOrdersFromSheet(action){
     return [];
   }catch(e){ return []; }
 }
+window.olLoadSheetDefault = async function(){
+  var btn = $id('olSheetDefaultBtn');
+  if(btn){ btn.style.opacity='0.5'; btn.disabled=true; }
+  var rows = await loadOrders();
+  _orders = rows;
+  var p = getPreset('today');
+  _date = {preset:'today', start:p.start, end:p.end, label:p.label};
+  updateDateBtn();
+  render();
+  if(btn){ btn.style.opacity=''; btn.disabled=false; }
+  _olShowToast('Default Data — Today', '#6366f1');
+};
 window.olLoadSheetO = async function(){
   var btn = $id('olSheetOBtn');
   if(btn){ btn.style.opacity='0.5'; btn.disabled=true; }
@@ -2039,6 +2051,7 @@ async function init(){
       return; // don't close panel
     }
     if(a==='cardselect') { if(typeof window.olEnterCardSel==='function') window.olEnterCardSel(); }
+    if(a==='loaddefault') { $id('olActDrop')?.classList.remove('open'); olLoadSheetDefault(); return; }
     if(a==='loado') { $id('olActDrop')?.classList.remove('open'); olLoadSheetO(); return; }
     if(a==='loadt') { $id('olActDrop')?.classList.remove('open'); olLoadSheetT(); return; }
     if(a==='shareimg') shareImg();

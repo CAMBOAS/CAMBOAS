@@ -865,6 +865,72 @@
 
   <div class="ol-dropdown" id="olActDrop" style="width:220px">
     <div class="ol-fd-handle"><span></span></div>
+    <div style="padding:6px 12px 4px">
+      <!-- Actions collapsible header -->
+      <button id="olActionsToggle" onclick="(function(){var el=document.getElementById('olActionsBody');var ic=document.getElementById('olActionsChevron');var open=el.style.display!=='none';el.style.display=open?'none':'block';ic.style.transform=open?'rotate(0deg)':'rotate(180deg)';})()" style="width:100%;height:32px;border-radius:8px;border:1.5px solid rgba(148,163,184,.3);background:rgba(148,163,184,.1);color:var(--text);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:0;transition:background .15s">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <span style="flex:1;text-align:left">Actions</span>
+        <svg id="olActionsChevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="transition:transform .2s;transform:rotate(0deg)"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <!-- Actions collapsible body (collapsed by default) -->
+      <div id="olActionsBody" style="display:none;padding-top:6px">
+        <!-- Share IMG -->
+        <button data-a="shareimg" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(168,85,247,.6);background:rgba(168,85,247,.18);color:#a855f7;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:5px;transition:background .15s">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span style="flex:1;text-align:left">Share IMG</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </button>
+        <!-- Export CSV -->
+        <button data-a="export" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(34,197,94,.6);background:rgba(34,197,94,.18);color:#16a34a;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:5px;transition:background .15s">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span style="flex:1;text-align:left">Export CSV</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.3);padding:1px 7px;border-radius:4px;color:#15803d">.csv</span>
+        </button>
+        <!-- Print Selected -->
+        <button data-a="printsel" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(14,165,233,.6);background:rgba(14,165,233,.18);color:#0284c7;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:5px;transition:background .15s">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span style="flex:1;text-align:left">Print Selected</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <!-- Report Delivery -->
+        <button data-a="reportdelivery" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(99,102,241,.6);background:rgba(99,102,241,.18);color:#4f46e5;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;transition:background .15s">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <span style="flex:1;text-align:left">Report Delivery</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="ol-divider" style="margin:2px 0"></div>
+    <div style="padding:6px 12px 4px">
+      <!-- Sheet collapsible header -->
+      <button id="olSheetToggle" onclick="(function(){var el=document.getElementById('olSheetBody');var ic=document.getElementById('olSheetChevron');var open=el.style.display!=='none';el.style.display=open?'none':'block';ic.style.transform=open?'rotate(0deg)':'rotate(180deg)';})()" style="width:100%;height:32px;border-radius:8px;border:1.5px solid rgba(148,163,184,.3);background:rgba(148,163,184,.1);color:var(--text);font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:0;transition:background .15s">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v5c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 10v5c0 1.66 4.03 3 9 3s9-1.34 9-3v-5"/></svg>
+        <span style="flex:1;text-align:left">Load Data</span>
+        <svg id="olSheetChevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="transition:transform .2s;transform:rotate(0deg)"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <!-- Sheet collapsible body (collapsed by default) -->
+      <div id="olSheetBody" style="display:none;padding-top:6px">
+        <!-- Default Data -->
+        <button id="olSheetDefaultBtn" data-a="loaddefault" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(99,102,241,.6);background:rgba(99,102,241,.18);color:#6366f1;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:6px;transition:background .15s">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          <span style="flex:1;text-align:left">Default Data</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(99,102,241,.25);padding:1px 7px;border-radius:4px">D</span>
+        </button>
+        <!-- SaleOrderO -->
+        <button data-a="loado" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(6,182,212,.6);background:rgba(6,182,212,.18);color:#06b6d4;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:6px;transition:background .15s">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v5c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 10v5c0 1.66 4.03 3 9 3s9-1.34 9-3v-5"/></svg>
+          <span style="flex:1;text-align:left">Data Original</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(6,182,212,.25);padding:1px 7px;border-radius:4px">O</span>
+        </button>
+        <!-- SaleOrderT -->
+        <button data-a="loadt" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(249,115,22,.6);background:rgba(249,115,22,.18);color:#f97316;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;transition:background .15s">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          <span style="flex:1;text-align:left">Data Trash</span>
+          <span style="font-size:10px;font-weight:700;background:rgba(249,115,22,.25);padding:1px 7px;border-radius:4px">T</span>
+        </button>
+      </div>
+    </div>
+    <div class="ol-divider" style="margin:2px 0"></div>
     <div style="padding:8px 12px 4px">
       <div style="font-size:10px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase;margin-bottom:4px">លេខប៉ុង</div>
       <input id="olReceiptNo" type="text" placeholder="បញ្ចូលលេខប៉ុង (optional)"
@@ -875,50 +941,6 @@
       <button id="olQrToggle" data-a="qrtoggle"
         style="width:100%;height:32px;border-radius:7px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.12);color:#f87171;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
         QR Code: OFF
-      </button>
-    </div>
-    <div class="ol-divider" style="margin:2px 0"></div>
-    <div style="padding:6px 12px 4px">
-      <div style="font-size:10px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:6px">ទាញទិន្នន័យ Sheet</div>
-      <!-- SaleOrderO -->
-      <button data-a="loado" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(6,182,212,.6);background:rgba(6,182,212,.18);color:#06b6d4;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:6px;transition:background .15s">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v5c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 10v5c0 1.66 4.03 3 9 3s9-1.34 9-3v-5"/></svg>
-        <span style="flex:1;text-align:left">Data Original</span>
-        <span style="font-size:10px;font-weight:700;background:rgba(6,182,212,.25);padding:1px 7px;border-radius:4px">O</span>
-      </button>
-      <!-- SaleOrderT -->
-      <button data-a="loadt" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(249,115,22,.6);background:rgba(249,115,22,.18);color:#f97316;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;transition:background .15s">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-        <span style="flex:1;text-align:left">Data Trash</span>
-        <span style="font-size:10px;font-weight:700;background:rgba(249,115,22,.25);padding:1px 7px;border-radius:4px">T</span>
-      </button>
-    </div>
-    <div class="ol-divider" style="margin:2px 0"></div>
-    <div style="padding:6px 12px 4px">
-      <div style="font-size:10px;font-weight:800;letter-spacing:.07em;color:#64748b;text-transform:uppercase;margin-bottom:6px">Actions</div>
-      <!-- Share IMG -->
-      <button data-a="shareimg" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(168,85,247,.6);background:rgba(168,85,247,.18);color:#a855f7;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:5px;transition:background .15s">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        <span style="flex:1;text-align:left">Share IMG</span>
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      </button>
-      <!-- Export CSV -->
-      <button data-a="export" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(34,197,94,.6);background:rgba(34,197,94,.18);color:#16a34a;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:5px;transition:background .15s">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span style="flex:1;text-align:left">Export CSV</span>
-        <span style="font-size:10px;font-weight:700;background:rgba(34,197,94,.3);padding:1px 7px;border-radius:4px;color:#15803d">.csv</span>
-      </button>
-      <!-- Print Selected -->
-      <button data-a="printsel" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(14,165,233,.6);background:rgba(14,165,233,.18);color:#0284c7;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;margin-bottom:5px;transition:background .15s">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        <span style="flex:1;text-align:left">Print Selected</span>
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg>
-      </button>
-      <!-- Report Delivery -->
-      <button data-a="reportdelivery" style="width:100%;height:34px;border-radius:8px;border:1.5px solid rgba(99,102,241,.6);background:rgba(99,102,241,.18);color:#4f46e5;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;padding:0 10px;transition:background .15s">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-        <span style="flex:1;text-align:left">Report Delivery</span>
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       </button>
     </div>
     <div class="ol-divider"></div>
