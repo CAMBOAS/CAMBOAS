@@ -8,7 +8,7 @@
   'use strict';
 
   const APPS_SCRIPT_URL =
-    'https://script.google.com/macros/s/AKfycbwOGbB79rXs56U6uAq18w0jg-3NvXtWVC3DuOx4hb-W9PPzE4021Q4B-00q8dKmwtgS4g/exec';
+    'https://script.google.com/macros/s/AKfycbyhPAP25edj3Q2hlW1yZNMW56BzsC3Hd9fH60lRZofqQnRUMcuqa-CRIo60912HGweM1w/exec';
 
   // Use Vercel proxy only when running on vercel.app domain
   function isVercel() {
@@ -50,3 +50,4 @@
 
   window.CamboAPI = { get, post, getBase, APPS_SCRIPT_URL };
 })();
+

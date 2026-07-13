@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="km">
 <head>
   <script>(function(){var r=localStorage.getItem('cambo_login_required');if(r==='false')return;var k='cambo_session';if(sessionStorage.getItem(k)==='1'||localStorage.getItem(k)==='1')return;document.documentElement.style.visibility='hidden';location.replace('../login.html');})();</script>
@@ -1107,7 +1107,7 @@
         CamboOrdersData.fetchOrders(5000),
         window.CamboAPI
           ? window.CamboAPI.get({ action: 'saleinfor' })
-          : fetch('https://script.google.com/macros/s/AKfycbwOGbB79rXs56U6uAq18w0jg-3NvXtWVC3DuOx4hb-W9PPzE4021Q4B-00q8dKmwtgS4g/exec?action=saleinfor&_=' + Date.now()).then(function(r){ return r.json(); })
+          : fetch('https://script.google.com/macros/s/AKfycbyhPAP25edj3Q2hlW1yZNMW56BzsC3Hd9fH60lRZofqQnRUMcuqa-CRIo60912HGweM1w/exec?action=saleinfor&_=' + Date.now()).then(function(r){ return r.json(); })
       ]);
       allOrders = ordersResult;
       _dataReady = true;
@@ -1419,3 +1419,4 @@
 </script>
 </body>
 </html>
+

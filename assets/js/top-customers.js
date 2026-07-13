@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Top Customers Widget — CAMBO MINI Dashboard
  * Controlled by global date filter (cambo-global-date event)
  */
@@ -28,7 +28,7 @@ async function fetchOrders() {
     if (window.CamboAPI) {
       data = await window.CamboAPI.get({action:'list', limit:'1000'});
     } else {
-      const DIRECT = 'https://script.google.com/macros/s/AKfycbzefJjsVDLZ7YwtzHxIilWyQ8-j6-7sCieD8CmPqvlKVbazr6Jhi7Zj9sjG-MLaHMkQIA/exec';
+      const DIRECT = 'https://script.google.com/macros/s/AKfycbyhPAP25edj3Q2hlW1yZNMW56BzsC3Hd9fH60lRZofqQnRUMcuqa-CRIo60912HGweM1w/exec';
       const res = await fetch(DIRECT + '?action=list&limit=1000&_=' + Date.now());
       data = await res.json();
     }
@@ -143,3 +143,4 @@ window.addEventListener('cambo-orders-updated', async () => {
 document.addEventListener('DOMContentLoaded', init);
 
 })();
+
