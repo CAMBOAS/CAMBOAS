@@ -91,6 +91,8 @@ function doGet(e) {
     const action = String((e && e.parameter && e.parameter.action) || 'status').trim();
     if (action === 'status')        return jsonOutput_({ ok:true, status:'running', message:'CAMBO MINI v3.1 is working.' });
     if (action === 'list')          return jsonOutput_({ ok:true, orders: listOrders_() });
+    if (action === 'list_o')        return jsonOutput_({ ok:true, orders: listOrdersFromSheet_('SaleOrderO') });
+    if (action === 'list_t')        return jsonOutput_({ ok:true, orders: listOrdersFromSheet_('SaleOrderT') });
     if (action === 'stroke')        return jsonOutput_({ ok:true, stroke: listStroke_() });
     if (action === 'stock_history') return jsonOutput_(listStrokeHistory_(e));
     if (action === 'products')      return jsonOutput_({ ok:true, products: listProducts_() });
@@ -740,6 +742,64 @@ function listOrders_() {
     return 0;
   }
   return Object.values(groups).sort((a,b) => parseSortMs_(b.dateTime) - parseSortMs_(a.dateTime));
+}
+
+/* Read orders from SaleOrderO (Original) or SaleOrderT (Trash) — same column structure as SaleOrder */
+function listOrdersFromSheet_(sheetName) {
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+  if (!sheet) return [];
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return [];
+  const values = sheet.getRange(2, 1, lastRow - 1, HEADER.length).getValues();
+  const groups = {};
+  values.forEach(row => {
+    const orderId = safe_(row[1]);
+    if (!orderId) return;
+    const dtRaw = row[0];
+    const dateTimeStr = (dtRaw instanceof Date && !isNaN(dtRaw.getTime()))
+      ? Utilities.formatDate(dtRaw, TZ, 'dd/MM/yyyy HH:mm')
+      : safe_(dtRaw);
+    if (!groups[orderId]) {
+      groups[orderId] = {
+        id:orderId, orderId, dateTime:dateTimeStr, date:formatDateOnly_(dateTimeStr),
+        page:safe_(row[2]), closeBy:safe_(row[3]), status:safe_(row[4]),
+        customer:safe_(row[5]), phone:safe_(row[6]), province:safe_(row[7]),
+        detailAddress:safe_(row[8]), address:safe_(row[8]),
+        deliveryName:safe_(row[9]), deliveryFee:toNumber_(row[10]),
+        payment:safe_(row[11]), note:safe_(row[12]),
+        grandTotal:toNumber_(row[20]),
+        products:[], items:[]
+      };
+    }
+    const item = {
+      number   : toNumber_(row[13]),
+      name     : safe_(row[14]), product: safe_(row[14]),
+      qty      : toNumber_(row[15]),
+      unit     : safe_(row[16]),
+      price    : toNumber_(row[17]),
+      discount : toNumber_(row[18]),
+      subtotal : toNumber_(row[19]),
+      productId: safe_(row[21])
+    };
+    groups[orderId].products.push(item);
+    groups[orderId].items.push(item);
+    const gt = toNumber_(row[20]);
+    if (gt > 0) groups[orderId].grandTotal = gt;
+  });
+  return Object.values(groups).sort((a,b) => {
+    var ta = parseSortMs__(a.dateTime), tb = parseSortMs__(b.dateTime);
+    return tb - ta;
+  });
+}
+function parseSortMs__(dt) {
+  if (!dt) return 0;
+  var s = String(dt);
+  var m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})[^\d]+(\d{1,2}):(\d{2})/);
+  if (m) return new Date(m[3]+'-'+m[2]+'-'+m[1]+'T'+m[4].padStart(2,'0')+':'+m[5]+':00').getTime();
+  var m2 = s.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})(?:[^\d]+(\d{1,2}):(\d{2}))?/);
+  if (m2) return new Date(m2[3]+'-'+m2[2]+'-'+m2[1]+'T'+(m2[4]||'00').padStart(2,'0')+':'+(m2[5]||'00')+':00').getTime();
+  return 0;
 }
 
 

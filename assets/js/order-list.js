@@ -368,6 +368,38 @@ async function loadOrders(){
     return [];
   }catch(e){ return []; }
 }
+async function loadOrdersFromSheet(action){
+  try{
+    var d = window.CamboAPI
+      ? await window.CamboAPI.get({action:action,limit:1000})
+      : await fetch(SCRIPT_URL+'?action='+action+'&limit=1000&_='+Date.now()).then(function(r){return r.json();});
+    var arr = Array.isArray(d?.orders)?d.orders
+             :Array.isArray(d?.data?.orders)?d.data.orders
+             :Array.isArray(d?.rows)?d.rows
+             :Array.isArray(d?.data)?d.data
+             :null;
+    if(arr) return normalizeOrders(arr);
+    return [];
+  }catch(e){ return []; }
+}
+window.olLoadSheetO = async function(){
+  var btn = $id('olSheetOBtn');
+  if(btn){ btn.style.opacity='0.5'; btn.disabled=true; }
+  var rows = await loadOrdersFromSheet('list_o');
+  _orders = rows;
+  render();
+  if(btn){ btn.style.opacity=''; btn.disabled=false; }
+  _olShowToast('SaleOrderO — ' + rows.length + ' orders', '#22d3ee');
+};
+window.olLoadSheetT = async function(){
+  var btn = $id('olSheetTBtn');
+  if(btn){ btn.style.opacity='0.5'; btn.disabled=true; }
+  var rows = await loadOrdersFromSheet('list_t');
+  _orders = rows;
+  render();
+  if(btn){ btn.style.opacity=''; btn.disabled=false; }
+  _olShowToast('SaleOrderT — ' + rows.length + ' orders', '#f59e0b');
+};
 function fixPhone(v){
   var ph = String(v||'').trim();
   // Cambodian numbers: 7–10 digits without leading 0 → add 0 prefix
