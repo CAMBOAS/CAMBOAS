@@ -339,6 +339,15 @@ function closeAllDrops(){
   document.querySelectorAll('.ol-dropdown.open').forEach(function(d){ d.classList.remove('open'); });
   var bd = document.getElementById('olBackdrop');
   if(bd) bd.classList.remove('show');
+  // Collapse all collapsible sections inside Actions dropdown
+  ['olActionsBody','olSheetBody'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.display = 'none';
+  });
+  ['olActionsChevron','olSheetChevron'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.transform = 'rotate(0deg)';
+  });
 }
 
 // Backdrop click closes all dropdowns
