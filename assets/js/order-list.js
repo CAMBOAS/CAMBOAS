@@ -8,7 +8,7 @@ var SCRIPT_URL = (window.CamboAPI && window.CamboAPI.getBase()) ||
 var _orders = [], _sel = new Set();
 window._olSel = _sel;
 window._cardSelMode = false;
-var _qrOn = true; // QR Code toggle state
+var _qrOn = false; // QR Code toggle state
 
 /* ── Print marks: localStorage cache + Google Sheet sync ── */
 var _printMarks = {};
@@ -1486,7 +1486,7 @@ window.orderTotal    = orderTotal;
 window.fmtDisplay    = fmtDisplay;
 
 /* ── Drawer QR toggle ── */
-var _drQrOn = true;
+var _drQrOn = false;
 window.olDrToggleQr = function(){
   _drQrOn = !_drQrOn;
   var btn = $id('olDrQrBtn');
