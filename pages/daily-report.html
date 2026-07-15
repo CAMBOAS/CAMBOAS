@@ -415,6 +415,101 @@
     .dr-kpi { grid-template-columns:repeat(2,minmax(0,1fr)) }
   }
 
+  /* ── Product Sales by Day Modal ── */
+  .drps-overlay { position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,.65); display:none; align-items:center; justify-content:center; padding:16px; box-sizing:border-box }
+  .drps-overlay.show { display:flex }
+  .drps-modal { background:#12172a; border:1px solid rgba(139,92,246,.28); border-radius:20px; width:100%; max-width:980px; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 64px rgba(0,0,0,.7) }
+  [data-theme="light"] .drps-modal { background:#fff; border-color:rgba(109,40,217,.18); box-shadow:0 12px 40px rgba(0,0,0,.18) }
+  .drps-head { padding:16px 20px 14px; border-bottom:1px solid rgba(148,163,200,.1); display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-shrink:0 }
+  .drps-title { font-size:15px; font-weight:800; color:var(--text); margin:0 0 8px }
+  .drps-meta { display:flex; align-items:center; flex-wrap:wrap; gap:6px }
+  .drps-chip { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap }
+  .drps-chip-pg { background:rgba(139,92,246,.12); color:#a78bfa; border:1px solid rgba(139,92,246,.25) }
+  [data-theme="light"] .drps-chip-pg { background:rgba(109,40,217,.08); color:#7c3aed; border-color:rgba(109,40,217,.2) }
+  .drps-chip-dt { background:rgba(6,182,212,.1); color:#22d3ee; border:1px solid rgba(6,182,212,.22) }
+  [data-theme="light"] .drps-chip-dt { background:rgba(8,145,178,.07); color:#0891b2; border-color:rgba(8,145,178,.2) }
+  .drps-close { width:32px; height:32px; border-radius:9px; border:1px solid rgba(148,163,200,.2); background:none; color:var(--muted); font-size:20px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0 }
+  .drps-close:hover { background:rgba(239,68,68,.1); color:#f87171; border-color:rgba(239,68,68,.3) }
+  .drps-body { overflow:auto; flex:1 }
+  .drps-tbl-wrap { padding:12px 16px; min-width:max-content }
+  .drps-tbl { border-collapse:collapse; white-space:nowrap; font-size:12.5px }
+  .drps-th { padding:9px 12px; background:#0c1320; border-bottom:2px solid rgba(139,92,246,.2); font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); text-align:center; position:sticky; top:0; z-index:5 }
+  [data-theme="light"] .drps-th { background:#f1f5f9 }
+  .drps-th-num { width:36px; position:sticky; left:0; z-index:7; background:#0c1320 }
+  [data-theme="light"] .drps-th-num { background:#f1f5f9 }
+  .drps-th-nm { text-align:left; min-width:160px; position:sticky; left:36px; z-index:7; background:#0c1320 }
+  [data-theme="light"] .drps-th-nm { background:#f1f5f9 }
+  .drps-th-d { min-width:54px }
+  .drps-th-tot { color:#22d3ee; position:sticky; right:0; z-index:7; background:#0c1320; border-left:1px solid rgba(139,92,246,.15) }
+  [data-theme="light"] .drps-th-tot { color:#0891b2; background:#f1f5f9 }
+  .drps-td-num { width:36px; position:sticky; left:0; background:#12172a; text-align:center; font-size:11px; font-weight:700; color:var(--muted); z-index:3; padding:8px 6px }
+  [data-theme="light"] .drps-td-num { background:#fff }
+  .drps-td-nm { position:sticky; left:36px; background:#12172a; font-size:12.5px; font-weight:700; color:var(--text); text-align:left; z-index:3; padding:8px 12px; max-width:200px; overflow:hidden; text-overflow:ellipsis }
+  [data-theme="light"] .drps-td-nm { background:#fff }
+  .drps-td-q { text-align:center; padding:8px 10px; color:var(--muted); font-size:12px }
+  .drps-td-q.drps-has-q { color:#a78bfa; font-weight:800; font-size:13px }
+  [data-theme="light"] .drps-td-q.drps-has-q { color:#7c3aed }
+  .drps-zero { opacity:.3 }
+  .drps-td-tot { position:sticky; right:0; background:#12172a; font-weight:800; color:#22d3ee; text-align:center; padding:8px 12px; border-left:1px solid rgba(139,92,246,.15); z-index:3 }
+  [data-theme="light"] .drps-td-tot { background:#f8fafc; color:#0891b2 }
+  .drps-tbl tbody tr td { border-bottom:1px solid rgba(148,163,200,.07) }
+  [data-theme="light"] .drps-tbl tbody tr td { border-bottom-color:rgba(0,0,0,.06) }
+  .drps-tbl tbody tr:nth-child(even) .drps-td-num,
+  .drps-tbl tbody tr:nth-child(even) .drps-td-nm,
+  .drps-tbl tbody tr:nth-child(even) .drps-td-tot { background:#0e1828 }
+  [data-theme="light"] .drps-tbl tbody tr:nth-child(even) .drps-td-num,
+  [data-theme="light"] .drps-tbl tbody tr:nth-child(even) .drps-td-nm,
+  [data-theme="light"] .drps-tbl tbody tr:nth-child(even) .drps-td-tot { background:#f8fafc }
+  .drps-tbl tbody tr:nth-child(even) .drps-td-q { background:rgba(255,255,255,.015) }
+  .drps-tbl tbody tr:hover .drps-td-num,.drps-tbl tbody tr:hover .drps-td-nm,.drps-tbl tbody tr:hover .drps-td-q,.drps-tbl tbody tr:hover .drps-td-tot { background:rgba(139,92,246,.06) !important }
+  [data-theme="light"] .drps-tbl tbody tr:hover .drps-td-num,[data-theme="light"] .drps-tbl tbody tr:hover .drps-td-nm,[data-theme="light"] .drps-tbl tbody tr:hover .drps-td-q,[data-theme="light"] .drps-tbl tbody tr:hover .drps-td-tot { background:rgba(109,40,217,.04) !important }
+  .drps-tr-foot td { border-top:2px solid rgba(139,92,246,.2) !important; font-weight:800; padding:10px 12px }
+  .drps-tr-foot .drps-td-num { background:#0a0f1e !important; color:var(--muted) }
+  [data-theme="light"] .drps-tr-foot .drps-td-num { background:#f1f5f9 !important }
+  .drps-tr-foot .drps-td-nm { background:#0a0f1e !important; color:#f59e0b; font-size:11px; font-weight:800; letter-spacing:.05em }
+  [data-theme="light"] .drps-tr-foot .drps-td-nm { background:#f1f5f9 !important; color:#d97706 }
+  .drps-td-dtot { text-align:center; background:#0a0f1e !important; color:#f59e0b; font-weight:700 }
+  [data-theme="light"] .drps-td-dtot { background:#f1f5f9 !important; color:#d97706 }
+  .drps-td-gtot { background:#0a0f1e !important; color:#f59e0b !important }
+  [data-theme="light"] .drps-td-gtot { background:#f1f5f9 !important; color:#d97706 !important }
+  .drps-rk { font-size:11px; font-weight:800 }
+  .drps-rk.r1 { color:#f59e0b }
+  .drps-rk.r2 { color:#94a3b8 }
+  .drps-rk.r3 { color:#b45309 }
+  .drps-foot { padding:12px 20px; border-top:1px solid rgba(148,163,200,.1); display:flex; align-items:center; justify-content:space-between; gap:8px; flex-shrink:0; flex-wrap:wrap }
+  .drps-foot-info { font-size:11px; color:var(--muted) }
+  .drps-btn-exp { height:32px; padding:0 14px; border-radius:8px; border:none; background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; gap:6px }
+  .drps-btn-exp:hover { opacity:.88 }
+  .drps-btn-cls { height:32px; padding:0 12px; border-radius:8px; border:1px solid rgba(148,163,200,.2); background:none; color:var(--muted); font-size:12px; font-weight:600; font-family:inherit; cursor:pointer }
+  .drps-btn-cls:hover { background:rgba(148,163,200,.08) }
+
+  /* ── Column toggler bar ── */
+  .drps-col-bar { padding:10px 20px 12px; border-bottom:1px solid rgba(148,163,200,.1); display:flex; align-items:center; gap:6px; flex-wrap:wrap; flex-shrink:0 }
+  .drps-col-label { font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); flex-shrink:0; margin-right:2px }
+  .drps-col-chip { height:26px; padding:0 10px; border-radius:20px; border:1px solid rgba(148,163,200,.18); background:transparent; color:var(--muted); font-size:11px; font-weight:600; font-family:inherit; cursor:pointer; transition:all .12s; white-space:nowrap }
+  .drps-col-chip:not(.drps-col-pin):hover { border-color:rgba(139,92,246,.45); color:#a78bfa }
+  [data-theme="light"] .drps-col-chip:not(.drps-col-pin):hover { color:#7c3aed; border-color:rgba(109,40,217,.3) }
+  .drps-col-chip.drps-col-on { background:rgba(139,92,246,.15); border-color:rgba(139,92,246,.4); color:#c4b5fd; font-weight:700 }
+  [data-theme="light"] .drps-col-chip.drps-col-on { background:rgba(109,40,217,.08); border-color:rgba(109,40,217,.25); color:#6d28d9 }
+  .drps-col-chip.drps-col-pin { cursor:default; opacity:.85; background:rgba(139,92,246,.1); border-color:rgba(139,92,246,.25); color:#a78bfa }
+  [data-theme="light"] .drps-col-chip.drps-col-pin { background:rgba(109,40,217,.06); color:#7c3aed; border-color:rgba(109,40,217,.2) }
+  /* Summary table cells */
+  .drps-tbl td { padding:8px 10px }
+  .drps-tbl tbody tr:hover td { background:rgba(139,92,246,.06) !important }
+  [data-theme="light"] .drps-tbl tbody tr:hover td { background:rgba(109,40,217,.04) !important }
+  .drps-tbl tbody tr:nth-child(even) td { background:rgba(255,255,255,.018) }
+  [data-theme="light"] .drps-tbl tbody tr:nth-child(even) td { background:#f8fafc }
+  .drps-td-revenue,.drps-td-avgprice { color:#22d3ee; font-weight:700 }
+  [data-theme="light"] .drps-td-revenue,[data-theme="light"] .drps-td-avgprice { color:#0891b2 }
+  .drps-td-pctitems,.drps-td-pctrev { color:#a78bfa; font-weight:600 }
+  [data-theme="light"] .drps-td-pctitems,[data-theme="light"] .drps-td-pctrev { color:#7c3aed }
+  .drps-td-orders,.drps-td-items,.drps-td-avgord { color:var(--text); font-weight:600 }
+  /* Footer total row */
+  .drps-tr-foot td { background:#0a0f1e !important; border-top:2px solid rgba(139,92,246,.2); color:#f59e0b; font-weight:800 }
+  [data-theme="light"] .drps-tr-foot td { background:#f1f5f9 !important; color:#d97706 }
+  .drps-tr-foot .drps-td-name,.drps-tr-foot .drps-td-nm { color:#6b7280 !important }
+  .drps-tr-foot .drps-td-num { color:var(--muted) }
+
   /* ── Skeleton ── */
   .dr-skeleton { animation:dr-pulse 1.5s ease-in-out infinite }
   @keyframes dr-pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
@@ -1153,7 +1248,10 @@
     actDrop.id = 'drActDrop';
     var svgDl = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
     var svgPdf= '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
+    var svgTbl= '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>';
     actDrop.innerHTML =
+      '<button class="dr-act-item" id="drProdSaleBtn">'+svgTbl+' Product Sales by Day</button>' +
+      '<div style="height:1px;background:rgba(148,163,200,.1);margin:4px 2px"></div>' +
       '<button class="dr-act-item" id="drExportImg">'+svgDl+' Export as Image (PNG)</button>' +
       '<button class="dr-act-item" id="drExportImgRev">'+svgDl+' Export as Image + Revenue</button>' +
       '<button class="dr-act-item" id="drExportPdf">'+svgPdf+' Export as PDF</button>';
@@ -1179,6 +1277,251 @@
     actDrop.addEventListener('click', function(e){ e.stopPropagation(); });
     document.addEventListener('click', closeAct);
     window.addEventListener('scroll', closeAct, true);
+
+    /* ── Product Sales by Day Modal ── */
+    var _PROD_COLS = [
+      { id:'num',      label:'#',       vis:true,  pinned:false },
+      { id:'name',     label:'Product', vis:true,  pinned:true  },
+      { id:'orders',   label:'Orders',  vis:true,  pinned:false },
+      { id:'items',    label:'Items',   vis:true,  pinned:false },
+      { id:'revenue',  label:'Revenue', vis:true,  pinned:false },
+      { id:'avgord',   label:'Avg/Ord', vis:false, pinned:false },
+      { id:'avgprice', label:'Avg $',   vis:false, pinned:false },
+      { id:'pctitems', label:'% Items', vis:false, pinned:false },
+      { id:'pctrev',   label:'% Rev',   vis:false, pinned:false },
+    ];
+    var _showTotal = true;
+
+    var _prodSaleMod = document.createElement('div');
+    _prodSaleMod.className = 'drps-overlay';
+    _prodSaleMod.id = 'drProdSaleMod';
+    _prodSaleMod.innerHTML =
+      '<div class="drps-modal">' +
+        '<div class="drps-head">' +
+          '<div>' +
+            '<div class="drps-title">📊 Product Sales by Day</div>' +
+            '<div class="drps-meta" id="drpsMeta"></div>' +
+          '</div>' +
+          '<button class="drps-close" id="drpsClose" title="Close">×</button>' +
+        '</div>' +
+        '<div class="drps-col-bar" id="drpsColBar"></div>' +
+        '<div class="drps-body" id="drpsBody"></div>' +
+        '<div class="drps-foot">' +
+          '<span class="drps-foot-info" id="drpsFootInfo"></span>' +
+          '<div style="display:flex;gap:8px">' +
+            '<button class="drps-btn-exp" id="drpsExportBtn">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+              ' Export PNG' +
+            '</button>' +
+            '<button class="drps-btn-cls" id="drpsCloseBtn">Close</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(_prodSaleMod);
+
+    function _buildProdData() {
+      var prodMap = {};
+      filteredOrders.forEach(function(o) {
+        (o.products||[]).forEach(function(p) {
+          var name = String(p.name||'').trim(); if (!name) return;
+          if (!prodMap[name]) prodMap[name] = { name:name, orders:0, items:0, revenue:0 };
+          var qty = Number(p.qty||0);
+          prodMap[name].orders  += 1;
+          prodMap[name].items   += qty;
+          prodMap[name].revenue += qty * Number(p.price||0) - Number(p.discount||0);
+        });
+      });
+      var list = Object.values(prodMap).sort(function(a,b){ return b.items - a.items; });
+      var totItems = list.reduce(function(s,p){ return s+p.items; },0);
+      var totRev   = list.reduce(function(s,p){ return s+p.revenue; },0);
+      list.forEach(function(p){
+        p.avgOrd   = p.orders > 0 ? p.items / p.orders : 0;
+        p.avgPrice = p.items  > 0 ? p.revenue / p.items : 0;
+        p.pctItems = totItems > 0 ? p.items / totItems * 100 : 0;
+        p.pctRev   = totRev   > 0 ? p.revenue / totRev * 100 : 0;
+      });
+      return { products:list, totals:{ orders:filteredOrders.length, items:totItems, revenue:totRev } };
+    }
+
+    function _cellVal(col, p, i) {
+      if (col.id==='num')      return i + 1;
+      if (col.id==='name')     return esc(p.name);
+      if (col.id==='orders')   return p.orders;
+      if (col.id==='items')    return p.items;
+      if (col.id==='revenue')  return '$' + p.revenue.toFixed(2);
+      if (col.id==='avgord')   return p.avgOrd.toFixed(1);
+      if (col.id==='avgprice') return '$' + p.avgPrice.toFixed(2);
+      if (col.id==='pctitems') return p.pctItems.toFixed(1) + '%';
+      if (col.id==='pctrev')   return p.pctRev.toFixed(1) + '%';
+      return '';
+    }
+
+    function _footVal(col, tot) {
+      if (col.id==='num')      return '';
+      if (col.id==='name')     return 'TOTAL';
+      if (col.id==='orders')   return tot.orders;
+      if (col.id==='items')    return tot.items;
+      if (col.id==='revenue')  return '$' + tot.revenue.toFixed(2);
+      if (col.id==='avgord')   return tot.orders > 0 ? (tot.items / tot.orders).toFixed(1) : '—';
+      if (col.id==='avgprice') return tot.items > 0 ? '$' + (tot.revenue / tot.items).toFixed(2) : '—';
+      if (col.id==='pctitems') return '100%';
+      if (col.id==='pctrev')   return '100%';
+      return '';
+    }
+
+    function _renderColBar() {
+      var bar = document.getElementById('drpsColBar');
+      bar.innerHTML = '<span class="drps-col-label">Columns</span>' +
+        _PROD_COLS.map(function(c){
+          var cls = 'drps-col-chip' + (c.vis ? ' drps-col-on' : '') + (c.pinned ? ' drps-col-pin' : '');
+          return '<button class="' + cls + '" data-col="' + c.id + '">' + c.label + '</button>';
+        }).join('') +
+        '<span style="width:1px;height:20px;background:rgba(148,163,200,.15);margin:0 4px;align-self:center;flex-shrink:0"></span>' +
+        '<button class="drps-col-chip' + (_showTotal ? ' drps-col-on' : '') + '" data-total="1">Total Row</button>';
+      bar.querySelectorAll('.drps-col-chip:not(.drps-col-pin)').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if (this.getAttribute('data-total')) {
+            _showTotal = !_showTotal; _renderColBar(); _renderProdTable();
+          } else {
+            var cid = this.getAttribute('data-col');
+            var col = _PROD_COLS.find(function(c){ return c.id === cid; });
+            if (col) { col.vis = !col.vis; _renderColBar(); _renderProdTable(); }
+          }
+        });
+      });
+    }
+
+    function _renderProdTable() {
+      var data = _buildProdData();
+      var vis  = _PROD_COLS.filter(function(c){ return c.vis; });
+      var body = document.getElementById('drpsBody');
+      if (!data.products.length) {
+        body.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--muted);font-size:13px">គ្មានទិន្នន័យ</div>';
+        document.getElementById('drpsFootInfo').textContent = '0 products';
+        return;
+      }
+
+      var thead = '<thead><tr>' + vis.map(function(c){
+        var al = (c.id==='name') ? 'left' : (c.id==='revenue'||c.id==='avgprice') ? 'right' : 'center';
+        return '<th class="drps-th drps-th-' + c.id + '" style="text-align:' + al + '">' + c.label + '</th>';
+      }).join('') + '</tr></thead>';
+
+      var tbody = '<tbody>' + data.products.map(function(p, i){
+        var rkCls = i===0 ? ' drps-rk r1' : i===1 ? ' drps-rk r2' : i===2 ? ' drps-rk r3' : ' drps-rk';
+        return '<tr>' + vis.map(function(c){
+          var val = _cellVal(c, p, i);
+          var al  = (c.id==='name') ? 'left' : (c.id==='revenue'||c.id==='avgprice') ? 'right' : 'center';
+          var xc  = (c.id==='num') ? rkCls : '';
+          return '<td class="drps-td-' + c.id + xc + '" style="text-align:' + al + '">' + val + '</td>';
+        }).join('') + '</tr>';
+      }).join('') + '</tbody>';
+
+      var tfoot = '<tfoot><tr class="drps-tr-foot">' + vis.map(function(c){
+        var val = _footVal(c, data.totals);
+        var al  = (c.id==='name') ? 'left' : (c.id==='revenue'||c.id==='avgprice') ? 'right' : 'center';
+        return '<td class="drps-td-' + c.id + '" style="text-align:' + al + '">' + val + '</td>';
+      }).join('') + '</tr></tfoot>';
+
+      body.innerHTML = '<div class="drps-tbl-wrap"><table class="drps-tbl">' + thead + tbody + (_showTotal ? tfoot : '') + '</table></div>';
+      document.getElementById('drpsFootInfo').textContent = data.products.length + ' ប្រភេទ · ' + data.totals.items + ' items';
+    }
+
+    function _openProdSaleMod() {
+      var pageTxt = selectedPages.length ? selectedPages.join(', ') : 'All Pages';
+      var dateTxt = dateFrom === dateTo ? fmtDate(dateFrom) : fmtDate(dateFrom) + ' → ' + fmtDate(dateTo);
+      document.getElementById('drpsMeta').innerHTML =
+        '<span class="drps-chip drps-chip-pg">📄 ' + esc(pageTxt) + '</span>' +
+        '&nbsp;<span class="drps-chip drps-chip-dt">📅 ' + esc(dateTxt) + '</span>';
+      _renderColBar();
+      _renderProdTable();
+      _prodSaleMod.classList.add('show');
+    }
+
+    function _exportProdSalePNG() {
+      var data = _buildProdData();
+      if (!data.products.length) return;
+      var vis = _PROD_COLS.filter(function(c){ return c.vis; });
+      var CW  = { num:36, name:200, orders:72, items:72, revenue:92, avgord:76, avgprice:86, pctitems:76, pctrev:76 };
+      var colW = vis.map(function(c){ return CW[c.id]||80; });
+      var scale=2, padX=40, titleH=76, rowH=36, colH=42;
+      var tableW = colW.reduce(function(s,w){ return s+w; },0);
+      var footRows = _showTotal ? 1 : 0;
+      var W = padX*2 + tableW, H = titleH + colH + (data.products.length + footRows)*rowH + 40;
+      var canvas=document.createElement('canvas'); canvas.width=W*scale; canvas.height=H*scale;
+      var ctx=canvas.getContext('2d'); ctx.scale(scale,scale);
+      ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+      // Title
+      ctx.fillStyle='#1a1a2e'; ctx.font='bold 20px system-ui,sans-serif';
+      ctx.fillText('Product Sales by Day',padX,34);
+      // Meta
+      var pTxt='Page: '+(selectedPages.length?selectedPages.join(', '):'All Pages');
+      var dTxt='Date: '+(dateFrom===dateTo?fmtDate(dateFrom):fmtDate(dateFrom)+' → '+fmtDate(dateTo));
+      ctx.fillStyle='#6b7280'; ctx.font='11px system-ui,sans-serif';
+      ctx.fillText(pTxt+'   |   '+dTxt,padX,56);
+      // Header row
+      ctx.fillStyle='#4f46e5'; ctx.fillRect(padX,titleH,tableW,colH);
+      ctx.fillStyle='#fff'; ctx.font='bold 12px system-ui,sans-serif';
+      var x=padX;
+      vis.forEach(function(c,ci){
+        var w=colW[ci];
+        var al=(c.id==='name')?'left':(c.id==='revenue'||c.id==='avgprice')?'right':'center';
+        var tw=ctx.measureText(c.label).width;
+        var tx=al==='left'?x+8:al==='right'?x+w-8-tw:x+(w-tw)/2;
+        ctx.fillText(c.label,tx,titleH+colH/2+4); x+=w;
+      });
+      // Data rows
+      data.products.forEach(function(p,i){
+        var y=titleH+colH+i*rowH;
+        ctx.fillStyle=i%2===0?'#fff':'#f9fafb'; ctx.fillRect(padX,y,tableW,rowH);
+        ctx.strokeStyle='#f0f0f0'; ctx.lineWidth=0.5;
+        ctx.beginPath();ctx.moveTo(padX,y+rowH);ctx.lineTo(padX+tableW,y+rowH);ctx.stroke();
+        var cy=y+rowH/2+4; x=padX;
+        vis.forEach(function(c,ci){
+          var w=colW[ci]; var val=String(_cellVal(c,p,i));
+          var al=(c.id==='name')?'left':(c.id==='revenue'||c.id==='avgprice')?'right':'center';
+          if(c.id==='num'){ctx.fillStyle='#9ca3af';ctx.font='11px system-ui,sans-serif';}
+          else if(c.id==='name'){ctx.fillStyle='#111827';ctx.font='600 12px system-ui,sans-serif';val=truncate(ctx,val,w-12);}
+          else if(c.id==='revenue'||c.id==='avgprice'){ctx.fillStyle='#0891b2';ctx.font='bold 12px system-ui,sans-serif';}
+          else if(c.id==='pctitems'||c.id==='pctrev'){ctx.fillStyle='#7c3aed';ctx.font='600 12px system-ui,sans-serif';}
+          else{ctx.fillStyle='#374151';ctx.font='600 12px system-ui,sans-serif';}
+          var tw=ctx.measureText(val).width;
+          var tx=al==='left'?x+8:al==='right'?x+w-8-tw:x+(w-tw)/2;
+          ctx.fillText(val,tx,cy); x+=w;
+        });
+      });
+      // Footer total row (only if _showTotal)
+      if (_showTotal) {
+        var fy=titleH+colH+data.products.length*rowH;
+        ctx.fillStyle='#f0f4ff'; ctx.fillRect(padX,fy,tableW,rowH);
+        ctx.strokeStyle='#6366f1'; ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(padX,fy);ctx.lineTo(padX+tableW,fy);ctx.stroke();
+        var fcy=fy+rowH/2+4; x=padX;
+        vis.forEach(function(c,ci){
+          var w=colW[ci]; var val=String(_footVal(c,data.totals));
+          var al=(c.id==='name')?'left':(c.id==='revenue'||c.id==='avgprice')?'right':'center';
+          ctx.fillStyle=(c.id==='name')?'#374151':'#d97706'; ctx.font='bold 12px system-ui,sans-serif';
+          var tw=ctx.measureText(val).width;
+          var tx=al==='left'?x+8:al==='right'?x+w-8-tw:x+(w-tw)/2;
+          ctx.fillText(val,tx,fcy); x+=w;
+        });
+      }
+      // Border
+      ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=1;
+      ctx.strokeRect(padX,titleH,tableW,colH+(data.products.length+footRows)*rowH);
+      // Footer text
+      ctx.fillStyle='#9ca3af'; ctx.font='10px system-ui,sans-serif';
+      var ed=(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})();
+      ctx.fillText('CAMBO MINI  Export Date: '+ed,padX,H-14);
+      var link=document.createElement('a');
+      link.download='product-sales-'+dateFrom+(dateFrom!==dateTo?'_'+dateTo:'')+'.png';
+      link.href=canvas.toDataURL('image/png'); link.click();
+    }
+
+    document.getElementById('drProdSaleBtn').addEventListener('click', function(){ closeAct(); _openProdSaleMod(); });
+    document.getElementById('drpsClose').addEventListener('click', function(){ _prodSaleMod.classList.remove('show'); });
+    document.getElementById('drpsCloseBtn').addEventListener('click', function(){ _prodSaleMod.classList.remove('show'); });
+    document.getElementById('drpsExportBtn').addEventListener('click', _exportProdSalePNG);
+    _prodSaleMod.addEventListener('click', function(e){ if(e.target===_prodSaleMod)_prodSaleMod.classList.remove('show'); });
 
     /* ── Shared: build rows per day (all dates in range, even empty ones) ── */
     function buildDayRows() {
