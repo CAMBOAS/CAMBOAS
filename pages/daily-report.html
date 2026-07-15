@@ -1454,6 +1454,7 @@
     document.addEventListener('click', function(e){
       if (!panel.contains(e.target) && e.target !== btn) closeCfg();
     });
+    window.addEventListener('scroll', function(){ closeCfg(); }, true);
   })();
 
   /* ── Actions dropdown ── */
