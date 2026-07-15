@@ -701,7 +701,7 @@ function render(keepPage){
         : '📭 គ្មាន Order ' + (_date.start === _date.end
             ? displayDate(_date.start)
             : displayDate(_date.start) + ' → ' + displayDate(_date.end));
-    tbody.innerHTML = '<tr><td colspan="11" class="ol-empty">' + emptyMsg + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" class="ol-empty">' + emptyMsg + '</td></tr>';
     // Clear mobile card view too
     try { if(typeof window._olRenderCards==='function') window._olRenderCards([], 0); } catch(e){}
     return;
@@ -727,6 +727,7 @@ function render(keepPage){
       +'<td class="ol-customer ol-col-cust">'+esc(o.customer||'—')+'</td>'
       +'<td class="ol-phone ol-col-tel">'+esc(o.phone||'')+'</td>'
       +'<td class="ol-col-prov">'+esc(o.province||'')+'</td>'
+      +'<td class="ol-muted ol-col-delivery-by">'+esc(o.deliveryName||'-')+'</td>'
       +'<td class="ol-col-prod">'+ptxt+'</td>'
       +'<td class="ol-muted ol-col-page">'+esc(o.page||o.pages||'')+'</td>'
       +'<td class="ol-muted ol-col-cb2">'+esc(o.closeBy||o.closeby||'')+'</td>'
@@ -737,7 +738,7 @@ function render(keepPage){
       +'</tr>';
   }).join('');
   if(hasMore){
-    rowHtml += '<tr><td colspan="11" style="text-align:center;padding:14px 0">'
+    rowHtml += '<tr><td colspan="12" style="text-align:center;padding:14px 0">'
       +'<button onclick="window.olLoadMore()" style="padding:8px 24px;border-radius:20px;border:1px solid rgba(139,92,246,.4);background:rgba(139,92,246,.12);color:#a78bfa;font-size:13px;font-weight:600;cursor:pointer">'
       +'បន្ថែម... ('+(rows.length-_olRenderCount)+' នៅសល់)'
       +'</button></td></tr>';
