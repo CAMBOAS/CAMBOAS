@@ -510,6 +510,30 @@
   .drps-tr-foot .drps-td-name,.drps-tr-foot .drps-td-nm { color:#6b7280 !important }
   .drps-tr-foot .drps-td-num { color:var(--muted) }
 
+  /* ── Table Column Settings ── */
+  .dr-tbl-cfg-btn { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; border:1px solid rgba(148,163,200,.15); background:none; color:var(--muted); cursor:pointer; transition:all .15s; flex-shrink:0 }
+  .dr-tbl-cfg-btn:hover,.dr-tbl-cfg-btn.open { background:rgba(139,92,246,.1); border-color:rgba(139,92,246,.35); color:#a78bfa }
+  [data-theme="light"] .dr-tbl-cfg-btn:hover,[data-theme="light"] .dr-tbl-cfg-btn.open { background:rgba(109,40,217,.07); border-color:rgba(109,40,217,.25); color:#7c3aed }
+  .dr-tbl-cfg-panel { position:fixed; z-index:9999; background:#12172a; border:1px solid rgba(139,92,246,.25); border-radius:14px; padding:16px 18px 14px; width:290px; box-shadow:0 16px 48px rgba(0,0,0,.55); display:none }
+  .dr-tbl-cfg-panel.show { display:block }
+  [data-theme="light"] .dr-tbl-cfg-panel { background:#fff; border-color:rgba(109,40,217,.15); box-shadow:0 8px 32px rgba(0,0,0,.14) }
+  .dr-cfg-title { font-size:11px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin-bottom:12px }
+  .dr-cfg-sec { margin-bottom:12px }
+  .dr-cfg-sec-lbl { font-size:10px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); opacity:.55; margin-bottom:6px }
+  .dr-cfg-chips { display:flex; flex-wrap:wrap; gap:5px }
+  .dr-cfg-chip { display:inline-flex; align-items:center; gap:5px; height:26px; padding:0 10px; border-radius:20px; font-size:11px; font-weight:600; font-family:inherit; cursor:pointer; transition:all .12s; border:1px solid rgba(148,163,200,.18); background:transparent; color:var(--muted); white-space:nowrap }
+  .dr-cfg-chip.on { background:rgba(139,92,246,.15); border-color:rgba(139,92,246,.4); color:#c4b5fd }
+  [data-theme="light"] .dr-cfg-chip.on { background:rgba(109,40,217,.08); border-color:rgba(109,40,217,.25); color:#6d28d9 }
+  .dr-cfg-chip.on:hover { background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.3); color:#f87171 }
+  .dr-cfg-chip:not(.on):hover { border-color:rgba(139,92,246,.4); color:#a78bfa }
+  [data-theme="light"] .dr-cfg-chip:not(.on):hover { color:#7c3aed; border-color:rgba(109,40,217,.3) }
+  .dr-cfg-num { display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px; border-radius:50%; background:rgba(139,92,246,.3); color:#e9d5ff; font-size:9px; font-weight:800; padding:0 2px }
+  [data-theme="light"] .dr-cfg-num { background:rgba(109,40,217,.15); color:#6d28d9 }
+  .dr-cfg-reset { display:block; width:100%; padding:6px 10px; border-radius:8px; border:1px solid rgba(148,163,200,.13); background:transparent; color:var(--muted); font-size:11px; font-weight:600; font-family:inherit; cursor:pointer; margin-top:6px; transition:background .12s; text-align:center }
+  .dr-cfg-reset:hover { background:rgba(148,163,200,.08) }
+  .dr-cfg-divider { border:none; border-top:1px solid rgba(148,163,200,.1); margin:10px 0 10px }
+  .dr-tbl-cfg-panel { max-height:80vh; overflow-y:auto }
+
   /* ── Skeleton ── */
   .dr-skeleton { animation:dr-pulse 1.5s ease-in-out infinite }
   @keyframes dr-pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
@@ -644,6 +668,9 @@
               </button>
             </div>
           </div>
+          <button class="dr-tbl-cfg-btn" id="drTblCfgBtn" title="Table Column Settings" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
           <div id="drOrderList">
             <div class="dr-orders-empty">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -678,6 +705,74 @@
   var dateTo         = '';
   var searchQuery    = '';
   var _dataReady     = false;
+
+  /* ── Table Column Definitions ── */
+  var _DR_TABLE_COLS = [
+    { id:'cust',    label:'Customer', vis:true,  order:0,
+      thCls:'dr-col-cust',
+      thHtml:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Customer',
+      tdHtml:function(o){ return '<td class="dr-col-cust"><span class="dr-tc-cust">'+(o.customer?'<span>'+_esc(o.customer)+'</span>':'<em style="opacity:.5">—</em>')+'</span></td>'; }
+    },
+    { id:'phone',   label:'Phone', vis:true,  order:1,
+      thCls:'dr-col-phone',
+      thHtml:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Phone',
+      tdHtml:function(o){ return '<td class="dr-col-phone"><span class="dr-tc-phone">'+(o.phone?_esc(o.phone):'—')+'</span></td>'; }
+    },
+    { id:'prod',    label:'Product', vis:true,  order:2,
+      thCls:'dr-col-prod',
+      thHtml:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Product',
+      tdHtml:function(o){ var ps=o.products||[],f=ps[0]?_esc(ps[0].name):'—',m=ps.length>1?'<span class="dr-tc-prod-more">+'+(ps.length-1)+' item'+(ps.length-1>1?'s':'')+'</span>':''; return '<td class="dr-col-prod"><span class="dr-tc-prod-main">'+f+'</span>'+m+'</td>'; }
+    },
+    { id:'page',    label:'Pages', vis:true,  order:3,
+      thCls:'dr-col-page',
+      thHtml:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Pages',
+      tdHtml:function(o){ return '<td class="dr-col-page">'+(o.page?'<span class="dr-tc-page">'+_esc(o.page)+'</span>':'—')+'</td>'; }
+    },
+    { id:'closeby', label:'CloseBy', vis:true,  order:4,
+      thCls:'dr-col-closeby',
+      thHtml:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>CloseBy',
+      tdHtml:function(o){ return '<td class="dr-col-closeby" style="font-size:12px;color:var(--muted)">'+_esc(o.closeBy||o.closeby||'—')+'</td>'; }
+    },
+    { id:'delfee',  label:'Delivery', vis:true,  order:5,
+      thCls:'dr-col-delfee',
+      thHtml:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Delivery',
+      tdHtml:function(o){ return '<td class="dr-col-delfee" style="font-size:12px;color:var(--muted)">'+(Number(o.deliveryFee||0)>0?'$'+Number(o.deliveryFee).toFixed(2):'—')+'</td>'; }
+    },
+    { id:'tot',     label:'Total', vis:true,  order:6,
+      thCls:'dr-col-tot', thStyle:' style="text-align:right"',
+      thHtml:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Total',
+      tdHtml:function(o){ var t=calcOrderTotal(o); return '<td class="dr-col-tot"><span class="dr-tc-tot">'+fmtMoneyFull(t)+'</span></td>'; }
+    },
+    { id:'date',    label:'Date', vis:true,  order:7,
+      thCls:'dr-col-date',
+      thHtml:'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Date',
+      tdHtml:function(o){ return '<td class="dr-col-date">'+fmtDate(CamboOrdersData.toYMD(o.date))+'</td>'; }
+    },
+  ];
+  function _esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function _visCols(){ return _DR_TABLE_COLS.filter(function(c){ return c.vis; }).sort(function(a,b){ return a.order-b.order; }); }
+
+  var _DR_DETAIL_FIELDS = [
+    { id:'status',   label:'Status',    vis:true  },
+    { id:'province', label:'Province',  vis:true  },
+    { id:'delivery', label:'Delivery',  vis:true  },
+    { id:'delfee',   label:'Del. Fee',  vis:true  },
+    { id:'payment',  label:'Payment',   vis:true  },
+    { id:'closeby',  label:'Close By',  vis:true  },
+    { id:'receipt',  label:'Receipt #', vis:true  },
+    { id:'note',     label:'Note',      vis:true  },
+  ];
+  function _visDetailFields(){ return _DR_DETAIL_FIELDS.filter(function(f){ return f.vis; }); }
+  function _renderDetailField(fid, o) {
+    if (fid === 'status')   return o.status      ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ស្ថានភាព</div><div class="dr-meta-val"><span class="dr-tc-badge '+statusClass(o.status)+'">'+esc(o.status)+'</span></div></div>' : '';
+    if (fid === 'province') return o.province    ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ខេត្ត</div><div class="dr-meta-val">'+esc(o.province)+'</div></div>' : '';
+    if (fid === 'delivery') return o.deliveryName? '<div class="dr-meta-item"><div class="dr-meta-lbl">ដឹកជញ្ជូន</div><div class="dr-meta-val">'+esc(o.deliveryName)+'</div></div>' : '';
+    if (fid === 'delfee')   return o.deliveryFee ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ថ្លៃដឹក</div><div class="dr-meta-val">$'+Number(o.deliveryFee).toFixed(2)+'</div></div>' : '';
+    if (fid === 'payment')  return o.payment     ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ការទូទាត់</div><div class="dr-meta-val">'+esc(o.payment)+'</div></div>' : '';
+    if (fid === 'closeby')  return o.closeBy     ? '<div class="dr-meta-item"><div class="dr-meta-lbl">CloseBy</div><div class="dr-meta-val">'+esc(o.closeBy)+'</div></div>' : '';
+    if (fid === 'receipt')  return o.receiptNo   ? '<div class="dr-meta-item"><div class="dr-meta-lbl">លេខប៉ុង</div><div class="dr-meta-val">#'+esc(o.receiptNo)+'</div></div>' : '';
+    return '';
+  }
 
   /* ── Helpers ── */
   function pad(n) { return String(n).padStart(2,'0'); }
@@ -1038,34 +1133,24 @@
         '</div>';
       }).join('') : '<div style="font-size:12px;color:var(--muted);padding:6px 0">គ្មានផលិតផល</div>';
 
-      var metaHtml = [
-        o.province     ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ខេត្ត</div><div class="dr-meta-val">' + esc(o.province) + '</div></div>' : '',
-        o.deliveryName ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ដឹកជញ្ជូន</div><div class="dr-meta-val">' + esc(o.deliveryName) + '</div></div>' : '',
-        o.deliveryFee  ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ថ្លៃដឹក</div><div class="dr-meta-val">$' + Number(o.deliveryFee).toFixed(2) + '</div></div>' : '',
-        o.payment      ? '<div class="dr-meta-item"><div class="dr-meta-lbl">ការទូទាត់</div><div class="dr-meta-val">' + esc(o.payment) + '</div></div>' : '',
-        o.closeBy      ? '<div class="dr-meta-item"><div class="dr-meta-lbl">CloseBy</div><div class="dr-meta-val">' + esc(o.closeBy) + '</div></div>' : '',
-        o.receiptNo    ? '<div class="dr-meta-item"><div class="dr-meta-lbl">លេខប៉ុង</div><div class="dr-meta-val">#' + esc(o.receiptNo) + '</div></div>' : '',
-      ].filter(Boolean).join('');
+      var _vdf = _visDetailFields();
+      var metaHtml = _vdf.filter(function(f){ return f.id !== 'note'; })
+        .map(function(f){ return _renderDetailField(f.id, o); })
+        .filter(Boolean).join('');
+      var noteHtml = _vdf.some(function(f){ return f.id === 'note'; }) && o.note
+        ? '<div class="dr-note" style="margin-top:10px">📝 ' + esc(o.note) + '</div>' : '';
 
-      var noteHtml = o.note ? '<div class="dr-note" style="margin-top:10px">📝 ' + esc(o.note) + '</div>' : '';
-
+      var _vc = _visCols();
       var mainRow =
         '<tr class="dr-tr-main" id="dr-row-' + i + '" onclick="drToggleRow(' + i + ')">' +
           '<td class="dr-col-num dr-tc-num">' + (i+1) + '</td>' +
-          '<td class="dr-col-cust"><span class="dr-tc-cust">' + (o.customer ? esc(o.customer) : '<em style="opacity:.5">—</em>') + '</span></td>' +
-          '<td class="dr-col-phone"><span class="dr-tc-phone">' + (o.phone ? esc(o.phone) : '—') + '</span></td>' +
-          '<td class="dr-col-prod"><span class="dr-tc-prod-main">' + first + '</span>' + more + '</td>' +
-          '<td class="dr-col-page">' + (o.page ? '<span class="dr-tc-page">' + esc(o.page) + '</span>' : '—') + '</td>' +
-          '<td class="dr-col-closeby" style="font-size:12px;color:var(--muted)">' + esc(o.closeBy||o.closeby||'—') + '</td>' +
-          '<td class="dr-col-delfee" style="font-size:12px;color:var(--muted)">' + (Number(o.deliveryFee||0) > 0 ? '$' + Number(o.deliveryFee).toFixed(2) : '—') + '</td>' +
-          '<td class="dr-col-tot"><span class="dr-tc-tot">' + fmtMoneyFull(total) + '</span></td>' +
-          '<td class="dr-col-date">' + fmtDate(CamboOrdersData.toYMD(o.date)) + '</td>' +
+          _vc.map(function(c){ return c.tdHtml(o); }).join('') +
           '<td style="width:30px;text-align:center"><svg class="dr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></td>' +
         '</tr>';
 
       var detailRow =
         '<tr class="dr-tr-detail" id="dr-detail-' + i + '">' +
-          '<td colspan="10">' +
+          '<td colspan="' + (_vc.length + 2) + '">' +
             (metaHtml ? '<div class="dr-meta-row">' + metaHtml + '</div>' : '') +
             '<div class="dr-items-title">ផលិតផល</div>' +
             itemsHtml +
@@ -1090,16 +1175,10 @@
   }
 
   function drTableHead() {
+    var vis = _visCols();
     return '<thead><tr>' +
       '<th class="dr-col-num"><span class="dr-th-inner">#</span></th>' +
-      '<th class="dr-col-cust"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Customer</span></th>' +
-      '<th class="dr-col-phone"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Phone</span></th>' +
-      '<th class="dr-col-prod"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Product</span></th>' +
-      '<th class="dr-col-page"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Pages</span></th>' +
-      '<th class="dr-col-closeby"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>CloseBy</span></th>' +
-      '<th class="dr-col-delfee"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Delivery</span></th>' +
-      '<th class="dr-col-tot" style="text-align:right"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Total</span></th>' +
-      '<th class="dr-col-date"><span class="dr-th-inner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Date</span></th>' +
+      vis.map(function(c){ return '<th class="'+c.thCls+'"'+(c.thStyle||'')+'><span class="dr-th-inner">'+c.thHtml+'</span></th>'; }).join('') +
       '<th style="width:30px"></th>' +
     '</tr></thead>';
   }
@@ -1239,6 +1318,130 @@
 
   /* ── Refresh button ── */
   document.getElementById('drRefreshBtn').addEventListener('click', loadData);
+
+  /* ── Table Column Settings Panel ── */
+  (function(){
+    var btn   = document.getElementById('drTblCfgBtn');
+    var panel = document.createElement('div');
+    panel.className = 'dr-tbl-cfg-panel';
+    panel.id = 'drTblCfgPanel';
+    document.body.appendChild(panel);
+
+    var _DEFAULT = [0,1,2,3,4,5,6,7];
+
+    function renderCfgPanel() {
+      var vis = _visCols();
+      var hid = _DR_TABLE_COLS.filter(function(c){ return !c.vis; });
+      panel.innerHTML =
+        '<div class="dr-cfg-title">⚙ Table Column Settings</div>' +
+        '<div class="dr-cfg-sec">' +
+          '<div class="dr-cfg-sec-lbl">Visible — click to hide</div>' +
+          '<div class="dr-cfg-chips" id="drCfgVis">' +
+            vis.map(function(c, idx){
+              return '<button class="dr-cfg-chip on" data-cid="'+c.id+'">' +
+                '<span class="dr-cfg-num">'+(idx+1)+'</span>'+c.label+
+              '</button>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+        (hid.length ?
+          '<div class="dr-cfg-sec">' +
+            '<div class="dr-cfg-sec-lbl">Hidden — click to show</div>' +
+            '<div class="dr-cfg-chips" id="drCfgHid">' +
+              hid.map(function(c){
+                return '<button class="dr-cfg-chip" data-cid="'+c.id+'">+ '+c.label+'</button>';
+              }).join('') +
+            '</div>' +
+          '</div>'
+        : '') +
+        '<hr class="dr-cfg-divider">' +
+        '<div class="dr-cfg-title" style="margin-bottom:10px">Detail Row Fields</div>' +
+        '<div class="dr-cfg-sec">' +
+          '<div class="dr-cfg-sec-lbl">Visible — click to hide</div>' +
+          '<div class="dr-cfg-chips" id="drCfgDetVis">' +
+            _DR_DETAIL_FIELDS.filter(function(f){ return f.vis; }).map(function(f){
+              return '<button class="dr-cfg-chip on" data-dfid="'+f.id+'">'+f.label+'</button>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+        (_DR_DETAIL_FIELDS.some(function(f){ return !f.vis; }) ?
+          '<div class="dr-cfg-sec">' +
+            '<div class="dr-cfg-sec-lbl">Hidden — click to show</div>' +
+            '<div class="dr-cfg-chips" id="drCfgDetHid">' +
+              _DR_DETAIL_FIELDS.filter(function(f){ return !f.vis; }).map(function(f){
+                return '<button class="dr-cfg-chip" data-dfid="'+f.id+'">+ '+f.label+'</button>';
+              }).join('') +
+            '</div>' +
+          '</div>' : '') +
+        '<button class="dr-cfg-reset" id="drCfgReset">↺ Reset all</button>';
+
+      panel.querySelectorAll('#drCfgVis .dr-cfg-chip').forEach(function(chip){
+        chip.addEventListener('click', function(){
+          var vis2 = _visCols();
+          if (vis2.length <= 1) return;
+          var col = _DR_TABLE_COLS.find(function(c){ return c.id === chip.getAttribute('data-cid'); });
+          if (col) { col.vis = false; renderCfgPanel(); renderOrders(); }
+        });
+      });
+
+      panel.querySelectorAll('#drCfgHid .dr-cfg-chip').forEach(function(chip){
+        chip.addEventListener('click', function(){
+          var col = _DR_TABLE_COLS.find(function(c){ return c.id === chip.getAttribute('data-cid'); });
+          if (col) {
+            col.vis = true;
+            var maxOrd = Math.max.apply(null, _visCols().map(function(c){ return c.order; }));
+            col.order = maxOrd + 1;
+            renderCfgPanel(); renderOrders();
+          }
+        });
+      });
+
+      var detVis = panel.querySelectorAll('#drCfgDetVis .dr-cfg-chip');
+      detVis.forEach(function(chip){
+        chip.addEventListener('click', function(){
+          var vdf = _DR_DETAIL_FIELDS.filter(function(f){ return f.vis; });
+          if (vdf.length <= 1) return;
+          var fld = _DR_DETAIL_FIELDS.find(function(f){ return f.id === chip.getAttribute('data-dfid'); });
+          if (fld) { fld.vis = false; renderCfgPanel(); renderOrders(); }
+        });
+      });
+      var detHid = panel.querySelectorAll('#drCfgDetHid .dr-cfg-chip');
+      detHid.forEach(function(chip){
+        chip.addEventListener('click', function(){
+          var fld = _DR_DETAIL_FIELDS.find(function(f){ return f.id === chip.getAttribute('data-dfid'); });
+          if (fld) { fld.vis = true; renderCfgPanel(); renderOrders(); }
+        });
+      });
+
+      document.getElementById('drCfgReset').addEventListener('click', function(){
+        _DR_TABLE_COLS.forEach(function(c, i){ c.vis = true; c.order = _DEFAULT[i]; });
+        _DR_DETAIL_FIELDS.forEach(function(f){ f.vis = true; });
+        renderCfgPanel(); renderOrders();
+      });
+    }
+
+    function openCfg() {
+      renderCfgPanel();
+      var r = btn.getBoundingClientRect(), w = 290;
+      var left = r.right - w; if (left < 8) left = 8;
+      panel.style.top  = (r.bottom + 6) + 'px';
+      panel.style.left = left + 'px';
+      panel.classList.add('show');
+      btn.classList.add('open');
+    }
+    function closeCfg() {
+      panel.classList.remove('show');
+      btn.classList.remove('open');
+    }
+
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      panel.classList.contains('show') ? closeCfg() : openCfg();
+    });
+    document.addEventListener('click', function(e){
+      if (!panel.contains(e.target) && e.target !== btn) closeCfg();
+    });
+  })();
 
   /* ── Actions dropdown ── */
   (function(){
