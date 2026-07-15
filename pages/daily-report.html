@@ -707,6 +707,7 @@
   var dateTo         = '';
   var searchQuery    = '';
   var _dataReady     = false;
+  var _openRows      = new Set();
 
   /* ── Table Column Definitions ── */
   var _DR_TABLE_COLS = [
@@ -1189,9 +1190,18 @@
     var main   = document.getElementById('dr-row-' + i);
     var detail = document.getElementById('dr-detail-' + i);
     if (!main) return;
-    main.classList.toggle('open');
+    var opening = main.classList.toggle('open');
     detail.classList.toggle('open');
+    if (opening) _openRows.add(i); else _openRows.delete(i);
   };
+
+  function _reOpenRows(){
+    _openRows.forEach(function(i){
+      var main   = document.getElementById('dr-row-' + i);
+      var detail = document.getElementById('dr-detail-' + i);
+      if (main && detail){ main.classList.add('open'); detail.classList.add('open'); }
+    });
+  }
 
   /* ── Product Summary ── */
   var _drProdList = [];
@@ -1404,14 +1414,14 @@
           var vdf = _DR_DETAIL_FIELDS.filter(function(f){ return f.vis; });
           if (vdf.length <= 1) return;
           var fld = _DR_DETAIL_FIELDS.find(function(f){ return f.id === chip.getAttribute('data-dfid'); });
-          if (fld) { fld.vis = false; renderCfgPanel(); renderOrders(); }
+          if (fld) { fld.vis = false; renderCfgPanel(); renderOrders(); _reOpenRows(); }
         });
       });
       var detHid = panel.querySelectorAll('#drCfgDetHid .dr-cfg-chip');
       detHid.forEach(function(chip){
         chip.addEventListener('click', function(){
           var fld = _DR_DETAIL_FIELDS.find(function(f){ return f.id === chip.getAttribute('data-dfid'); });
-          if (fld) { fld.vis = true; renderCfgPanel(); renderOrders(); }
+          if (fld) { fld.vis = true; renderCfgPanel(); renderOrders(); _reOpenRows(); }
         });
       });
 
