@@ -632,23 +632,26 @@ function updateStats(rows){
   var t   = rows.length;
   var rev = rows.reduce(function(s,o){ return s+orderTotal(o); }, 0);
 
-  // Top Agent — closeBy with most orders in filtered rows
-  var agentMap = {};
+  // Delivery breakdown — count orders per delivery company
+  var delivMap = {};
   rows.forEach(function(o){
-    var a = (o.closeBy||o.closeby||'').trim();
-    if(!a) return;
-    if(!agentMap[a]) agentMap[a] = { count:0, rev:0 };
-    agentMap[a].count++;
-    agentMap[a].rev += orderTotal(o);
+    var raw = (o.deliveryName||'').trim();
+    if(!raw) return;
+    var d = normalizeDeliveryName(raw) || raw;
+    if(!delivMap[d]) delivMap[d] = 0;
+    delivMap[d]++;
   });
-  var topAgent = '—', topAgentCount = '';
-  Object.keys(agentMap).forEach(function(a){
-    if(topAgent==='—' || agentMap[a].count > agentMap[topAgent].count) topAgent = a;
-  });
-  if(topAgent !== '—'){
-    var d = agentMap[topAgent];
-    topAgentCount = d.count + ' orders · $' + d.rev.toFixed(2);
-  }
+  var delivEntries = Object.keys(delivMap).sort(function(a,b){ return delivMap[b]-delivMap[a]; });
+  var delivHtml = delivEntries.length
+    ? delivEntries.map(function(d){
+        return '<div class="ol-delv-row">'
+          +'<span class="ol-delv-name">'+esc(d)+'</span>'
+          +'<span class="ol-delv-badge">'+delivMap[d]+'</span>'
+        +'</div>';
+      }).join('')
+    : '<span style="font-size:12px;color:var(--muted)">—</span>';
+  var db = $id('olDelivBreakdown');
+  if(db) db.innerHTML = delivHtml;
 
   // Latest customer from filtered rows (respects date/search filter)
   var latestCust = '—', latestPhone = '', latestTotal = '';
@@ -665,8 +668,6 @@ function updateStats(rows){
   $id('olTotal').textContent      = t;
   $id('olRevenue').textContent    = '$'+rev.toFixed(2);
   $id('olFooter').textContent     = 'Showing '+rows.length+' of '+_orders.length+' records';
-  var ta = $id('olTopAgent');      if(ta) ta.textContent = topAgent;
-  var tc = $id('olTopAgentCount'); if(tc) tc.textContent = topAgentCount;
   $id('olLatestCust').textContent = latestCust;
   var ph = $id('olLatestPhone'); if(ph) ph.textContent = latestPhone;
   var lt = $id('olLatestTotal'); if(lt) lt.textContent = latestTotal;

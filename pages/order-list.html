@@ -140,6 +140,13 @@
   .ol-s-green .ol-stat-n{color:#22c55e}
   .ol-s-blue .ol-stat-n{color:#7dd3fc}
   [data-theme="light"] .ol-s-blue .ol-stat-n{color:#4f46e5}
+  .ol-delv-list{display:flex;flex-direction:column;gap:3px;overflow-y:auto;max-height:72px;padding-right:2px}
+  .ol-delv-list::-webkit-scrollbar{width:3px}
+  .ol-delv-list::-webkit-scrollbar-thumb{background:rgba(148,163,200,.25);border-radius:2px}
+  .ol-delv-row{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0}
+  .ol-delv-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+  .ol-delv-badge{font-size:11px;font-weight:800;color:#7dd3fc;flex-shrink:0;background:rgba(125,211,252,.1);padding:1px 8px;border-radius:20px}
+  [data-theme="light"] .ol-delv-badge{color:#4f46e5;background:rgba(79,70,229,.08)}
 
   /* ── Auto-refresh toast (fixed position) ── */
   .ol-new-badge{
@@ -651,10 +658,11 @@
     <div class="ol-stats">
       <div class="ol-stat ol-s-blue"><div class="ol-stat-n" id="olRevenue">$0</div><div class="ol-stat-l">Revenue</div></div>
       <div class="ol-stat"><div class="ol-stat-n" id="olTotal">0</div><div class="ol-stat-l">Total Orders</div></div>
-      <div class="ol-stat ol-s-warn" style="gap:2px" title="Top Agent">
-        <div class="ol-stat-n ol-stat-cust" id="olTopAgent">—</div>
-        <div id="olTopAgentCount" style="font-size:11px;color:var(--muted);font-weight:500"></div>
-        <div class="ol-stat-l">Top CloseBy Sale</div>
+      <div class="ol-stat" title="Delivery Breakdown">
+        <div class="ol-stat-l" style="margin-top:0;margin-bottom:7px">Delivery</div>
+        <div id="olDelivBreakdown" class="ol-delv-list">
+          <span style="font-size:12px;color:var(--muted)">—</span>
+        </div>
       </div>
       <div class="ol-stat ol-s-green" title="Latest Customer" style="gap:2px">
         <div class="ol-stat-n ol-stat-cust" id="olLatestCust">—</div>
