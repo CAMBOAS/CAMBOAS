@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
-  <title>Daily Report - CAMBO MINI</title>
+  <title>Sales Report - CAMBO MINI</title>
   <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="shortcut icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
   <link rel="apple-touch-icon" href="../images/logo/LOGO%20CAMBOMINI.png">
@@ -604,7 +604,7 @@
         </article>
       </section>
 
-      <!-- Product Summary (full-width, above Daily Report) -->
+      <!-- Product Summary (full-width, above Sales Report) -->
       <section class="glass-card dr-prod-card">
         <div class="dr-prod-head">
           <div>
@@ -623,8 +623,8 @@
       <!-- Filter Bar -->
       <section class="glass-card dr-filter">
         <div class="dr-filter-left">
-          <h2>📊 Daily Report</h2>
-          <p id="drSubtitle">របាយការណ៍ប្រចាំថ្ងៃ — ជ្រើសរើសកាលបរិច្ឆេទ និង Page</p>
+          <h2>📊 Sales Report</h2>
+          <p id="drSubtitle">របាយការណ៍លក់ — ជ្រើសរើសកាលបរិច្ឆេទ និង Page</p>
         </div>
         <div class="dr-filter-right">
           <button class="dr-refresh" id="drRefreshBtn">
@@ -1469,8 +1469,7 @@
     actDrop.innerHTML =
       '<button class="dr-act-item" id="drProdSaleBtn">'+svgTbl+' Product Sales by Day</button>' +
       '<div style="height:1px;background:rgba(148,163,200,.1);margin:4px 2px"></div>' +
-      '<button class="dr-act-item" id="drExportImg">'+svgDl+' Export as Image</button>' +
-      '<button class="dr-act-item" id="drExportPdf">'+svgPdf+' Export as PDF</button>';
+      '<button class="dr-act-item" id="drExportImg">'+svgDl+' Export Report</button>';
     document.body.appendChild(actDrop);
 
     function openAct() {
@@ -1528,6 +1527,10 @@
             '<button class="drps-btn-exp" id="drpsExportBtn">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
               ' Export PNG' +
+            '</button>' +
+            '<button class="drps-btn-exp" id="drpsPdfBtn" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);color:#f87171">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+              ' Export PDF' +
             '</button>' +
             '<button class="drps-btn-cls" id="drpsCloseBtn">Close</button>' +
           '</div>' +
@@ -1733,10 +1736,60 @@
       link.href=canvas.toDataURL('image/png'); link.click();
     }
 
+    function _exportProdSalePDF() {
+      var data = _buildProdData();
+      if (!data.products.length) return;
+      var vis = _PROD_COLS.filter(function(c){ return c.vis; });
+      var pageTxt = selectedPages.length ? selectedPages.join(', ') : 'All Pages';
+      var dateTxt = dateFrom === dateTo ? fmtDate(dateFrom) : fmtDate(dateFrom) + ' → ' + fmtDate(dateTo);
+      var thHtml = vis.map(function(c){
+        var al = c.id==='name' ? 'left' : c.id==='revenue'||c.id==='avgprice' ? 'right' : 'center';
+        return '<th style="text-align:'+al+'">'+c.label+'</th>';
+      }).join('');
+      var tbHtml = data.products.map(function(p, i){
+        var tds = vis.map(function(c){
+          var al = c.id==='name' ? 'left' : c.id==='revenue'||c.id==='avgprice' ? 'right' : 'center';
+          return '<td style="text-align:'+al+'"'+( c.id==='revenue'||c.id==='avgprice' ? ' class="rev"':'')+'>'+_cellVal(c,p,i)+'</td>';
+        }).join('');
+        return '<tr style="background:'+(i%2===0?'#fff':'#f9fafb')+'">'+tds+'</tr>';
+      }).join('');
+      var footHtml = '';
+      if (_showTotal) {
+        var ftds = vis.map(function(c){
+          var al = c.id==='name' ? 'left' : c.id==='revenue'||c.id==='avgprice' ? 'right' : 'center';
+          return '<td class="foot" style="text-align:'+al+'">'+_footVal(c,data.totals)+'</td>';
+        }).join('');
+        footHtml = '<tfoot><tr>'+ftds+'</tr></tfoot>';
+      }
+      var ed=(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})();
+      var win=window.open('','_blank','width=800,height=900');
+      win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Product Sales by Day</title><style>' +
+        '*{box-sizing:border-box;margin:0;padding:0}' +
+        'body{font-family:system-ui,sans-serif;padding:32px;color:#111827;background:#fff}' +
+        'h1{font-size:22px;font-weight:700;margin-bottom:4px}' +
+        '.sub{font-size:12px;color:#6b7280;margin-bottom:20px}' +
+        'table{width:100%;border-collapse:collapse;font-size:13px}' +
+        'thead tr{background:#8b5cf6}thead th{color:#fff;padding:10px 14px;font-weight:700}' +
+        'td{padding:9px 14px;border-bottom:1px solid #e5e7eb;color:#374151}' +
+        'td.rev{font-weight:700;color:#111827}' +
+        'tfoot td.foot{padding:9px 14px;font-weight:800;color:#111827;border-top:2px solid #d1d5db;background:#f3f4f6}' +
+        '.footer{margin-top:20px;font-size:10px;color:#9ca3af}' +
+        '@media print{@page{margin:18mm}body{padding:0}}' +
+        '</style></head><body>' +
+        '<h1>Product Sales by Day</h1>' +
+        '<div class="sub">'+esc(dateTxt)+'  ·  Page: '+esc(pageTxt)+'</div>' +
+        '<table><thead><tr>'+thHtml+'</tr></thead><tbody>'+tbHtml+'</tbody>'+footHtml+'</table>' +
+        '<div class="footer">CAMBO MINI &nbsp; Export Date: '+ed+'</div>' +
+        '<script>window.onload=function(){setTimeout(function(){window.print();},300);}<\/script>' +
+        '</body></html>');
+      win.document.close();
+    }
+
     document.getElementById('drProdSaleBtn').addEventListener('click', function(){ closeAct(); _openProdSaleMod(); });
     document.getElementById('drpsClose').addEventListener('click', function(){ _prodSaleMod.classList.remove('show'); });
     document.getElementById('drpsCloseBtn').addEventListener('click', function(){ _prodSaleMod.classList.remove('show'); });
     document.getElementById('drpsExportBtn').addEventListener('click', _exportProdSalePNG);
+    document.getElementById('drpsPdfBtn').addEventListener('click', _exportProdSalePDF);
     _prodSaleMod.addEventListener('click', function(e){ if(e.target===_prodSaleMod)_prodSaleMod.classList.remove('show'); });
 
     /* ── Shared: build rows per day (all dates in range, even empty ones) ── */
@@ -1788,7 +1841,7 @@
       return out + '…';
     }
 
-    /* ── Export Daily Report PNG Modal ── */
+    /* ── Export Sales Report PNG Modal ── */
     var _DR_COLS = [
       { id:'date',    label:'Date',     vis:true,  pinned:true  },
       { id:'orders',  label:'Orders',   vis:true,  pinned:false },
@@ -1806,7 +1859,7 @@
       '<div class="drps-modal">' +
         '<div class="drps-head">' +
           '<div>' +
-            '<div class="drps-title">📅 Export Daily Report as PNG</div>' +
+            '<div class="drps-title">📅 Export Sales Report as PNG</div>' +
             '<div class="drps-meta" id="drExpMeta"></div>' +
           '</div>' +
           '<button class="drps-close" id="drExpClose" title="Close">×</button>' +
@@ -1819,6 +1872,10 @@
             '<button class="drps-btn-exp" id="drExpExportBtn">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
               ' Export PNG' +
+            '</button>' +
+            '<button class="drps-btn-exp" id="drExpPdfBtn" style="background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.35);color:#f87171">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+              ' Export PDF' +
             '</button>' +
             '<button class="drps-btn-cls" id="drExpCloseBtn">Close</button>' +
           '</div>' +
@@ -1929,7 +1986,7 @@
       ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
       // Title
       ctx.fillStyle='#1a1a2e'; ctx.font='bold 24px system-ui,sans-serif';
-      ctx.fillText('Daily Report', padX, 56);
+      ctx.fillText('Sales Report', padX, 56);
       // Date — directly below title
       var dTxt='Date: '+(dateFrom===dateTo?fmtDate(dateFrom):fmtDate(dateFrom)+' → '+fmtDate(dateTo));
       ctx.fillStyle='#374151'; ctx.font='600 13px system-ui,sans-serif';
@@ -1991,58 +2048,56 @@
       var ed=(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})();
       ctx.fillText('CAMBO MINI  Export Date: '+ed, padX, H-16);
       var link=document.createElement('a');
-      link.download='daily-report-'+dateFrom+(dateFrom!==dateTo?'_'+dateTo:'')+'.png';
+      link.download='sales-report-'+dateFrom+(dateFrom!==dateTo?'_'+dateTo:'')+'.png';
       link.href=canvas.toDataURL('image/png',1.0); link.click();
+    }
+
+    function _doDrExportPDF() {
+      var rows = buildDayRows();
+      if (!rows.length) return;
+      var vis  = _DR_COLS.filter(function(c){ return c.vis; });
+      var pageTxt = selectedPages.length ? selectedPages.join(', ') : 'All Pages';
+      var dateTxt = dateFrom === dateTo ? fmtDate(dateFrom) : fmtDate(dateFrom) + ' → ' + fmtDate(dateTo);
+      var thHtml = vis.map(function(c){ return '<th>'+c.label+'</th>'; }).join('');
+      var tbHtml = rows.map(function(row, i){
+        var tds = vis.map(function(c){ return '<td'+(c.id==='revenue'||c.id==='avgord'||c.id==='avgitem'?' class="rev"':'')+'>'+_drCellVal(c,row)+'</td>'; }).join('');
+        return '<tr style="background:'+(i%2===0?'#fff':'#f9fafb')+'">'+tds+'</tr>';
+      }).join('');
+      var footHtml = '';
+      if (_drShowTotal) {
+        var tds = vis.map(function(c){ return '<td class="foot">'+_drFootVal(c,rows)+'</td>'; }).join('');
+        footHtml = '<tfoot><tr>'+tds+'</tr></tfoot>';
+      }
+      var ed=(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})();
+      var win = window.open('','_blank','width=760,height=900');
+      win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Sales Report</title><style>' +
+        '*{box-sizing:border-box;margin:0;padding:0}' +
+        'body{font-family:system-ui,sans-serif;padding:32px;color:#111827;background:#fff}' +
+        'h1{font-size:22px;font-weight:700;margin-bottom:4px}' +
+        '.sub{font-size:12px;color:#6b7280;margin-bottom:20px}' +
+        'table{width:100%;border-collapse:collapse;font-size:13px}' +
+        'thead tr{background:#4285f4}thead th{color:#fff;padding:11px 14px;text-align:left;font-weight:700}' +
+        'td{padding:9px 14px;border-bottom:1px solid #e5e7eb;color:#374151}' +
+        'td.rev{font-weight:700;color:#111827}' +
+        'tfoot td.foot{padding:9px 14px;font-weight:800;color:#111827;border-top:2px solid #d1d5db;background:#f3f4f6}' +
+        '.footer{margin-top:20px;font-size:10px;color:#9ca3af}' +
+        '@media print{@page{margin:18mm}body{padding:0}}' +
+        '</style></head><body>' +
+        '<h1>Sales Report</h1>' +
+        '<div class="sub">'+esc(dateTxt)+'  ·  Page: '+esc(pageTxt)+'</div>' +
+        '<table><thead><tr>'+thHtml+'</tr></thead><tbody>'+tbHtml+'</tbody>'+footHtml+'</table>' +
+        '<div class="footer">CAMBO MINI &nbsp; Export Date: '+ed+'</div>' +
+        '<script>window.onload=function(){setTimeout(function(){window.print();},300);}<\/script>' +
+        '</body></html>');
+      win.document.close();
     }
 
     document.getElementById('drExportImg').addEventListener('click', function(){ closeAct(); _openDrExportModal(); });
     document.getElementById('drExpClose').addEventListener('click', function(){ _drExpMod.classList.remove('show'); });
     document.getElementById('drExpCloseBtn').addEventListener('click', function(){ _drExpMod.classList.remove('show'); });
     document.getElementById('drExpExportBtn').addEventListener('click', _doDrExportPNG);
+    document.getElementById('drExpPdfBtn').addEventListener('click', _doDrExportPDF);
     _drExpMod.addEventListener('click', function(e){ if(e.target===_drExpMod)_drExpMod.classList.remove('show'); });
-
-    /* ── Export PDF (print) ── */
-    document.getElementById('drExportPdf').addEventListener('click', function(){
-      closeAct();
-      var rows = buildDayRows();
-      var r0=rows[0], rN=rows[rows.length-1];
-      var sub = r0 ? (r0.date+(rows.length>1?' -> '+rN.date:'')) : '';
-      sub += '   |   Page: ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
-      var trs = rows.map(function(row,i){
-        return '<tr style="background:'+(i%2===0?'#fff':'#f9fafb')+'">' +
-          '<td>'+row.date+'</td>' +
-          '<td class="num">'+row.orders+'</td>' +
-          '<td class="num">'+row.items+'</td>' +
-          '<td class="num rev">$'+row.revenue.toFixed(2)+'</td>' +
-        '</tr>';
-      }).join('');
-
-      var win=window.open('','_blank','width=700,height=900');
-      win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Daily Report</title><style>' +
-        '*{box-sizing:border-box;margin:0;padding:0}' +
-        'body{font-family:system-ui,sans-serif;padding:32px;color:#111827;background:#fff}' +
-        'h1{font-size:22px;font-weight:700;margin-bottom:4px}' +
-        '.sub{font-size:12px;color:#6b7280;margin-bottom:24px}' +
-        'table{width:100%;border-collapse:collapse;font-size:13px}' +
-        'thead tr{background:#4285f4}' +
-        'thead th{color:#fff;padding:11px 16px;text-align:left;font-size:13px;font-weight:700}' +
-        'td{padding:10px 16px;border-bottom:1px solid #e5e7eb;color:#374151}' +
-        'td.num{text-align:left;font-weight:600}' +
-        'td.rev{color:#111827;font-weight:700}' +
-        '.footer{margin-top:24px;font-size:10px;color:#9ca3af}' +
-        '@media print{@page{margin:20mm}body{padding:0}}' +
-        '</style></head><body>' +
-        '<h1>Daily Report</h1>' +
-        '<div class="sub">'+sub+'</div>' +
-        '<table>' +
-          '<thead><tr><th>Date</th><th>Orders</th><th>Items</th><th>Revenue</th></tr></thead>' +
-          '<tbody>'+trs+'</tbody>' +
-        '</table>' +
-        '<div class="footer">CAMBO MINI &nbsp; Export Date: '+(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})()+'</div>' +
-        '<script>window.onload=function(){setTimeout(function(){window.print();},300);}<\/script>' +
-        '</body></html>');
-      win.document.close();
-    });
   })();
 
   /* ── Spin animation ── */

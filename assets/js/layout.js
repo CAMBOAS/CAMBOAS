@@ -12,7 +12,7 @@
     return {
       'index.html':               { title: t('ផ្ទាំងគ្រប់គ្រង','Dashboard'),    subtitle: t('ទិដ្ឋភាពរួមនៃការលក់ ចំណូល និងសកម្មភាព','Overview of sales, revenue, and live activity') },
       'pages/analytics.html':     { title: t('វិភាគទិន្នន័យ','Analytics'),       subtitle: t('វិភាគស៊ីជម្រៅលើអាជីវកម្មរបស់អ្នក','Deep dive into your business metrics') },
-      'pages/daily-report.html':  { title: t('របាយការណ៍ប្រចាំថ្ងៃ','Daily Report'), subtitle: t('មើលការលក់ប្រចាំថ្ងៃ Orders និង Items','View daily sales, orders and items breakdown') },
+      'pages/sales-report.html':  { title: t('របាយការណ៍លក់','Sales Report'), subtitle: t('មើលការលក់ប្រចាំថ្ងៃ Orders និង Items','View daily sales, orders and items breakdown') },
       'pages/orders-details.html':{ title: t('Smart Orders','Smart Orders'),     subtitle: t('បង្កើតបញ្ជាទិញបានលឿន និងឆ្លាតវៃ','Create orders quickly and smartly') },
       'pages/order-list.html':    { title: t('បញ្ជីបញ្ជាទិញ','Order List'),      subtitle: t('មើល និងគ្រប់គ្រងបញ្ជាទិញទាំងអស់','View and manage all orders in one place') },
       'pages/new-order.html':     { title: t('បញ្ជាទិញថ្មី','New Order'),        subtitle: t('បង្កើតបញ្ជាទិញថ្មី','Create a new order') },
@@ -99,7 +99,7 @@
         <ul class="sb-list">
           ${link('index.html',                ic.dashboard, t('ផ្ទាំងគ្រប់គ្រង','Dashboard'))}
           ${link('pages/analytics.html',      ic.analytics, t('វិភាគទិន្នន័យ','Analytics'))}
-          ${link('pages/daily-report.html',   ic.dailyrpt,  t('របាយការណ៍ប្រចាំថ្ងៃ','Daily Report'))}
+          ${link('pages/sales-report.html',   ic.dailyrpt,  t('របាយការណ៍លក់','Sales Report'))}
           ${link('pages/new-order.html',      ic.neworder,  t('បញ្ជាទិញថ្មី','New Order'))}
           ${link('pages/new-order-2.html',    ic.neworder,  t('បញ្ជាទិញថ្មី II','New Order II'))}
           ${link('pages/order-list.html',     ic.orderlist, t('បញ្ជីបញ្ជាទិញ','Order List'))}
