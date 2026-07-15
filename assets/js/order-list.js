@@ -629,8 +629,9 @@ function getFiltered(){
 /* ── stats ── */
 function updateStats(rows){
   // Stats based on FILTERED rows (not all orders)
-  var t   = rows.length;
-  var rev = rows.reduce(function(s,o){ return s+orderTotal(o); }, 0);
+  var t    = rows.length;
+  var rev  = rows.reduce(function(s,o){ return s+orderTotal(o); }, 0);
+  var items = rows.reduce(function(s,o){ return s+getProds(o).reduce(function(s2,p){ return s2+Number(p.qty||1); },0); }, 0);
 
   // Delivery breakdown — count orders per delivery company
   var delivMap = {};
@@ -666,6 +667,7 @@ function updateStats(rows){
   }
 
   $id('olTotal').textContent      = t;
+  var oi = $id('olItems'); if(oi) oi.textContent = items + ' items';
   $id('olRevenue').textContent    = '$'+rev.toFixed(2);
   $id('olFooter').textContent     = 'Showing '+rows.length+' of '+_orders.length+' records';
   $id('olLatestCust').textContent = latestCust;
