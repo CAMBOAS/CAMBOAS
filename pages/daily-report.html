@@ -1572,75 +1572,218 @@
       return out + '…';
     }
 
-    /* ── Export PNG ── */
-    document.getElementById('drExportImg').addEventListener('click', function(){
-      closeAct();
-      try {
-        var rows = buildDayRows();
-        // Layout constants — white background, blue header like screenshot
-        var scale=2, pad=40, titleH=70, colH=44, rowH=40;
-        var W=560, colDate=180, colOrd=140, colItem=W-colDate-colOrd;
-        var H = titleH + colH + rows.length*rowH + 40;
+    /* ── Export Daily Report PNG Modal ── */
+    var _DR_COLS = [
+      { id:'date',    label:'Date',     vis:true,  pinned:true  },
+      { id:'orders',  label:'Orders',   vis:true,  pinned:false },
+      { id:'items',   label:'Items',    vis:true,  pinned:false },
+      { id:'revenue', label:'Revenue',  vis:true,  pinned:false },
+      { id:'avgord',  label:'Avg$/Ord', vis:false, pinned:false },
+      { id:'avgitem', label:'Avg$/Item',vis:false, pinned:false },
+    ];
+    var _drShowTotal = true;
 
-        var canvas=document.createElement('canvas');
-        canvas.width=W*scale; canvas.height=H*scale;
-        var ctx=canvas.getContext('2d');
-        ctx.scale(scale,scale);
+    var _drExpMod = document.createElement('div');
+    _drExpMod.className = 'drps-overlay';
+    _drExpMod.id = 'drExpMod';
+    _drExpMod.innerHTML =
+      '<div class="drps-modal">' +
+        '<div class="drps-head">' +
+          '<div>' +
+            '<div class="drps-title">📅 Export Daily Report as PNG</div>' +
+            '<div class="drps-meta" id="drExpMeta"></div>' +
+          '</div>' +
+          '<button class="drps-close" id="drExpClose" title="Close">×</button>' +
+        '</div>' +
+        '<div class="drps-col-bar" id="drExpColBar"></div>' +
+        '<div class="drps-body" id="drExpBody"></div>' +
+        '<div class="drps-foot">' +
+          '<span class="drps-foot-info" id="drExpFootInfo"></span>' +
+          '<div style="display:flex;gap:8px">' +
+            '<button class="drps-btn-exp" id="drExpExportBtn">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+              ' Export PNG' +
+            '</button>' +
+            '<button class="drps-btn-cls" id="drExpCloseBtn">Close</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(_drExpMod);
 
-        // White background
-        ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+    function _drCellVal(col, row) {
+      if (col.id==='date')    return row.date;
+      if (col.id==='orders')  return row.orders;
+      if (col.id==='items')   return row.items;
+      if (col.id==='revenue') return '$' + row.revenue.toFixed(2);
+      if (col.id==='avgord')  return row.orders > 0 ? '$' + (row.revenue/row.orders).toFixed(2) : '—';
+      if (col.id==='avgitem') return row.items  > 0 ? '$' + (row.revenue/row.items).toFixed(2)  : '—';
+      return '';
+    }
 
-        // Title "Daily Report"
-        ctx.fillStyle='#1a1a2e'; ctx.font='bold 22px system-ui,sans-serif';
-        ctx.fillText('Daily Report', pad, 38);
+    function _drFootVal(col, rows) {
+      var tO = rows.reduce(function(s,r){ return s+r.orders; },0);
+      var tI = rows.reduce(function(s,r){ return s+r.items; },0);
+      var tR = rows.reduce(function(s,r){ return s+r.revenue; },0);
+      if (col.id==='date')    return 'TOTAL';
+      if (col.id==='orders')  return tO;
+      if (col.id==='items')   return tI;
+      if (col.id==='revenue') return '$' + tR.toFixed(2);
+      if (col.id==='avgord')  return tO > 0 ? '$' + (tR/tO).toFixed(2) : '—';
+      if (col.id==='avgitem') return tI > 0 ? '$' + (tR/tI).toFixed(2) : '—';
+      return '';
+    }
 
-        // Subtitle date range + selected pages
-        var r0=rows[0], rN=rows[rows.length-1];
-        ctx.fillStyle='#6b7280'; ctx.font='12px system-ui,sans-serif';
-        var sub = r0 ? (r0.date+(rows.length>1?' -> '+rN.date:'')) : '';
-        var pageSub = '   |   Page: ' + (selectedPages.length ? selectedPages.join(', ') : 'All Pages');
-        ctx.fillText(sub+pageSub, pad, 58);
-
-        // Header row — blue background
-        ctx.fillStyle='#4285f4';
-        ctx.fillRect(pad, titleH, W-pad*2, colH);
-
-        ctx.fillStyle='#ffffff'; ctx.font='bold 13px system-ui,sans-serif';
-        var x1=pad+16, x2=pad+colDate+20, x3=pad+colDate+colOrd+20;
-        ctx.fillText('Date',   x1, titleH+colH/2+5);
-        ctx.fillText('Orders', x2, titleH+colH/2+5);
-        ctx.fillText('Items',  x3, titleH+colH/2+5);
-
-        // Data rows
-        rows.forEach(function(row,i){
-          var y = titleH+colH + i*rowH;
-          ctx.fillStyle = i%2===0 ? '#ffffff' : '#f9fafb';
-          ctx.fillRect(pad, y, W-pad*2, rowH);
-
-          ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=1;
-          ctx.beginPath(); ctx.moveTo(pad,y+rowH); ctx.lineTo(W-pad,y+rowH); ctx.stroke();
-
-          var cy = y+rowH/2+5;
-          ctx.fillStyle='#111827'; ctx.font='600 13px system-ui,sans-serif';
-          ctx.fillText(row.date, x1, cy);
-          ctx.fillStyle='#374151'; ctx.font='13px system-ui,sans-serif';
-          ctx.fillText(String(row.orders), x2, cy);
-          ctx.fillText(String(row.items),  x3, cy);
+    function _renderDrColBar() {
+      var bar = document.getElementById('drExpColBar');
+      bar.innerHTML = '<span class="drps-col-label">Columns</span>' +
+        _DR_COLS.map(function(c){
+          var cls = 'drps-col-chip' + (c.vis ? ' drps-col-on' : '') + (c.pinned ? ' drps-col-pin' : '');
+          return '<button class="' + cls + '" data-dcol="' + c.id + '">' + c.label + '</button>';
+        }).join('') +
+        '<span style="width:1px;height:20px;background:rgba(148,163,200,.15);margin:0 4px;align-self:center;flex-shrink:0"></span>' +
+        '<button class="drps-col-chip' + (_drShowTotal ? ' drps-col-on' : '') + '" data-dtotal="1">Total Row</button>';
+      bar.querySelectorAll('.drps-col-chip:not(.drps-col-pin)').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          if (this.getAttribute('data-dtotal')) {
+            _drShowTotal = !_drShowTotal; _renderDrColBar(); _renderDrPreviewTable();
+          } else {
+            var cid = this.getAttribute('data-dcol');
+            var col = _DR_COLS.find(function(c){ return c.id === cid; });
+            if (col) { col.vis = !col.vis; _renderDrColBar(); _renderDrPreviewTable(); }
+          }
         });
+      });
+    }
 
-        // Outer border
-        ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=1;
-        ctx.strokeRect(pad, titleH, W-pad*2, colH+rows.length*rowH);
+    function _renderDrPreviewTable() {
+      var rows = buildDayRows();
+      var vis  = _DR_COLS.filter(function(c){ return c.vis; });
+      var body = document.getElementById('drExpBody');
+      if (!rows.length) {
+        body.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--muted);font-size:13px">គ្មានទិន្នន័យ</div>';
+        document.getElementById('drExpFootInfo').textContent = '';
+        return;
+      }
+      var thead = '<thead><tr>' + vis.map(function(c){
+        var al = c.id==='date' ? 'left' : (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? 'right' : 'center';
+        return '<th class="drps-th" style="text-align:' + al + '">' + c.label + '</th>';
+      }).join('') + '</tr></thead>';
+      var tbody = '<tbody>' + rows.map(function(row, i){
+        return '<tr>' + vis.map(function(c){
+          var val = _drCellVal(c, row);
+          var al  = c.id==='date' ? 'left' : (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? 'right' : 'center';
+          var xc  = (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? ' drps-td-revenue' : '';
+          return '<td class="drps-tbl-td' + xc + '" style="text-align:' + al + ';padding:8px 10px">' + val + '</td>';
+        }).join('') + '</tr>';
+      }).join('') + '</tbody>';
+      var tfoot = '<tfoot><tr class="drps-tr-foot">' + vis.map(function(c){
+        var val = _drFootVal(c, rows);
+        var al  = c.id==='date' ? 'left' : (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? 'right' : 'center';
+        return '<td style="text-align:' + al + '">' + val + '</td>';
+      }).join('') + '</tr></tfoot>';
+      body.innerHTML = '<div class="drps-tbl-wrap"><table class="drps-tbl">' + thead + tbody + (_drShowTotal ? tfoot : '') + '</table></div>';
+      var tO = rows.reduce(function(s,r){ return s+r.orders; },0);
+      document.getElementById('drExpFootInfo').textContent = rows.length + ' ថ្ងៃ · ' + tO + ' orders';
+    }
 
-        // Footer
-        ctx.fillStyle='#9ca3af'; ctx.font='10px system-ui,sans-serif';
-        ctx.fillText('CAMBO MINI  Export Date: '+(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})(), pad, H-12);
+    function _openDrExportModal() {
+      var pageTxt = selectedPages.length ? selectedPages.join(', ') : 'All Pages';
+      var dateTxt = dateFrom === dateTo ? fmtDate(dateFrom) : fmtDate(dateFrom) + ' → ' + fmtDate(dateTo);
+      document.getElementById('drExpMeta').innerHTML =
+        '<span class="drps-chip drps-chip-pg">📄 ' + esc(pageTxt) + '</span>' +
+        '&nbsp;<span class="drps-chip drps-chip-dt">📅 ' + esc(dateTxt) + '</span>';
+      _renderDrColBar();
+      _renderDrPreviewTable();
+      _drExpMod.classList.add('show');
+    }
 
-        var link=document.createElement('a');
-        link.download='daily-report-'+dateFrom+(dateFrom!==dateTo?'_'+dateTo:'')+'.png';
-        link.href=canvas.toDataURL('image/png'); link.click();
-      } catch(e){ alert('Export error: '+e.message); }
-    });
+    function _doDrExportPNG() {
+      var rows = buildDayRows();
+      if (!rows.length) return;
+      var vis  = _DR_COLS.filter(function(c){ return c.vis; });
+      var CW   = { date:155, orders:95, items:95, revenue:120, avgord:120, avgitem:120 };
+      var colW = vis.map(function(c){ return CW[c.id]||95; });
+      var scale=3, padX=48, titleH=132, rowH=44, colH=50;
+      var footRows = _drShowTotal ? 1 : 0;
+      var tableW = colW.reduce(function(s,w){ return s+w; },0);
+      var W = padX*2 + tableW, H = titleH + colH + (rows.length + footRows)*rowH + 48;
+      var canvas=document.createElement('canvas'); canvas.width=W*scale; canvas.height=H*scale;
+      var ctx=canvas.getContext('2d');
+      ctx.scale(scale,scale);
+      ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+      // Title
+      ctx.fillStyle='#1a1a2e'; ctx.font='bold 24px system-ui,sans-serif';
+      ctx.fillText('Daily Report', padX, 56);
+      // Date — directly below title
+      var dTxt='Date: '+(dateFrom===dateTo?fmtDate(dateFrom):fmtDate(dateFrom)+' → '+fmtDate(dateTo));
+      ctx.fillStyle='#374151'; ctx.font='600 13px system-ui,sans-serif';
+      ctx.fillText(dTxt, padX, 80);
+      // Page — second subtitle line
+      var pTxt='Page: '+(selectedPages.length?selectedPages.join(', '):'All Pages');
+      ctx.fillStyle='#6b7280'; ctx.font='12px system-ui,sans-serif';
+      ctx.fillText(pTxt, padX, 100);
+      // Header row
+      ctx.fillStyle='#4f46e5'; ctx.fillRect(padX,titleH,tableW,colH);
+      ctx.fillStyle='#fff'; ctx.font='bold 14px system-ui,sans-serif';
+      var x=padX;
+      vis.forEach(function(c,ci){
+        var w=colW[ci];
+        var al=c.id==='date'?'left':(c.id==='revenue'||c.id==='avgord'||c.id==='avgitem')?'right':'center';
+        var tw=ctx.measureText(c.label).width;
+        var tx=al==='left'?x+10:al==='right'?x+w-10-tw:x+(w-tw)/2;
+        ctx.fillText(c.label,tx,titleH+colH/2+5); x+=w;
+      });
+      // Data rows
+      rows.forEach(function(row,i){
+        var y=titleH+colH+i*rowH;
+        ctx.fillStyle=i%2===0?'#fff':'#f8fafc'; ctx.fillRect(padX,y,tableW,rowH);
+        ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=0.5;
+        ctx.beginPath();ctx.moveTo(padX,y+rowH);ctx.lineTo(padX+tableW,y+rowH);ctx.stroke();
+        var cy=y+rowH/2+5; x=padX;
+        vis.forEach(function(c,ci){
+          var w=colW[ci]; var val=String(_drCellVal(c,row));
+          var al=c.id==='date'?'left':(c.id==='revenue'||c.id==='avgord'||c.id==='avgitem')?'right':'center';
+          if(c.id==='date'){ctx.fillStyle='#111827';ctx.font='600 13px system-ui,sans-serif';}
+          else if(c.id==='revenue'||c.id==='avgord'||c.id==='avgitem'){ctx.fillStyle='#0891b2';ctx.font='700 13px system-ui,sans-serif';}
+          else{ctx.fillStyle='#374151';ctx.font='13px system-ui,sans-serif';}
+          var tw=ctx.measureText(val).width;
+          var tx=al==='left'?x+10:al==='right'?x+w-10-tw:x+(w-tw)/2;
+          ctx.fillText(val,tx,cy); x+=w;
+        });
+      });
+      // Footer total row
+      if (_drShowTotal) {
+        var fy=titleH+colH+rows.length*rowH;
+        ctx.fillStyle='#eef2ff'; ctx.fillRect(padX,fy,tableW,rowH);
+        ctx.strokeStyle='#6366f1'; ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(padX,fy);ctx.lineTo(padX+tableW,fy);ctx.stroke();
+        var fcy=fy+rowH/2+5; x=padX;
+        vis.forEach(function(c,ci){
+          var w=colW[ci]; var val=String(_drFootVal(c,rows));
+          var al=c.id==='date'?'left':(c.id==='revenue'||c.id==='avgord'||c.id==='avgitem')?'right':'center';
+          ctx.fillStyle=(c.id==='date')?'#374151':'#d97706'; ctx.font='bold 14px system-ui,sans-serif';
+          var tw=ctx.measureText(val).width;
+          var tx=al==='left'?x+10:al==='right'?x+w-10-tw:x+(w-tw)/2;
+          ctx.fillText(val,tx,fcy); x+=w;
+        });
+      }
+      // Border
+      ctx.strokeStyle='#d1d5db'; ctx.lineWidth=1;
+      ctx.strokeRect(padX,titleH,tableW,colH+(rows.length+footRows)*rowH);
+      // Watermark
+      ctx.fillStyle='#9ca3af'; ctx.font='11px system-ui,sans-serif';
+      var ed=(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})();
+      ctx.fillText('CAMBO MINI  Export Date: '+ed, padX, H-16);
+      var link=document.createElement('a');
+      link.download='daily-report-'+dateFrom+(dateFrom!==dateTo?'_'+dateTo:'')+'.png';
+      link.href=canvas.toDataURL('image/png',1.0); link.click();
+    }
+
+    document.getElementById('drExportImg').addEventListener('click', function(){ closeAct(); _openDrExportModal(); });
+    document.getElementById('drExpClose').addEventListener('click', function(){ _drExpMod.classList.remove('show'); });
+    document.getElementById('drExpCloseBtn').addEventListener('click', function(){ _drExpMod.classList.remove('show'); });
+    document.getElementById('drExpExportBtn').addEventListener('click', _doDrExportPNG);
+    _drExpMod.addEventListener('click', function(e){ if(e.target===_drExpMod)_drExpMod.classList.remove('show'); });
 
     /* ── Export PNG + Revenue ── */
     document.getElementById('drExportImgRev').addEventListener('click', function(){
