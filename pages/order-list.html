@@ -657,10 +657,16 @@
     <!-- Stats -->
     <div class="ol-stats">
       <div class="ol-stat ol-s-blue"><div class="ol-stat-n" id="olRevenue">$0</div><div class="ol-stat-l">Revenue</div></div>
-      <div class="ol-stat">
-        <div class="ol-stat-n" id="olTotal">0</div>
-        <div id="olItems" style="font-size:12px;font-weight:700;color:var(--muted);margin-top:3px">0 items</div>
-        <div class="ol-stat-l">Total Orders</div>
+      <div class="ol-stat" style="display:flex;align-items:center;gap:0">
+        <div style="flex:1;min-width:0">
+          <div class="ol-stat-n" id="olTotal">0</div>
+          <div class="ol-stat-l">Total Orders</div>
+        </div>
+        <div style="width:1px;background:rgba(148,163,200,.15);align-self:stretch;margin:0 14px"></div>
+        <div style="flex:1;min-width:0">
+          <div class="ol-stat-n" id="olItems" style="color:#a78bfa">0</div>
+          <div class="ol-stat-l">Items</div>
+        </div>
       </div>
       <div class="ol-stat" title="Delivery Breakdown">
         <div class="ol-stat-l" style="margin-top:0;margin-bottom:7px">Delivery</div>

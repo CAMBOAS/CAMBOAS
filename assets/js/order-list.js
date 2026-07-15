@@ -667,7 +667,7 @@ function updateStats(rows){
   }
 
   $id('olTotal').textContent      = t;
-  var oi = $id('olItems'); if(oi) oi.textContent = items + ' items';
+  var oi = $id('olItems'); if(oi) oi.textContent = items;
   $id('olRevenue').textContent    = '$'+rev.toFixed(2);
   $id('olFooter').textContent     = 'Showing '+rows.length+' of '+_orders.length+' records';
   $id('olLatestCust').textContent = latestCust;
