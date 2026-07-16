@@ -2690,6 +2690,17 @@
   .pthumb img { cursor:zoom-in; transition:transform .18s ease; }
   .pthumb img:hover { transform:scale(1.06); }
 
+  /* ── Mobile (<680px): Customer form on top, Products below, Cart at bottom ── */
+  @media (max-width: 679px) {
+    /* Make both columns transparent so no-grid can reorder all 3 sections */
+    #leftCol  { display: contents !important; }
+    #rightCol { display: contents !important; }
+    /* Order: 1=Customer form, 2=Products, 3=Cart */
+    #custSection { order: 1 !important; }
+    #prodSection { order: 2 !important; }
+    #cartPanel   { order: 3 !important; }
+  }
+
   /* ── Tablet (680px–979px): action-bar clearance + 2-col customer form ── */
   @media (min-width: 680px) and (max-width: 979px) {
     /* Right padding clears the fixed action bar (right:14px width:64px → 84px total) */
