@@ -10,11 +10,13 @@
   const APPS_SCRIPT_URL =
     'https://script.google.com/macros/s/AKfycbyhPAP25edj3Q2hlW1yZNMW56BzsC3Hd9fH60lRZofqQnRUMcuqa-CRIo60912HGweM1w/exec';
 
-  // Use Vercel proxy only when running on vercel.app domain
+  // Use Vercel proxy for all production hosts (not localhost / LAN)
   function isVercel() {
-    return typeof location !== 'undefined' &&
-      (location.hostname.endsWith('.vercel.app') ||
-       location.hostname === 'vercel.app');
+    if (typeof location === 'undefined') return false;
+    const h = location.hostname;
+    if (!h || h === 'localhost' || h === '127.0.0.1') return false;
+    if (/^192\.168\.|^10\.|^172\.(1[6-9]|2\d|3[01])\./.test(h)) return false;
+    return true; // any other hostname → use /api/proxy to avoid CORS
   }
 
   function getBase() {
