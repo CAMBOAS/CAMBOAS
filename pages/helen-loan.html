@@ -490,7 +490,7 @@
             </div>
           </h3>
           <div class="tools">
-            <input type="text" id="srch" data-i18n="srchPH" data-i18n-attr="placeholder" placeholder="ស្វែងរកឈ្មោះ / ទូរស័ព្ទ..." oninput="filterLoans()" style="flex:1;min-width:160px">
+            <input type="text" id="srch" data-i18n="srchPH" data-i18n-attr="placeholder" placeholder="ស្វែងរកឈ្មោះ / NID..." oninput="filterLoans()" style="flex:1;min-width:160px">
             <select id="fGroup" onchange="filterLoans()">
               <option value="" data-i18n="allGroups">All Groups</option>
             </select>
@@ -640,7 +640,7 @@ const I18N = {
   btnClear:     [['លុបទម្រង់',           'Clear Form']],
   btnSaving:    [['កំពុងរក្សាទុក...',    'Saving...']],
   listTitle:    [['បញ្ជីអ្នកកម្ចី',      'Borrower List']],
-  srchPH:       [['ស្វែងរកឈ្មោះ / ទូរស័ព្ទ...', 'Search name / phone...']],
+  srchPH:       [['ស្វែងរកឈ្មោះ / NID...', 'Search name / NID...']],
   allGroups:    [['All Groups',           'All Groups']],
   exportBtn:    [['Export',              'Export']],
   refresh:      [['↻ Refresh',            '↻ Refresh']],
@@ -745,7 +745,7 @@ function filterLoans() {
   const q = document.getElementById('srch').value.toLowerCase();
   const g = document.getElementById('fGroup').value;
   filtered = allLoans.filter(l =>
-    (!q || (l.FullName||'').toLowerCase().includes(q) || (l.Phone||'').includes(q)) &&
+    (!q || (l.FullName||'').toLowerCase().includes(q) || (l.NationalID||'').toLowerCase().includes(q)) &&
     (!g || l.Groups === g)
   );
   renderTable();
