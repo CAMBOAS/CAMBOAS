@@ -1053,7 +1053,7 @@
       right: 8px;
       left: auto;
       top: 50%;
-      transform: translateY(-50%);
+      transform: translateY(-50%) translateX(0);
       bottom: auto;
       display: flex;
       flex-direction: column;
@@ -1067,14 +1067,19 @@
       -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.08);
       border: 1px solid rgba(255,255,255,.55);
       box-shadow: 0 4px 24px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(255,255,255,.2);
-      z-index: 9000;
+      z-index: 9999;
+      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease !important;
     }
     [data-theme="dark"] .mob-bottom-bar {
       background: rgba(255,255,255,.04);
       border-color: rgba(255,255,255,.18);
       box-shadow: 0 4px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.15), inset 0 -1px 0 rgba(255,255,255,.05);
     }
-    .mob-bottom-bar.bar-hidden { display: none !important; }
+    .mob-bottom-bar.bar-hidden {
+      transform: translateY(-50%) translateX(calc(100% + 30px)) !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
 
     /* TikTok icon button */
     .tik-btn {
@@ -1367,7 +1372,6 @@
         right: 14px !important;
         left: auto !important;
         top: 50% !important;
-        transform: translateY(-50%) !important;
         width: 64px !important;
       }
       .fgrid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
@@ -2386,19 +2390,15 @@
       #cartPanel .khr-row { border-top: none !important; padding: 0 0 0 20px !important; margin: 0 !important; border-left: 1px solid rgba(0,0,0,0.07) !important; }
 
       /* ── ACTION BAR: TikTok right panel on desktop ── */
-      #mobBottomBar,
-      #mobBottomBar.bar-hidden {
+      #mobBottomBar {
         position: fixed !important;
         right: 14px !important;
         left: auto !important;
         bottom: auto !important;
         top: 50% !important;
-        transform: translateY(-50%) !important;
         width: 64px !important;
         border-radius: 22px !important;
-        z-index: 9000 !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
+        z-index: 9999 !important;
         display: flex !important;
       }
     }
@@ -2582,19 +2582,15 @@
       [data-theme="dark"] #cartPanel .srow.total span:last-child { color: #a78bfa !important; }
 
       /* ── Action bar: TikTok right panel (same as above, ensure override) ── */
-      #mobBottomBar,
-      #mobBottomBar.bar-hidden {
+      #mobBottomBar {
         position: fixed !important;
         right: 14px !important;
         left: auto !important;
         bottom: auto !important;
         top: 50% !important;
-        transform: translateY(-50%) !important;
         width: 64px !important;
         border-radius: 22px !important;
-        z-index: 9000 !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
+        z-index: 9999 !important;
         display: flex !important;
       }
     }
@@ -3859,20 +3855,48 @@ document.addEventListener('DOMContentLoaded', function(){
   var scrollBtns = document.getElementById('scrollBtns');
   var lastY = window.scrollY, ticking = false, DELTA = 8;
 
-  /* Header + bottom bar: hide on scroll down, show on scroll up */
-  function showBars(){ if(header) header.classList.remove('header-hidden'); if(bar) bar.classList.remove('bar-hidden'); }
-  function hideBars(){ if(header) header.classList.add('header-hidden');    if(bar) bar.classList.add('bar-hidden'); }
+  /* Header + action bar: hide on scroll down, show on scroll up */
+  var barVisible = true, barAnim = null;
+
+  function animateBar(toHidden) {
+    if (!bar) return;
+    var w = bar.offsetWidth || 64;
+    var slide = (w + 30) + 'px';
+    var from = toHidden
+      ? { transform: 'translateY(-50%) translateX(0px)',    opacity: '1', pointerEvents: 'auto' }
+      : { transform: 'translateY(-50%) translateX(' + slide + ')', opacity: '0', pointerEvents: 'none' };
+    var to   = toHidden
+      ? { transform: 'translateY(-50%) translateX(' + slide + ')', opacity: '0', pointerEvents: 'none' }
+      : { transform: 'translateY(-50%) translateX(0px)',    opacity: '1', pointerEvents: 'auto' };
+    if (barAnim) { try { barAnim.cancel(); } catch(e){} }
+    barAnim = bar.animate([from, to], { duration: 280, fill: 'forwards', easing: 'cubic-bezier(0.4,0,0.2,1)' });
+    barAnim.onfinish = function() {
+      bar.style.transform   = to.transform;
+      bar.style.opacity     = to.opacity;
+      bar.style.pointerEvents = to.pointerEvents;
+      barAnim = null;
+    };
+  }
+
+  function showBars() {
+    if(header) header.classList.remove('header-hidden');
+    if(bar && !barVisible) { barVisible = true; animateBar(false); }
+  }
+  function hideBars() {
+    if(header) header.classList.add('header-hidden');
+    if(bar && barVisible) { barVisible = false; animateBar(true); }
+  }
   function onScroll(){
     var y = window.scrollY, d = y - lastY;
-    if(y <= 40)        showBars();
-    else if(d >= DELTA && !window.__kbFocused)  hideBars();
-    else if(d <= -DELTA) showBars();
+    if(y <= 40)                             showBars();
+    else if(d >= DELTA && !window.__kbFocused) hideBars();
+    else if(d <= -DELTA)                    showBars();
     lastY = y; ticking = false;
   }
   window.addEventListener('scroll', function(){
     if(!ticking){ requestAnimationFrame(onScroll); ticking = true; }
   }, {passive:true});
-  if(bar) bar.addEventListener('pointerdown', showBars, {passive:true});
+  if(bar) bar.addEventListener('pointerdown', function(){ if(!barVisible){ barVisible=true; animateBar(false); } }, {passive:true});
 
   /* Scroll buttons: smart show/hide per button */
   var btnTop = document.getElementById('scrollTopBtn');
