@@ -1351,9 +1351,9 @@
       .pinfo b { font-size: 13.5px; }
     }
 
-    /* Remove 2-column product grid at 600–679px → single column */
+    /* Product grid: 2 columns at 600–679px */
     @media (min-width: 600px) and (max-width: 679px) {
-      #prodBody .plist { grid-template-columns: 1fr !important; }
+      #prodBody .plist { grid-template-columns: repeat(2, 1fr) !important; }
     }
 
     /* ══════════════════════════════════════════════════════
@@ -2278,10 +2278,10 @@
         box-shadow: 0 4px 12px rgba(124,92,255,.35) !important;
       }
 
-      /* ── PRODUCT GRID: auto-fill columns based on container width ── */
+      /* ── PRODUCT GRID: 3 columns at 680–979px ── */
       #prodBody .plist {
         display: grid !important;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+        grid-template-columns: repeat(3, 1fr) !important;
         gap: 14px !important;
         margin: 0 !important;
       }
@@ -2621,6 +2621,11 @@
         gap: 16px !important;
         align-items: start !important;
       }
+      /* Product grid: 4 columns at ≥980px (desktop default) */
+      #prodBody .plist {
+        grid-template-columns: repeat(4, 1fr) !important;
+      }
+
       /* Customer form: 2 columns at desktop — ~200px per field, much more readable */
       #custBody {
         grid-template-columns: 1fr 1fr !important;
