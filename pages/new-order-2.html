@@ -3943,7 +3943,7 @@ document.addEventListener('DOMContentLoaded', function(){
     var cart = document.getElementById('cartPanel');
     if (!noGrid || !lc || !rc || !cust || !cart) return;
 
-    if (window.innerWidth < 680 && !_mobileReordered) {
+    if (window.innerWidth < 980 && !_mobileReordered) {
       /* custSection → first (before leftCol) */
       noGrid.insertBefore(cust, lc);
       /* cartPanel → third (right after leftCol) */
@@ -3951,7 +3951,7 @@ document.addEventListener('DOMContentLoaded', function(){
       /* rightCol is now empty — hide it */
       rc.style.display = 'none';
       _mobileReordered = true;
-    } else if (window.innerWidth >= 680 && _mobileReordered) {
+    } else if (window.innerWidth >= 980 && _mobileReordered) {
       /* Restore: custSection and cartPanel back inside rightCol */
       rc.insertBefore(cust, rc.firstChild);
       rc.appendChild(cart);
