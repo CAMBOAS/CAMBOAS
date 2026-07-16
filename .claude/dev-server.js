@@ -10,7 +10,7 @@ const url   = require('url');
 
 const PORT           = 3001;
 const ROOT           = path.join(__dirname, '..');
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1d4-wbEtIOVGBp0hdniaWZL7GnLbGtT-xxxeakcDXVXHkmDynzYzMFHMWtUhUOF2kuA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzHg9xhHS8Jl7N_AhhvJE6CeqcDBDfx034Egfqy0QaAp5VgDFpSybZYxZ5SZipUebCMVw/exec';
 
 const MIME = {
   '.html':  'text/html; charset=utf-8',
