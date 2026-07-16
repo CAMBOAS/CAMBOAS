@@ -2684,16 +2684,8 @@
   .pthumb img { cursor:zoom-in; transition:transform .18s ease; }
   .pthumb img:hover { transform:scale(1.06); }
 
-  /* ── Mobile (<680px): Customer form on top, Products below, Cart at bottom ── */
-  @media (max-width: 679px) {
-    /* Make both columns transparent so no-grid can reorder all 3 sections */
-    #leftCol  { display: contents !important; }
-    #rightCol { display: contents !important; }
-    /* Order: 1=Customer form, 2=Products, 3=Cart */
-    #custSection { order: 1 !important; }
-    #prodSection { order: 2 !important; }
-    #cartPanel   { order: 3 !important; }
-  }
+  /* Mobile section order is handled by applyMobileOrder() in JS (DOM reorder),
+     which works on all browsers without relying on display:contents. */
 
   /* ── Tablet (680px–979px): action-bar clearance + 2-col customer form ── */
   @media (min-width: 680px) and (max-width: 979px) {
@@ -3939,6 +3931,35 @@ document.addEventListener('DOMContentLoaded', function(){
     else   window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'});
   };
 
+  /* ── Mobile DOM reorder: custSection(1) → prodSection(2) → cartPanel(3) ──
+     Moves sections in the actual DOM instead of relying on display:contents,
+     which has inconsistent support across mobile browsers. ── */
+  var _mobileReordered = false;
+  function applyMobileOrder() {
+    var noGrid = document.querySelector('.no-grid');
+    var lc   = document.getElementById('leftCol');
+    var rc   = document.getElementById('rightCol');
+    var cust = document.getElementById('custSection');
+    var cart = document.getElementById('cartPanel');
+    if (!noGrid || !lc || !rc || !cust || !cart) return;
+
+    if (window.innerWidth < 680 && !_mobileReordered) {
+      /* custSection → first (before leftCol) */
+      noGrid.insertBefore(cust, lc);
+      /* cartPanel → third (right after leftCol) */
+      noGrid.insertBefore(cart, lc.nextSibling);
+      /* rightCol is now empty — hide it */
+      rc.style.display = 'none';
+      _mobileReordered = true;
+    } else if (window.innerWidth >= 680 && _mobileReordered) {
+      /* Restore: custSection and cartPanel back inside rightCol */
+      rc.insertBefore(cust, rc.firstChild);
+      rc.appendChild(cart);
+      rc.style.display = '';
+      _mobileReordered = false;
+    }
+  }
+
   /* ── Fix both columns on desktop: independent scroll panes ── */
   function fixRightCol() {
     var rc = document.getElementById('rightCol');
@@ -3946,6 +3967,8 @@ document.addEventListener('DOMContentLoaded', function(){
     if (!rc) return;
     if (window.innerWidth < 980) {
       rc.style.cssText = '';
+      /* Keep empty rightCol hidden when mobile DOM reorder is active */
+      if (_mobileReordered) rc.style.display = 'none';
       if (lc) { lc.style.height = ''; lc.style.overflowY = ''; lc.style.overflowX = ''; }
       return;
     }
@@ -3985,6 +4008,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   }
   function fixAndAttachScroll() {
+    applyMobileOrder();
     fixRightCol();
     /* Attach leftCol scroll listener after columns are set up */
     var lc = document.getElementById('leftCol');
