@@ -7,7 +7,7 @@ param([int]$Port = 3000)
 $scriptDir = if ($MyInvocation.MyCommand.Path) {
   Split-Path $MyInvocation.MyCommand.Path -Parent
 } else {
-  "D:\07 Code\02 Sample\CAMBO-MINI-FIXED-FINAL\CAMBO_MINI\.claude"
+  "D:\07 Code\01 Project CAMBO\CAMBO\.claude"
 }
 $root = Split-Path $scriptDir -Parent
 

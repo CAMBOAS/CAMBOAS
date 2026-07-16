@@ -2061,8 +2061,8 @@ function updateHelenLoan_(key, loan) {
     loan.Money ? Number(loan.Money) : '',
     String(loan.Note       || '').trim(),
   ];
-  sheet.getRange(rowNum, 3, 1, 1).setNumberFormat('@');
-  sheet.getRange(rowNum, 6, 1, 1).setNumberFormat('@');
+  try { sheet.getRange(rowNum, 3, 1, 1).setNumberFormat('@'); } catch(e) {}
+  try { sheet.getRange(rowNum, 6, 1, 1).setNumberFormat('@'); } catch(e) {}
   sheet.getRange(rowNum, 1, 1, row.length).setValues([row]);
   return true;
 }
@@ -2202,9 +2202,9 @@ function addHelenLoan_(loan) {
   /* Insert at row 2 so newest appears first */
   if (sheet.getLastRow() > 1) sheet.insertRowBefore(2);
   const range = sheet.getRange(2, 1, 1, row.length);
-  /* Force Phone (col 6) and NationalID (col 3) as plain text to preserve leading zeros */
-  sheet.getRange(2, 3, 1, 1).setNumberFormat('@');
-  sheet.getRange(2, 6, 1, 1).setNumberFormat('@');
+  /* Try to force Phone/NationalID as plain text; skip if column is typed */
+  try { sheet.getRange(2, 3, 1, 1).setNumberFormat('@'); } catch(e) {}
+  try { sheet.getRange(2, 6, 1, 1).setNumberFormat('@'); } catch(e) {}
   range.setValues([row]);
 }
 

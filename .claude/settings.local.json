@@ -74,7 +74,21 @@
       "Bash(clasp status *)",
       "Bash(git rm *)",
       "Bash(del \"pages\\\\commission.html\")",
-      "Bash(Remove-Item \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\pages\\\\commission.html\" -Force)"
+      "Bash(Remove-Item \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\pages\\\\commission.html\" -Force)",
+      "Bash(git commit -m ' *)",
+      "Bash(git status *)",
+      "Bash(dir \"images\\\\products\\\\body\" /b)",
+      "Bash(findstr \"5\")",
+      "Bash(git update-index *)",
+      "Bash(git diff-index *)",
+      "Bash(grep -n \"</style>\\\\|<\\\\/body>\" pages/nod.html)",
+      "Bash(git mv *)",
+      "PowerShell(head)",
+      "PowerShell(Get-ChildItem -Path \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\assets\\\\img\" -Recurse | Select-Object -First 50 | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\\\\\",\"\"\\) })",
+      "Bash(grep -v \"//\\\\|css\\\\|\\\\.css\\\\|stylesheet\")",
+      "Bash(git -C \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\" add pages/products.html)",
+      "Bash(git -C 'D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI' commit -m ' *)",
+      "Bash(git -C \"D:\\\\07 Code\\\\02 Sample\\\\CAMBO-MINI-FIXED-FINAL\\\\CAMBO_MINI\" push)"
     ]
   }
 }
