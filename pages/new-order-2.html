@@ -2266,10 +2266,10 @@
         box-shadow: 0 4px 12px rgba(124,92,255,.35) !important;
       }
 
-      /* ── PRODUCT GRID: 3 cols default, 4 cols on large screens ── */
+      /* ── PRODUCT GRID: auto-fill columns based on container width ── */
       #prodBody .plist {
         display: grid !important;
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
         gap: 14px !important;
         margin: 0 !important;
       }
@@ -2595,12 +2595,6 @@
       }
     }
 
-    /* ── 4 columns on large viewports (≥1100px) ── */
-    @media (min-width: 1100px) {
-      #prodBody .plist {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-      }
-    }
 
     /* ── Desktop 2-col fix: override display:contents from 680px block above ── */
     @media (min-width: 980px) {
