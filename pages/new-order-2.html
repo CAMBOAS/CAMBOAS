@@ -2633,6 +2633,10 @@
       #rightCol::-webkit-scrollbar { width: 4px; }
       #rightCol::-webkit-scrollbar-track { background: transparent; }
       #rightCol::-webkit-scrollbar-thumb { background: rgba(124,92,255,.25); border-radius: 4px; }
+      /* Left column independent scroll */
+      #leftCol::-webkit-scrollbar { width: 4px; }
+      #leftCol::-webkit-scrollbar-track { background: transparent; }
+      #leftCol::-webkit-scrollbar-thumb { background: rgba(124,92,255,.18); border-radius: 4px; }
     }
   /* SaleInfor Settings Modal */
   .del-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:9998;display:none;align-items:center;justify-content:center}
@@ -3853,7 +3857,17 @@ document.addEventListener('DOMContentLoaded', function(){
   var header = document.getElementById('sharedHeader');
   var bar    = document.getElementById('mobBottomBar');
   var scrollBtns = document.getElementById('scrollBtns');
-  var lastY = window.scrollY, ticking = false, DELTA = 8;
+  var lastY = 0, ticking = false, DELTA = 8;
+
+  /* On desktop leftCol scrolls independently; on mobile window scrolls */
+  function getScrollEl() {
+    var lc = document.getElementById('leftCol');
+    return (window.innerWidth >= 980 && lc && lc.style.overflowY === 'auto') ? lc : null;
+  }
+  function getScrollY() {
+    var el = getScrollEl();
+    return el ? el.scrollTop : window.scrollY;
+  }
 
   /* Header + action bar: hide on scroll down, show on scroll up */
   var barVisible = true, barAnim = null;
@@ -3887,15 +3901,14 @@ document.addEventListener('DOMContentLoaded', function(){
     if(bar && barVisible) { barVisible = false; animateBar(true); }
   }
   function onScroll(){
-    var y = window.scrollY, d = y - lastY;
-    if(y <= 40)                             showBars();
+    var y = getScrollY(), d = y - lastY;
+    if(y <= 40)                                showBars();
     else if(d >= DELTA && !window.__kbFocused) hideBars();
-    else if(d <= -DELTA)                    showBars();
+    else if(d <= -DELTA)                       showBars();
     lastY = y; ticking = false;
   }
-  window.addEventListener('scroll', function(){
-    if(!ticking){ requestAnimationFrame(onScroll); ticking = true; }
-  }, {passive:true});
+  function scheduleScroll(){ if(!ticking){ requestAnimationFrame(onScroll); ticking = true; } }
+  window.addEventListener('scroll', scheduleScroll, {passive:true});
   if(bar) bar.addEventListener('pointerdown', function(){ if(!barVisible){ barVisible=true; animateBar(false); } }, {passive:true});
 
   /* Scroll buttons: smart show/hide per button */
@@ -3904,15 +3917,13 @@ document.addEventListener('DOMContentLoaded', function(){
   var sbTimer;
 
   function updateScrollBtns() {
-    var y   = window.scrollY;
-    var max = document.body.scrollHeight - window.innerHeight;
-    /* ▲ show only when scrolled > 200px from top */
-    if(y > 200) btnTop && btnTop.classList.add('sb-show');
-    else         btnTop && btnTop.classList.remove('sb-show');
-    /* ▼ show only when more than 80px of content remains below */
+    var el  = getScrollEl();
+    var y   = el ? el.scrollTop  : window.scrollY;
+    var max = el ? (el.scrollHeight - el.clientHeight) : (document.body.scrollHeight - window.innerHeight);
+    if(y > 200)      btnTop && btnTop.classList.add('sb-show');
+    else             btnTop && btnTop.classList.remove('sb-show');
     if(y < max - 80) btnBot && btnBot.classList.add('sb-show');
-    else              btnBot && btnBot.classList.remove('sb-show');
-    /* auto-hide both after 2.5s of no scrolling */
+    else             btnBot && btnBot.classList.remove('sb-show');
     clearTimeout(sbTimer);
     sbTimer = setTimeout(function(){
       btnTop && btnTop.classList.remove('sb-show');
@@ -3923,16 +3934,25 @@ document.addEventListener('DOMContentLoaded', function(){
   window.addEventListener('scroll', updateScrollBtns, {passive:true});
   updateScrollBtns();
 
-  if(btnTop) btnTop.onclick = function(){ window.scrollTo({top:0, behavior:'smooth'}); };
-  if(btnBot) btnBot.onclick = function(){ window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'}); };
+  if(btnTop) btnTop.onclick = function(){
+    var el = getScrollEl();
+    if(el) el.scrollTo({top:0, behavior:'smooth'});
+    else   window.scrollTo({top:0, behavior:'smooth'});
+  };
+  if(btnBot) btnBot.onclick = function(){
+    var el = getScrollEl();
+    if(el) el.scrollTo({top:el.scrollHeight, behavior:'smooth'});
+    else   window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'});
+  };
 
-  /* ── Fix right column (Cart + Action bar) on desktop/tablet ── */
+  /* ── Fix both columns on desktop: independent scroll panes ── */
   function fixRightCol() {
     var rc = document.getElementById('rightCol');
     var lc = document.getElementById('leftCol');
     if (!rc) return;
     if (window.innerWidth < 980) {
       rc.style.cssText = '';
+      if (lc) { lc.style.height = ''; lc.style.overflowY = ''; lc.style.overflowX = ''; }
       return;
     }
     /* main has CSS transform → it becomes the containing block for position:fixed children.
@@ -3962,12 +3982,28 @@ document.addEventListener('DOMContentLoaded', function(){
     rc.style.flexDirection = 'column';
     rc.style.gap           = '12px';
     rc.style.zIndex        = '10';
+    /* Left column: same height, independent scroll */
+    if (lc) {
+      lc.style.height     = maxH + 'px';
+      lc.style.overflowY  = 'auto';
+      lc.style.overflowX  = 'hidden';
+      lc.style.paddingBottom = '8px';
+    }
   }
-  fixRightCol();
-  /* Re-run after page-load animations settle (mainRect may shift during transitions) */
-  setTimeout(fixRightCol, 350);
-  window.addEventListener('resize', fixRightCol);
-  document.addEventListener('sidebar-toggled', fixRightCol);
+  function fixAndAttachScroll() {
+    fixRightCol();
+    /* Attach leftCol scroll listener after columns are set up */
+    var lc = document.getElementById('leftCol');
+    if (lc && !lc._scrollListened) {
+      lc.addEventListener('scroll', scheduleScroll,    {passive:true});
+      lc.addEventListener('scroll', updateScrollBtns, {passive:true});
+      lc._scrollListened = true;
+    }
+  }
+  fixAndAttachScroll();
+  setTimeout(fixAndAttachScroll, 350);
+  window.addEventListener('resize', fixAndAttachScroll);
+  document.addEventListener('sidebar-toggled', fixAndAttachScroll);
 
   /* Watch sidebar width changes (collapse/expand) */
   var _sidebar = document.getElementById('sharedSidebar');
