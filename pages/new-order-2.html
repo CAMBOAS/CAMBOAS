@@ -1080,8 +1080,16 @@
       opacity: 0 !important;
       pointer-events: none !important;
     }
-    /* Action bar is desktop-only — hide on phone & tablet */
-    @media (max-width: 979px) {
+    /* Action bar: match desktop pill style on tablet & medium phone (480–979px) */
+    @media (min-width: 480px) and (max-width: 979px) {
+      #mobBottomBar {
+        right: 14px !important;
+        width: 64px !important;
+      }
+      .no-wrap { padding-right: 84px !important; }
+    }
+    /* Very small phone (<480px): action bar too cramped — hide it */
+    @media (max-width: 479px) {
       #mobBottomBar { display: none !important; }
     }
 
