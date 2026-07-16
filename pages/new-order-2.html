@@ -1080,6 +1080,10 @@
       opacity: 0 !important;
       pointer-events: none !important;
     }
+    /* Action bar is desktop-only — hide on phone & tablet */
+    @media (max-width: 979px) {
+      #mobBottomBar { display: none !important; }
+    }
 
     /* TikTok icon button */
     .tik-btn {
