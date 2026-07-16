@@ -4,7 +4,7 @@
  */
 
 const APPS_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbyhPAP25edj3Q2hlW1yZNMW56BzsC3Hd9fH60lRZofqQnRUMcuqa-CRIo60912HGweM1w/exec';
+  'https://script.google.com/macros/s/AKfycby-ntQjUR10XTeCjLUqif-DEHHHbbg6WJvnUp0nZczL2TXN9e5ad3e2WKysIrdIx3DE/exec';
 
 // Disable Vercel's automatic body parser so we get raw body string
 export const config = {
