@@ -3944,10 +3944,9 @@ document.addEventListener('DOMContentLoaded', function(){
     var lcRect = lc ? lc.getBoundingClientRect() : null;
     var gap = 16;
     var rightLeft = lcRect ? lcRect.right + gap : 0;   /* viewport X */
-    /* Use full available width; add padding-right so content stays clear of action bar
-       (action bar: position:fixed right:14px width:64px → left edge at vw-78) */
-    var rightWidth   = window.innerWidth - rightLeft - 24;
-    var actionBarPad = 64 + 14 + 6;  /* 84px: keeps content from going behind action bar */
+    /* rightCol stops just left of the action bar (right:14px width:64px → left edge vw-78).
+       8px gap keeps content clear — no internal padding dead-zone. */
+    var rightWidth = window.innerWidth - rightLeft - (64 + 14 + 8);
     var topbarOffset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-offset')) || 110;
     var topPos  = lcRect ? lcRect.top : (topbarOffset + 14);  /* align with leftCol top */
     var maxH    = window.innerHeight - topPos - 20;
@@ -3955,7 +3954,7 @@ document.addEventListener('DOMContentLoaded', function(){
     rc.style.top           = (topPos  - mainRect.top)  + 'px';
     rc.style.left          = (rightLeft - mainRect.left) + 'px';
     rc.style.width         = rightWidth + 'px';
-    rc.style.paddingRight  = actionBarPad + 'px';
+    rc.style.paddingRight  = '6px';
     rc.style.maxHeight     = maxH + 'px';
     rc.style.overflowY     = 'auto';
     rc.style.overflowX     = 'hidden';
