@@ -1,40 +1,31 @@
 ﻿/**
  * CAMBO MINI — Central API helper
- * - On Vercel (https): routes through /api/proxy to avoid CORS
- * - On Local (file:// or localhost): calls Apps Script directly
+ * GET  → direct to Apps Script (no CORS issue for GET)
+ * POST → /api/proxy (avoids CORS block from Apps Script redirect on POST)
  */
 
 (function () {
   'use strict';
 
   const APPS_SCRIPT_URL =
-    'https://script.google.com/macros/s/AKfycby-ntQjUR10XTeCjLUqif-DEHHHbbg6WJvnUp0nZczL2TXN9e5ad3e2WKysIrdIx3DE/exec';
-
-  // Always use /api/proxy — local dev-server and Vercel both provide it.
-  // Direct browser→Apps Script POST is blocked by CORS redirect.
-  function getBase() {
-    return '/api/proxy';
-  }
+    'https://script.google.com/macros/s/AKfycbx1d4-wbEtIOVGBp0hdniaWZL7GnLbGtT-xxxeakcDXVXHkmDynzYzMFHMWtUhUOF2kuA/exec';
 
   /**
    * GET request — fetch orders / stock etc.
-   * Usage: CamboAPI.get({ action: 'list', limit: 1000 })
+   * Goes direct to Apps Script; GET responses include CORS headers so no proxy needed.
    */
   async function get(params) {
-    const base = getBase();
     const qs = new URLSearchParams(Object.assign({ _: Date.now() }, params)).toString();
-    const url = base + (base.includes('?') ? '&' : '?') + qs;
-    const res = await fetch(url, { redirect: 'follow' });
+    const res = await fetch(APPS_SCRIPT_URL + '?' + qs, { redirect: 'follow' });
     return res.json();
   }
 
   /**
    * POST request — add / update / delete
-   * Usage: CamboAPI.post({ action: 'add', order: {...} })
+   * Must go through /api/proxy because Apps Script POST redirects are CORS-blocked.
    */
   async function post(body) {
-    const base = getBase();
-    const res = await fetch(base, {
+    const res = await fetch('/api/proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(body),
@@ -43,6 +34,6 @@
     return res.json();
   }
 
-  window.CamboAPI = { get, post, getBase, APPS_SCRIPT_URL };
+  window.CamboAPI = { get, post, APPS_SCRIPT_URL };
 })();
 
