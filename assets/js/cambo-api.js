@@ -20,10 +20,9 @@
   }
 
   async function post(body) {
-    if (location.protocol === 'file:') {
-      return { ok: false, message: 'ត្រូវ start server មុន:\n① double-click  start-local.bat\n② ឬបើក http://localhost:3001/' };
-    }
-    const res = await fetch('/api/proxy', {
+    // On file:// there is no /api/proxy — post directly to Apps Script
+    const url = location.protocol === 'file:' ? APPS_SCRIPT_URL : '/api/proxy';
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(body),
