@@ -59,8 +59,8 @@
       display: flex;
       flex-direction: column;
       gap: 0;
-      padding: 0 0 calc(20px + env(safe-area-inset-bottom));
-      /* space for TikTok left panel on mobile */
+      padding: 0 76px calc(20px + env(safe-area-inset-bottom)) 0;
+      /* right 76px clears fixed action bar (right:8px width:60px) on mobile */
     }
     .no-grid {
       display: flex;
@@ -1310,7 +1310,7 @@
     ══════════════════════════════════════════════════════ */
     @media (min-width: 600px) {
       .no-wrap {
-        padding: 14px 20px calc(72px + env(safe-area-inset-bottom) + 20px);
+        padding: 14px 76px calc(72px + env(safe-area-inset-bottom) + 20px);
         gap: 14px;
       }
       .mob-section {
@@ -1352,11 +1352,11 @@
       #leftCol { gap: 16px !important; }
       #rightCol {
         align-self: start;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
         max-height: calc(100vh - var(--topbar-offset, 110px) - 28px);
-        overflow-y: auto;
+        overflow-y: auto !important;
         scrollbar-width: none;
       }
       #rightCol::-webkit-scrollbar { display: none; }
@@ -2605,6 +2605,41 @@
         grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
       }
     }
+
+    /* ── Desktop 2-col fix: override display:contents from 680px block above ── */
+    @media (min-width: 980px) {
+      .no-wrap {
+        max-width: none !important;        /* fill full content area — no centering gap */
+        margin: 0 !important;
+        padding: 16px 20px 20px !important;
+      }
+      .no-grid {
+        display: grid !important;
+        grid-template-columns: 1.3fr 1fr !important;
+        gap: 16px !important;
+        align-items: start !important;
+      }
+      /* Customer form: 2 columns at desktop — ~200px per field, much more readable */
+      #custBody {
+        grid-template-columns: 1fr 1fr !important;
+      }
+      /* Address: full-width (addresses are always long) */
+      #custBody .od-row:nth-child(3) { grid-column: 1 / -1 !important; }
+      /* Payment row + Note row: span full width */
+      #custBody .od-row-pay  { grid-column: 1 / -1 !important; }
+      #custBody .od-row-note { grid-column: 1 / -1 !important; }
+      #rightCol {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        /* padding/box-sizing without !important so JS can override padding-right */
+        padding: 2px 6px 10px;
+        box-sizing: border-box;
+      }
+      #rightCol::-webkit-scrollbar { width: 4px; }
+      #rightCol::-webkit-scrollbar-track { background: transparent; }
+      #rightCol::-webkit-scrollbar-thumb { background: rgba(124,92,255,.25); border-radius: 4px; }
+    }
   /* SaleInfor Settings Modal */
   .del-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:9998;display:none;align-items:center;justify-content:center}
   .del-modal.show{display:flex}
@@ -2656,6 +2691,16 @@
   #pdBtnClose:hover { background:rgba(0,0,0,.05); }
   .pthumb img { cursor:zoom-in; transition:transform .18s ease; }
   .pthumb img:hover { transform:scale(1.06); }
+
+  /* ── Tablet (680px–979px): action-bar clearance + 2-col customer form ── */
+  @media (min-width: 680px) and (max-width: 979px) {
+    /* Right padding clears the fixed action bar (right:14px width:64px → 84px total) */
+    .no-wrap { padding-right: 84px !important; }
+    /* 2 columns fit better on tablet than 4 — each col ~200px at 768px */
+    #custBody { grid-template-columns: 1fr 1fr !important; }
+    #custBody .od-row-pay  { grid-column: 1 / -1 !important; }
+    #custBody .od-row-note { grid-column: 1 / -1 !important; }
+  }
   </style>
 </head>
 <body>
@@ -2672,10 +2717,37 @@
     <div class="no-wrap">
       <div class="no-grid">
 
-        <!-- ═══ LEFT COLUMN ═══ -->
+        <!-- ═══ LEFT COLUMN ═══ (Products only) -->
         <div style="display:flex;flex-direction:column;gap:12px;" id="leftCol">
 
-          <!-- ── Section 1: Customer Info ── -->
+          <!-- ── Section: Product Picker ── -->
+          <div class="mob-section" id="prodSection">
+            <div class="mob-sect-head is-open" id="prodHead" onclick="mobCollapse(this,'prodBody')">
+              <h3>📦 ជ្រើសរើសផលិតផល</h3>
+              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <button type="button" class="pm-open-btn" id="pmOpenBtn">⚙️ គ្រប់គ្រង</button>
+                <span class="mob-sect-chevron">▾</span>
+              </div>
+            </div>
+            <div class="mob-sect-body" id="prodBody">
+              <div class="ptabs" id="categoryTabs">
+                <button class="ptab active" data-cat="All">All</button>
+                <button class="ptab" data-cat="Hair">Hair</button>
+                <button class="ptab" data-cat="Body">Body</button>
+                <button class="ptab" data-cat="Face">Face</button>
+                <button class="ptab" data-cat="Drink">Drink</button>
+              </div>
+
+              <div class="plist" id="pList"></div>
+            </div>
+          </div><!-- /prodSection -->
+
+        </div><!-- /leftCol -->
+
+        <!-- ═══ RIGHT COLUMN ═══ (Customer Info + Cart) -->
+        <div id="rightCol">
+
+          <!-- ── Section: Customer Info ── -->
           <div class="mob-section" id="custSection">
             <div class="mob-sect-head is-open" id="custHead" onclick="mobCollapse(this,'custBody')">
               <div class="od-sect-badge">
@@ -2833,33 +2905,6 @@
             </div><!-- /custBody -->
           </div><!-- /custSection -->
 
-          <!-- ── Section 3: Product Picker ── -->
-          <div class="mob-section" id="prodSection">
-            <div class="mob-sect-head is-open" id="prodHead" onclick="mobCollapse(this,'prodBody')">
-              <h3>📦 ជ្រើសរើសផលិតផល</h3>
-              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-                <button type="button" class="pm-open-btn" id="pmOpenBtn">⚙️ គ្រប់គ្រង</button>
-                <span class="mob-sect-chevron">▾</span>
-              </div>
-            </div>
-            <div class="mob-sect-body" id="prodBody">
-              <div class="ptabs" id="categoryTabs">
-                <button class="ptab active" data-cat="All">All</button>
-                <button class="ptab" data-cat="Hair">Hair</button>
-                <button class="ptab" data-cat="Body">Body</button>
-                <button class="ptab" data-cat="Face">Face</button>
-                <button class="ptab" data-cat="Drink">Drink</button>
-              </div>
-
-              <div class="plist" id="pList"></div>
-            </div>
-          </div><!-- /prodSection -->
-
-        </div><!-- /leftCol -->
-
-        <!-- ═══ RIGHT COLUMN ═══ (sticky: Cart + Action Bar always visible) -->
-        <div id="rightCol">
-
           <!-- Cart Summary -->
           <div class="mob-section" id="cartPanel">
             <div class="mob-sect-head is-open" id="cartHead" onclick="mobCollapse(this,'cartBody')">
@@ -2910,6 +2955,8 @@
               </div>
             </div>
           </div><!-- /cartPanel -->
+
+        </div><!-- /rightCol -->
 
       </div><!-- /no-grid -->
     </div><!-- /no-wrap -->
@@ -3855,18 +3902,38 @@ document.addEventListener('DOMContentLoaded', function(){
       rc.style.cssText = '';
       return;
     }
+    /* main has CSS transform → it becomes the containing block for position:fixed children.
+       All left/top values are relative to main's painted rect, not the viewport.
+       Subtract mainRect.left/top to convert viewport coords → main-local coords. */
+    var mainEl = rc.closest('main') || document.querySelector('main');
+    var mainRect = mainEl ? mainEl.getBoundingClientRect() : { left: 0, top: 0 };
+
     var lcRect = lc ? lc.getBoundingClientRect() : null;
     var gap = 16;
-    var rightLeft = lcRect ? lcRect.right + gap : 0;
-    var rightWidth = window.innerWidth - rightLeft - 24;
+    var rightLeft = lcRect ? lcRect.right + gap : 0;   /* viewport X */
+    /* Use full available width; add padding-right so content stays clear of action bar
+       (action bar: position:fixed right:14px width:64px → left edge at vw-78) */
+    var rightWidth   = window.innerWidth - rightLeft - 24;
+    var actionBarPad = 64 + 14 + 6;  /* 84px: keeps content from going behind action bar */
     var topbarOffset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-offset')) || 110;
-    rc.style.position = 'fixed';
-    rc.style.top    = (topbarOffset + 14) + 'px';
-    rc.style.left   = rightLeft + 'px';
-    rc.style.width  = rightWidth + 'px';
-    rc.style.zIndex = '10';
+    var topPos  = lcRect ? lcRect.top : (topbarOffset + 14);  /* align with leftCol top */
+    var maxH    = window.innerHeight - topPos - 20;
+    rc.style.position      = 'fixed';
+    rc.style.top           = (topPos  - mainRect.top)  + 'px';
+    rc.style.left          = (rightLeft - mainRect.left) + 'px';
+    rc.style.width         = rightWidth + 'px';
+    rc.style.paddingRight  = actionBarPad + 'px';
+    rc.style.maxHeight     = maxH + 'px';
+    rc.style.overflowY     = 'auto';
+    rc.style.overflowX     = 'hidden';
+    rc.style.display       = 'flex';
+    rc.style.flexDirection = 'column';
+    rc.style.gap           = '12px';
+    rc.style.zIndex        = '10';
   }
   fixRightCol();
+  /* Re-run after page-load animations settle (mainRect may shift during transitions) */
+  setTimeout(fixRightCol, 350);
   window.addEventListener('resize', fixRightCol);
   document.addEventListener('sidebar-toggled', fixRightCol);
 
