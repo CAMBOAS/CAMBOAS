@@ -2083,11 +2083,22 @@ input::placeholder, textarea::placeholder {
   margin-bottom: 16px !important;
 }
 
+/* Stock + Pages chart 2-col row → stack on narrow screens */
+.stock-pages-row {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+@media (max-width: 1100px) {
+  .stock-pages-row { grid-template-columns: 1fr 320px !important; }
+}
 @media (max-width: 900px) {
   .content-grid { grid-template-columns: 1fr !important; height: auto !important; }
   .content-grid > .glass-card { height: auto !important; min-height: 280px !important; }
   .tx-stroke-list { grid-template-columns: 1fr !important; }
   .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .stock-pages-row { grid-template-columns: 1fr !important; }
 }
 
 /* ══════════════════════════════════════════════════

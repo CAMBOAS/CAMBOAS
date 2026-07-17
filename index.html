@@ -345,8 +345,9 @@
                 </div>
             </section>
 
-            <!-- Row 3: Stock Overview -->
-            <section class="tx-full-section">
+            <!-- Row 3: Stock Overview + Pages Chart -->
+            <section class="stock-pages-row">
+                <!-- Left: Stock Overview -->
                 <div class="glass-card">
                     <div class="card-header">
                         <div>
@@ -359,6 +360,20 @@
                         </div>
                     </div>
                     <div id="stockOverviewList" class="tx-stroke-list" style="max-height:320px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,.2) transparent"></div>
+                </div>
+                <!-- Right: Orders by Pages donut chart -->
+                <div class="glass-card" style="display:flex;flex-direction:column;min-height:260px">
+                    <div class="card-header" style="flex-shrink:0">
+                        <div>
+                            <h2 class="card-title">Orders by Pages</h2>
+                            <p class="card-subtitle">ការបញ្ជាទិញតាម Pages</p>
+                        </div>
+                        <span id="pagesTotalBadge" style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(124,92,255,.12);color:#7c5cff;font-weight:700"></span>
+                    </div>
+                    <div id="pagesPieWrap" style="flex:1;display:flex;align-items:center;justify-content:center;gap:18px;padding:8px 0 4px;flex-wrap:wrap">
+                        <svg id="pagesPieSvg" width="160" height="160" viewBox="0 0 160 160" style="flex-shrink:0"></svg>
+                        <div id="pagesPieLegend" style="display:flex;flex-direction:column;gap:6px;min-width:120px;max-width:170px;overflow:hidden"></div>
+                    </div>
                 </div>
             </section>
 
@@ -587,6 +602,109 @@
   });
 })();
 </script>
+
+<!-- Pages Donut Chart -->
+<script>
+(function(){
+  var PIE_COLORS = [
+    '#4a90e2','#06b6d4','#7c5cff','#f472b6','#22c55e',
+    '#f59e0b','#ef4444','#8b5cf6','#10b981','#f97316',
+    '#0e7490','#818cf8','#a3e635','#1e1b4b','#94a3b8'
+  ];
+
+  function renderPagesPieChart(orders){
+    var svg    = document.getElementById('pagesPieSvg');
+    var legend = document.getElementById('pagesPieLegend');
+    var badge  = document.getElementById('pagesTotalBadge');
+    if(!svg || !legend) return;
+
+    var total = (orders||[]).length;
+
+    /* Count by page */
+    var counts = {};
+    (orders||[]).forEach(function(o){
+      var p = (o.page||'').trim() || 'Unknown';
+      counts[p] = (counts[p]||0) + 1;
+    });
+
+    /* Sort descending */
+    var entries = Object.keys(counts).map(function(k){ return {name:k, count:counts[k]}; });
+    entries.sort(function(a,b){ return b.count - a.count; });
+
+    /* Badge */
+    if(badge) badge.textContent = total + ' Orders';
+
+    if(!total || !entries.length){
+      svg.innerHTML = '<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.2)" stroke-width="22"/>'
+        +'<text x="80" y="86" text-anchor="middle" font-size="12" fill="#94a3b8">No data</text>';
+      legend.innerHTML = '<span style="font-size:12px;color:var(--muted)">No orders yet</span>';
+      return;
+    }
+
+    /* Build SVG donut */
+    var circumference = 2 * Math.PI * 55;
+    var offset = 0;
+    var svgParts = ['<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.1)" stroke-width="22"/>'];
+
+    var topEntry = entries[0];
+    var topPct   = Math.round(topEntry.count / total * 100);
+
+    entries.forEach(function(e, i){
+      var dash  = (e.count / total) * circumference;
+      var gap   = circumference - dash;
+      var color = PIE_COLORS[i % PIE_COLORS.length];
+      var sdo   = circumference - offset - circumference * 0.25;
+      svgParts.push(
+        '<circle cx="80" cy="80" r="55" fill="none"'
+        +' stroke="'+color+'"'
+        +' stroke-width="22"'
+        +' stroke-dasharray="'+dash.toFixed(2)+' '+gap.toFixed(2)+'"'
+        +' stroke-dashoffset="'+sdo.toFixed(2)+'"'
+        +' style="transform-origin:center;transition:stroke-dashoffset .4s"/>'
+      );
+      offset += dash;
+    });
+
+    svgParts.push(
+      '<text x="80" y="75" text-anchor="middle" font-size="20" font-weight="800" fill="var(--text,#18213a)">'+topPct+'%</text>',
+      '<text x="80" y="94" text-anchor="middle" font-size="9" font-weight="700" fill="#94a3b8" letter-spacing="0.04em">'+
+        (topEntry.name.length > 12 ? topEntry.name.slice(0,11)+'…' : topEntry.name)+'</text>'
+    );
+
+    svg.innerHTML = svgParts.join('');
+
+    /* Legend */
+    var legendHTML = entries.slice(0, 8).map(function(e, i){
+      var pct   = Math.round(e.count / total * 100);
+      var color = PIE_COLORS[i % PIE_COLORS.length];
+      var name  = e.name.length > 16 ? e.name.slice(0,15)+'…' : e.name;
+      return '<div style="display:flex;align-items:center;gap:6px">'
+        +'<span style="width:10px;height:10px;border-radius:50%;background:'+color+';flex-shrink:0"></span>'
+        +'<span style="font-size:11px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</span>'
+        +'<span style="font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0">'+pct+'%</span>'
+        +'</div>';
+    }).join('');
+
+    if(entries.length > 8){
+      var othersCount = entries.slice(8).reduce(function(s,e){ return s+e.count; },0);
+      var othersPct   = Math.round(othersCount / total * 100);
+      legendHTML += '<div style="display:flex;align-items:center;gap:6px">'
+        +'<span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;flex-shrink:0"></span>'
+        +'<span style="font-size:11px;font-weight:600;color:var(--text);flex:1">Others</span>'
+        +'<span style="font-size:11px;font-weight:800;color:var(--muted)">'+othersPct+'%</span>'
+        +'</div>';
+    }
+
+    legend.innerHTML = legendHTML;
+  }
+
+  /* Listen to the event dashboard-live.js fires after each fetch */
+  window.addEventListener('cambo-dash-refreshed', function(e){
+    renderPagesPieChart((e && e.detail) || []);
+  });
+})();
+</script>
+
 <script src="assets/js/sw-register.js?v=158"></script>
 <script>
 /* ── Stock Sales Filter standalone card ── */
