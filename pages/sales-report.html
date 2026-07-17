@@ -311,11 +311,11 @@
 
   /* ── Product Summary ── */
   /* ── Products section (full-width, compact) ── */
-  .dr-prod-card { padding:14px 16px; border-radius:16px; margin-top:0 }
-  .dr-prod-head { margin-bottom:10px; display:flex; align-items:center; justify-content:space-between }
+  .dr-prod-card { padding:14px 16px; border-radius:16px; margin-top:0; display:flex; flex-direction:column }
+  .dr-prod-head { margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0 }
   .dr-prod-head h3 { margin:0 0 1px; font-size:13px; font-weight:800; color:var(--text) }
   .dr-prod-head p { margin:0; font-size:10px; color:var(--muted) }
-  .dr-prod-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:7px; max-height:195px; overflow-y:auto; padding-right:4px }
+  .dr-prod-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:7px; flex:1; overflow-y:auto; padding-right:4px; align-content:start }
   .dr-prod-grid::-webkit-scrollbar { width:4px }
   .dr-prod-grid::-webkit-scrollbar-track { background:transparent }
   .dr-prod-grid::-webkit-scrollbar-thumb { background:rgba(139,92,246,.35); border-radius:4px }
