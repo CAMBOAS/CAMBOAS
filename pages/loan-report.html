@@ -24,14 +24,15 @@
     .lr-kpi-icon { width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; flex-shrink:0 }
 
     /* ── Charts Row ── */
-    .lr-charts-row { display:grid; grid-template-columns:1fr 220px; gap:14px; align-items:start }
+    .lr-charts-row { display:flex; flex-direction:column; gap:14px }
     .lr-card { padding:16px 18px; border-radius:18px }
     .lr-card-title { font-size:12px; font-weight:800; color:var(--text); margin:0 0 4px }
     .lr-card-sub { font-size:10px; color:var(--muted); margin:0 0 14px }
 
     /* Status donut */
-    .lr-donut-wrap { display:flex; flex-direction:column; align-items:center; gap:12px }
-    .lr-donut-legend { width:100%; display:flex; flex-direction:column; gap:5px }
+    .lr-donut-wrap { display:flex; flex-direction:row; align-items:flex-start; gap:20px }
+    .lr-donut-wrap svg { flex-shrink:0 }
+    .lr-donut-legend { flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; margin-top:4px }
     .lr-legend-row { display:grid; grid-template-columns:8px 1fr 28px 42px; align-items:center; column-gap:5px }
     .lr-legend-hdr { margin-bottom:4px; padding-bottom:5px; border-bottom:1px solid rgba(148,163,184,.12) }
 
