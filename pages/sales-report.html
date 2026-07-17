@@ -1352,29 +1352,37 @@
     );
     svg.innerHTML = parts.join('');
 
-    var html = entries.slice(0, 7).map(function(e, i){
+    var GCOLS = '9px 1fr 26px 32px 58px';
+    var ROW   = 'display:grid;align-items:center;column-gap:5px;grid-template-columns:' + GCOLS;
+    var hdr   = '<div style="' + ROW + ';margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid rgba(148,163,184,.12)">'
+      + '<span></span>'
+      + '<span style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase">Pages</span>'
+      + '<span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">%</span>'
+      + '<span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">Ord</span>'
+      + '<span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">Revenue</span>'
+      + '</div>';
+    var html = hdr + entries.slice(0, 7).map(function(e, i){
       var pct   = Math.round(e.count / total * 100);
       var color = SR_PIE_COLORS[i % SR_PIE_COLORS.length];
-      var name  = e.name.length > 18 ? e.name.slice(0,17) + '…' : e.name;
-      var rev   = fmtMoney(e.revenue);
-      return '<div style="display:flex;align-items:center;gap:6px">'
-        + '<span style="width:8px;height:8px;border-radius:50%;background:' + color + ';flex-shrink:0"></span>'
-        + '<span style="font-size:11px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + name + '</span>'
-        + '<span style="font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0">' + pct + '%</span>'
-        + '<span style="font-size:10px;color:var(--muted);flex-shrink:0;padding:0 4px;border-left:1px solid rgba(148,163,184,.2)">' + e.count + ' orders</span>'
-        + '<span style="font-size:10px;font-weight:700;color:#22c55e;flex-shrink:0">' + rev + '</span>'
+      var name  = e.name.length > 22 ? e.name.slice(0,21) + '…' : e.name;
+      return '<div style="' + ROW + '">'
+        + '<span style="width:8px;height:8px;border-radius:50%;background:' + color + ';margin:0 auto"></span>'
+        + '<span style="font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + name + '</span>'
+        + '<span style="font-size:10px;font-weight:700;color:var(--muted);text-align:right">' + pct + '%</span>'
+        + '<span style="font-size:10px;color:var(--muted);text-align:right">' + e.count + '</span>'
+        + '<span style="font-size:10px;font-weight:700;color:#22c55e;text-align:right">' + fmtMoney(e.revenue) + '</span>'
         + '</div>';
     }).join('');
     if (entries.length > 7) {
       var othersCount   = entries.slice(7).reduce(function(s,e){ return s + e.count; }, 0);
       var othersRevenue = entries.slice(7).reduce(function(s,e){ return s + e.revenue; }, 0);
       var othersPct     = Math.round(othersCount / total * 100);
-      html += '<div style="display:flex;align-items:center;gap:6px">'
-        + '<span style="width:8px;height:8px;border-radius:50%;background:#cbd5e1;flex-shrink:0"></span>'
-        + '<span style="font-size:11px;font-weight:600;color:var(--text);flex:1">Others</span>'
-        + '<span style="font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0">' + othersPct + '%</span>'
-        + '<span style="font-size:10px;color:var(--muted);flex-shrink:0;padding:0 4px;border-left:1px solid rgba(148,163,184,.2)">' + othersCount + ' orders</span>'
-        + '<span style="font-size:10px;font-weight:700;color:#22c55e;flex-shrink:0">' + fmtMoney(othersRevenue) + '</span>'
+      html += '<div style="' + ROW + '">'
+        + '<span style="width:8px;height:8px;border-radius:50%;background:#cbd5e1;margin:0 auto"></span>'
+        + '<span style="font-size:11px;font-weight:600;color:var(--text)">Others</span>'
+        + '<span style="font-size:10px;font-weight:700;color:var(--muted);text-align:right">' + othersPct + '%</span>'
+        + '<span style="font-size:10px;color:var(--muted);text-align:right">' + othersCount + '</span>'
+        + '<span style="font-size:10px;font-weight:700;color:#22c55e;text-align:right">' + fmtMoney(othersRevenue) + '</span>'
         + '</div>';
     }
     legend.innerHTML = html;
