@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <script>(function(){var r=localStorage.getItem('cambo_login_required');if(r==='false')return;var k='cambo_session';if(sessionStorage.getItem(k)==='1'||localStorage.getItem(k)==='1')return;document.documentElement.style.visibility='hidden';location.replace('../login.html');})();</script>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+  <title>Loan Report - CAMBO MINI</title>
+  <link rel="icon" type="image/png" href="../images/logo/LOGO%20CAMBOMINI.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Khmer:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/templatemo-glass-admin-style.css?v=158">
+  <link rel="stylesheet" href="../assets/css/main.css?v=158">
+  <style>
+    /* ── Layout ── */
+    .lr-wrap { display:flex; flex-direction:column; gap:16px }
+
+    /* ── KPI Row ── */
+    .lr-kpi-row { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:12px }
+    .lr-kpi { padding:16px 18px; border-radius:18px; position:relative; overflow:hidden }
+    .lr-kpi-label { font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:8px }
+    .lr-kpi-val { font-size:26px; font-weight:800; color:var(--text); line-height:1 }
+    .lr-kpi-sub { font-size:11px; color:var(--muted); margin-top:5px }
+    .lr-kpi-accent { position:absolute; right:-10px; top:-10px; width:70px; height:70px; border-radius:50%; opacity:.12 }
+    .lr-kpi-icon { width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; flex-shrink:0 }
+
+    /* ── Charts Row ── */
+    .lr-charts-row { display:grid; grid-template-columns:220px 1fr 1fr; gap:14px; align-items:start }
+    .lr-card { padding:16px 18px; border-radius:18px }
+    .lr-card-title { font-size:12px; font-weight:800; color:var(--text); margin:0 0 4px }
+    .lr-card-sub { font-size:10px; color:var(--muted); margin:0 0 14px }
+
+    /* Status donut */
+    .lr-donut-wrap { display:flex; flex-direction:column; align-items:center; gap:12px }
+    .lr-donut-legend { width:100%; display:flex; flex-direction:column; gap:5px }
+    .lr-legend-row { display:grid; grid-template-columns:8px 1fr 28px 42px; align-items:center; column-gap:5px }
+    .lr-legend-hdr { margin-bottom:4px; padding-bottom:5px; border-bottom:1px solid rgba(148,163,184,.12) }
+
+    /* Group bars */
+    .lr-bar-list { display:flex; flex-direction:column; gap:7px }
+    .lr-bar-item { display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px }
+    .lr-bar-name { font-size:11px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+    .lr-bar-track { height:6px; border-radius:4px; background:rgba(148,163,184,.12); overflow:hidden; margin-top:3px }
+    .lr-bar-fill { height:100%; border-radius:4px; transition:width .6s cubic-bezier(.4,0,.2,1) }
+    .lr-bar-count { font-size:10px; font-weight:700; color:var(--muted); min-width:28px; text-align:right }
+
+    /* Gender split */
+    .lr-gender-wrap { display:flex; flex-direction:column; gap:14px }
+    .lr-gender-bar { height:16px; border-radius:8px; overflow:hidden; display:flex; background:rgba(148,163,184,.1) }
+    .lr-gender-m { background:linear-gradient(90deg,#06b6d4,#3b82f6); border-radius:8px 0 0 8px }
+    .lr-gender-f { background:linear-gradient(90deg,#ec4899,#f472b6); border-radius:0 8px 8px 0 }
+    .lr-gender-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px }
+    .lr-gender-stat { text-align:center }
+    .lr-gender-stat-val { font-size:18px; font-weight:800; color:var(--text) }
+    .lr-gender-stat-lbl { font-size:10px; color:var(--muted); margin-top:2px }
+
+    /* ── Table ── */
+    .lr-table-card { padding:16px 18px 0; border-radius:18px }
+    .lr-table-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px }
+    .lr-toolbar-left { display:flex; gap:8px; flex:1; flex-wrap:wrap; align-items:center; min-width:0 }
+    .lr-srch { flex:1; min-width:160px; max-width:280px; padding:8px 12px; border-radius:10px; font-size:13px; font-family:inherit;
+      background:rgba(255,255,255,.06); border:1px solid rgba(148,163,200,.2); color:var(--text); outline:none }
+    [data-theme="light"] .lr-srch { background:#f1f5f9; border-color:rgba(148,163,184,.25); color:#0f172a }
+    .lr-srch:focus { border-color:rgba(6,182,212,.4) }
+    .lr-filter { padding:8px 10px; border-radius:10px; font-size:12px; font-family:inherit;
+      background:rgba(255,255,255,.06); border:1px solid rgba(148,163,200,.2); color:var(--text); outline:none; cursor:pointer }
+    [data-theme="light"] .lr-filter { background:#f1f5f9; border-color:rgba(148,163,184,.25); color:#0f172a }
+    .lr-filter:focus { border-color:rgba(6,182,212,.4) }
+    .lr-btn { padding:8px 14px; border-radius:10px; border:none; cursor:pointer; font-size:12px; font-weight:700; font-family:inherit; display:flex; align-items:center; gap:5px; transition:.15s }
+    .lr-btn-export { background:rgba(34,197,94,.1); color:#86efac; border:1px solid rgba(34,197,94,.25) }
+    .lr-btn-export:hover { background:rgba(34,197,94,.2) }
+    .lr-btn-refresh { background:rgba(6,182,212,.1); color:#7dd3fc; border:1px solid rgba(6,182,212,.25) }
+    .lr-btn-refresh:hover { background:rgba(6,182,212,.2) }
+
+    /* Table */
+    .lr-tbl-wrap { overflow-x:auto; max-height:calc(100vh - 360px); min-height:260px; scrollbar-width:thin; scrollbar-color:rgba(148,163,200,.15) transparent }
+    .lr-tbl { width:100%; border-collapse:collapse; font-size:12.5px; min-width:740px }
+    .lr-tbl thead th { position:sticky; top:0; z-index:10; padding:8px 10px; text-align:left; font-size:10.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); white-space:nowrap; background:rgba(9,15,35,.97); border-bottom:2px solid rgba(148,163,200,.15); cursor:pointer; user-select:none }
+    [data-theme="light"] .lr-tbl thead th { background:#f8fafc; border-bottom-color:rgba(148,163,184,.18); color:#64748b }
+    .lr-tbl thead th:hover { color:var(--text) }
+    .lr-tbl thead th.sort-asc::after { content:' ▲'; font-size:9px }
+    .lr-tbl thead th.sort-desc::after { content:' ▼'; font-size:9px }
+    .lr-tbl tbody td { padding:9px 10px; border-bottom:1px solid rgba(148,163,200,.07); color:var(--text); vertical-align:middle; font-size:12.5px }
+    [data-theme="light"] .lr-tbl tbody td { border-bottom-color:rgba(148,163,184,.1) }
+    .lr-tbl tbody tr { transition:background .12s }
+    .lr-tbl tbody tr:hover td { background:rgba(139,92,246,.06) }
+    [data-theme="light"] .lr-tbl tbody tr:hover td { background:#f8fafc }
+    .lr-tbl-footer { display:flex; align-items:center; justify-content:space-between; padding:10px 0 14px; font-size:12px; color:var(--muted) }
+
+    /* Tags */
+    .tag { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700; border:1px solid; white-space:nowrap }
+    .tag-m   { background:rgba(6,182,212,.1);  color:#7dd3fc; border-color:rgba(6,182,212,.2) }
+    .tag-f   { background:rgba(236,72,153,.1); color:#f9a8d4; border-color:rgba(236,72,153,.2) }
+    .tag-o   { background:rgba(251,191,36,.1); color:#fde68a; border-color:rgba(251,191,36,.2) }
+    .tag-good   { background:rgba(34,197,94,.1);  color:#86efac; border-color:rgba(34,197,94,.25) }
+    .tag-normal { background:rgba(6,182,212,.1);  color:#7dd3fc; border-color:rgba(6,182,212,.2) }
+    .tag-black  { background:rgba(239,68,68,.1);  color:#fca5a5; border-color:rgba(239,68,68,.2) }
+    .tag-risk   { background:rgba(251,191,36,.1); color:#fde68a; border-color:rgba(251,191,36,.25) }
+    .tag-def    { background:rgba(255,255,255,.06); color:var(--muted); border-color:rgba(148,163,200,.15) }
+    .tag-group  { background:rgba(99,102,241,.1);  color:#a5b4fc; border-color:rgba(99,102,241,.2) }
+
+    /* Loading / empty */
+    .lr-loading { text-align:center; padding:40px 20px; color:var(--muted); font-size:13px }
+
+    /* Toast */
+    .toast { position:fixed; bottom:24px; right:24px; padding:13px 20px; border-radius:14px; font-size:13px; font-weight:600;
+      background:rgba(6,182,212,.15); border:1px solid rgba(6,182,212,.3); color:#7dd3fc;
+      backdrop-filter:blur(12px); z-index:9999; transform:translateY(20px); opacity:0; transition:.3s; pointer-events:none }
+    .toast.show { transform:translateY(0); opacity:1 }
+    .toast.err  { background:rgba(239,68,68,.15); border-color:rgba(239,68,68,.3); color:#fca5a5 }
+
+    /* Responsive */
+    @media(max-width:1200px) { .lr-kpi-row { grid-template-columns:repeat(3,1fr) } }
+    @media(max-width:1000px) { .lr-charts-row { grid-template-columns:1fr 1fr } .lr-charts-row > .lr-card:first-child { grid-column:1/-1 } }
+    @media(max-width:768px)  {
+      .lr-kpi-row { grid-template-columns:repeat(2,1fr) }
+      .lr-charts-row { grid-template-columns:1fr }
+      .lr-tbl-wrap { max-height:none }
+    }
+  </style>
+</head>
+<body>
+<div class="background"></div><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+<div class="dashboard">
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar" id="sharedSidebar"></aside>
+  <main class="main-content">
+    <div class="shared-topbar" id="sharedHeader"></div>
+
+      <div class="lr-wrap">
+
+        <!-- KPI Row -->
+        <div class="lr-kpi-row" id="lrKpiRow">
+          <!-- Skeleton KPIs -->
+          <div class="glass-card lr-kpi"><div class="lr-kpi-label">Loading...</div><div class="lr-kpi-val">—</div></div>
+          <div class="glass-card lr-kpi"><div class="lr-kpi-label">Loading...</div><div class="lr-kpi-val">—</div></div>
+          <div class="glass-card lr-kpi"><div class="lr-kpi-label">Loading...</div><div class="lr-kpi-val">—</div></div>
+          <div class="glass-card lr-kpi"><div class="lr-kpi-label">Loading...</div><div class="lr-kpi-val">—</div></div>
+          <div class="glass-card lr-kpi"><div class="lr-kpi-label">Loading...</div><div class="lr-kpi-val">—</div></div>
+          <div class="glass-card lr-kpi"><div class="lr-kpi-label">Loading...</div><div class="lr-kpi-val">—</div></div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="lr-charts-row">
+          <!-- Status Donut -->
+          <div class="glass-card lr-card" id="lrStatusCard">
+            <h3 class="lr-card-title">ស្ថានភាព</h3>
+            <p class="lr-card-sub">Status Distribution</p>
+            <div class="lr-donut-wrap">
+              <svg id="lrStatusSvg" width="120" height="120" viewBox="0 0 160 160" style="flex-shrink:0">
+                <circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.15)" stroke-width="24"/>
+              </svg>
+              <div class="lr-donut-legend" id="lrStatusLegend">
+                <div class="lr-legend-row lr-legend-hdr">
+                  <span></span>
+                  <span style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Status</span>
+                  <span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">%</span>
+                  <span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">Count</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gender + Monthly trend -->
+          <div class="glass-card lr-card">
+            <h3 class="lr-card-title">ភេទ</h3>
+            <p class="lr-card-sub">Gender Distribution</p>
+            <div class="lr-gender-wrap" id="lrGenderWrap">
+              <div class="lr-gender-bar" id="lrGenderBar">
+                <div class="lr-gender-m" id="lrGenderM" style="width:50%"></div>
+                <div class="lr-gender-f" id="lrGenderF" style="width:50%"></div>
+              </div>
+              <div class="lr-gender-stats" id="lrGenderStats">
+                <div class="lr-gender-stat">
+                  <div class="lr-gender-stat-val" id="lrGMaleVal">—</div>
+                  <div class="lr-gender-stat-lbl" style="color:#7dd3fc">ប្រុស (Male)</div>
+                </div>
+                <div class="lr-gender-stat">
+                  <div class="lr-gender-stat-val" id="lrGFemVal">—</div>
+                  <div class="lr-gender-stat-lbl" style="color:#f9a8d4">ស្រី (Female)</div>
+                </div>
+                <div class="lr-gender-stat">
+                  <div class="lr-gender-stat-val" id="lrGOtherVal">—</div>
+                  <div class="lr-gender-stat-lbl">ផ្សេងៗ</div>
+                </div>
+              </div>
+              <!-- Monthly new borrowers mini chart -->
+              <div style="margin-top:8px;border-top:1px solid rgba(148,163,184,.1);padding-top:12px">
+                <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px">ថ្មី / ខែ (New / Month)</div>
+                <div id="lrMonthBars" style="display:flex;align-items:flex-end;gap:4px;height:48px"></div>
+                <div id="lrMonthLabels" style="display:flex;gap:4px;margin-top:4px"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Groups -->
+          <div class="glass-card lr-card">
+            <h3 class="lr-card-title">ក្រុម</h3>
+            <p class="lr-card-sub">Top Groups by Borrowers</p>
+            <div class="lr-bar-list" id="lrGroupBars">
+              <div class="lr-loading" style="padding:20px">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="glass-card lr-table-card">
+          <div class="lr-table-toolbar">
+            <div class="lr-toolbar-left">
+              <input class="lr-srch" id="lrSrch" placeholder="ស្វែងរកឈ្មោះ / NID / ទូរស័ព្ទ..." oninput="applyFilter()">
+              <select class="lr-filter" id="lrFGroup" onchange="applyFilter()">
+                <option value="">All Groups</option>
+              </select>
+              <select class="lr-filter" id="lrFStatus" onchange="applyFilter()">
+                <option value="">All Status</option>
+                <option value="Good">Good</option>
+                <option value="Normal">Normal</option>
+                <option value="BlackListed">BlackListed</option>
+                <option value="High Risk">High Risk</option>
+              </select>
+              <select class="lr-filter" id="lrFGender" onchange="applyFilter()">
+                <option value="">All Gender</option>
+                <option value="Male">Male / ប្រុស</option>
+                <option value="Female">Female / ស្រី</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <button class="lr-btn lr-btn-export" onclick="exportCSV()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export CSV
+            </button>
+            <button class="lr-btn lr-btn-refresh" onclick="loadData()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              Refresh
+            </button>
+          </div>
+
+          <div class="lr-tbl-wrap">
+            <table class="lr-tbl">
+              <thead>
+                <tr>
+                  <th onclick="sortTable('_idx')">#</th>
+                  <th onclick="sortTable('FullName')">ឈ្មោះ (Name)</th>
+                  <th onclick="sortTable('NationalID')">National ID</th>
+                  <th onclick="sortTable('Phone')">ទូរស័ព្ទ</th>
+                  <th onclick="sortTable('Gender')">ភេទ</th>
+                  <th onclick="sortTable('Groups')">ក្រុម</th>
+                  <th onclick="sortTable('Money')" style="text-align:right">Amount ($)</th>
+                  <th onclick="sortTable('Status')">ស្ថានភាព</th>
+                  <th onclick="sortTable('_date')">កាលបរិច្ឆេទ</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+              <tbody id="lrTbody">
+                <tr><td colspan="10" class="lr-loading">កំពុងផ្ទុក...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="lr-tbl-footer">
+            <span id="lrFootInfo">—</span>
+            <span id="lrFootCount" style="font-weight:700;color:var(--text)">—</span>
+          </div>
+        </div>
+
+      </div><!-- /.lr-wrap -->
+    </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../assets/js/layout.js?v=158"></script>
+<script src="../assets/js/dashboard-layout.js?v=158"></script>
+<script src="../assets/js/cambo-api.js?v=158"></script>
+<script>
+var _allLoans   = [];
+var _filtered   = [];
+var _sortCol    = '_idx';
+var _sortAsc    = true;
+
+/* ── Helpers ── */
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtMoney(v) { var n=Number(v||0); return isNaN(n)?'—':'$'+n.toFixed(2).replace(/\.00$/,''); }
+function fmtDate(dt) {
+  if (!dt) return '—';
+  var s = String(dt);
+  var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return m[3]+'/'+m[2]+'/'+m[1];
+  return s.split('T')[0] || '—';
+}
+function today_ymd() {
+  var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function toast(msg, err) {
+  var el=document.getElementById('toast');
+  if(!el) return;
+  el.textContent=msg; el.className='toast'+(err?' err':'');
+  void el.offsetWidth; el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 3200);
+}
+
+/* ── Status tag ── */
+function statusTag(s) {
+  var v = (s||'').trim();
+  if (!v) return '<span class="tag tag-def">—</span>';
+  var lower = v.toLowerCase();
+  if (lower==='good')       return '<span class="tag tag-good">Good</span>';
+  if (lower==='normal')     return '<span class="tag tag-normal">Normal</span>';
+  if (lower==='blacklisted')return '<span class="tag tag-black">BlackListed</span>';
+  if (lower.includes('high')|| lower.includes('risk')) return '<span class="tag tag-risk">High Risk</span>';
+  return '<span class="tag tag-def">'+esc(v)+'</span>';
+}
+function genderTag(g) {
+  var v = (g||'').trim().toLowerCase();
+  if (v==='male'||v==='ប្រុស')   return '<span class="tag tag-m">ប្រុស</span>';
+  if (v==='female'||v==='ស្រី') return '<span class="tag tag-f">ស្រី</span>';
+  if (v) return '<span class="tag tag-o">'+esc(g)+'</span>';
+  return '—';
+}
+
+/* ── Status colors ── */
+var STATUS_COLORS = {
+  'Good':       '#22c55e',
+  'Normal':     '#06b6d4',
+  'BlackListed':'#ef4444',
+  'High Risk':  '#f59e0b',
+};
+function statusColor(s) {
+  var v = (s||'').trim();
+  if (v.toLowerCase()==='blacklisted') return STATUS_COLORS['BlackListed'];
+  return STATUS_COLORS[v] || '#94a3b8';
+}
+
+/* ── Load data ── */
+async function loadData() {
+  document.getElementById('lrTbody').innerHTML = '<tr><td colspan="10" class="lr-loading">កំពុងផ្ទុកទិន្នន័យ...</td></tr>';
+  try {
+    var data = await CamboAPI.get({ action: 'helen_loan_list' });
+    _allLoans = (data.ok && Array.isArray(data.loans)) ? data.loans : [];
+    _allLoans.forEach(function(l, i){ l._idx = i+1; l._date = (l.DateTime||'').split('T')[0]; });
+  } catch(e) {
+    _allLoans = [];
+    toast('❌ Cannot connect to Server', true);
+  }
+  populateFilters();
+  applyFilter();
+  renderCharts();
+}
+
+/* ── Populate filter dropdowns ── */
+function populateFilters() {
+  var groups = [...new Set(_allLoans.map(function(l){ return l.Groups||''; }).filter(Boolean))].sort();
+  var sel = document.getElementById('lrFGroup');
+  sel.innerHTML = '<option value="">All Groups</option>' +
+    groups.map(function(g){ return '<option value="'+esc(g)+'">'+esc(g)+'</option>'; }).join('');
+}
+
+/* ── Filter + Sort ── */
+function applyFilter() {
+  var q  = (document.getElementById('lrSrch').value||'').toLowerCase().trim();
+  var fg = document.getElementById('lrFGroup').value;
+  var fs = document.getElementById('lrFStatus').value;
+  var fn = document.getElementById('lrFGender').value;
+
+  _filtered = _allLoans.filter(function(l){
+    if (q && !(
+      (l.FullName||'').toLowerCase().includes(q) ||
+      (l.NationalID||'').toLowerCase().includes(q) ||
+      (l.Phone||'').replace(/\s/g,'').includes(q.replace(/\s/g,''))
+    )) return false;
+    if (fg && l.Groups !== fg) return false;
+    if (fs) {
+      var st = (l.Status||'').trim().toLowerCase();
+      if (fs.toLowerCase() !== st) return false;
+    }
+    if (fn) {
+      var gv = (l.Gender||'').trim().toLowerCase();
+      if (fn.toLowerCase() !== gv) return false;
+    }
+    return true;
+  });
+
+  sortAndRender();
+}
+
+function sortTable(col) {
+  if (_sortCol === col) { _sortAsc = !_sortAsc; }
+  else { _sortCol = col; _sortAsc = true; }
+  document.querySelectorAll('.lr-tbl thead th').forEach(function(th){ th.className=''; });
+  var ths = document.querySelectorAll('.lr-tbl thead th');
+  var colMap = ['_idx','FullName','NationalID','Phone','Gender','Groups','Money','Status','_date','_note'];
+  var idx = colMap.indexOf(col);
+  if (idx >= 0 && ths[idx]) ths[idx].className = _sortAsc ? 'sort-asc' : 'sort-desc';
+  renderTable();
+}
+
+function sortAndRender() {
+  var ths = document.querySelectorAll('.lr-tbl thead th');
+  var colMap = ['_idx','FullName','NationalID','Phone','Gender','Groups','Money','Status','_date','_note'];
+  var idx = colMap.indexOf(_sortCol);
+  if (idx >= 0 && ths[idx]) ths[idx].className = _sortAsc ? 'sort-asc' : 'sort-desc';
+  renderTable();
+}
+
+function renderTable() {
+  var arr = _filtered.slice();
+  arr.sort(function(a,b){
+    var av = a[_sortCol]||'', bv = b[_sortCol]||'';
+    if (_sortCol === 'Money') { av = Number(av)||0; bv = Number(bv)||0; }
+    if (_sortCol === '_idx')  { av = Number(av)||0; bv = Number(bv)||0; }
+    var r = (av > bv ? 1 : av < bv ? -1 : 0);
+    return _sortAsc ? r : -r;
+  });
+
+  if (!arr.length) {
+    document.getElementById('lrTbody').innerHTML = '<tr><td colspan="10" class="lr-loading">មិនមានទិន្នន័យ</td></tr>';
+    document.getElementById('lrFootInfo').textContent = '0 borrowers';
+    document.getElementById('lrFootCount').textContent = '';
+    return;
+  }
+
+  var html = arr.map(function(l, i){
+    var money = Number(l.Money||0);
+    var moneyHtml = isNaN(money) || money===0 ? '<span style="color:var(--muted)">—</span>' : '<span style="color:#34d399;font-weight:700">'+fmtMoney(money)+'</span>';
+    return '<tr>'
+      + '<td style="color:var(--muted);font-size:11px">'+esc(String(l._idx||i+1))+'</td>'
+      + '<td style="font-weight:700;color:var(--text)">'+esc(l.FullName||'—')+'</td>'
+      + '<td style="font-family:monospace;font-size:11.5px;color:#60a5fa">'+esc(l.NationalID||'—')+'</td>'
+      + '<td style="font-size:12px"><a href="tel:'+esc(l.Phone||'')+'" style="color:#60a5fa;text-decoration:none">'+esc(l.Phone||'—')+'</a></td>'
+      + '<td>'+genderTag(l.Gender)+'</td>'
+      + '<td>'+(l.Groups?'<span class="tag tag-group">'+esc(l.Groups)+'</span>':'—')+'</td>'
+      + '<td style="text-align:right">'+moneyHtml+'</td>'
+      + '<td>'+statusTag(l.Status)+'</td>'
+      + '<td style="font-size:11px;color:var(--muted)">'+fmtDate(l.DateTime)+'</td>'
+      + '<td style="font-size:11px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(l.Note||'')+'">'+esc(l.Note||'—')+'</td>'
+      + '</tr>';
+  }).join('');
+
+  document.getElementById('lrTbody').innerHTML = html;
+  document.getElementById('lrFootInfo').textContent = _filtered.length + ' / ' + _allLoans.length + ' borrowers';
+  document.getElementById('lrFootCount').textContent = arr.length + ' shown';
+}
+
+/* ── Charts ── */
+function renderCharts() {
+  renderKPIs();
+  renderStatusDonut();
+  renderGender();
+  renderGroupBars();
+  renderMonthChart();
+}
+
+function renderKPIs() {
+  var total     = _allLoans.length;
+  var totalAmt  = _allLoans.reduce(function(s,l){ var n=Number(l.Money||0); return s+(isNaN(n)?0:n); }, 0);
+  var blacklist = _allLoans.filter(function(l){ return (l.Status||'').toLowerCase()==='blacklisted'; }).length;
+  var good      = _allLoans.filter(function(l){ return (l.Status||'').trim().toLowerCase()==='good'; }).length;
+  var highRisk  = _allLoans.filter(function(l){ var s=(l.Status||'').toLowerCase(); return s.includes('high')||s.includes('risk'); }).length;
+  var today     = today_ymd();
+  var newToday  = _allLoans.filter(function(l){ return (l._date||'')=== today; }).length;
+
+  var blPct = total ? Math.round(blacklist/total*100) : 0;
+  var gdPct = total ? Math.round(good/total*100) : 0;
+
+  document.getElementById('lrKpiRow').innerHTML = [
+    kpiCard('អ្នកកម្ចីសរុប','Total Borrowers', total, '',          '#7c5cff','#7c5cff'),
+    kpiCard('ប្រាក់សរុប','Total Amount',      fmtMoney(totalAmt), '', '#22c55e','#22c55e'),
+    kpiCard('Blacklisted','',                  blacklist, blPct+'% of total', '#ef4444','#ef4444'),
+    kpiCard('Good','',                          good,      gdPct+'% of total', '#22c55e','#22c55e'),
+    kpiCard('High Risk','',                     highRisk,  '', '#f59e0b','#f59e0b'),
+    kpiCard('ថ្ងៃនេះ','New Today',             newToday,  today, '#06b6d4','#06b6d4'),
+  ].join('');
+}
+
+function kpiCard(label, sublabel, val, sub, iconColor, accentColor) {
+  return '<div class="glass-card lr-kpi">'
+    + '<div class="lr-kpi-accent" style="background:'+accentColor+'"></div>'
+    + '<div class="lr-kpi-label">'+esc(label)+(sublabel?' <span style="opacity:.6;font-weight:400">'+esc(sublabel)+'</span>':'')+'</div>'
+    + '<div class="lr-kpi-val" style="color:'+iconColor+'">'+esc(String(val))+'</div>'
+    + (sub ? '<div class="lr-kpi-sub">'+esc(sub)+'</div>' : '')
+    + '</div>';
+}
+
+function renderStatusDonut() {
+  var counts = {};
+  _allLoans.forEach(function(l){
+    var s = (l.Status||'').trim() || 'Unknown';
+    if (s.toLowerCase()==='blacklisted') s='BlackListed';
+    if (s.toLowerCase().includes('high')) s='High Risk';
+    counts[s] = (counts[s]||0) + 1;
+  });
+  var entries = Object.keys(counts).map(function(k){ return {name:k, count:counts[k]}; });
+  entries.sort(function(a,b){ return b.count-a.count; });
+
+  var total = _allLoans.length;
+  var svg   = document.getElementById('lrStatusSvg');
+  var lgnd  = document.getElementById('lrStatusLegend');
+
+  if (!total) {
+    svg.innerHTML = '<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.2)" stroke-width="24"/><text x="80" y="86" text-anchor="middle" font-size="11" fill="#94a3b8">No data</text>';
+    return;
+  }
+
+  var circ = 2*Math.PI*55;
+  var off  = 0;
+  var top  = entries[0];
+  var topPct = Math.round(top.count/total*100);
+  var parts = ['<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.08)" stroke-width="24"/>'];
+
+  entries.forEach(function(e){
+    var dash  = (e.count/total)*circ;
+    var gap   = circ-dash;
+    var color = statusColor(e.name);
+    var sdo   = circ - off - circ*0.25;
+    parts.push('<circle cx="80" cy="80" r="55" fill="none" stroke="'+color+'" stroke-width="24"'
+      +' stroke-dasharray="'+dash.toFixed(2)+' '+gap.toFixed(2)+'"'
+      +' stroke-dashoffset="'+sdo.toFixed(2)+'" style="transform-origin:center;transition:stroke-dashoffset .5s"/>');
+    off += dash;
+  });
+  parts.push(
+    '<text x="80" y="74" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text,#18213a)">'+topPct+'%</text>',
+    '<text x="80" y="91" text-anchor="middle" font-size="9" font-weight="700" fill="#94a3b8">'+top.name+'</text>'
+  );
+  svg.innerHTML = parts.join('');
+
+  var GCOLS = '8px 1fr 26px 30px';
+  var ROW = 'display:grid;align-items:center;column-gap:4px;grid-template-columns:'+GCOLS;
+  var hdr = '<div class="lr-legend-row lr-legend-hdr" style="'+ROW+'">'
+    + '<span></span>'
+    + '<span style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Status</span>'
+    + '<span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">%</span>'
+    + '<span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">N</span>'
+    + '</div>';
+
+  var rows = entries.map(function(e){
+    var pct   = Math.round(e.count/total*100);
+    var color = statusColor(e.name);
+    return '<div style="'+ROW+';gap:4px">'
+      + '<span style="width:7px;height:7px;border-radius:50%;background:'+color+';margin:0 auto"></span>'
+      + '<span style="font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(e.name)+'</span>'
+      + '<span style="font-size:10px;font-weight:700;color:var(--muted);text-align:right">'+pct+'%</span>'
+      + '<span style="font-size:10px;color:var(--muted);text-align:right">'+e.count+'</span>'
+      + '</div>';
+  }).join('');
+  lgnd.innerHTML = hdr + rows;
+}
+
+function renderGender() {
+  var male   = _allLoans.filter(function(l){ var g=(l.Gender||'').toLowerCase(); return g==='male'||g==='ប្រុស'; }).length;
+  var female = _allLoans.filter(function(l){ var g=(l.Gender||'').toLowerCase(); return g==='female'||g==='ស្រី'; }).length;
+  var other  = _allLoans.length - male - female;
+  var total  = _allLoans.length || 1;
+
+  document.getElementById('lrGMaleVal').textContent  = male;
+  document.getElementById('lrGFemVal').textContent   = female;
+  document.getElementById('lrGOtherVal').textContent = other < 0 ? 0 : other;
+
+  var mp = male/total*100, fp = female/total*100;
+  document.getElementById('lrGenderM').style.width = mp+'%';
+  document.getElementById('lrGenderF').style.width = fp+'%';
+}
+
+function renderGroupBars() {
+  var counts = {};
+  _allLoans.forEach(function(l){
+    var g = (l.Groups||'Unknown').trim();
+    counts[g] = (counts[g]||0) + 1;
+  });
+  var entries = Object.keys(counts).map(function(k){ return {name:k, count:counts[k]}; });
+  entries.sort(function(a,b){ return b.count-a.count; });
+  var topEntries = entries.slice(0, 8);
+  var max = topEntries.length ? topEntries[0].count : 1;
+
+  var GROUP_COLORS = ['#7c5cff','#06b6d4','#22c55e','#f59e0b','#ef4444','#ec4899','#8b5cf6','#10b981'];
+
+  var html = topEntries.map(function(e, i){
+    var pct = Math.round(e.count/max*100);
+    var color = GROUP_COLORS[i%GROUP_COLORS.length];
+    var name  = e.name.length > 20 ? e.name.slice(0,19)+'…' : e.name;
+    return '<div>'
+      + '<div class="lr-bar-item">'
+      + '<span class="lr-bar-name" title="'+esc(e.name)+'"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+color+';margin-right:5px"></span>'+esc(name)+'</span>'
+      + '<span class="lr-bar-count">'+e.count+'</span>'
+      + '</div>'
+      + '<div class="lr-bar-track"><div class="lr-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'
+      + '</div>';
+  }).join('');
+
+  document.getElementById('lrGroupBars').innerHTML = html || '<div class="lr-loading" style="padding:16px">—</div>';
+}
+
+function renderMonthChart() {
+  var months = {};
+  var now = new Date();
+  for (var i=5; i>=0; i--) {
+    var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    var key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    months[key] = 0;
+  }
+  _allLoans.forEach(function(l){
+    var k = (l._date||'').slice(0,7);
+    if (k in months) months[k]++;
+  });
+
+  var keys   = Object.keys(months);
+  var vals   = keys.map(function(k){ return months[k]; });
+  var maxVal = Math.max.apply(null, vals) || 1;
+  var MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  var bars = keys.map(function(k, i){
+    var h   = Math.round(vals[i]/maxVal*100);
+    var isCurrentMonth = (k === (now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')));
+    return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">'
+      + '<span style="font-size:9px;color:var(--muted)">'+(vals[i]||'')+'</span>'
+      + '<div style="width:100%;height:'+Math.max(h*0.4,2)+'px;border-radius:3px;background:'+(isCurrentMonth?'#7c5cff':'rgba(99,102,241,.35)')+'"></div>'
+      + '</div>';
+  }).join('');
+
+  var labels = keys.map(function(k){
+    var parts = k.split('-');
+    return '<div style="flex:1;text-align:center;font-size:9px;color:var(--muted)">'+MONTH_NAMES[parseInt(parts[1])-1]+'</div>';
+  }).join('');
+
+  document.getElementById('lrMonthBars').innerHTML = bars;
+  document.getElementById('lrMonthLabels').innerHTML = labels;
+}
+
+/* ── Export ── */
+function exportCSV() {
+  var data = _filtered.length ? _filtered : _allLoans;
+  if (!data.length) { toast('No data to export', true); return; }
+  var headers = ['#','Full Name','National ID','DOB','Gender','Phone','Group','Amount ($)','Status','Date','Note'];
+  var rows = data.map(function(l, i){
+    return [i+1, l.FullName||'', l.NationalID||'', l.DOB||'', l.Gender||'', '\t'+(l.Phone||''),
+            l.Groups||'', l.Money||'', l.Status||'', fmtDate(l.DateTime), l.Note||''];
+  });
+  var csv = [headers].concat(rows).map(function(r){
+    return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',');
+  }).join('\r\n');
+  var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  var now  = new Date();
+  a.download = 'LoanReport_'+now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Exported '+data.length+' rows');
+}
+
+/* ── Init ── */
+loadData();
+</script>
+</body>
+</html>

@@ -24,6 +24,7 @@
       'pages/cmd.html':           { title: t('កម្រៃជើងសារ','Commission'),         subtitle: t('កម្រៃអ្នកលក់ និងតារាងចំណាត់ថ្នាក់','Agent commission and leaderboard') },
       'pages/packaging.html':     { title: t('វេចខ្ចប់','Packaging'),             subtitle: t('វេចខ្ចប់ និងរៀបចំការដឹកជញ្ជូន','Packaging and delivery preparation') },
       'pages/helen-loan.html':    { title: t('ការកម្ចី','Loans'),                 subtitle: t('គ្រប់គ្រងការកម្ចី និងព័ត៌មានអ្នកខ្ចី','Manage loans and borrower information') },
+      'pages/loan-report.html':  { title: t('បញ្ជីកម្ចី','Loan Report'),          subtitle: t('វិភាគ និងតារាងអ្នកខ្ចីសរុប','Borrower analytics and full list view') },
       'pages/settings.html':      { title: t('ការកំណត់','Settings'),              subtitle: t('រៀបចំ Workspace របស់អ្នក','Configure your workspace') },
       'login.html':               { title: t('ចូលប្រើ','Login'),                  subtitle: '' },
     };
@@ -47,6 +48,7 @@
     cmd:        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
     settings:   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
     loan:       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>',
+    loanrpt:    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
     logout:     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
     moon:       '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
     sun:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
@@ -117,7 +119,8 @@
         <div class="sb-divider sb-divider-sm"></div>
         <div class="sb-section-label">${t('ហិរញ្ញវត្ថុ','Finance')}</div>
         <ul class="sb-list">
-          ${link('pages/helen-loan.html', ic.loan, t('ការកម្ចី','Loans'))}
+          ${link('pages/helen-loan.html',  ic.loan,    t('ការកម្ចី','Loans'))}
+          ${link('pages/loan-report.html', ic.loanrpt, t('បញ្ជីកម្ចី','Loan Report'))}
         </ul>
         <div class="sb-divider sb-divider-sm"></div>
         <div class="sb-section-label">${t('ប្រព័ន្ធ','System')}</div>
