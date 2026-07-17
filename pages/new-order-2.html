@@ -1080,16 +1080,16 @@
       opacity: 0 !important;
       pointer-events: none !important;
     }
-    /* Action bar: match desktop pill style on tablet & medium phone (480–979px) */
-    @media (min-width: 480px) and (max-width: 979px) {
+    /* Action bar: right-side pill on tablet (680–979px) */
+    @media (min-width: 680px) and (max-width: 979px) {
       #mobBottomBar {
         right: 14px !important;
         width: 64px !important;
       }
       .no-wrap { padding-right: 84px !important; }
     }
-    /* Phone (480–679px): action bar → horizontal bottom bar (full-width, slides up/down) */
-    @media (min-width: 480px) and (max-width: 679px) {
+    /* Phone (360–679px): action bar → horizontal bottom bar (full-width, slides up/down) */
+    @media (min-width: 360px) and (max-width: 679px) {
       #mobBottomBar {
         top: auto !important;
         bottom: 0 !important;
@@ -1112,8 +1112,8 @@
         padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
       }
     }
-    /* Very small phone (<480px): action bar too cramped — hide it */
-    @media (max-width: 479px) {
+    /* Very small phone (<360px): action bar too cramped — hide it */
+    @media (max-width: 359px) {
       #mobBottomBar { display: none !important; }
     }
 
@@ -3913,7 +3913,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   function animateBar(toHidden) {
     if (!bar) return;
-    var isPhone = window.innerWidth >= 480 && window.innerWidth < 680;
+    var isPhone = window.innerWidth >= 360 && window.innerWidth < 680;
     var from, to;
     if (isPhone) {
       /* Phone bottom bar: slide down to hide, slide up to show */
