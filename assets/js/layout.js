@@ -24,7 +24,7 @@
       'pages/cmd.html':           { title: t('កម្រៃជើងសារ','Commission'),         subtitle: t('កម្រៃអ្នកលក់ និងតារាងចំណាត់ថ្នាក់','Agent commission and leaderboard') },
       'pages/packaging.html':     { title: t('វេចខ្ចប់','Packaging'),             subtitle: t('វេចខ្ចប់ និងរៀបចំការដឹកជញ្ជូន','Packaging and delivery preparation') },
       'pages/helen-loan.html':    { title: t('ការកម្ចី','Loans'),                 subtitle: t('គ្រប់គ្រងការកម្ចី និងព័ត៌មានអ្នកខ្ចី','Manage loans and borrower information') },
-      'pages/loan-report.html':  { title: t('បញ្ជីកម្ចី','Loan Report'),          subtitle: t('វិភាគ និងតារាងអ្នកខ្ចីសរុប','Borrower analytics and full list view') },
+      'pages/loan-report.html':  { title: t('បញ្ជីកម្ចី','Loan List'),             subtitle: t('តារាង និងការគ្រប់គ្រងអ្នកខ្ចីសរុប','Borrower list and management') },
       'pages/settings.html':      { title: t('ការកំណត់','Settings'),              subtitle: t('រៀបចំ Workspace របស់អ្នក','Configure your workspace') },
       'login.html':               { title: t('ចូលប្រើ','Login'),                  subtitle: '' },
     };
@@ -120,7 +120,7 @@
         <div class="sb-section-label">${t('ហិរញ្ញវត្ថុ','Finance')}</div>
         <ul class="sb-list">
           ${link('pages/helen-loan.html',  ic.loan,    t('ការកម្ចី','Loans'))}
-          ${link('pages/loan-report.html', ic.loanrpt, t('បញ្ជីកម្ចី','Loan Report'))}
+          ${link('pages/loan-report.html', ic.loanrpt, t('បញ្ជីកម្ចី','Loan List'))}
         </ul>
         <div class="sb-divider sb-divider-sm"></div>
         <div class="sb-section-label">${t('ប្រព័ន្ធ','System')}</div>
