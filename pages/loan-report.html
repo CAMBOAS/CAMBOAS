@@ -201,6 +201,7 @@
                   <th onclick="sortTable('_idx')">#</th>
                   <th onclick="sortTable('FullName')">ឈ្មោះ (Name)</th>
                   <th onclick="sortTable('NationalID')">National ID</th>
+                  <th onclick="sortTable('DOB')">DOB</th>
                   <th onclick="sortTable('Phone')">ទូរស័ព្ទ</th>
                   <th onclick="sortTable('Gender')">ភេទ</th>
                   <th onclick="sortTable('Groups')">ក្រុម</th>
@@ -346,7 +347,7 @@ function sortTable(col) {
   else { _sortCol = col; _sortAsc = true; }
   document.querySelectorAll('.lr-tbl thead th').forEach(function(th){ th.className=''; });
   var ths = document.querySelectorAll('.lr-tbl thead th');
-  var colMap = ['_idx','FullName','NationalID','Phone','Gender','Groups','Money','Status','_date','_note'];
+  var colMap = ['_idx','FullName','NationalID','DOB','Phone','Gender','Groups','Money','Status','_date','_note'];
   var idx = colMap.indexOf(col);
   if (idx >= 0 && ths[idx]) ths[idx].className = _sortAsc ? 'sort-asc' : 'sort-desc';
   renderTable();
@@ -354,7 +355,7 @@ function sortTable(col) {
 
 function sortAndRender() {
   var ths = document.querySelectorAll('.lr-tbl thead th');
-  var colMap = ['_idx','FullName','NationalID','Phone','Gender','Groups','Money','Status','_date','_note'];
+  var colMap = ['_idx','FullName','NationalID','DOB','Phone','Gender','Groups','Money','Status','_date','_note'];
   var idx = colMap.indexOf(_sortCol);
   if (idx >= 0 && ths[idx]) ths[idx].className = _sortAsc ? 'sort-asc' : 'sort-desc';
   renderTable();
@@ -371,7 +372,7 @@ function renderTable() {
   });
 
   if (!arr.length) {
-    document.getElementById('lrTbody').innerHTML = '<tr><td colspan="10" class="lr-loading">មិនមានទិន្នន័យ</td></tr>';
+    document.getElementById('lrTbody').innerHTML = '<tr><td colspan="11" class="lr-loading">មិនមានទិន្នន័យ</td></tr>';
     document.getElementById('lrFootInfo').textContent = '0 borrowers';
     document.getElementById('lrFootCount').textContent = '';
     return;
@@ -384,6 +385,7 @@ function renderTable() {
       + '<td style="color:var(--muted);font-size:11px">'+esc(String(l._idx||i+1))+'</td>'
       + '<td style="font-weight:700;color:var(--text)">'+esc(l.FullName||'—')+'</td>'
       + '<td style="font-family:monospace;font-size:11.5px;color:#60a5fa">'+esc(l.NationalID||'—')+'</td>'
+      + '<td style="font-size:11px;color:var(--muted)">'+esc(l.DOB||'—')+'</td>'
       + '<td style="font-size:12px"><a href="tel:'+esc(l.Phone||'')+'" style="color:#60a5fa;text-decoration:none">'+esc(l.Phone||'—')+'</a></td>'
       + '<td>'+genderTag(l.Gender)+'</td>'
       + '<td>'+(l.Groups?'<span class="tag tag-group">'+esc(l.Groups)+'</span>':'—')+'</td>'
