@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="km">
 <head>
   <script>(function(){var r=localStorage.getItem('cambo_login_required');if(r==='false')return;var k='cambo_session';if(sessionStorage.getItem(k)==='1'||localStorage.getItem(k)==='1')return;document.documentElement.style.visibility='hidden';location.replace('../login.html');})();</script>
@@ -24,7 +24,7 @@
     .lr-kpi-icon { width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; flex-shrink:0 }
 
     /* ── Charts Row ── */
-    .lr-charts-row { display:grid; grid-template-columns:220px 1fr 1fr; gap:14px; align-items:start }
+    .lr-charts-row { display:grid; grid-template-columns:220px 1fr; gap:14px; align-items:start }
     .lr-card { padding:16px 18px; border-radius:18px }
     .lr-card-title { font-size:12px; font-weight:800; color:var(--text); margin:0 0 4px }
     .lr-card-sub { font-size:10px; color:var(--muted); margin:0 0 14px }
@@ -43,15 +43,6 @@
     .lr-bar-fill { height:100%; border-radius:4px; transition:width .6s cubic-bezier(.4,0,.2,1) }
     .lr-bar-count { font-size:10px; font-weight:700; color:var(--muted); min-width:28px; text-align:right }
 
-    /* Gender split */
-    .lr-gender-wrap { display:flex; flex-direction:column; gap:14px }
-    .lr-gender-bar { height:16px; border-radius:8px; overflow:hidden; display:flex; background:rgba(148,163,184,.1) }
-    .lr-gender-m { background:linear-gradient(90deg,#06b6d4,#3b82f6); border-radius:8px 0 0 8px }
-    .lr-gender-f { background:linear-gradient(90deg,#ec4899,#f472b6); border-radius:0 8px 8px 0 }
-    .lr-gender-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px }
-    .lr-gender-stat { text-align:center }
-    .lr-gender-stat-val { font-size:18px; font-weight:800; color:var(--text) }
-    .lr-gender-stat-lbl { font-size:10px; color:var(--muted); margin-top:2px }
 
     /* ── Table ── */
     .lr-table-card { padding:16px 18px 0; border-radius:18px }
@@ -110,7 +101,7 @@
 
     /* Responsive */
     @media(max-width:1200px) { .lr-kpi-row { grid-template-columns:repeat(3,1fr) } }
-    @media(max-width:1000px) { .lr-charts-row { grid-template-columns:1fr 1fr } .lr-charts-row > .lr-card:first-child { grid-column:1/-1 } }
+    @media(max-width:1000px) { .lr-charts-row { grid-template-columns:1fr } }
     @media(max-width:768px)  {
       .lr-kpi-row { grid-template-columns:repeat(2,1fr) }
       .lr-charts-row { grid-template-columns:1fr }
@@ -156,38 +147,6 @@
                   <span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">%</span>
                   <span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">Count</span>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Gender + Monthly trend -->
-          <div class="glass-card lr-card">
-            <h3 class="lr-card-title">ភេទ</h3>
-            <p class="lr-card-sub">Gender Distribution</p>
-            <div class="lr-gender-wrap" id="lrGenderWrap">
-              <div class="lr-gender-bar" id="lrGenderBar">
-                <div class="lr-gender-m" id="lrGenderM" style="width:50%"></div>
-                <div class="lr-gender-f" id="lrGenderF" style="width:50%"></div>
-              </div>
-              <div class="lr-gender-stats" id="lrGenderStats">
-                <div class="lr-gender-stat">
-                  <div class="lr-gender-stat-val" id="lrGMaleVal">—</div>
-                  <div class="lr-gender-stat-lbl" style="color:#7dd3fc">ប្រុស (Male)</div>
-                </div>
-                <div class="lr-gender-stat">
-                  <div class="lr-gender-stat-val" id="lrGFemVal">—</div>
-                  <div class="lr-gender-stat-lbl" style="color:#f9a8d4">ស្រី (Female)</div>
-                </div>
-                <div class="lr-gender-stat">
-                  <div class="lr-gender-stat-val" id="lrGOtherVal">—</div>
-                  <div class="lr-gender-stat-lbl">ផ្សេងៗ</div>
-                </div>
-              </div>
-              <!-- Monthly new borrowers mini chart -->
-              <div style="margin-top:8px;border-top:1px solid rgba(148,163,184,.1);padding-top:12px">
-                <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px">ថ្មី / ខែ (New / Month)</div>
-                <div id="lrMonthBars" style="display:flex;align-items:flex-end;gap:4px;height:48px"></div>
-                <div id="lrMonthLabels" style="display:flex;gap:4px;margin-top:4px"></div>
               </div>
             </div>
           </div>
@@ -443,9 +402,7 @@ function renderTable() {
 function renderCharts() {
   renderKPIs();
   renderStatusDonut();
-  renderGender();
   renderGroupBars();
-  renderMonthChart();
 }
 
 function renderKPIs() {
@@ -543,21 +500,6 @@ function renderStatusDonut() {
   lgnd.innerHTML = hdr + rows;
 }
 
-function renderGender() {
-  var male   = _allLoans.filter(function(l){ var g=(l.Gender||'').toLowerCase(); return g==='male'||g==='ប្រុស'; }).length;
-  var female = _allLoans.filter(function(l){ var g=(l.Gender||'').toLowerCase(); return g==='female'||g==='ស្រី'; }).length;
-  var other  = _allLoans.length - male - female;
-  var total  = _allLoans.length || 1;
-
-  document.getElementById('lrGMaleVal').textContent  = male;
-  document.getElementById('lrGFemVal').textContent   = female;
-  document.getElementById('lrGOtherVal').textContent = other < 0 ? 0 : other;
-
-  var mp = male/total*100, fp = female/total*100;
-  document.getElementById('lrGenderM').style.width = mp+'%';
-  document.getElementById('lrGenderF').style.width = fp+'%';
-}
-
 function renderGroupBars() {
   var counts = {};
   _allLoans.forEach(function(l){
@@ -587,41 +529,6 @@ function renderGroupBars() {
   document.getElementById('lrGroupBars').innerHTML = html || '<div class="lr-loading" style="padding:16px">—</div>';
 }
 
-function renderMonthChart() {
-  var months = {};
-  var now = new Date();
-  for (var i=5; i>=0; i--) {
-    var d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-    var key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-    months[key] = 0;
-  }
-  _allLoans.forEach(function(l){
-    var k = (l._date||'').slice(0,7);
-    if (k in months) months[k]++;
-  });
-
-  var keys   = Object.keys(months);
-  var vals   = keys.map(function(k){ return months[k]; });
-  var maxVal = Math.max.apply(null, vals) || 1;
-  var MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-  var bars = keys.map(function(k, i){
-    var h   = Math.round(vals[i]/maxVal*100);
-    var isCurrentMonth = (k === (now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')));
-    return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">'
-      + '<span style="font-size:9px;color:var(--muted)">'+(vals[i]||'')+'</span>'
-      + '<div style="width:100%;height:'+Math.max(h*0.4,2)+'px;border-radius:3px;background:'+(isCurrentMonth?'#7c5cff':'rgba(99,102,241,.35)')+'"></div>'
-      + '</div>';
-  }).join('');
-
-  var labels = keys.map(function(k){
-    var parts = k.split('-');
-    return '<div style="flex:1;text-align:center;font-size:9px;color:var(--muted)">'+MONTH_NAMES[parseInt(parts[1])-1]+'</div>';
-  }).join('');
-
-  document.getElementById('lrMonthBars').innerHTML = bars;
-  document.getElementById('lrMonthLabels').innerHTML = labels;
-}
 
 /* ── Export ── */
 function exportCSV() {
