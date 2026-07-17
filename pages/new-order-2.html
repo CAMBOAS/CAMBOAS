@@ -1080,16 +1080,8 @@
       opacity: 0 !important;
       pointer-events: none !important;
     }
-    /* Action bar: right-side pill on tablet (680–979px) */
-    @media (min-width: 680px) and (max-width: 979px) {
-      #mobBottomBar {
-        right: 14px !important;
-        width: 64px !important;
-      }
-      .no-wrap { padding-right: 84px !important; }
-    }
-    /* Phone (360–679px): action bar → horizontal bottom bar (full-width, slides up/down) */
-    @media (min-width: 360px) and (max-width: 679px) {
+    /* Phone + Tablet (360–979px): action bar → horizontal bottom bar (full-width, slides up/down) */
+    @media (min-width: 360px) and (max-width: 979px) {
       #mobBottomBar {
         top: auto !important;
         bottom: 0 !important;
@@ -2740,15 +2732,6 @@
   /* Mobile section order is handled by applyMobileOrder() in JS (DOM reorder),
      which works on all browsers without relying on display:contents. */
 
-  /* ── Tablet (680px–979px): action-bar clearance + 2-col customer form ── */
-  @media (min-width: 680px) and (max-width: 979px) {
-    /* Right padding clears the fixed action bar (right:14px width:64px → 84px total) */
-    .no-wrap { padding-right: 84px !important; }
-    /* 2 columns fit better on tablet than 4 — each col ~200px at 768px */
-    #custBody { grid-template-columns: 1fr 1fr !important; }
-    #custBody .od-row-pay  { grid-column: 1 / -1 !important; }
-    #custBody .od-row-note { grid-column: 1 / -1 !important; }
-  }
   </style>
 </head>
 <body>
@@ -3913,7 +3896,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   function animateBar(toHidden) {
     if (!bar) return;
-    var isPhone = window.innerWidth >= 360 && window.innerWidth < 680;
+    var isPhone = window.innerWidth >= 360 && window.innerWidth < 980;
     var from, to;
     if (isPhone) {
       /* Phone bottom bar: slide down to hide, slide up to show */
