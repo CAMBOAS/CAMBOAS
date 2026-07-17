@@ -2665,11 +2665,11 @@
       .no-wrap {
         max-width: none !important;        /* fill full content area — no centering gap */
         margin: 0 !important;
-        padding: 12px 4px 16px !important;
+        padding: 0 4px 16px !important;
       }
       .no-grid {
         display: grid !important;
-        grid-template-columns: 1.3fr 1fr !important;
+        grid-template-columns: 1fr 1fr !important;
         gap: 0 !important;
         align-items: start !important;
       }
@@ -2681,6 +2681,7 @@
       /* Customer form: 2 columns at desktop — ~200px per field, much more readable */
       #custBody {
         grid-template-columns: 1fr 1fr !important;
+        gap: 12px 14px !important;
       }
       /* Payment row + Note row: span full width */
       #custBody .od-row-pay  { grid-column: 1 / -1 !important; }
@@ -2688,9 +2689,9 @@
       #rightCol {
         display: flex !important;
         flex-direction: column !important;
-        gap: 12px !important;
+        gap: 14px !important;
         /* padding/box-sizing without !important so JS can override padding-right */
-        padding: 2px 4px 10px 0;
+        padding: 4px 82px 10px 0;
         box-sizing: border-box;
       }
       #rightCol::-webkit-scrollbar { width: 4px; }
@@ -2700,15 +2701,26 @@
       #leftCol::-webkit-scrollbar { width: 4px; }
       #leftCol::-webkit-scrollbar-track { background: transparent; }
       #leftCol::-webkit-scrollbar-thumb { background: rgba(124,92,255,.18); border-radius: 4px; }
+      /* Minimize inner-edge gap: square the sides that face each other */
+      #leftCol .mob-section {
+        border-top-right-radius: 4px !important;
+        border-bottom-right-radius: 4px !important;
+      }
+      #rightCol .mob-section {
+        border-top-left-radius: 4px !important;
+        border-bottom-left-radius: 4px !important;
+      }
     }
     /* Product grid: 3 columns at 1280–1599px (medium desktop) */
     @media (min-width: 1280px) {
+      .no-grid { grid-template-columns: 1.2fr 1fr !important; }
       #prodBody .plist {
         grid-template-columns: repeat(3, 1fr) !important;
       }
     }
     /* Product grid: 4 columns at ≥1600px (large desktop / widescreen) */
     @media (min-width: 1600px) {
+      .no-grid { grid-template-columns: 1.45fr 1fr !important; }
       #prodBody .plist {
         grid-template-columns: repeat(4, 1fr) !important;
       }
