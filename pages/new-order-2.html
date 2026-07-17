@@ -1088,6 +1088,30 @@
       }
       .no-wrap { padding-right: 84px !important; }
     }
+    /* Phone (480–679px): action bar → horizontal bottom bar (full-width, slides up/down) */
+    @media (min-width: 480px) and (max-width: 679px) {
+      #mobBottomBar {
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        transform: translateY(0) !important;
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        border-radius: 18px 18px 0 0 !important;
+        padding: 6px 10px calc(env(safe-area-inset-bottom) + 6px) !important;
+        gap: 2px !important;
+      }
+      #mobBottomBar .tik-div { display: none !important; }
+      #mobBottomBar .tik-receipt { flex-direction: column !important; align-items: center !important; }
+      .mob-bottom-bar.bar-hidden { transform: translateY(100%) !important; }
+      .no-wrap {
+        padding-right: 4px !important;
+        padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+      }
+    }
     /* Very small phone (<480px): action bar too cramped — hide it */
     @media (max-width: 479px) {
       #mobBottomBar { display: none !important; }
@@ -2613,17 +2637,17 @@
       .no-wrap {
         max-width: none !important;        /* fill full content area — no centering gap */
         margin: 0 !important;
-        padding: 16px 20px 20px !important;
+        padding: 12px 4px 16px !important;
       }
       .no-grid {
         display: grid !important;
         grid-template-columns: 1.3fr 1fr !important;
-        gap: 16px !important;
+        gap: 0 !important;
         align-items: start !important;
       }
-      /* Product grid: 4 columns at ≥980px (desktop default) */
+      /* Product grid: 2 columns at 980–1279px (small desktop / laptop) */
       #prodBody .plist {
-        grid-template-columns: repeat(4, 1fr) !important;
+        grid-template-columns: repeat(2, 1fr) !important;
       }
 
       /* Customer form: 2 columns at desktop — ~200px per field, much more readable */
@@ -2638,7 +2662,7 @@
         flex-direction: column !important;
         gap: 12px !important;
         /* padding/box-sizing without !important so JS can override padding-right */
-        padding: 2px 6px 10px;
+        padding: 2px 4px 10px 0;
         box-sizing: border-box;
       }
       #rightCol::-webkit-scrollbar { width: 4px; }
@@ -2648,6 +2672,18 @@
       #leftCol::-webkit-scrollbar { width: 4px; }
       #leftCol::-webkit-scrollbar-track { background: transparent; }
       #leftCol::-webkit-scrollbar-thumb { background: rgba(124,92,255,.18); border-radius: 4px; }
+    }
+    /* Product grid: 3 columns at 1280–1599px (medium desktop) */
+    @media (min-width: 1280px) {
+      #prodBody .plist {
+        grid-template-columns: repeat(3, 1fr) !important;
+      }
+    }
+    /* Product grid: 4 columns at ≥1600px (large desktop / widescreen) */
+    @media (min-width: 1600px) {
+      #prodBody .plist {
+        grid-template-columns: repeat(4, 1fr) !important;
+      }
     }
   /* SaleInfor Settings Modal */
   .del-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);z-index:9998;display:none;align-items:center;justify-content:center}
@@ -3877,19 +3913,32 @@ document.addEventListener('DOMContentLoaded', function(){
 
   function animateBar(toHidden) {
     if (!bar) return;
-    var w = bar.offsetWidth || 64;
-    var slide = (w + 30) + 'px';
-    var from = toHidden
-      ? { transform: 'translateY(-50%) translateX(0px)',    opacity: '1', pointerEvents: 'auto' }
-      : { transform: 'translateY(-50%) translateX(' + slide + ')', opacity: '0', pointerEvents: 'none' };
-    var to   = toHidden
-      ? { transform: 'translateY(-50%) translateX(' + slide + ')', opacity: '0', pointerEvents: 'none' }
-      : { transform: 'translateY(-50%) translateX(0px)',    opacity: '1', pointerEvents: 'auto' };
+    var isPhone = window.innerWidth >= 480 && window.innerWidth < 680;
+    var from, to;
+    if (isPhone) {
+      /* Phone bottom bar: slide down to hide, slide up to show */
+      from = toHidden
+        ? { transform: 'translateY(0)',    opacity: '1', pointerEvents: 'auto' }
+        : { transform: 'translateY(100%)', opacity: '0', pointerEvents: 'none' };
+      to = toHidden
+        ? { transform: 'translateY(100%)', opacity: '0', pointerEvents: 'none' }
+        : { transform: 'translateY(0)',    opacity: '1', pointerEvents: 'auto' };
+    } else {
+      /* Tablet/desktop right-side bar: slide right to hide, slide left to show */
+      var w = bar.offsetWidth || 64;
+      var slide = (w + 30) + 'px';
+      from = toHidden
+        ? { transform: 'translateY(-50%) translateX(0px)',    opacity: '1', pointerEvents: 'auto' }
+        : { transform: 'translateY(-50%) translateX(' + slide + ')', opacity: '0', pointerEvents: 'none' };
+      to = toHidden
+        ? { transform: 'translateY(-50%) translateX(' + slide + ')', opacity: '0', pointerEvents: 'none' }
+        : { transform: 'translateY(-50%) translateX(0px)',    opacity: '1', pointerEvents: 'auto' };
+    }
     if (barAnim) { try { barAnim.cancel(); } catch(e){} }
     barAnim = bar.animate([from, to], { duration: 280, fill: 'forwards', easing: 'cubic-bezier(0.4,0,0.2,1)' });
     barAnim.onfinish = function() {
-      bar.style.transform   = to.transform;
-      bar.style.opacity     = to.opacity;
+      bar.style.transform    = to.transform;
+      bar.style.opacity      = to.opacity;
       bar.style.pointerEvents = to.pointerEvents;
       barAnim = null;
     };
