@@ -2086,9 +2086,12 @@ input::placeholder, textarea::placeholder {
 /* Stock + Pages chart 2-col row → stack on narrow screens */
 .stock-pages-row {
   display: grid;
-  grid-template-columns: 1fr 380px;
+  grid-template-columns: 1fr 460px;
   gap: 14px;
   margin-bottom: 16px;
+}
+@media (max-width: 1300px) {
+  .stock-pages-row { grid-template-columns: 1fr 380px !important; }
 }
 @media (max-width: 1100px) {
   .stock-pages-row { grid-template-columns: 1fr 320px !important; }

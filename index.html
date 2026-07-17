@@ -370,9 +370,9 @@
                         </div>
                         <span id="pagesTotalBadge" style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(124,92,255,.12);color:#7c5cff;font-weight:700"></span>
                     </div>
-                    <div id="pagesPieWrap" style="flex:1;display:flex;align-items:center;justify-content:center;gap:18px;padding:8px 0 4px;flex-wrap:wrap">
-                        <svg id="pagesPieSvg" width="160" height="160" viewBox="0 0 160 160" style="flex-shrink:0"></svg>
-                        <div id="pagesPieLegend" style="display:flex;flex-direction:column;gap:6px;min-width:120px;max-width:170px;overflow:hidden"></div>
+                    <div id="pagesPieWrap" style="flex:1;display:flex;align-items:center;gap:16px;padding:8px 0 4px">
+                        <svg id="pagesPieSvg" width="150" height="150" viewBox="0 0 160 160" style="flex-shrink:0"></svg>
+                        <div id="pagesPieLegend" style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;overflow:hidden"></div>
                     </div>
                 </div>
             </section>
@@ -641,6 +641,8 @@
     });
   }
 
+  function fmtM(v){ var n=Number(v||0); return '$'+n.toFixed(2).replace(/\.00$/,''); }
+
   function renderPagesPieChart(){
     var svg    = document.getElementById('pagesPieSvg');
     var legend = document.getElementById('pagesPieLegend');
@@ -650,18 +652,22 @@
     var orders = applyDateFilter(_allRows, _dateFrom, _dateTo);
     var total  = orders.length;
 
-    /* Count by page */
-    var counts = {};
+    /* Aggregate count + qty + revenue by page */
+    var pageMap = {};
     orders.forEach(function(o){
       var p = (o.page||'').trim() || 'Unknown';
-      counts[p] = (counts[p]||0) + 1;
+      if(!pageMap[p]) pageMap[p] = {count:0, qty:0, revenue:0};
+      pageMap[p].count++;
+      pageMap[p].qty     += (o.products||[]).reduce(function(s,pr){ return s+Number(pr.qty||0); },0);
+      pageMap[p].revenue += (o.products||[]).reduce(function(s,pr){ return s+(Number(pr.qty||0)*Number(pr.price||0))-Number(pr.discount||0); },0)
+                          + Number(o.deliveryFee||0);
     });
 
-    /* Sort descending */
-    var entries = Object.keys(counts).map(function(k){ return {name:k, count:counts[k]}; });
+    var entries = Object.keys(pageMap).map(function(k){
+      return {name:k, count:pageMap[k].count, qty:pageMap[k].qty, revenue:pageMap[k].revenue};
+    });
     entries.sort(function(a,b){ return b.count - a.count; });
 
-    /* Badge */
     if(badge) badge.textContent = total + ' Orders';
 
     if(!total || !entries.length){
@@ -675,7 +681,6 @@
     var circumference = 2 * Math.PI * 55;
     var offset = 0;
     var svgParts = ['<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.1)" stroke-width="22"/>'];
-
     var topEntry = entries[0];
     var topPct   = Math.round(topEntry.count / total * 100);
 
@@ -694,34 +699,48 @@
       );
       offset += dash;
     });
-
     svgParts.push(
       '<text x="80" y="75" text-anchor="middle" font-size="20" font-weight="800" fill="var(--text,#18213a)">'+topPct+'%</text>',
       '<text x="80" y="94" text-anchor="middle" font-size="9" font-weight="700" fill="#94a3b8" letter-spacing="0.04em">'+
         (topEntry.name.length > 12 ? topEntry.name.slice(0,11)+'…' : topEntry.name)+'</text>'
     );
-
     svg.innerHTML = svgParts.join('');
 
-    /* Legend */
-    var legendHTML = entries.slice(0, 8).map(function(e, i){
+    /* Legend — aligned grid: dot | name | % | QTY | Revenue */
+    var GCOLS = '9px 1fr 26px 28px 54px';
+    var ROW   = 'display:grid;align-items:center;column-gap:4px;grid-template-columns:'+GCOLS;
+    var hdr   = '<div style="'+ROW+';margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid rgba(148,163,184,.12)">'
+      +'<span></span>'
+      +'<span style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase">Pages</span>'
+      +'<span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">%</span>'
+      +'<span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">QTY</span>'
+      +'<span style="font-size:9px;font-weight:700;color:var(--muted);text-align:right">Revenue</span>'
+      +'</div>';
+
+    var legendHTML = hdr + entries.slice(0, 7).map(function(e, i){
       var pct   = Math.round(e.count / total * 100);
       var color = PIE_COLORS[i % PIE_COLORS.length];
-      var name  = e.name.length > 16 ? e.name.slice(0,15)+'…' : e.name;
-      return '<div style="display:flex;align-items:center;gap:6px">'
-        +'<span style="width:10px;height:10px;border-radius:50%;background:'+color+';flex-shrink:0"></span>'
-        +'<span style="font-size:11px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</span>'
-        +'<span style="font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0">'+pct+'%</span>'
+      var name  = e.name.length > 22 ? e.name.slice(0,21)+'…' : e.name;
+      return '<div style="'+ROW+'">'
+        +'<span style="width:8px;height:8px;border-radius:50%;background:'+color+';margin:0 auto"></span>'
+        +'<span style="font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</span>'
+        +'<span style="font-size:10px;font-weight:700;color:var(--muted);text-align:right">'+pct+'%</span>'
+        +'<span style="font-size:10px;color:var(--muted);text-align:right">'+e.qty+'</span>'
+        +'<span style="font-size:10px;font-weight:700;color:#22c55e;text-align:right">'+fmtM(e.revenue)+'</span>'
         +'</div>';
     }).join('');
 
-    if(entries.length > 8){
-      var othersCount = entries.slice(8).reduce(function(s,e){ return s+e.count; },0);
-      var othersPct   = Math.round(othersCount / total * 100);
-      legendHTML += '<div style="display:flex;align-items:center;gap:6px">'
-        +'<span style="width:10px;height:10px;border-radius:50%;background:#cbd5e1;flex-shrink:0"></span>'
-        +'<span style="font-size:11px;font-weight:600;color:var(--text);flex:1">Others</span>'
-        +'<span style="font-size:11px;font-weight:800;color:var(--muted)">'+othersPct+'%</span>'
+    if(entries.length > 7){
+      var othersCount   = entries.slice(7).reduce(function(s,e){ return s+e.count; },0);
+      var othersQty     = entries.slice(7).reduce(function(s,e){ return s+e.qty; },0);
+      var othersRevenue = entries.slice(7).reduce(function(s,e){ return s+e.revenue; },0);
+      var othersPct     = Math.round(othersCount / total * 100);
+      legendHTML += '<div style="'+ROW+'">'
+        +'<span style="width:8px;height:8px;border-radius:50%;background:#cbd5e1;margin:0 auto"></span>'
+        +'<span style="font-size:11px;font-weight:600;color:var(--text)">Others</span>'
+        +'<span style="font-size:10px;font-weight:700;color:var(--muted);text-align:right">'+othersPct+'%</span>'
+        +'<span style="font-size:10px;color:var(--muted);text-align:right">'+othersQty+'</span>'
+        +'<span style="font-size:10px;font-weight:700;color:#22c55e;text-align:right">'+fmtM(othersRevenue)+'</span>'
         +'</div>';
     }
 
