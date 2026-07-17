@@ -127,6 +127,23 @@
     .lr-btn-save:disabled { opacity:.45; cursor:not-allowed }
     .lr-name-link { cursor:pointer; color:var(--text); text-decoration:none; transition:.15s }
     .lr-name-link:hover { color:#a78bfa }
+    .lr-del-btn { background:none; border:none; cursor:pointer; color:rgba(148,163,184,.4); padding:5px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; transition:.18s }
+    .lr-del-btn:hover { background:rgba(239,68,68,.12); color:#f87171 }
+
+    /* Confirm Delete Modal */
+    .lr-confirm-bg { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(6px); z-index:1100; display:none; align-items:center; justify-content:center }
+    .lr-confirm-bg.open { display:flex }
+    .lr-confirm-box { background:var(--card); border:1px solid rgba(239,68,68,.25); border-radius:20px; width:min(400px,92vw); padding:28px 28px 22px; box-shadow:0 24px 64px rgba(0,0,0,.5); text-align:center }
+    .lr-confirm-icon { width:52px; height:52px; border-radius:50%; background:rgba(239,68,68,.12); display:flex; align-items:center; justify-content:center; margin:0 auto 16px }
+    .lr-confirm-title { font-size:16px; font-weight:800; color:var(--text); margin-bottom:8px }
+    .lr-confirm-name { font-size:13px; font-weight:700; color:#f87171; margin-bottom:8px }
+    .lr-confirm-sub { font-size:12px; color:var(--muted); line-height:1.6; margin-bottom:22px }
+    .lr-confirm-btns { display:flex; gap:10px; justify-content:center }
+    .lr-confirm-cancel { flex:1; padding:10px; border-radius:10px; border:none; background:rgba(148,163,184,.12); color:var(--muted); font-size:13px; font-weight:700; cursor:pointer; transition:.18s }
+    .lr-confirm-cancel:hover { background:rgba(148,163,184,.22) }
+    .lr-confirm-delete { flex:1; padding:10px; border-radius:10px; border:none; background:linear-gradient(135deg,#ef4444,#dc2626); color:#fff; font-size:13px; font-weight:700; cursor:pointer; transition:.18s }
+    .lr-confirm-delete:hover { opacity:.88 }
+    .lr-confirm-delete:disabled { opacity:.45; cursor:not-allowed }
 
     /* Responsive */
     @media(max-width:1200px) { .lr-kpi-row { grid-template-columns:repeat(3,1fr) } }
@@ -237,10 +254,11 @@
                   <th onclick="sortTable('Status')">ស្ថានភាព</th>
                   <th onclick="sortTable('_date')">កាលបរិច្ឆេទ</th>
                   <th>Note</th>
+                  <th style="text-align:center;width:60px">Action</th>
                 </tr>
               </thead>
               <tbody id="lrTbody">
-                <tr><td colspan="10" class="lr-loading">កំពុងផ្ទុក...</td></tr>
+                <tr><td colspan="12" class="lr-loading">កំពុងផ្ទុក...</td></tr>
               </tbody>
             </table>
           </div>
@@ -400,7 +418,7 @@ function renderTable() {
   });
 
   if (!arr.length) {
-    document.getElementById('lrTbody').innerHTML = '<tr><td colspan="11" class="lr-loading">មិនមានទិន្នន័យ</td></tr>';
+    document.getElementById('lrTbody').innerHTML = '<tr><td colspan="12" class="lr-loading">មិនមានទិន្នន័យ</td></tr>';
     document.getElementById('lrFootInfo').textContent = '0 borrowers';
     document.getElementById('lrFootCount').textContent = '';
     return;
@@ -421,6 +439,7 @@ function renderTable() {
       + '<td>'+statusTag(l.Status)+'</td>'
       + '<td style="font-size:11px;color:var(--muted)">'+fmtDate(l.DateTime)+'</td>'
       + '<td style="font-size:11px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(l.Note||'')+'">'+esc(l.Note||'—')+'</td>'
+      + '<td style="text-align:center"><button class="lr-del-btn" data-dt="'+esc(l.DateTime||'')+'" data-name="'+esc(l.FullName||'—')+'" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></td>'
       + '</tr>';
   }).join('');
 
@@ -584,6 +603,46 @@ function exportCSV() {
   toast('Exported '+data.length+' rows');
 }
 
+/* ── Delete Confirm ── */
+var _deleteLoan = null;
+
+function openConfirm(loan) {
+  _deleteLoan = loan;
+  document.getElementById('lrConfirmName').textContent = loan.FullName || '—';
+  var btn = document.getElementById('lrConfirmDelBtn');
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>លុបចោល';
+  document.getElementById('lrConfirmBg').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('lrConfirmBg').classList.remove('open');
+  _deleteLoan = null;
+}
+
+async function confirmDelete() {
+  if (!_deleteLoan) return;
+  var btn = document.getElementById('lrConfirmDelBtn');
+  btn.disabled = true;
+  btn.textContent = 'កំពុងលុប...';
+  try {
+    var res = await CamboAPI.post({ action: 'helen_loan_delete', key: _deleteLoan.DateTime });
+    if (res && res.ok) {
+      toast('🗑️ លុបបានជោគជ័យ — ផ្ញើទៅ Trash');
+      closeConfirm();
+      loadData();
+    } else {
+      toast('❌ ' + ((res && res.message) || 'Delete failed'), true);
+      btn.disabled = false;
+      btn.textContent = 'លុបចោល';
+    }
+  } catch(e) {
+    toast('❌ Network error', true);
+    btn.disabled = false;
+    btn.textContent = 'លុបចោល';
+  }
+}
+
 /* ── Edit Modal ── */
 var _editLoan = null;
 
@@ -658,14 +717,41 @@ async function saveEdit() {
 
 /* ── Init ── */
 document.getElementById('lrTbody').addEventListener('click', function(e) {
-  var el = e.target.closest('.lr-name-link');
-  if (!el) return;
-  var dt = el.getAttribute('data-dt');
-  var loan = _allLoans.find(function(x){ return x.DateTime === dt; });
-  if (loan) openEditModal(loan);
+  var nameEl = e.target.closest('.lr-name-link');
+  if (nameEl) {
+    var dt = nameEl.getAttribute('data-dt');
+    var loan = _allLoans.find(function(x){ return x.DateTime === dt; });
+    if (loan) openEditModal(loan);
+    return;
+  }
+  var delEl = e.target.closest('.lr-del-btn');
+  if (delEl) {
+    var dt = delEl.getAttribute('data-dt');
+    var loan = _allLoans.find(function(x){ return x.DateTime === dt; });
+    if (loan) openConfirm(loan);
+  }
 });
 loadData();
 </script>
+
+<!-- Confirm Delete Modal -->
+<div class="lr-confirm-bg" id="lrConfirmBg">
+  <div class="lr-confirm-box">
+    <div class="lr-confirm-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </div>
+    <div class="lr-confirm-title">បញ្ជាក់ការលុប</div>
+    <div class="lr-confirm-name" id="lrConfirmName"></div>
+    <div class="lr-confirm-sub">អ្នកកំពុងលុបទិន្នន័យអ្នកខ្ចីនេះ។<br>សកម្មភាពនេះនឹងផ្ញើទៅ Trash — អ្នកអាច Recover បានពីក្នុង Trash។</div>
+    <div class="lr-confirm-btns">
+      <button class="lr-confirm-cancel" onclick="closeConfirm()">មិនលុបទេ</button>
+      <button class="lr-confirm-delete" id="lrConfirmDelBtn" onclick="confirmDelete()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        លុបចោល
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Edit Modal -->
 <div class="lr-modal-bg" id="lrModalBg" onclick="if(event.target===this)closeEditModal()">
