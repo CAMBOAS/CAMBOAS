@@ -100,6 +100,34 @@
     .toast.show { transform:translateY(0); opacity:1 }
     .toast.err  { background:rgba(239,68,68,.15); border-color:rgba(239,68,68,.3); color:#fca5a5 }
 
+    /* Edit Modal */
+    .lr-modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(4px); z-index:1000; display:none; align-items:center; justify-content:center }
+    .lr-modal-bg.open { display:flex }
+    .lr-modal { background:var(--card); border:1px solid rgba(148,163,184,.12); border-radius:22px; width:min(540px,96vw); max-height:90vh; overflow-y:auto; padding:28px 28px 24px; box-shadow:0 24px 64px rgba(0,0,0,.5) }
+    .lr-modal-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px }
+    .lr-modal-title { font-size:15px; font-weight:800; color:var(--text) }
+    .lr-modal-close { width:32px; height:32px; border-radius:50%; border:none; background:rgba(148,163,184,.12); color:var(--muted); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1 }
+    .lr-modal-close:hover { background:rgba(239,68,68,.15); color:#fca5a5 }
+    .lr-field { margin-bottom:14px }
+    .lr-field label { display:block; font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px }
+    .lr-field input, .lr-field select, .lr-field textarea {
+      width:100%; box-sizing:border-box; padding:9px 12px; border-radius:10px;
+      border:1px solid rgba(148,163,184,.18); background:rgba(148,163,184,.07);
+      color:var(--text); font-size:13px; font-family:inherit; outline:none; transition:.2s }
+    .lr-field input:focus, .lr-field select:focus, .lr-field textarea:focus { border-color:rgba(124,92,255,.5); background:rgba(124,92,255,.06) }
+    .lr-field textarea { resize:vertical; min-height:64px }
+    .lr-field select option { background:var(--card); color:var(--text) }
+    .lr-modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:0 14px }
+    .lr-modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; padding-top:16px; border-top:1px solid rgba(148,163,184,.1) }
+    .lr-btn { padding:9px 22px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; border:none; transition:.2s }
+    .lr-btn-cancel { background:rgba(148,163,184,.12); color:var(--muted) }
+    .lr-btn-cancel:hover { background:rgba(148,163,184,.22) }
+    .lr-btn-save { background:linear-gradient(135deg,#7c5cff,#06b6d4); color:#fff }
+    .lr-btn-save:hover { opacity:.88 }
+    .lr-btn-save:disabled { opacity:.45; cursor:not-allowed }
+    .lr-name-link { cursor:pointer; color:var(--text); text-decoration:none; border-bottom:1px dashed rgba(124,92,255,.5); transition:.15s }
+    .lr-name-link:hover { color:#a78bfa; border-bottom-color:#a78bfa }
+
     /* Responsive */
     @media(max-width:1200px) { .lr-kpi-row { grid-template-columns:repeat(3,1fr) } }
     @media(max-width:1000px) { .lr-charts-row { grid-template-columns:1fr } }
@@ -383,7 +411,7 @@ function renderTable() {
     var moneyHtml = isNaN(money) || money===0 ? '<span style="color:var(--muted)">—</span>' : '<span style="color:#34d399;font-weight:700">'+fmtMoney(money)+'</span>';
     return '<tr>'
       + '<td style="color:var(--muted);font-size:11px">'+esc(String(l._idx||i+1))+'</td>'
-      + '<td style="font-weight:700;color:var(--text)">'+esc(l.FullName||'—')+'</td>'
+      + '<td style="font-weight:700"><span class="lr-name-link" data-dt="'+esc(l.DateTime||'')+'">'+esc(l.FullName||'—')+'</span></td>'
       + '<td style="font-family:monospace;font-size:11.5px;color:#60a5fa">'+esc(l.NationalID||'—')+'</td>'
       + '<td style="font-size:11px;color:var(--muted)">'+esc(l.DOB||'—')+'</td>'
       + '<td style="font-size:12px"><a href="tel:'+esc(l.Phone||'')+'" style="color:#60a5fa;text-decoration:none">'+esc(l.Phone||'—')+'</a></td>'
@@ -556,8 +584,105 @@ function exportCSV() {
   toast('Exported '+data.length+' rows');
 }
 
+/* ── Edit Modal ── */
+var _editLoan = null;
+
+function openEditModal(loan) {
+  _editLoan = loan;
+  var groups = [...new Set(_allLoans.map(function(l){ return l.Groups||''; }).filter(Boolean))].sort();
+  var groupOpts = groups.map(function(g){
+    return '<option value="'+esc(g)+'"'+(g===loan.Groups?' selected':'')+'>'+esc(g)+'</option>';
+  }).join('');
+  var statusList = ['Good','Normal','BlackListed','High Risk'];
+  var statusOpts = statusList.map(function(s){
+    return '<option value="'+s+'"'+(s===(loan.Status||'').trim()?' selected':'')+'>'+s+'</option>';
+  }).join('');
+  var genderList = ['Male','Female','Other'];
+  var genderOpts = '<option value="">—</option>' + genderList.map(function(g){
+    return '<option value="'+g+'"'+(g.toLowerCase()===(loan.Gender||'').toLowerCase()?' selected':'')+'>'+g+'</option>';
+  }).join('');
+
+  document.getElementById('lrModalName').textContent = esc(loan.FullName||'—');
+  document.getElementById('lrEditForm').innerHTML =
+    '<div class="lr-modal-grid">'
+    +'<div class="lr-field"><label>ឈ្មោះ (Full Name)</label><input id="ef_FullName" value="'+esc(loan.FullName||'')+'"></div>'
+    +'<div class="lr-field"><label>National ID</label><input id="ef_NationalID" value="'+esc(loan.NationalID||'')+'"></div>'
+    +'<div class="lr-field"><label>DOB</label><input id="ef_DOB" value="'+esc(loan.DOB||'')+'"></div>'
+    +'<div class="lr-field"><label>ទូរស័ព្ទ (Phone)</label><input id="ef_Phone" value="'+esc(loan.Phone||'')+'"></div>'
+    +'<div class="lr-field"><label>ភេទ (Gender)</label><select id="ef_Gender">'+genderOpts+'</select></div>'
+    +'<div class="lr-field"><label>ក្រុម (Group)</label><select id="ef_Groups"><option value="">—</option>'+groupOpts+'</select></div>'
+    +'<div class="lr-field"><label>ប្រាក់កម្ចី Amount ($)</label><input id="ef_Money" type="number" min="0" value="'+esc(loan.Money||'')+'"></div>'
+    +'<div class="lr-field"><label>ស្ថានភាព (Status)</label><select id="ef_Status"><option value="">—</option>'+statusOpts+'</select></div>'
+    +'</div>'
+    +'<div class="lr-field"><label>Note</label><textarea id="ef_Note">'+esc(loan.Note||'')+'</textarea></div>';
+
+  document.getElementById('lrModalBg').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('lrModalBg').classList.remove('open');
+  _editLoan = null;
+}
+
+async function saveEdit() {
+  if (!_editLoan) return;
+  var btn = document.getElementById('lrSaveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  var updated = {
+    FullName:   document.getElementById('ef_FullName').value.trim(),
+    NationalID: document.getElementById('ef_NationalID').value.trim(),
+    DOB:        document.getElementById('ef_DOB').value.trim(),
+    Phone:      document.getElementById('ef_Phone').value.trim(),
+    Gender:     document.getElementById('ef_Gender').value,
+    Groups:     document.getElementById('ef_Groups').value,
+    Money:      document.getElementById('ef_Money').value,
+    Status:     document.getElementById('ef_Status').value,
+    Note:       document.getElementById('ef_Note').value.trim(),
+  };
+  try {
+    var res = await CamboAPI.post({ action: 'helen_loan_update', key: _editLoan.DateTime, loan: updated });
+    if (res && res.ok) {
+      toast('✅ Saved successfully');
+      closeEditModal();
+      loadData();
+    } else {
+      toast('❌ ' + ((res && res.message) || 'Update failed'), true);
+      btn.disabled = false; btn.textContent = 'Save';
+    }
+  } catch(e) {
+    toast('❌ Network error', true);
+    btn.disabled = false; btn.textContent = 'Save';
+  }
+}
+
 /* ── Init ── */
+document.getElementById('lrTbody').addEventListener('click', function(e) {
+  var el = e.target.closest('.lr-name-link');
+  if (!el) return;
+  var dt = el.getAttribute('data-dt');
+  var loan = _allLoans.find(function(x){ return x.DateTime === dt; });
+  if (loan) openEditModal(loan);
+});
 loadData();
 </script>
+
+<!-- Edit Modal -->
+<div class="lr-modal-bg" id="lrModalBg" onclick="if(event.target===this)closeEditModal()">
+  <div class="lr-modal">
+    <div class="lr-modal-hdr">
+      <div>
+        <div class="lr-modal-title">កែសម្រួលព័ត៌មាន</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px" id="lrModalName"></div>
+      </div>
+      <button class="lr-modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div id="lrEditForm"></div>
+    <div class="lr-modal-footer">
+      <button class="lr-btn lr-btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="lr-btn lr-btn-save" id="lrSaveBtn" onclick="saveEdit()">💾 Save</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
