@@ -612,17 +612,47 @@
     '#0e7490','#818cf8','#a3e635','#1e1b4b','#94a3b8'
   ];
 
-  function renderPagesPieChart(orders){
+  var _allRows   = [];
+  var _dateFrom  = '';
+  var _dateTo    = '';
+
+  /* Inline date filter — mirrors filterByDateRange in dashboard-live.js */
+  function parseDateLocal(value){
+    if(!value) return null;
+    var s = String(value).trim();
+    var m1 = s.match(/^(\d{2}),\s*(\d{2}),\s*(\d{4})/);
+    if(m1) return new Date(+m1[3], +m1[2]-1, +m1[1]);
+    var m2 = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    if(m2) return new Date(+m2[3], +m2[2]-1, +m2[1]);
+    if(/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s.slice(0,10)+'T00:00:00');
+    return null;
+  }
+
+  function applyDateFilter(rows, dateFrom, dateTo){
+    if(!dateFrom && !dateTo) return rows;
+    var fromD = dateFrom ? new Date(dateFrom+'T00:00:00') : null;
+    var toD   = dateTo   ? new Date(dateTo+'T23:59:59')   : null;
+    return rows.filter(function(o){
+      var d = parseDateLocal(o.date);
+      if(!d) return false;
+      if(fromD && d < fromD) return false;
+      if(toD   && d > toD)   return false;
+      return true;
+    });
+  }
+
+  function renderPagesPieChart(){
     var svg    = document.getElementById('pagesPieSvg');
     var legend = document.getElementById('pagesPieLegend');
     var badge  = document.getElementById('pagesTotalBadge');
     if(!svg || !legend) return;
 
-    var total = (orders||[]).length;
+    var orders = applyDateFilter(_allRows, _dateFrom, _dateTo);
+    var total  = orders.length;
 
     /* Count by page */
     var counts = {};
-    (orders||[]).forEach(function(o){
+    orders.forEach(function(o){
       var p = (o.page||'').trim() || 'Unknown';
       counts[p] = (counts[p]||0) + 1;
     });
@@ -698,9 +728,18 @@
     legend.innerHTML = legendHTML;
   }
 
-  /* Listen to the event dashboard-live.js fires after each fetch */
+  /* New data arrived from API */
   window.addEventListener('cambo-dash-refreshed', function(e){
-    renderPagesPieChart((e && e.detail) || []);
+    _allRows = (e && e.detail) || [];
+    renderPagesPieChart();
+  });
+
+  /* Date filter changed — same event dashboard-live.js listens to */
+  window.addEventListener('cambo-global-date', function(e){
+    var d = (e && e.detail) || {};
+    _dateFrom = d.dateFrom || '';
+    _dateTo   = d.dateTo   || '';
+    renderPagesPieChart();
   });
 })();
 </script>
