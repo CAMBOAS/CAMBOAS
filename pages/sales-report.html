@@ -534,6 +534,32 @@
   .dr-cfg-divider { border:none; border-top:1px solid rgba(148,163,200,.1); margin:10px 0 10px }
   .dr-tbl-cfg-panel { max-height:80vh; overflow-y:auto }
 
+  /* ── Product + Pages row ── */
+  .dr-prod-pages-row {
+    display: grid;
+    grid-template-columns: 1fr 310px;
+    gap: 14px;
+    align-items: start;
+  }
+  .dr-prod-pages-row .dr-prod-card { margin-top: 0 }
+  .sr-pages-card {
+    padding: 14px 16px 12px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    min-height: 260px;
+  }
+  .sr-pages-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  @media(max-width:1100px) { .dr-prod-pages-row { grid-template-columns: 1fr 270px } }
+  @media(max-width:860px)  { .dr-prod-pages-row { grid-template-columns: 1fr } }
+
   /* ── Skeleton ── */
   .dr-skeleton { animation:dr-pulse 1.5s ease-in-out infinite }
   @keyframes dr-pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
@@ -604,19 +630,38 @@
         </article>
       </section>
 
-      <!-- Product Summary (full-width, above Sales Report) -->
-      <section class="glass-card dr-prod-card">
-        <div class="dr-prod-head">
-          <div>
-            <h3>ផលិតផលលក់ច្រើន</h3>
-            <p id="drProdSubtitle">ក្នុងថ្ងៃនេះ</p>
+      <!-- Product Summary + Pages Chart row -->
+      <section class="dr-prod-pages-row">
+        <!-- Left: Products -->
+        <div class="glass-card dr-prod-card">
+          <div class="dr-prod-head">
+            <div>
+              <h3>ផលិតផលលក់ច្រើន</h3>
+              <p id="drProdSubtitle">ក្នុងថ្ងៃនេះ</p>
+            </div>
+          </div>
+          <div class="dr-prod-grid" id="drProdGrid">
+            <div class="dr-skeleton" style="height:80px;border-radius:12px;background:rgba(148,163,184,.1)"></div>
+            <div class="dr-skeleton" style="height:80px;border-radius:12px;background:rgba(148,163,184,.1)"></div>
+            <div class="dr-skeleton" style="height:80px;border-radius:12px;background:rgba(148,163,184,.1)"></div>
+            <div class="dr-skeleton" style="height:80px;border-radius:12px;background:rgba(148,163,184,.1)"></div>
           </div>
         </div>
-        <div class="dr-prod-grid" id="drProdGrid">
-          <div class="dr-skeleton" style="height:80px;border-radius:12px;background:rgba(148,163,184,.1)"></div>
-          <div class="dr-skeleton" style="height:80px;border-radius:12px;background:rgba(148,163,184,.1)"></div>
-          <div class="dr-skeleton" style="height:80px;border-radius:12px;background:rgba(148,163,184,.1)"></div>
-          <div class="dr-skeleton" style="height:80px;border-radius:12px;background:rgba(148,163,184,.1)"></div>
+        <!-- Right: Pages Donut Chart -->
+        <div class="glass-card sr-pages-card">
+          <div class="sr-pages-head">
+            <div>
+              <h3 style="margin:0 0 1px;font-size:13px;font-weight:800;color:var(--text)">Orders by Pages</h3>
+              <p style="margin:0;font-size:10px;color:var(--muted)">ការបញ្ជាទិញតាម Pages</p>
+            </div>
+            <span id="srPagesBadge" style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(139,92,246,.12);color:#a78bfa;font-weight:700"></span>
+          </div>
+          <div id="srPagesPieWrap" style="flex:1;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;padding:6px 0 2px">
+            <svg id="srPagesPieSvg" width="140" height="140" viewBox="0 0 160 160" style="flex-shrink:0">
+              <circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.15)" stroke-width="22"/>
+            </svg>
+            <div id="srPagesPieLegend" style="display:flex;flex-direction:column;gap:5px;min-width:110px;max-width:160px;overflow:hidden"></div>
+          </div>
         </div>
       </section>
 
@@ -1080,6 +1125,7 @@
     renderKPI();
     renderOrders();
     renderProducts();
+    renderPagesSrChart(filteredOrders);
   }
 
   /* ── KPI ── */
@@ -1244,6 +1290,84 @@
         '</div>' +
       '</div>';
     }).join('');
+  }
+
+  /* ── Pages Donut Chart (Sales Report) ── */
+  var SR_PIE_COLORS = [
+    '#4a90e2','#06b6d4','#7c5cff','#f472b6','#22c55e',
+    '#f59e0b','#ef4444','#8b5cf6','#10b981','#f97316',
+    '#0e7490','#818cf8','#a3e635','#1e1b4b','#94a3b8'
+  ];
+
+  function renderPagesSrChart(orders) {
+    var svg    = document.getElementById('srPagesPieSvg');
+    var legend = document.getElementById('srPagesPieLegend');
+    var badge  = document.getElementById('srPagesBadge');
+    if (!svg || !legend) return;
+
+    var total  = (orders||[]).length;
+    var counts = {};
+    (orders||[]).forEach(function(o){
+      var p = (o.page||'').trim() || 'Unknown';
+      counts[p] = (counts[p]||0) + 1;
+    });
+    var entries = Object.keys(counts).map(function(k){ return {name:k, count:counts[k]}; });
+    entries.sort(function(a,b){ return b.count - a.count; });
+
+    if (badge) badge.textContent = total + ' Orders';
+
+    if (!total || !entries.length) {
+      svg.innerHTML = '<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.2)" stroke-width="22"/>'
+        + '<text x="80" y="86" text-anchor="middle" font-size="12" fill="#94a3b8">No data</text>';
+      legend.innerHTML = '<span style="font-size:12px;color:var(--muted)">No orders yet</span>';
+      return;
+    }
+
+    var circumference = 2 * Math.PI * 55;
+    var offset = 0;
+    var topEntry = entries[0];
+    var topPct   = Math.round(topEntry.count / total * 100);
+    var parts = ['<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.1)" stroke-width="22"/>'];
+
+    entries.forEach(function(e, i){
+      var dash  = (e.count / total) * circumference;
+      var gap   = circumference - dash;
+      var color = SR_PIE_COLORS[i % SR_PIE_COLORS.length];
+      var sdo   = circumference - offset - circumference * 0.25;
+      parts.push('<circle cx="80" cy="80" r="55" fill="none"'
+        + ' stroke="' + color + '" stroke-width="22"'
+        + ' stroke-dasharray="' + dash.toFixed(2) + ' ' + gap.toFixed(2) + '"'
+        + ' stroke-dashoffset="' + sdo.toFixed(2) + '"'
+        + ' style="transform-origin:center;transition:stroke-dashoffset .4s"/>');
+      offset += dash;
+    });
+    parts.push(
+      '<text x="80" y="75" text-anchor="middle" font-size="20" font-weight="800" fill="var(--text,#18213a)">' + topPct + '%</text>',
+      '<text x="80" y="94" text-anchor="middle" font-size="9" font-weight="700" fill="#94a3b8" letter-spacing="0.04em">'
+        + (topEntry.name.length > 12 ? topEntry.name.slice(0,11) + '…' : topEntry.name) + '</text>'
+    );
+    svg.innerHTML = parts.join('');
+
+    var html = entries.slice(0, 7).map(function(e, i){
+      var pct   = Math.round(e.count / total * 100);
+      var color = SR_PIE_COLORS[i % SR_PIE_COLORS.length];
+      var name  = e.name.length > 15 ? e.name.slice(0,14) + '…' : e.name;
+      return '<div style="display:flex;align-items:center;gap:6px">'
+        + '<span style="width:9px;height:9px;border-radius:50%;background:' + color + ';flex-shrink:0"></span>'
+        + '<span style="font-size:11px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + name + '</span>'
+        + '<span style="font-size:11px;font-weight:800;color:var(--muted);flex-shrink:0">' + pct + '%</span>'
+        + '</div>';
+    }).join('');
+    if (entries.length > 7) {
+      var others    = entries.slice(7).reduce(function(s,e){ return s + e.count; }, 0);
+      var othersPct = Math.round(others / total * 100);
+      html += '<div style="display:flex;align-items:center;gap:6px">'
+        + '<span style="width:9px;height:9px;border-radius:50%;background:#cbd5e1;flex-shrink:0"></span>'
+        + '<span style="font-size:11px;font-weight:600;color:var(--text);flex:1">Others</span>'
+        + '<span style="font-size:11px;font-weight:800;color:var(--muted)">' + othersPct + '%</span>'
+        + '</div>';
+    }
+    legend.innerHTML = html;
   }
 
   var _drActiveProd = null;
