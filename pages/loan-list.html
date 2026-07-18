@@ -477,14 +477,15 @@ function renderCharts() {
 
 function renderMonthlyTrend() {
   var now = new Date();
+  var curYear = now.getFullYear();
+  var curMonth = now.getMonth(); // 0-indexed
   var months = [];
-  for (var i = 11; i >= 0; i--) {
-    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+  for (var i = 0; i < 12; i++) {
     months.push({
-      key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'),
-      label: String(d.getMonth() + 1),
+      key: curYear + '-' + String(i + 1).padStart(2, '0'),
+      label: String(i + 1),
       count: 0,
-      isCurrent: i === 0
+      isCurrent: i === curMonth
     });
   }
   _allLoans.forEach(function(l) {
