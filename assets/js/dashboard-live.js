@@ -1,4 +1,5 @@
 ﻿let revenueChart;
+let _chartPeriod = 'monthly';
 let _dashRows = [];
 let _globalDateFrom = '';
 let _globalDateTo   = '';
@@ -191,8 +192,41 @@ function buildChartData(rows) {
     return { labels, totals };
   }
 
-  /* Monthly overview (default / All Time) */
-  const now        = new Date();
+  const now = new Date();
+
+  if (_chartPeriod === 'weekly') {
+    /* Last 8 weeks */
+    const weeks = [];
+    for (let i = 7; i >= 0; i--) {
+      const s = new Date(now); s.setDate(now.getDate() - now.getDay() - i * 7); s.setHours(0,0,0,0);
+      const e = new Date(s); e.setDate(s.getDate() + 6); e.setHours(23,59,59,999);
+      weeks.push({ start: s.getTime(), end: e.getTime(), label: (s.getMonth()+1) + '/' + s.getDate() });
+    }
+    const totals = Array(8).fill(0);
+    rows.forEach(o => {
+      const d = parseOrderDate(o.date); if (!d) return;
+      const t = d.getTime();
+      weeks.forEach((w, i) => { if (t >= w.start && t <= w.end) totals[i] += orderTotal(o); });
+    });
+    return { labels: weeks.map(w => w.label), totals };
+  }
+
+  if (_chartPeriod === 'daily') {
+    /* Last 30 days */
+    const labels = [], totals = Array(30).fill(0);
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now); d.setDate(now.getDate() - i);
+      labels.push((d.getMonth()+1) + '/' + d.getDate());
+    }
+    rows.forEach(o => {
+      const d = parseOrderDate(o.date); if (!d) return;
+      const diff = Math.floor((now - d) / 86400000);
+      if (diff >= 0 && diff < 30) totals[29 - diff] += orderTotal(o);
+    });
+    return { labels, totals };
+  }
+
+  /* Monthly overview (default) */
   const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const yr         = now.getFullYear();
   const totals     = Array(12).fill(0);
@@ -215,22 +249,6 @@ function updateChart(rows) {
   if (revenueChart) revenueChart.destroy();
 
   const { labels, totals } = buildChartData(rows);
-
-  const lbl = document.getElementById('chartDateLabel');
-  if (lbl) {
-    const isSingle = _globalDateFrom && _globalDateFrom === _globalDateTo;
-    const isRange  = _globalDateFrom && _globalDateTo && _globalDateFrom !== _globalDateTo;
-    if (isSingle) {
-      const [yr,mo,dy] = _globalDateFrom.split('-').map(Number);
-      lbl.textContent = `Revenue by hour — ${String(dy).padStart(2,'0')}/${String(mo).padStart(2,'0')}/${yr}`;
-    } else if (isRange) {
-      const [y1,m1,d1] = _globalDateFrom.split('-').map(Number);
-      const [y2,m2,d2] = _globalDateTo.split('-').map(Number);
-      lbl.textContent = `Revenue by day — ${String(d1).padStart(2,'0')}/${String(m1).padStart(2,'0')}/${y1} → ${String(d2).padStart(2,'0')}/${String(m2).padStart(2,'0')}/${y2}`;
-    } else {
-      lbl.textContent = 'Monthly overview';
-    }
-  }
 
   revenueChart = new Chart(ctx, {
     type: 'line',
@@ -281,7 +299,21 @@ window.addEventListener('cambo-global-date', e => {
   applyGlobalDate(d.dateFrom, d.dateTo);
 });
 
+function bindChartButtons() {
+  const btns = document.querySelectorAll('.chart-card .card-btn');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const map = { 'Monthly': 'monthly', 'Weekly': 'weekly', 'Daily': 'daily' };
+      _chartPeriod = map[btn.textContent.trim()] || 'monthly';
+      updateChart(_dashRows);
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  bindChartButtons();
   refreshDashboard();
   setInterval(refreshDashboard, 30000);
 });
