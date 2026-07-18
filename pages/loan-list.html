@@ -24,7 +24,12 @@
     .lr-kpi-icon { width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; flex-shrink:0 }
 
     /* ── Charts Row ── */
-    .lr-charts-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; align-items:start }
+    .lr-charts-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; align-items:stretch }
+    .lr-charts-row .glass-card.lr-card { display:flex; flex-direction:column }
+    .lr-bar-list { flex:1 }
+    #lrMonthList { flex:1; display:flex; flex-direction:column; justify-content:flex-end }
+    .lr-month-chart { flex:1; align-items:flex-end }
+    .lr-donut-wrap { flex:1 }
     .lr-month-chart { display:flex; align-items:flex-end; gap:6px; height:110px; padding-bottom:0 }
     .lr-month-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px }
     .lr-month-val { font-size:9px; font-weight:700; color:var(--muted) }
