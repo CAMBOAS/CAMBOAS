@@ -25,13 +25,15 @@
 
     /* ── Charts Row ── */
     .lr-charts-row { display:grid; grid-template-columns:1fr 260px 360px; gap:14px; align-items:start }
-    .lr-month-list { display:flex; flex-direction:column; gap:7px }
-    .lr-month-row { display:flex; align-items:center; gap:8px }
-    .lr-month-lbl { font-size:10px; color:var(--muted); width:28px; flex-shrink:0 }
-    .lr-month-track { flex:1; height:10px; border-radius:5px; background:rgba(148,163,184,.1); overflow:hidden }
-    .lr-month-fill { height:100%; border-radius:5px; background:linear-gradient(90deg,#22c55e,#4ade80); transition:width .5s ease }
-    .lr-month-fill.current { background:linear-gradient(90deg,#16a34a,#22c55e); box-shadow:0 0 6px rgba(34,197,94,.4) }
-    .lr-month-count { font-size:10px; font-weight:700; color:var(--muted); width:18px; text-align:right; flex-shrink:0 }
+    .lr-month-chart { display:flex; align-items:flex-end; gap:6px; height:110px; padding-bottom:0 }
+    .lr-month-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px }
+    .lr-month-val { font-size:9px; font-weight:700; color:var(--muted) }
+    .lr-month-bar-wrap { width:100%; flex:1; display:flex; align-items:flex-end }
+    .lr-month-bar { width:100%; border-radius:5px 5px 0 0; background:linear-gradient(180deg,#06b6d4 0%,rgba(6,182,212,.1) 100%); transition:height .5s ease; min-height:4px }
+    .lr-month-bar.current { background:linear-gradient(180deg,#22d3ee 0%,rgba(6,182,212,.2) 100%); box-shadow:0 0 10px rgba(6,182,212,.35) }
+    .lr-month-name { font-size:8.5px; color:var(--muted); margin-top:5px }
+    .lr-month-name.current { color:#22d3ee; font-weight:700 }
+    .lr-month-divider { width:100%; height:1px; background:rgba(148,163,184,.1); margin:0 0 2px }
     .lr-card { padding:16px 18px; border-radius:18px }
     .lr-card-title { font-size:12px; font-weight:800; color:var(--text); margin:0 0 4px }
     .lr-card-sub { font-size:10px; color:var(--muted); margin:0 0 14px }
@@ -491,14 +493,18 @@ function renderMonthlyTrend() {
     if (m) m.count++;
   });
   var max = Math.max.apply(null, months.map(function(m) { return m.count; })) || 1;
-  var html = months.map(function(m) {
-    var pct = Math.round(m.count / max * 100);
-    return '<div class="lr-month-row">'
-      + '<span class="lr-month-lbl' + (m.isCurrent ? '" style="color:var(--text);font-weight:700' : '') + '">' + m.label + '</span>'
-      + '<div class="lr-month-track"><div class="lr-month-fill' + (m.isCurrent ? ' current' : '') + '" style="width:' + pct + '%"></div></div>'
-      + '<span class="lr-month-count' + (m.isCurrent ? '" style="color:#4ade80' : '') + '">' + m.count + '</span>'
-      + '</div>';
-  }).join('');
+  var BAR_MAX_H = 80;
+  var html = '<div class="lr-month-chart">'
+    + months.map(function(m) {
+      var barH = max > 0 ? Math.max(Math.round(m.count / max * BAR_MAX_H), m.count > 0 ? 4 : 2) : 2;
+      return '<div class="lr-month-col">'
+        + '<span class="lr-month-val' + (m.isCurrent ? '" style="color:#22d3ee' : '') + '">' + (m.count || '') + '</span>'
+        + '<div class="lr-month-bar-wrap"><div class="lr-month-bar' + (m.isCurrent ? ' current' : '') + '" style="height:' + barH + 'px"></div></div>'
+        + '<div class="lr-month-divider"></div>'
+        + '<span class="lr-month-name' + (m.isCurrent ? ' current' : '') + '">' + m.label + '</span>'
+        + '</div>';
+    }).join('')
+    + '</div>';
   document.getElementById('lrMonthList').innerHTML = html;
 }
 
