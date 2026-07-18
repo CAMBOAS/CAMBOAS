@@ -798,6 +798,25 @@ a {
     gap: 8px;
 }
 
+.chart-bar-wrap {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.chart-val {
+    font-size: 9px;
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    min-height: 13px;
+    line-height: 13px;
+}
+
 .chart-bar {
     width: 100%;
     max-width: 40px;
@@ -805,7 +824,14 @@ a {
     background: linear-gradient(180deg, var(--emerald-light), var(--emerald));
     transition: all var(--transition-normal);
     position: relative;
-    min-height: 10px;
+    min-height: 0;
+}
+
+.chart-bar.bar-zero {
+    opacity: 0.25;
+    min-height: 2px;
+    height: 2px !important;
+    border-radius: 4px;
 }
 
 .chart-bar.bar-emerald {

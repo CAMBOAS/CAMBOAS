@@ -250,30 +250,48 @@ function updateChart(rows) {
 
   const { labels, totals } = buildChartData(rows);
 
-  const BAR_COLORS = ['#10b981','#f59e0b','#ef4444','#06b6d4','#f59e0b','#10b981','#f59e0b','#ef4444','#06b6d4','#f59e0b','#10b981','#f59e0b'];
-  const barBg = totals.map(function(_, i) { return BAR_COLORS[i % BAR_COLORS.length]; });
-
   revenueChart = new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
       labels,
       datasets: [{
         label: 'Revenue',
         data: totals,
-        backgroundColor: barBg,
-        borderColor: barBg,
-        borderWidth: 0,
-        borderRadius: 6,
-        borderSkipped: 'bottom'
+        borderColor: '#7c5cff',
+        backgroundColor: 'rgba(124,92,255,0.12)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#7c5cff',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 1.5,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: '#7c5cff'
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: {
+          label: function(ctx) {
+            var v = ctx.raw || 0;
+            return v >= 1000 ? '$' + (v/1000).toFixed(1).replace(/\.0$/,'') + 'K' : '$' + v;
+          }
+        }
+      }},
       scales: {
-        x: { ticks: { color: '#cbd5e1', font: { size: 10 } }, grid: { color: 'rgba(148,163,184,.06)' } },
-        y: { ticks: { color: '#94a3b8', callback: function(v) { return v >= 1000 ? '$'+(v/1000).toFixed(0)+'K' : '$'+v; } }, grid: { color: 'rgba(148,163,184,.08)' }, beginAtZero: true }
+        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: 'rgba(148,163,184,.06)' } },
+        y: {
+          ticks: {
+            color: '#94a3b8',
+            font: { size: 10 },
+            callback: function(v) { return v >= 1000 ? '$'+(v/1000).toFixed(0)+'K' : '$'+v; }
+          },
+          grid: { color: 'rgba(148,163,184,.08)' },
+          beginAtZero: true
+        }
       }
     }
   });
