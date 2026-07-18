@@ -111,10 +111,35 @@
     [data-theme="light"] .lr-filter { background:#f1f5f9; border-color:rgba(148,163,184,.25); color:#0f172a }
     .lr-filter:focus { border-color:rgba(6,182,212,.4) }
     .lr-btn { padding:8px 14px; border-radius:10px; border:none; cursor:pointer; font-size:12px; font-weight:700; font-family:inherit; display:flex; align-items:center; gap:5px; transition:.15s }
+    .lr-btn-add { background:rgba(34,197,94,.12); color:#4ade80; border:1px solid rgba(34,197,94,.3); padding:7px 9px; font-size:15px; font-weight:900; line-height:1 }
+    .lr-btn-add:hover { background:rgba(34,197,94,.22); color:#86efac }
+    [data-theme="light"] .lr-btn-add { background:rgba(34,197,94,.1); color:#16a34a; border-color:rgba(34,197,94,.25) }
     .lr-btn-export { background:rgba(34,197,94,.1); color:#86efac; border:1px solid rgba(34,197,94,.25) }
     .lr-btn-export:hover { background:rgba(34,197,94,.2) }
     .lr-btn-refresh { background:rgba(6,182,212,.1); color:#7dd3fc; border:1px solid rgba(6,182,212,.25) }
     .lr-btn-refresh:hover { background:rgba(6,182,212,.2) }
+    .lr-btn-filter { background:rgba(124,92,255,.1); color:#a78bfa; border:1px solid rgba(124,92,255,.25); padding:8px 10px; position:relative }
+    .lr-btn-filter:hover { background:rgba(124,92,255,.2) }
+    .lr-btn-filter.lr-filter-on { background:rgba(124,92,255,.18); border-color:rgba(124,92,255,.5); color:#c4b5fd }
+    [data-theme="light"] .lr-btn-filter { background:rgba(124,92,255,.08); color:#7c5cff; border-color:rgba(124,92,255,.2) }
+    [data-theme="light"] .lr-btn-filter.lr-filter-on { background:rgba(124,92,255,.15); border-color:rgba(124,92,255,.4) }
+    .lr-filter-badge { position:absolute; top:-3px; right:-3px; width:8px; height:8px; border-radius:50%; background:#7c5cff; border:1.5px solid var(--body-bg,#090f23); pointer-events:none }
+    [data-theme="light"] .lr-filter-badge { border-color:#f8fafc }
+    .lr-filter-wrap { position:relative; display:inline-flex }
+    .lr-fpanel { position:absolute; top:calc(100% + 6px); right:0; z-index:300; min-width:270px; max-width:320px;
+      background:rgba(9,15,35,.97); backdrop-filter:blur(16px); border:1px solid rgba(148,163,200,.18);
+      border-radius:14px; padding:14px; box-shadow:0 8px 32px rgba(0,0,0,.4); display:flex; flex-direction:column; gap:10px }
+    [data-theme="light"] .lr-fpanel { background:#fff; border-color:rgba(148,163,184,.22); box-shadow:0 8px 24px rgba(0,0,0,.12) }
+    .lr-fpanel-hd { display:flex; align-items:center; justify-content:space-between; font-size:12px; font-weight:800; color:var(--text) }
+    .lr-fpanel-clear { font-size:11px; color:#a78bfa; background:none; border:none; cursor:pointer; font-family:inherit; padding:3px 7px; border-radius:6px; transition:.13s }
+    .lr-fpanel-clear:hover { background:rgba(124,92,255,.12) }
+    .lr-fpanel-stitle { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted,#64748b); margin-bottom:6px }
+    .lr-fpanel-chips { display:flex; flex-wrap:wrap; gap:5px }
+    .lr-fpanel-chip { padding:5px 10px; border-radius:8px; font-size:11.5px; cursor:pointer; border:1px solid rgba(148,163,200,.16);
+      color:var(--text-muted,#94a3b8); background:rgba(148,163,200,.06); transition:.13s; user-select:none; font-family:inherit; white-space:nowrap }
+    .lr-fpanel-chip:hover { background:rgba(148,163,200,.13); color:var(--text) }
+    .lr-fpanel-chip.lr-factive { background:var(--chip-bg,rgba(124,92,255,.15)); border-color:var(--chip-c,rgba(124,92,255,.45)); color:var(--chip-c,#c4b5fd); font-weight:700 }
+    .lr-fpanel-div { height:1px; background:rgba(148,163,200,.1); margin:0 -2px }
 
     /* Table */
     .lr-tbl-wrap { overflow-x:auto; max-height:calc(100vh - 360px); min-height:260px; scrollbar-width:thin; scrollbar-color:rgba(148,163,200,.15) transparent }
@@ -275,22 +300,51 @@
           <div class="lr-table-toolbar">
             <div class="lr-toolbar-left">
               <input class="lr-srch" id="lrSrch" placeholder="ស្វែងរកឈ្មោះ / NID / ទូរស័ព្ទ..." oninput="applyFilter()">
-              <select class="lr-filter" id="lrFGroup" onchange="_groupActive=null;document.body.style.removeProperty('--group-color');document.body.style.removeProperty('--group-rgb');renderGroupBars();applyFilter()">
-                <option value="">All Groups</option>
-              </select>
-              <select class="lr-filter" id="lrFStatus" onchange="_kpiActive='';document.querySelectorAll('.lr-kpi-clickable.active').forEach(function(e){e.classList.remove('active')});applyFilter()">
-                <option value="">All Status</option>
-                <option value="Good">Good</option>
-                <option value="Normal">Normal</option>
-                <option value="BlackListed">BlackListed</option>
-                <option value="High Risk">High Risk</option>
-              </select>
-              <select class="lr-filter" id="lrFGender" onchange="applyFilter()">
-                <option value="">All Gender</option>
-                <option value="Male">Male / ប្រុស</option>
-                <option value="Female">Female / ស្រី</option>
-                <option value="Other">Other</option>
-              </select>
+              <button class="lr-btn lr-btn-add" onclick="openAddModal()" title="បន្ថែម Borrower ថ្មី">＋</button>
+              <!-- Hidden state holders — values read by applyFilter() -->
+              <select style="display:none" id="lrFGroup" onchange="applyFilter()"><option value="">All Groups</option></select>
+              <select style="display:none" id="lrFStatus" onchange="applyFilter()"><option value="">All Status</option><option value="Good">Good</option><option value="Normal">Normal</option><option value="BlackListed">BlackListed</option><option value="High Risk">High Risk</option></select>
+              <select style="display:none" id="lrFGender" onchange="applyFilter()"><option value="">All Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
+            </div>
+            <div class="lr-filter-wrap">
+              <button class="lr-btn lr-btn-filter" id="lrBtnFilter" onclick="toggleLrFilters()" title="Filter Data">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                <span id="lrFilterBadge" class="lr-filter-badge" style="display:none"></span>
+              </button>
+              <div class="lr-fpanel" id="lrFilterPanel" style="display:none">
+                <div class="lr-fpanel-hd">
+                  <span>Filter Data</span>
+                  <button class="lr-fpanel-clear" onclick="clearLrFilters()">Clear All</button>
+                </div>
+                <div class="lr-fpanel-div"></div>
+                <div>
+                  <div class="lr-fpanel-stitle">ស្ថានភាព (Status)</div>
+                  <div class="lr-fpanel-chips" id="lrFPStatus">
+                    <span class="lr-fpanel-chip lr-factive" data-type="status" data-val="">All</span>
+                    <span class="lr-fpanel-chip" data-type="status" data-val="Good" style="--chip-c:#22c55e;--chip-bg:rgba(34,197,94,.13)">Good</span>
+                    <span class="lr-fpanel-chip" data-type="status" data-val="Normal" style="--chip-c:#06b6d4;--chip-bg:rgba(6,182,212,.13)">Normal</span>
+                    <span class="lr-fpanel-chip" data-type="status" data-val="BlackListed" style="--chip-c:#ef4444;--chip-bg:rgba(239,68,68,.13)">BlackListed</span>
+                    <span class="lr-fpanel-chip" data-type="status" data-val="High Risk" style="--chip-c:#f59e0b;--chip-bg:rgba(245,158,11,.13)">High Risk</span>
+                  </div>
+                </div>
+                <div class="lr-fpanel-div"></div>
+                <div>
+                  <div class="lr-fpanel-stitle">ភេទ (Gender)</div>
+                  <div class="lr-fpanel-chips" id="lrFPGender">
+                    <span class="lr-fpanel-chip lr-factive" data-type="gender" data-val="">All</span>
+                    <span class="lr-fpanel-chip" data-type="gender" data-val="Male">Male / ប្រុស</span>
+                    <span class="lr-fpanel-chip" data-type="gender" data-val="Female">Female / ស្រី</span>
+                    <span class="lr-fpanel-chip" data-type="gender" data-val="Other">Other</span>
+                  </div>
+                </div>
+                <div class="lr-fpanel-div"></div>
+                <div>
+                  <div class="lr-fpanel-stitle">ក្រុម (Groups)</div>
+                  <div class="lr-fpanel-chips" id="lrFPGroups">
+                    <span class="lr-fpanel-chip lr-factive" data-type="group" data-val="">All</span>
+                  </div>
+                </div>
+              </div>
             </div>
             <button class="lr-btn lr-btn-export" onclick="exportCSV()">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -465,6 +519,7 @@ function populateFilters() {
   var sel = document.getElementById('lrFGroup');
   sel.innerHTML = '<option value="">All Groups</option>' +
     groups.map(function(g){ return '<option value="'+esc(g)+'">'+esc(g)+'</option>'; }).join('');
+  renderFPGroups();
 }
 
 /* ── Filter + Sort ── */
@@ -742,6 +797,73 @@ function renderGroupBars() {
 
 
 /* ── Export ── */
+function toggleLrFilters() {
+  var panel = document.getElementById('lrFilterPanel');
+  var btn   = document.getElementById('lrBtnFilter');
+  var open  = panel.style.display === 'none';
+  panel.style.display = open ? 'flex' : 'none';
+  btn.classList.toggle('lr-filter-on', open);
+}
+
+function setFPChip(type, val) {
+  var containers = { status:'lrFPStatus', gender:'lrFPGender', group:'lrFPGroups' };
+  var selects    = { status:'lrFStatus',  gender:'lrFGender',  group:'lrFGroup'  };
+  var c = document.getElementById(containers[type]);
+  if (c) c.querySelectorAll('.lr-fpanel-chip').forEach(function(ch) {
+    ch.classList.toggle('lr-factive', ch.getAttribute('data-val') === val);
+  });
+  var sel = document.getElementById(selects[type]);
+  if (sel) sel.value = val;
+  if (type === 'group') {
+    _groupActive = null;
+    document.body.style.removeProperty('--group-color');
+    document.body.style.removeProperty('--group-rgb');
+    renderGroupBars();
+  }
+  if (type === 'status') {
+    _kpiActive = '';
+    document.querySelectorAll('.lr-kpi-clickable.active').forEach(function(e){ e.classList.remove('active'); });
+  }
+  applyFilter();
+  updateFilterBadge();
+}
+
+function clearLrFilters() {
+  ['status','gender','group'].forEach(function(t){ setFPChip(t, ''); });
+}
+
+function updateFilterBadge() {
+  var active = document.getElementById('lrFGroup').value ||
+               document.getElementById('lrFStatus').value ||
+               document.getElementById('lrFGender').value;
+  var badge = document.getElementById('lrFilterBadge');
+  if (badge) badge.style.display = active ? 'block' : 'none';
+}
+
+function renderFPGroups() {
+  var c = document.getElementById('lrFPGroups');
+  if (!c) return;
+  var groups = [];
+  _allLoans.forEach(function(l){ var g=(l.Groups||'').trim(); if(g && !groups.includes(g)) groups.push(g); });
+  groups.sort();
+  var cur = document.getElementById('lrFGroup').value;
+  c.innerHTML = '<span class="lr-fpanel-chip'+(cur===''?' lr-factive':'')+'" data-type="group" data-val="">All</span>'
+    + groups.map(function(g){
+        return '<span class="lr-fpanel-chip'+(cur===g?' lr-factive':'')+'" data-type="group" data-val="'+g.replace(/"/g,'&quot;')+'">'+g+'</span>';
+      }).join('');
+}
+
+document.addEventListener('click', function(e) {
+  var chip = e.target.closest('.lr-fpanel-chip');
+  if (chip) { setFPChip(chip.getAttribute('data-type'), chip.getAttribute('data-val')); return; }
+  var panel = document.getElementById('lrFilterPanel');
+  var btn   = document.getElementById('lrBtnFilter');
+  if (panel && panel.style.display !== 'none' && !panel.contains(e.target) && btn && !btn.contains(e.target)) {
+    panel.style.display = 'none';
+    btn.classList.remove('lr-filter-on');
+  }
+});
+
 function exportCSV() {
   var data = _filtered.length ? _filtered : _allLoans;
   if (!data.length) { toast('No data to export', true); return; }
@@ -806,6 +928,70 @@ async function confirmDelete() {
 
 /* ── Edit Modal ── */
 var _editLoan = null;
+
+function openAddModal() {
+  var groups = [...new Set(_allLoans.map(function(l){ return l.Groups||''; }).filter(Boolean))].sort();
+  var groupOpts = groups.map(function(g){ return '<option value="'+esc(g)+'">'+esc(g)+'</option>'; }).join('');
+  var statusOpts = ['Good','Normal','BlackListed','High Risk'].map(function(s){
+    return '<option value="'+s+'">'+s+'</option>';
+  }).join('');
+
+  document.getElementById('lrAddForm').innerHTML =
+    '<div class="lr-modal-grid">'
+    +'<div class="lr-field"><label>ឈ្មោះ (Full Name) <span style="color:#ef4444">*</span></label><input id="af_FullName" placeholder="ឈ្មោះពេញ..."></div>'
+    +'<div class="lr-field"><label>National ID</label><input id="af_NationalID" placeholder="លេខអត្តសញ្ញាណប័ណ្ណ..."></div>'
+    +'<div class="lr-field"><label>DOB</label><input id="af_DOB" placeholder="DD/MM/YYYY"></div>'
+    +'<div class="lr-field"><label>ទូរស័ព្ទ (Phone)</label><input id="af_Phone" placeholder="0XX XXX XXX"></div>'
+    +'<div class="lr-field"><label>ភេទ (Gender)</label><select id="af_Gender"><option value="">— ជ្រើសរើស —</option><option value="Male">Male / ប្រុស</option><option value="Female">Female / ស្រី</option><option value="Other">Other</option></select></div>'
+    +'<div class="lr-field"><label>ក្រុម (Group)</label><select id="af_Groups"><option value="">— ជ្រើសរើស —</option>'+groupOpts+'</select></div>'
+    +'<div class="lr-field"><label>ប្រាក់កម្ចី Amount ($)</label><input id="af_Money" type="number" min="0" placeholder="0"></div>'
+    +'<div class="lr-field"><label>ស្ថានភាព (Status) <span style="color:#ef4444">*</span></label><select id="af_Status"><option value="">— ជ្រើសរើស —</option>'+statusOpts+'</select></div>'
+    +'</div>'
+    +'<div class="lr-field"><label>Note</label><textarea id="af_Note" placeholder="កំណត់ចំណាំ..."></textarea></div>';
+
+  document.getElementById('lrAddModalBg').classList.add('open');
+  setTimeout(function(){ var f=document.getElementById('af_FullName'); if(f) f.focus(); }, 80);
+}
+
+function closeAddModal() {
+  document.getElementById('lrAddModalBg').classList.remove('open');
+}
+
+async function saveAdd() {
+  var fullName = document.getElementById('af_FullName').value.trim();
+  var status   = document.getElementById('af_Status').value;
+  if (!fullName) { toast('⚠️ សូមបំពេញឈ្មោះ', true); document.getElementById('af_FullName').focus(); return; }
+  if (!status)   { toast('⚠️ សូមជ្រើសរើស Status', true); document.getElementById('af_Status').focus(); return; }
+
+  var btn = document.getElementById('lrAddBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  var loan = {
+    FullName:   fullName,
+    NationalID: document.getElementById('af_NationalID').value.trim(),
+    DOB:        document.getElementById('af_DOB').value.trim(),
+    Phone:      document.getElementById('af_Phone').value.trim(),
+    Gender:     document.getElementById('af_Gender').value,
+    Groups:     document.getElementById('af_Groups').value,
+    Money:      document.getElementById('af_Money').value,
+    Status:     status,
+    Note:       document.getElementById('af_Note').value.trim(),
+  };
+  try {
+    var res = await CamboAPI.post({ action: 'helen_loan_add', loan: loan });
+    if (res && res.ok) {
+      toast('✅ បន្ថែមដោយជោគជ័យ');
+      closeAddModal();
+      loadData();
+    } else {
+      toast('❌ ' + ((res && res.message) || 'Add failed'), true);
+      btn.disabled = false; btn.textContent = '➕ Add';
+    }
+  } catch(e) {
+    toast('❌ Network error', true);
+    btn.disabled = false; btn.textContent = '➕ Add';
+  }
+}
 
 function openEditModal(loan) {
   _editLoan = loan;
@@ -992,6 +1178,24 @@ loadData();
     <div class="lr-modal-footer">
       <button class="lr-btn lr-btn-cancel" onclick="closeEditModal()">Cancel</button>
       <button class="lr-btn lr-btn-save" id="lrSaveBtn" onclick="saveEdit()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add New Borrower Modal -->
+<div class="lr-modal-bg" id="lrAddModalBg" onclick="if(event.target===this)closeAddModal()">
+  <div class="lr-modal">
+    <div class="lr-modal-hdr">
+      <div>
+        <div class="lr-modal-title">➕ បន្ថែម Borrower ថ្មី</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">បំពេញព័ត៌មានខាងក្រោម</div>
+      </div>
+      <button class="lr-modal-close" onclick="closeAddModal()">✕</button>
+    </div>
+    <div id="lrAddForm"></div>
+    <div class="lr-modal-footer">
+      <button class="lr-btn lr-btn-cancel" onclick="closeAddModal()">Cancel</button>
+      <button class="lr-btn lr-btn-save" id="lrAddBtn" onclick="saveAdd()">➕ Add</button>
     </div>
   </div>
 </div>
