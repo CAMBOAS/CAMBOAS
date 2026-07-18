@@ -22,6 +22,11 @@
     .lr-kpi-sub { font-size:11px; color:var(--muted); margin-top:5px }
     .lr-kpi-accent { position:absolute; right:-10px; top:-10px; width:70px; height:70px; border-radius:50%; opacity:.12 }
     .lr-kpi-icon { width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; flex-shrink:0 }
+    .lr-kpi-clickable { cursor:pointer; transition:.18s }
+    .lr-kpi-clickable:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.18) }
+    .lr-kpi-clickable.active { outline:2px solid var(--kpi-color,#7c5cff); outline-offset:2px; box-shadow:0 0 0 4px rgba(var(--kpi-rgb,124,92,255),.15) }
+    tr.lr-row-highlight td { background:rgba(124,92,255,.07) }
+    tr.lr-row-highlight .lr-name-link { color:#a78bfa; font-weight:800 }
 
     /* ── Charts Row ── */
     .lr-charts-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; align-items:stretch }
@@ -243,7 +248,7 @@
               <select class="lr-filter" id="lrFGroup" onchange="applyFilter()">
                 <option value="">All Groups</option>
               </select>
-              <select class="lr-filter" id="lrFStatus" onchange="applyFilter()">
+              <select class="lr-filter" id="lrFStatus" onchange="_kpiActive='';document.querySelectorAll('.lr-kpi-clickable.active').forEach(function(e){e.classList.remove('active')});applyFilter()">
                 <option value="">All Status</option>
                 <option value="Good">Good</option>
                 <option value="Normal">Normal</option>
@@ -455,7 +460,8 @@ function renderTable() {
   var html = arr.map(function(l, i){
     var money = Number(l.Money||0);
     var moneyHtml = isNaN(money) || money===0 ? '<span style="color:var(--muted)">—</span>' : '<span style="color:#34d399;font-weight:700">'+fmtMoney(money)+'</span>';
-    return '<tr>'
+    var isHL = _kpiActive && (l.Status||'').trim().toLowerCase() === _kpiActive.toLowerCase();
+    return '<tr'+(isHL?' class="lr-row-highlight"':'')+'>'
       + '<td style="color:var(--muted);font-size:11px">'+esc(String(l._idx||i+1))+'</td>'
       + '<td style="font-weight:700"><span class="lr-name-link" data-dt="'+esc(l.DateTime||'')+'">'+esc(l.FullName||'—')+'</span></td>'
       + '<td style="font-family:monospace;font-size:11.5px;color:#60a5fa">'+esc(l.NationalID||'—')+'</td>'
@@ -531,21 +537,22 @@ function renderKPIs() {
   var gdPct = total ? Math.round(good/total*100) : 0;
 
   document.getElementById('lrKpiRow').innerHTML = [
-    kpiCard('អ្នកកម្ចីសរុប','Total Borrowers', total, '',          '#7c5cff','#7c5cff'),
-    kpiCard('ប្រាក់សរុប','Total Amount',      fmtMoney(totalAmt), '', '#22c55e','#22c55e'),
-    kpiCard('Blacklisted','',                  blacklist, blPct+'% of total', '#ef4444','#ef4444'),
-    kpiCard('Good','',                          good,      gdPct+'% of total', '#22c55e','#22c55e'),
-    kpiCard('High Risk','',                     highRisk,  '', '#f59e0b','#f59e0b'),
-    kpiCard('ថ្ងៃនេះ','New Today',             newToday,  today, '#06b6d4','#06b6d4'),
+    kpiCard('អ្នកកម្ចីសរុប','Total Borrowers', total,            '',                '#7c5cff','#7c5cff', '124,92,255',  ''),
+    kpiCard('ប្រាក់សរុប',   'Total Amount',    fmtMoney(totalAmt),'',               '#22c55e','#22c55e', '34,197,94',   ''),
+    kpiCard('Blacklisted',   '',                blacklist,         blPct+'% of total','#ef4444','#ef4444', '239,68,68',   'BlackListed'),
+    kpiCard('Good',          '',                good,              gdPct+'% of total','#22c55e','#22c55e', '34,197,94',   'Good'),
+    kpiCard('High Risk',     '',                highRisk,          '',                '#f59e0b','#f59e0b', '245,158,11',  'High Risk'),
+    kpiCard('ថ្ងៃនេះ',     'New Today',        newToday,          today,             '#06b6d4','#06b6d4', '6,182,212',   ''),
   ].join('');
 }
 
-function kpiCard(label, sublabel, val, sub, iconColor, accentColor) {
-  return '<div class="glass-card lr-kpi">'
-    + '<div class="lr-kpi-accent" style="background:'+accentColor+'"></div>'
-    + '<div class="lr-kpi-label">'+esc(label)+(sublabel?' <span style="opacity:.6;font-weight:400">'+esc(sublabel)+'</span>':'')+'</div>'
-    + '<div class="lr-kpi-val" style="color:'+iconColor+'">'+esc(String(val))+'</div>'
-    + (sub ? '<div class="lr-kpi-sub">'+esc(sub)+'</div>' : '')
+function kpiCard(label, sublabel, val, sub, iconColor, accentColor, rgb, filterVal) {
+  var extra = filterVal ? ' lr-kpi-clickable" data-filter="' + filterVal + '" style="--kpi-color:' + iconColor + ';--kpi-rgb:' + rgb : '';
+  return '<div class="glass-card lr-kpi' + extra + '">'
+    + '<div class="lr-kpi-accent" style="background:' + accentColor + '"></div>'
+    + '<div class="lr-kpi-label">' + esc(label) + (sublabel ? ' <span style="opacity:.6;font-weight:400">' + esc(sublabel) + '</span>' : '') + '</div>'
+    + '<div class="lr-kpi-val" style="color:' + iconColor + '">' + esc(String(val)) + '</div>'
+    + (sub ? '<div class="lr-kpi-sub">' + esc(sub) + '</div>' : '')
     + '</div>';
 }
 
@@ -779,6 +786,28 @@ async function saveEdit() {
 }
 
 /* ── Init ── */
+/* ── KPI click filter ── */
+var _kpiActive = '';
+document.getElementById('lrKpiRow').addEventListener('click', function(e) {
+  var card = e.target.closest('.lr-kpi-clickable');
+  if (!card) return;
+  var filter = card.getAttribute('data-filter');
+  if (_kpiActive === filter) {
+    // deselect
+    _kpiActive = '';
+    card.classList.remove('active');
+    document.getElementById('lrFStatus').value = '';
+  } else {
+    // deselect previous
+    var prev = document.querySelector('.lr-kpi-clickable.active');
+    if (prev) prev.classList.remove('active');
+    _kpiActive = filter;
+    card.classList.add('active');
+    document.getElementById('lrFStatus').value = filter;
+  }
+  applyFilter();
+});
+
 document.getElementById('lrTbody').addEventListener('click', function(e) {
   var nameEl = e.target.closest('.lr-name-link');
   if (nameEl) {
