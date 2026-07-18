@@ -27,6 +27,8 @@
     .lr-kpi-clickable.active { outline:2px solid var(--kpi-color,#7c5cff); outline-offset:2px; box-shadow:0 0 0 4px rgba(var(--kpi-rgb,124,92,255),.15) }
     tr.lr-row-highlight td { background:rgba(124,92,255,.07) }
     tr.lr-row-highlight .lr-name-link { color:#a78bfa; font-weight:800 }
+    tr.lr-row-paint td { background:rgba(var(--paint-rgb,124,92,255),.07) }
+    tr.lr-row-paint .lr-name-link { color:var(--paint-color,#a78bfa); font-weight:800; text-decoration:underline dashed 1px }
 
     /* ── Charts Row ── */
     .lr-charts-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; align-items:stretch }
@@ -406,12 +408,14 @@ function setPaintMode(status) {
   document.getElementById('lrPaintBanner').classList.remove('lr-banner-hidden');
   document.getElementById('lrTbody').classList.add('lr-paint-on');
   renderStatusDonut();
+  renderTable();
 }
 function exitPaintMode() {
   _paintStatus = '';
   document.getElementById('lrPaintBanner').classList.add('lr-banner-hidden');
   document.getElementById('lrTbody').classList.remove('lr-paint-on');
   renderStatusDonut();
+  renderTable();
 }
 async function updateLoanStatus(loan, newStatus) {
   var updated = Object.assign({}, loan, { Status: newStatus });
@@ -515,8 +519,11 @@ function renderTable() {
   var html = arr.map(function(l, i){
     var money = Number(l.Money||0);
     var moneyHtml = isNaN(money) || money===0 ? '<span style="color:var(--muted)">—</span>' : '<span style="color:#34d399;font-weight:700">'+fmtMoney(money)+'</span>';
-    var isHL = _kpiActive && (l.Status||'').trim().toLowerCase() === _kpiActive.toLowerCase();
-    return '<tr'+(isHL?' class="lr-row-highlight"':'')+'>'
+    var rowStatus = (l.Status||'').trim().toLowerCase();
+    var isHL    = _kpiActive    && rowStatus === _kpiActive.toLowerCase();
+    var isPaint = _paintStatus  && rowStatus === _paintStatus.toLowerCase();
+    var trClass = isPaint ? ' class="lr-row-paint"' : isHL ? ' class="lr-row-highlight"' : '';
+    return '<tr'+trClass+'>'
       + '<td style="color:var(--muted);font-size:11px">'+esc(String(l._idx||i+1))+'</td>'
       + '<td style="font-weight:700"><span class="lr-name-link" data-dt="'+esc(l.DateTime||'')+'">'+esc(l.FullName||'—')+'</span></td>'
       + '<td style="font-family:monospace;font-size:11.5px;color:#60a5fa">'+esc(l.NationalID||'—')+'</td>'
