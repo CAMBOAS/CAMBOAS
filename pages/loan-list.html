@@ -483,16 +483,12 @@ function setPaintMode(status) {
   var rgb   = statusRGB(status);
   document.body.style.setProperty('--paint-color', color);
   document.body.style.setProperty('--paint-rgb', rgb);
-  document.getElementById('lrPaintDot').style.background = color;
-  document.getElementById('lrPaintLabel').textContent = 'ចុចឈ្មោះ → ' + status;
-  document.getElementById('lrPaintBanner').classList.remove('lr-banner-hidden');
   document.getElementById('lrTbody').classList.add('lr-paint-on');
   renderStatusDonut();
   renderTable();
 }
 function exitPaintMode() {
   _paintStatus = '';
-  document.getElementById('lrPaintBanner').classList.add('lr-banner-hidden');
   document.getElementById('lrTbody').classList.remove('lr-paint-on');
   renderStatusDonut();
   renderTable();
@@ -506,7 +502,6 @@ async function updateLoanStatus(loan, newStatus) {
     renderTable(); renderKPIs(); renderStatusDonut(); renderGroupBars();
   } catch(err) { console.error('updateLoanStatus failed', err); }
 }
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && _paintStatus) exitPaintMode(); });
 
 /* ── HelenInfor (Groups + Statuses from Google Sheet) ── */
 var _helenInfor = { groups: [], statuses: [] };
@@ -629,7 +624,7 @@ function renderTable() {
       + '<td style="font-size:11px;color:var(--muted)">'+esc(l.DOB||'—')+'</td>'
       + '<td style="font-size:12px"><a href="tel:'+esc(l.Phone||'')+'" style="color:#60a5fa;text-decoration:none">'+esc(l.Phone||'—')+'</a></td>'
       + '<td>'+genderTag(l.Gender)+'</td>'
-      + '<td>'+(l.Groups?'<span class="tag tag-group">'+esc(l.Groups)+'</span>':'—')+'</td>'
+      + '<td style="font-size:12px">'+esc(l.Groups||'—')+'</td>'
       + '<td style="text-align:right">'+moneyHtml+'</td>'
       + '<td>'+statusTag(l.Status)+'</td>'
       + '<td style="font-size:11px;color:var(--muted)">'+fmtDate(l.DateTime)+'</td>'
@@ -1044,8 +1039,10 @@ function openEditModal(loan) {
     return '<option value="'+s+'"'+(s===(loan.Status||'').trim()?' selected':'')+'>'+s+'</option>';
   }).join('');
   var genderList = ['Male','Female','Other'];
+  var _gNorm = {'ប្រុស':'Male','male':'Male','ស្រី':'Female','female':'Female','ផ្សេងៗ':'Other','other':'Other'};
+  var _gSel  = _gNorm[(loan.Gender||'').trim()] || _gNorm[(loan.Gender||'').trim().toLowerCase()] || '';
   var genderOpts = '<option value="">—</option>' + genderList.map(function(g){
-    return '<option value="'+g+'"'+(g.toLowerCase()===(loan.Gender||'').toLowerCase()?' selected':'')+'>'+g+'</option>';
+    return '<option value="'+g+'"'+(g===_gSel?' selected':'')+'>'+g+'</option>';
   }).join('');
 
   document.getElementById('lrModalName').textContent = esc(loan.FullName||'—');
@@ -1060,6 +1057,7 @@ function openEditModal(loan) {
     +'<div class="lr-field"><label>ប្រាក់កម្ចី Amount ($)</label><input id="ef_Money" type="number" min="0" value="'+esc(loan.Money||'')+'"></div>'
     +'<div class="lr-field"><label>ស្ថានភាព (Status)</label><select id="ef_Status"><option value="">—</option>'+statusOpts+'</select></div>'
     +'</div>'
+    +'<div class="lr-field"><label>📅 ថ្ងៃបញ្ចូលទិន្នន័យ (Date)</label><input id="ef_DateTime" type="date" value="'+esc((loan.DateTime||'').slice(0,10))+'"></div>'
     +'<div class="lr-field"><label>Note</label><textarea id="ef_Note">'+esc(loan.Note||'')+'</textarea></div>';
 
   document.getElementById('lrModalBg').classList.add('open');
@@ -1075,7 +1073,9 @@ async function saveEdit() {
   var btn = document.getElementById('lrSaveBtn');
   btn.disabled = true;
   btn.textContent = 'Saving…';
+  var newDate = document.getElementById('ef_DateTime').value;
   var updated = {
+    DateTime:   newDate ? newDate + 'T00:00:00' : _editLoan.DateTime,
     FullName:   document.getElementById('ef_FullName').value.trim(),
     NationalID: document.getElementById('ef_NationalID').value.trim(),
     DOB:        document.getElementById('ef_DOB').value.trim(),
@@ -1178,12 +1178,6 @@ document.getElementById('lrTbody').addEventListener('click', function(e) {
 loadData();
 </script>
 
-<!-- Paint Mode Banner -->
-<div class="lr-paint-banner lr-banner-hidden" id="lrPaintBanner">
-  <div class="lr-paint-dot" id="lrPaintDot"></div>
-  <span id="lrPaintLabel">—</span>
-  <button class="lr-paint-esc" onclick="exitPaintMode()">✕ ESC</button>
-</div>
 
 <!-- Confirm Delete Modal -->
 <div class="lr-confirm-bg" id="lrConfirmBg">

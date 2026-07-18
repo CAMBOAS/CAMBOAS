@@ -2050,7 +2050,7 @@ function updateHelenLoan_(key, loan) {
   const rowNum = findHelenLoanRow_(key);
   if (rowNum < 0) return false;
   const row = [
-    key,
+    String(loan.DateTime || key).trim(),
     String(loan.FullName   || '').trim(),
     String(loan.NationalID || '').trim(),
     String(loan.DOB        || '').trim(),
