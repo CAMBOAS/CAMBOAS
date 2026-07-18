@@ -58,6 +58,23 @@
     .lr-donut-legend { flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; margin-top:4px }
     .lr-legend-row { display:grid; grid-template-columns:8px 1fr 28px 42px; align-items:center; column-gap:5px }
     .lr-legend-hdr { margin-bottom:4px; padding-bottom:5px; border-bottom:1px solid rgba(148,163,184,.12) }
+    .lr-legend-item { border-radius:7px; padding:3px 5px; cursor:pointer; transition:.15s; }
+    .lr-legend-item:hover { background:rgba(148,163,184,.1); }
+    .lr-legend-item.lr-paint-active { background:rgba(var(--paint-rgb,124,92,255),.13); outline:1.5px solid var(--paint-color,#7c5cff); }
+    .lr-donut-wrap svg circle[data-status] { cursor:pointer; transition:opacity .15s; }
+    .lr-donut-wrap svg circle[data-status]:hover { opacity:.78; }
+    /* Paint-mode name links */
+    .lr-paint-on .lr-name-link { cursor:crosshair !important; }
+    .lr-paint-on .lr-name-link:hover { color:var(--paint-color,#7c5cff) !important; text-decoration:underline dashed 1px; }
+    /* Paint banner */
+    .lr-paint-banner { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); z-index:9999;
+      background:#1e293b; color:#fff; border-radius:99px; padding:9px 20px 9px 14px;
+      display:flex; align-items:center; gap:9px; font-size:12px; font-weight:600;
+      box-shadow:0 6px 28px rgba(0,0,0,.35); transition:opacity .2s,transform .2s; pointer-events:none; }
+    .lr-paint-banner.lr-banner-hidden { opacity:0; transform:translateX(-50%) translateY(10px); }
+    .lr-paint-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .lr-paint-esc { pointer-events:auto; cursor:pointer; margin-left:4px; background:rgba(255,255,255,.12);
+      border:none; color:#fff; border-radius:99px; padding:2px 9px; font-size:10px; font-weight:700; }
 
     /* Group bars */
     .lr-bar-list { display:flex; flex-direction:column; gap:7px }
@@ -368,6 +385,44 @@ function statusColor(s) {
   if (v.toLowerCase()==='blacklisted') return STATUS_COLORS['BlackListed'];
   return STATUS_COLORS[v] || '#94a3b8';
 }
+var STATUS_RGB = { 'Good':'34,197,94', 'Normal':'6,182,212', 'BlackListed':'239,68,68', 'High Risk':'245,158,11' };
+function statusRGB(s) {
+  var v = (s||'').trim();
+  if (v.toLowerCase()==='blacklisted') return STATUS_RGB['BlackListed'];
+  return STATUS_RGB[v] || '148,163,184';
+}
+
+/* ── Paint-status mode ── */
+var _paintStatus = '';
+function setPaintMode(status) {
+  if (_paintStatus === status) { exitPaintMode(); return; }
+  _paintStatus = status;
+  var color = statusColor(status);
+  var rgb   = statusRGB(status);
+  document.body.style.setProperty('--paint-color', color);
+  document.body.style.setProperty('--paint-rgb', rgb);
+  document.getElementById('lrPaintDot').style.background = color;
+  document.getElementById('lrPaintLabel').textContent = 'ចុចឈ្មោះ → ' + status;
+  document.getElementById('lrPaintBanner').classList.remove('lr-banner-hidden');
+  document.getElementById('lrTbody').classList.add('lr-paint-on');
+  renderStatusDonut();
+}
+function exitPaintMode() {
+  _paintStatus = '';
+  document.getElementById('lrPaintBanner').classList.add('lr-banner-hidden');
+  document.getElementById('lrTbody').classList.remove('lr-paint-on');
+  renderStatusDonut();
+}
+async function updateLoanStatus(loan, newStatus) {
+  var updated = Object.assign({}, loan, { Status: newStatus });
+  try {
+    await CamboAPI.post({ action: 'helen_loan_update', key: loan.DateTime, loan: updated });
+    var idx = _allLoans.findIndex(function(x){ return x.DateTime === loan.DateTime; });
+    if (idx >= 0) _allLoans[idx].Status = newStatus;
+    renderTable(); renderKPIs(); renderStatusDonut(); renderGroupBars();
+  } catch(err) { console.error('updateLoanStatus failed', err); }
+}
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && _paintStatus) exitPaintMode(); });
 
 /* ── Load data ── */
 async function loadData() {
@@ -587,9 +642,11 @@ function renderStatusDonut() {
     var gap   = circ-dash;
     var color = statusColor(e.name);
     var sdo   = circ - off - circ*0.25;
-    parts.push('<circle cx="80" cy="80" r="55" fill="none" stroke="'+color+'" stroke-width="24"'
+    var isAct = _paintStatus === e.name;
+    parts.push('<circle cx="80" cy="80" r="55" fill="none" stroke="'+color+'" stroke-width="'+(isAct?28:24)+'"'
       +' stroke-dasharray="'+dash.toFixed(2)+' '+gap.toFixed(2)+'"'
-      +' stroke-dashoffset="'+sdo.toFixed(2)+'" style="transform-origin:center;transition:stroke-dashoffset .5s"/>');
+      +' stroke-dashoffset="'+sdo.toFixed(2)+'" data-status="'+esc(e.name)+'"'
+      +' style="transform-origin:center;transition:stroke-dashoffset .5s,stroke-width .2s"/>');
     off += dash;
   });
   parts.push(
@@ -610,11 +667,16 @@ function renderStatusDonut() {
   var rows = entries.map(function(e){
     var pct   = Math.round(e.count/total*100);
     var color = statusColor(e.name);
-    return '<div style="'+ROW+';gap:4px">'
+    var isAct = _paintStatus === e.name;
+    return '<div class="lr-legend-item'+(isAct?' lr-paint-active':'')+'" data-status="'+esc(e.name)+'"'
+      + (isAct?' style="--paint-color:'+color+';--paint-rgb:'+statusRGB(e.name)+'"':'')
+      + ' title="ចុចដើម្បីបោះពណ៌ Status នេះ">'
+      + '<span style="display:grid;grid-template-columns:'+GCOLS+';align-items:center;column-gap:4px;width:100%">'
       + '<span style="width:7px;height:7px;border-radius:50%;background:'+color+';margin:0 auto"></span>'
       + '<span style="font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(e.name)+'</span>'
       + '<span style="font-size:10px;font-weight:700;color:var(--muted);text-align:right">'+pct+'%</span>'
       + '<span style="font-size:10px;color:var(--muted);text-align:right">'+e.count+'</span>'
+      + '</span>'
       + '</div>';
   }).join('');
   lgnd.innerHTML = hdr + rows;
@@ -808,11 +870,18 @@ document.getElementById('lrKpiRow').addEventListener('click', function(e) {
   applyFilter();
 });
 
+document.getElementById('lrStatusCard').addEventListener('click', function(e) {
+  var item = e.target.closest('[data-status]');
+  if (!item) return;
+  setPaintMode(item.getAttribute('data-status'));
+});
+
 document.getElementById('lrTbody').addEventListener('click', function(e) {
   var nameEl = e.target.closest('.lr-name-link');
   if (nameEl) {
     var dt = nameEl.getAttribute('data-dt');
     var loan = _allLoans.find(function(x){ return x.DateTime === dt; });
+    if (_paintStatus && loan) { updateLoanStatus(loan, _paintStatus); return; }
     if (loan) openEditModal(loan);
     return;
   }
@@ -825,6 +894,13 @@ document.getElementById('lrTbody').addEventListener('click', function(e) {
 });
 loadData();
 </script>
+
+<!-- Paint Mode Banner -->
+<div class="lr-paint-banner lr-banner-hidden" id="lrPaintBanner">
+  <div class="lr-paint-dot" id="lrPaintDot"></div>
+  <span id="lrPaintLabel">—</span>
+  <button class="lr-paint-esc" onclick="exitPaintMode()">✕ ESC</button>
+</div>
 
 <!-- Confirm Delete Modal -->
 <div class="lr-confirm-bg" id="lrConfirmBg">
