@@ -2181,7 +2181,10 @@ function addHelenLoan_(loan) {
     sheet.setFrozenRows(1);
   }
 
-  const now = Utilities.formatDate(new Date(), TZ, "yyyy-MM-dd'T'HH:mm:ss");
+  /* Use custom DateTime if provided (for historical data entry), else current time */
+  const now = loan.DateTime
+    ? String(loan.DateTime).trim()
+    : Utilities.formatDate(new Date(), TZ, "yyyy-MM-dd'T'HH:mm:ss");
 
   /* DOB arrives already as dd/mm/yyyy from the UI text input — store as-is */
   const row = [

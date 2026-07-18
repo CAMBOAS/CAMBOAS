@@ -111,6 +111,11 @@
     [data-theme="light"] .lr-filter { background:#f1f5f9; border-color:rgba(148,163,184,.25); color:#0f172a }
     .lr-filter:focus { border-color:rgba(6,182,212,.4) }
     .lr-btn { padding:8px 14px; border-radius:10px; border:none; cursor:pointer; font-size:12px; font-weight:700; font-family:inherit; display:flex; align-items:center; gap:5px; transition:.15s }
+    .af-date-row { background:rgba(124,92,255,.06); border:1px solid rgba(124,92,255,.2); border-radius:10px; padding:10px 14px; margin-bottom:4px }
+    .af-date-row label { font-size:12px; font-weight:700; color:#a78bfa; margin-bottom:6px; display:block }
+    .af-date-row input[type="date"] { width:100%; padding:8px 10px; border-radius:8px; border:1px solid rgba(124,92,255,.25); background:rgba(124,92,255,.08); color:var(--text); font-size:13px; font-family:inherit; cursor:pointer }
+    [data-theme="light"] .af-date-row { background:rgba(124,92,255,.05); border-color:rgba(124,92,255,.18) }
+    [data-theme="light"] .af-date-row input[type="date"] { background:#f5f3ff; border-color:rgba(124,92,255,.2); color:#3730a3 }
     .lr-btn-add { background:rgba(34,197,94,.12); color:#4ade80; border:1px solid rgba(34,197,94,.3); padding:7px 9px; font-size:15px; font-weight:900; line-height:1 }
     .lr-btn-add:hover { background:rgba(34,197,94,.22); color:#86efac }
     [data-theme="light"] .lr-btn-add { background:rgba(34,197,94,.1); color:#16a34a; border-color:rgba(34,197,94,.25) }
@@ -361,15 +366,15 @@
               <thead>
                 <tr>
                   <th onclick="sortTable('_idx')">#</th>
-                  <th onclick="sortTable('FullName')">ឈ្មោះ (Name)</th>
+                  <th onclick="sortTable('FullName')">Name</th>
                   <th onclick="sortTable('NationalID')">National ID</th>
                   <th onclick="sortTable('DOB')">DOB</th>
-                  <th onclick="sortTable('Phone')">ទូរស័ព្ទ</th>
-                  <th onclick="sortTable('Gender')">ភេទ</th>
-                  <th onclick="sortTable('Groups')">ក្រុម</th>
+                  <th onclick="sortTable('Phone')">Phone</th>
+                  <th onclick="sortTable('Gender')">Gender</th>
+                  <th onclick="sortTable('Groups')">Group</th>
                   <th onclick="sortTable('Money')" style="text-align:right">Amount ($)</th>
-                  <th onclick="sortTable('Status')">ស្ថានភាព</th>
-                  <th onclick="sortTable('_date')">កាលបរិច្ឆេទ</th>
+                  <th onclick="sortTable('Status')">Status</th>
+                  <th onclick="sortTable('_date')">Date</th>
                   <th>Note</th>
                   <th style="text-align:center;width:60px">Action</th>
                 </tr>
@@ -409,6 +414,12 @@ function fmtDate(dt) {
   var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (m) return m[3]+'/'+m[2]+'/'+m[1];
   return s.split('T')[0] || '—';
+}
+function fmtDOB(el) {
+  var v = el.value.replace(/\D/g, '').slice(0, 8);
+  if (v.length > 4) v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+  else if (v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
+  el.value = v;
 }
 function today_ymd() {
   var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -497,11 +508,27 @@ async function updateLoanStatus(loan, newStatus) {
 }
 document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && _paintStatus) exitPaintMode(); });
 
+/* ── HelenInfor (Groups + Statuses from Google Sheet) ── */
+var _helenInfor = { groups: [], statuses: [] };
+async function fetchHelenInfor() {
+  try {
+    var res = await CamboAPI.get({ action: 'helen_infor' });
+    if (res && res.ok) {
+      _helenInfor.groups   = Array.isArray(res.groups)   ? res.groups.filter(function(g){ return g && g.toLowerCase() !== 'groups'; })   : [];
+      _helenInfor.statuses = Array.isArray(res.statuses) ? res.statuses.filter(function(s){ return s && s.toLowerCase() !== 'status'; }) : [];
+    }
+  } catch(e) { /* silent — fall back to hardcoded */ }
+}
+
 /* ── Load data ── */
 async function loadData() {
   document.getElementById('lrTbody').innerHTML = '<tr><td colspan="10" class="lr-loading">កំពុងផ្ទុកទិន្នន័យ...</td></tr>';
   try {
-    var data = await CamboAPI.get({ action: 'helen_loan_list' });
+    var results = await Promise.all([
+      CamboAPI.get({ action: 'helen_loan_list' }),
+      fetchHelenInfor()
+    ]);
+    var data = results[0];
     _allLoans = (data.ok && Array.isArray(data.loans)) ? data.loans : [];
     _allLoans.forEach(function(l, i){ l._idx = i+1; l._date = (l.DateTime||'').split('T')[0]; });
   } catch(e) {
@@ -930,22 +957,31 @@ async function confirmDelete() {
 var _editLoan = null;
 
 function openAddModal() {
-  var groups = [...new Set(_allLoans.map(function(l){ return l.Groups||''; }).filter(Boolean))].sort();
-  var groupOpts = groups.map(function(g){ return '<option value="'+esc(g)+'">'+esc(g)+'</option>'; }).join('');
-  var statusOpts = ['Good','Normal','BlackListed','High Risk'].map(function(s){
-    return '<option value="'+s+'">'+s+'</option>';
-  }).join('');
+  var groups   = _helenInfor.groups.length   ? _helenInfor.groups   : [...new Set(_allLoans.map(function(l){ return l.Groups||''; }).filter(Boolean))].sort();
+  var statuses = _helenInfor.statuses.length ? _helenInfor.statuses : ['Good','Normal','BlackListed','High Risk'];
+  var groupOpts  = groups.map(function(g){ return '<option value="'+esc(g)+'">'+esc(g)+'</option>'; }).join('');
+  var statusOpts = statuses.map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+'</option>'; }).join('');
+
+  /* Default date = today */
+  var today = new Date();
+  var todayVal = today.getFullYear() + '-'
+    + String(today.getMonth()+1).padStart(2,'0') + '-'
+    + String(today.getDate()).padStart(2,'0');
 
   document.getElementById('lrAddForm').innerHTML =
     '<div class="lr-modal-grid">'
     +'<div class="lr-field"><label>ឈ្មោះ (Full Name) <span style="color:#ef4444">*</span></label><input id="af_FullName" placeholder="ឈ្មោះពេញ..."></div>'
     +'<div class="lr-field"><label>National ID</label><input id="af_NationalID" placeholder="លេខអត្តសញ្ញាណប័ណ្ណ..."></div>'
-    +'<div class="lr-field"><label>DOB</label><input id="af_DOB" placeholder="DD/MM/YYYY"></div>'
+    +'<div class="lr-field"><label>DOB</label><input id="af_DOB" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric" oninput="fmtDOB(this)"></div>'
     +'<div class="lr-field"><label>ទូរស័ព្ទ (Phone)</label><input id="af_Phone" placeholder="0XX XXX XXX"></div>'
     +'<div class="lr-field"><label>ភេទ (Gender)</label><select id="af_Gender"><option value="">— ជ្រើសរើស —</option><option value="Male">Male / ប្រុស</option><option value="Female">Female / ស្រី</option><option value="Other">Other</option></select></div>'
     +'<div class="lr-field"><label>ក្រុម (Group)</label><select id="af_Groups"><option value="">— ជ្រើសរើស —</option>'+groupOpts+'</select></div>'
     +'<div class="lr-field"><label>ប្រាក់កម្ចី Amount ($)</label><input id="af_Money" type="number" min="0" placeholder="0"></div>'
     +'<div class="lr-field"><label>ស្ថានភាព (Status) <span style="color:#ef4444">*</span></label><select id="af_Status"><option value="">— ជ្រើសរើស —</option>'+statusOpts+'</select></div>'
+    +'</div>'
+    +'<div class="lr-field af-date-row">'
+    +'<label>📅 កំណត់ថ្ងៃបញ្ចូលទិន្នន័យ <span style="font-size:10px;font-weight:400;color:var(--muted)">(ទទេ = ថ្ងៃនេះ)</span></label>'
+    +'<input id="af_DateTime" type="date" value="'+todayVal+'" max="'+todayVal+'">'
     +'</div>'
     +'<div class="lr-field"><label>Note</label><textarea id="af_Note" placeholder="កំណត់ចំណាំ..."></textarea></div>';
 
@@ -966,6 +1002,9 @@ async function saveAdd() {
   var btn = document.getElementById('lrAddBtn');
   btn.disabled = true; btn.textContent = 'Saving…';
 
+  var dateVal = document.getElementById('af_DateTime').value;
+  var customDT = dateVal ? dateVal + 'T00:00:00' : '';
+
   var loan = {
     FullName:   fullName,
     NationalID: document.getElementById('af_NationalID').value.trim(),
@@ -976,6 +1015,7 @@ async function saveAdd() {
     Money:      document.getElementById('af_Money').value,
     Status:     status,
     Note:       document.getElementById('af_Note').value.trim(),
+    DateTime:   customDT,
   };
   try {
     var res = await CamboAPI.post({ action: 'helen_loan_add', loan: loan });
@@ -999,7 +1039,7 @@ function openEditModal(loan) {
   var groupOpts = groups.map(function(g){
     return '<option value="'+esc(g)+'"'+(g===loan.Groups?' selected':'')+'>'+esc(g)+'</option>';
   }).join('');
-  var statusList = ['Good','Normal','BlackListed','High Risk'];
+  var statusList = _helenInfor.statuses.length ? _helenInfor.statuses : ['Good','Normal','BlackListed','High Risk'];
   var statusOpts = statusList.map(function(s){
     return '<option value="'+s+'"'+(s===(loan.Status||'').trim()?' selected':'')+'>'+s+'</option>';
   }).join('');
@@ -1013,7 +1053,7 @@ function openEditModal(loan) {
     '<div class="lr-modal-grid">'
     +'<div class="lr-field"><label>ឈ្មោះ (Full Name)</label><input id="ef_FullName" value="'+esc(loan.FullName||'')+'"></div>'
     +'<div class="lr-field"><label>National ID</label><input id="ef_NationalID" value="'+esc(loan.NationalID||'')+'"></div>'
-    +'<div class="lr-field"><label>DOB</label><input id="ef_DOB" value="'+esc(loan.DOB||'')+'"></div>'
+    +'<div class="lr-field"><label>DOB</label><input id="ef_DOB" value="'+esc(loan.DOB||'')+'" maxlength="10" inputmode="numeric" oninput="fmtDOB(this)"></div>'
     +'<div class="lr-field"><label>ទូរស័ព្ទ (Phone)</label><input id="ef_Phone" value="'+esc(loan.Phone||'')+'"></div>'
     +'<div class="lr-field"><label>ភេទ (Gender)</label><select id="ef_Gender">'+genderOpts+'</select></div>'
     +'<div class="lr-field"><label>ក្រុម (Group)</label><select id="ef_Groups"><option value="">—</option>'+groupOpts+'</select></div>'

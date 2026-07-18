@@ -8,7 +8,7 @@
   'use strict';
 
   const APPS_SCRIPT_URL =
-    'https://script.google.com/macros/s/AKfycbzHg9xhHS8Jl7N_AhhvJE6CeqcDBDfx034Egfqy0QaAp5VgDFpSybZYxZ5SZipUebCMVw/exec';
+    'https://script.google.com/macros/s/AKfycbwbbvfDsn80JEUmNtCZFbsDpSu7R_YC3amfMrq_MlNrVCq4X3cuSKpr3cMXB8MQtEpKLw/exec';
 
   // getBase kept for backward-compat (order-list.js calls it at init time)
   function getBase() { return APPS_SCRIPT_URL; }
