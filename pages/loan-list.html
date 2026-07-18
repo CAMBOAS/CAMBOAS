@@ -26,7 +26,11 @@
     /* ── Charts Row ── */
     .lr-charts-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; align-items:stretch }
     .lr-charts-row .glass-card.lr-card { display:flex; flex-direction:column }
-    .lr-bar-list { flex:1 }
+    .lr-bar-list { flex:1; overflow-y:auto; padding-right:4px }
+    .lr-bar-list::-webkit-scrollbar { width:3px }
+    .lr-bar-list::-webkit-scrollbar-track { background:transparent }
+    .lr-bar-list::-webkit-scrollbar-thumb { background:rgba(148,163,184,.2); border-radius:4px }
+    .lr-bar-list::-webkit-scrollbar-thumb:hover { background:rgba(148,163,184,.4) }
     #lrMonthList { flex:1; display:flex; flex-direction:column; justify-content:flex-end }
     .lr-month-chart { flex:1; align-items:flex-end }
     .lr-donut-wrap { flex:1 }
