@@ -250,19 +250,21 @@ function updateChart(rows) {
 
   const { labels, totals } = buildChartData(rows);
 
+  const BAR_COLORS = ['#10b981','#f59e0b','#ef4444','#06b6d4','#f59e0b','#10b981','#f59e0b','#ef4444','#06b6d4','#f59e0b','#10b981','#f59e0b'];
+  const barBg = totals.map(function(_, i) { return BAR_COLORS[i % BAR_COLORS.length]; });
+
   revenueChart = new Chart(ctx, {
-    type: 'line',
+    type: 'bar',
     data: {
       labels,
       datasets: [{
         label: 'Revenue',
         data: totals,
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139,92,246,.18)',
-        fill: true,
-        tension: .35,
-        pointRadius: 3,
-        pointBackgroundColor: '#22d3ee'
+        backgroundColor: barBg,
+        borderColor: barBg,
+        borderWidth: 0,
+        borderRadius: 6,
+        borderSkipped: 'bottom'
       }]
     },
     options: {
@@ -270,8 +272,8 @@ function updateChart(rows) {
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { color: '#cbd5e1', maxRotation: 45 }, grid: { color: 'rgba(148,163,184,.08)' } },
-        y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,.08)' } }
+        x: { ticks: { color: '#cbd5e1', font: { size: 10 } }, grid: { color: 'rgba(148,163,184,.06)' } },
+        y: { ticks: { color: '#94a3b8', callback: function(v) { return v >= 1000 ? '$'+(v/1000).toFixed(0)+'K' : '$'+v; } }, grid: { color: 'rgba(148,163,184,.08)' }, beginAtZero: true }
       }
     }
   });

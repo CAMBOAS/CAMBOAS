@@ -245,8 +245,8 @@
           <div class="glass-card lr-card">
             <h3 class="lr-card-title">ការបន្ថែមប្រចាំខែ</h3>
             <p class="lr-card-sub">Monthly New Borrowers</p>
-            <div class="lr-month-list" id="lrMonthList" style="position:relative;flex:1;min-height:0">
-              <canvas id="lrMonthCanvas" style="width:100%;height:100%"></canvas>
+            <div class="lr-month-list" id="lrMonthList">
+              <div class="lr-loading" style="padding:12px">—</div>
             </div>
           </div>
 
@@ -337,7 +337,6 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="../assets/js/vendor/chart-lite.js?v=160"></script>
 <script src="../assets/js/layout.js?v=158"></script>
 <script src="../assets/js/dashboard-layout.js?v=158"></script>
 <script src="../assets/js/cambo-api.js?v=158"></script>
@@ -570,78 +569,40 @@ function renderCharts() {
   renderMonthlyTrend();
 }
 
-var _monthChart = null;
 function renderMonthlyTrend() {
   var now = new Date();
   var curYear = now.getFullYear();
   var curMonth = now.getMonth();
-  var MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var keys   = MONTH_LABELS.map(function(_, i){ return curYear + '-' + String(i+1).padStart(2,'0'); });
-  var counts = Array(12).fill(0);
+  var months = [];
+  for (var i = 0; i < 12; i++) {
+    months.push({
+      key: curYear + '-' + String(i + 1).padStart(2, '0'),
+      label: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i],
+      count: 0,
+      isCurrent: i === curMonth
+    });
+  }
   _allLoans.forEach(function(l) {
-    var k = (l.DateTime||'').slice(0,7);
-    var idx = keys.indexOf(k);
-    if (idx >= 0) counts[idx]++;
+    var k = (l.DateTime || '').slice(0, 7);
+    var m = months.find(function(x) { return x.key === k; });
+    if (m) m.count++;
   });
-
-  var canvas = document.getElementById('lrMonthCanvas');
-  if (!canvas || !window.Chart) return;
-  if (_monthChart) { _monthChart.destroy(); _monthChart = null; }
-
-  /* bar colors: active month cyan, selected month brighter, rest muted */
-  var barColors = counts.map(function(_, i) {
-    var key = keys[i];
-    if (_monthActive === key)  return 'rgba(6,182,212,.95)';
-    if (i === curMonth)        return 'rgba(34,211,238,.75)';
-    return counts[i] > 0      ? 'rgba(6,182,212,.45)' : 'rgba(148,163,184,.18)';
-  });
-
-  _monthChart = new Chart(canvas, {
-    type: 'bar',
-    data: {
-      labels: MONTH_LABELS,
-      datasets: [{
-        label: 'Borrowers',
-        data: counts,
-        backgroundColor: barColors,
-        borderColor: barColors.map(function(c){ return c.replace(/[\d.]+\)$/, '1)'); }),
-        borderWidth: 1,
-        borderRadius: 5,
-        borderSkipped: 'bottom'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function(ctx) { return ' ' + ctx.parsed.y + ' borrowers'; }
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: '#94a3b8', font: { size: 9 } },
-          grid:  { color: 'rgba(148,163,184,.06)' }
-        },
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#94a3b8', font: { size: 9 }, stepSize: 1, precision: 0 },
-          grid:  { color: 'rgba(148,163,184,.08)' }
-        }
-      },
-      onClick: function(evt, elements) {
-        if (!elements.length) return;
-        var idx = elements[0].index;
-        var key = keys[idx];
-        _monthActive = (_monthActive === key) ? '' : key;
-        renderMonthlyTrend();
-        renderTable();
-      }
-    }
-  });
+  var max = Math.max.apply(null, months.map(function(m) { return m.count; })) || 1;
+  var BAR_MAX_H = 80;
+  var html = '<div class="lr-month-chart">'
+    + months.map(function(m) {
+      var barH  = max > 0 ? Math.max(Math.round(m.count / max * BAR_MAX_H), m.count > 0 ? 4 : 2) : 2;
+      var isAct = _monthActive === m.key;
+      var cls   = 'lr-month-col' + (isAct ? ' lr-month-active' : '');
+      return '<div class="' + cls + '" data-month="' + m.key + '" title="' + m.label + ' — ' + m.count + ' borrowers">'
+        + '<span class="lr-month-val' + (m.isCurrent ? '" style="color:#22d3ee' : '') + '">' + (m.count || '') + '</span>'
+        + '<div class="lr-month-bar-wrap"><div class="lr-month-bar' + (m.isCurrent && !isAct ? ' current' : '') + '" style="height:' + barH + 'px"></div></div>'
+        + '<div class="lr-month-divider"></div>'
+        + '<span class="lr-month-name' + (m.isCurrent && !isAct ? ' current' : '') + '">' + m.label + '</span>'
+        + '</div>';
+    }).join('')
+    + '</div>';
+  document.getElementById('lrMonthList').innerHTML = html;
 }
 
 function renderKPIs() {
@@ -963,7 +924,14 @@ document.getElementById('lrGroupBars').addEventListener('click', function(e) {
   renderTable();
 });
 
-/* Month click is now handled via Chart.js onClick in renderMonthlyTrend() */
+document.getElementById('lrMonthList').addEventListener('click', function(e) {
+  var col = e.target.closest('[data-month]');
+  if (!col) return;
+  var key = col.getAttribute('data-month');
+  _monthActive = (_monthActive === key) ? '' : key;
+  renderMonthlyTrend();
+  renderTable();
+});
 
 document.getElementById('lrTbody').addEventListener('click', function(e) {
   var nameEl = e.target.closest('.lr-name-link');
