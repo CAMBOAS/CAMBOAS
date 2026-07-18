@@ -482,7 +482,7 @@ function renderMonthlyTrend() {
     var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     months.push({
       key: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'),
-      label: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()],
+      label: String(d.getMonth() + 1),
       count: 0,
       isCurrent: i === 0
     });
