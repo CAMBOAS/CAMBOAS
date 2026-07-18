@@ -29,6 +29,11 @@
     tr.lr-row-highlight .lr-name-link { color:#a78bfa; font-weight:800 }
     tr.lr-row-paint td { background:rgba(var(--paint-rgb,124,92,255),.07) }
     tr.lr-row-paint .lr-name-link { color:var(--paint-color,#a78bfa); font-weight:800; text-decoration:underline dashed 1px }
+    tr.lr-row-group td { background:rgba(var(--group-rgb,124,92,255),.07) }
+    tr.lr-row-group .lr-name-link { color:var(--group-color,#7c5cff); font-weight:800 }
+    .lr-bar-item-wrap { cursor:pointer; border-radius:8px; padding:4px 6px; margin:-4px -6px; transition:.15s; }
+    .lr-bar-item-wrap:hover { background:rgba(148,163,184,.09); }
+    .lr-bar-item-wrap.lr-group-active { background:rgba(var(--group-rgb,124,92,255),.11); outline:1.5px solid var(--group-color,#7c5cff); }
 
     /* ── Charts Row ── */
     .lr-charts-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; align-items:stretch }
@@ -264,7 +269,7 @@
           <div class="lr-table-toolbar">
             <div class="lr-toolbar-left">
               <input class="lr-srch" id="lrSrch" placeholder="ស្វែងរកឈ្មោះ / NID / ទូរស័ព្ទ..." oninput="applyFilter()">
-              <select class="lr-filter" id="lrFGroup" onchange="applyFilter()">
+              <select class="lr-filter" id="lrFGroup" onchange="_groupActive=null;document.body.style.removeProperty('--group-color');document.body.style.removeProperty('--group-rgb');renderGroupBars();applyFilter()">
                 <option value="">All Groups</option>
               </select>
               <select class="lr-filter" id="lrFStatus" onchange="_kpiActive='';document.querySelectorAll('.lr-kpi-clickable.active').forEach(function(e){e.classList.remove('active')});applyFilter()">
@@ -396,6 +401,9 @@ function statusRGB(s) {
 
 /* ── Paint-status mode ── */
 var _paintStatus = '';
+var _groupActive  = null; // { name, color, rgb }
+var GROUP_COLORS_HEX = ['#7c5cff','#06b6d4','#22c55e','#f59e0b','#ef4444','#ec4899','#8b5cf6','#10b981'];
+var GROUP_COLORS_RGB = ['124,92,255','6,182,212','34,197,94','245,158,11','239,68,68','236,72,153','139,92,246','16,185,129'];
 function setPaintMode(status) {
   if (_paintStatus === status) { exitPaintMode(); return; }
   _paintStatus = status;
@@ -522,7 +530,8 @@ function renderTable() {
     var rowStatus = (l.Status||'').trim().toLowerCase();
     var isHL    = _kpiActive    && rowStatus === _kpiActive.toLowerCase();
     var isPaint = _paintStatus  && rowStatus === _paintStatus.toLowerCase();
-    var trClass = isPaint ? ' class="lr-row-paint"' : isHL ? ' class="lr-row-highlight"' : '';
+    var isGroup = _groupActive  && (l.Groups||'').trim() === _groupActive.name;
+    var trClass = isPaint ? ' class="lr-row-paint"' : isHL ? ' class="lr-row-highlight"' : isGroup ? ' class="lr-row-group"' : '';
     return '<tr'+trClass+'>'
       + '<td style="color:var(--muted);font-size:11px">'+esc(String(l._idx||i+1))+'</td>'
       + '<td style="font-weight:700"><span class="lr-name-link" data-dt="'+esc(l.DateTime||'')+'">'+esc(l.FullName||'—')+'</span></td>'
@@ -700,15 +709,18 @@ function renderGroupBars() {
   var topEntries = entries.slice(0, 8);
   var max = topEntries.length ? topEntries[0].count : 1;
 
-  var GROUP_COLORS = ['#7c5cff','#06b6d4','#22c55e','#f59e0b','#ef4444','#ec4899','#8b5cf6','#10b981'];
-
   var html = topEntries.map(function(e, i){
-    var pct = Math.round(e.count/max*100);
-    var color = GROUP_COLORS[i%GROUP_COLORS.length];
+    var pct   = Math.round(e.count/max*100);
+    var color = GROUP_COLORS_HEX[i % GROUP_COLORS_HEX.length];
+    var rgb   = GROUP_COLORS_RGB[i % GROUP_COLORS_RGB.length];
+    var isAct = _groupActive && _groupActive.name === e.name;
     var name  = e.name.length > 20 ? e.name.slice(0,19)+'…' : e.name;
-    return '<div>'
+    return '<div class="lr-bar-item-wrap'+(isAct?' lr-group-active':'')+'"'
+      + ' data-group="'+esc(e.name)+'" data-color="'+color+'" data-rgb="'+rgb+'"'
+      + (isAct?' style="--group-color:'+color+';--group-rgb:'+rgb+'"':'')
+      + ' title="ចុចដើម្បី Highlight ក្រុមនេះ">'
       + '<div class="lr-bar-item">'
-      + '<span class="lr-bar-name" title="'+esc(e.name)+'"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+color+';margin-right:5px"></span>'+esc(name)+'</span>'
+      + '<span class="lr-bar-name"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+color+';margin-right:5px"></span>'+esc(name)+'</span>'
       + '<span class="lr-bar-count">'+e.count+'</span>'
       + '</div>'
       + '<div class="lr-bar-track"><div class="lr-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'
@@ -881,6 +893,25 @@ document.getElementById('lrStatusCard').addEventListener('click', function(e) {
   var item = e.target.closest('[data-status]');
   if (!item) return;
   setPaintMode(item.getAttribute('data-status'));
+});
+
+document.getElementById('lrGroupBars').addEventListener('click', function(e) {
+  var item = e.target.closest('[data-group]');
+  if (!item) return;
+  var name  = item.getAttribute('data-group');
+  var color = item.getAttribute('data-color');
+  var rgb   = item.getAttribute('data-rgb');
+  if (_groupActive && _groupActive.name === name) {
+    _groupActive = null;
+    document.body.style.removeProperty('--group-color');
+    document.body.style.removeProperty('--group-rgb');
+  } else {
+    _groupActive = { name: name, color: color, rgb: rgb };
+    document.body.style.setProperty('--group-color', color);
+    document.body.style.setProperty('--group-rgb', rgb);
+  }
+  renderGroupBars();
+  renderTable();
 });
 
 document.getElementById('lrTbody').addEventListener('click', function(e) {
