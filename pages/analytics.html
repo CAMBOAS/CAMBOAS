@@ -144,6 +144,12 @@
     .an-custom-dates{width:100%;box-sizing:border-box}
     .an-custom-dates input[type=date]{flex:1}
   }
+  /* ── Revenue by Day: animation keyframes ── */
+  @keyframes rev-zoom-in    { from{transform:scale(.85);opacity:0} to{transform:scale(1);opacity:1} }
+  @keyframes rev-slide-up   { from{transform:translateY(35px);opacity:0} to{transform:translateY(0);opacity:1} }
+  @keyframes rev-slide-left { from{transform:translateX(30px);opacity:0} to{transform:translateX(0);opacity:1} }
+  @keyframes rev-flip       { from{transform:scaleY(0);transform-origin:bottom;opacity:0} to{transform:scaleY(1);transform-origin:bottom;opacity:1} }
+  @keyframes rev-burst      { from{transform:scale(1.12);opacity:0} to{transform:scale(1);opacity:1} }
   </style>
 </head>
 <body>

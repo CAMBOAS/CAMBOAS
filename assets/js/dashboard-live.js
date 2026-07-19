@@ -295,6 +295,28 @@ function updateChart(rows) {
       }
     }
   });
+
+  /* ── Random animation style (0-9) each render ── */
+  const _revStyle = Math.floor(Math.random() * 10);
+  if (_revStyle < 5) {
+    /* styles 0-4: canvas draw-from-left with 5 different easings */
+    const _durations = [850, 950, 1100, 700, 1000];
+    revenueChart.animate(_revStyle, _durations[_revStyle]);
+  } else {
+    /* styles 5-9: CSS wrapper animations */
+    const _cssAnims = [
+      'rev-zoom-in .55s cubic-bezier(.3,1.4,.5,1) both',
+      'rev-slide-up .5s ease-out both',
+      'rev-slide-left .5s ease-out both',
+      'rev-flip .55s ease-in-out both',
+      'rev-burst .45s cubic-bezier(.2,1.4,.4,1) both',
+    ];
+    const _canvasWrap = document.querySelector('.chart-canvas-wrap') || document.querySelector('.chart-wrapper');
+    if (_canvasWrap) {
+      _canvasWrap.style.animation = 'none';
+      requestAnimationFrame(function() { _canvasWrap.style.animation = _cssAnims[_revStyle - 5]; });
+    }
+  }
 }
 
 function applyGlobalDate(dateFrom, dateTo) {

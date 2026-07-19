@@ -174,6 +174,22 @@
     .lr-btn-refresh:hover { background:rgba(6,182,212,.2) }
     @keyframes lr-spin { to { transform:rotate(360deg) } }
     .lr-btn-refresh.spinning svg { animation:lr-spin .7s linear infinite }
+    /* ── Status Donut: 10 Animation Style Keyframes ── */
+    @keyframes pie-zoom-in  { from{transform:scale(.3) rotate(-20deg);opacity:0} to{transform:scale(1) rotate(0);opacity:1} }
+    @keyframes pie-spin-in  { from{transform:rotate(-200deg) scale(.7);opacity:0} to{transform:rotate(0) scale(1);opacity:1} }
+    @keyframes pie-burst    { from{transform:scale(1.4);opacity:0} to{transform:scale(1);opacity:1} }
+    @keyframes pie-flip-in  { from{transform:scaleX(0);opacity:0} to{transform:scaleX(1);opacity:1} }
+    @keyframes pie-rise     { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+    @keyframes pie-drop     { from{transform:translateY(-30px);opacity:0} to{transform:translateY(0);opacity:1} }
+    @keyframes pie-seg-pop  { 0%{opacity:0;transform:scale(0)} 65%{transform:scale(1.12)} 100%{opacity:1;transform:scale(1)} }
+    @keyframes leg-slide-up { from{transform:translateY(14px);opacity:0} to{transform:translateY(0);opacity:1} }
+    @keyframes leg-slide-dn { from{transform:translateY(-10px);opacity:0} to{transform:translateY(0);opacity:1} }
+    @keyframes leg-slide-r  { from{transform:translateX(22px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes leg-slide-l  { from{transform:translateX(-22px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes leg-pop      { 0%{transform:scale(.6);opacity:0} 65%{transform:scale(1.09)} 100%{transform:scale(1);opacity:1} }
+    @keyframes leg-bounce   { 0%{transform:translateY(10px) scale(.9);opacity:0} 60%{transform:translateY(-4px) scale(1.04)} 100%{transform:translateY(0) scale(1);opacity:1} }
+    @keyframes leg-fade     { from{opacity:0} to{opacity:1} }
+    @keyframes pie-text-in  { from{opacity:0;transform:scale(.4)} to{opacity:1;transform:scale(1)} }
     .lr-btn-filter { background:rgba(124,92,255,.1); color:#a78bfa; border:1px solid rgba(124,92,255,.25); padding:8px 10px; position:relative }
     .lr-btn-filter:hover { background:rgba(124,92,255,.2) }
     .lr-btn-filter.lr-filter-on { background:rgba(124,92,255,.18); border-color:rgba(124,92,255,.5); color:#c4b5fd }
@@ -916,6 +932,19 @@ function kpiCard(label, sublabel, val, sub, iconColor, accentColor, rgb, filterV
     + '</div>';
 }
 
+var _STATUS_ANIM_STYLES = [
+  { segType:'sweep', dur:.75, ease:'ease-out',                        stagger:.08, svgAnim:null,                                         legAnim:'leg-slide-up', legDur:.32, legStagger:.07  },
+  { segType:'sweep', dur:.95, ease:'cubic-bezier(.34,1.7,.64,1)',     stagger:.07, svgAnim:null,                                         legAnim:'leg-pop',      legDur:.42, legStagger:.08  },
+  { segType:'wrap',  dur:0,   ease:'',                                stagger:0,   svgAnim:'pie-zoom-in .55s cubic-bezier(.3,1.4,.5,1)', legAnim:'leg-slide-r',  legDur:.3,  legStagger:.06  },
+  { segType:'sweep', dur:.45, ease:'ease-out',                        stagger:.22, svgAnim:null,                                         legAnim:'leg-fade',     legDur:.35, legStagger:.13  },
+  { segType:'sweep', dur:1.1, ease:'cubic-bezier(.5,1.9,.5,.85)',     stagger:.06, svgAnim:null,                                         legAnim:'leg-bounce',   legDur:.5,  legStagger:.07  },
+  { segType:'wrap',  dur:0,   ease:'',                                stagger:0,   svgAnim:'pie-spin-in .65s ease-out',                  legAnim:'leg-fade',     legDur:.4,  legStagger:.1   },
+  { segType:'wrap',  dur:0,   ease:'',                                stagger:0,   svgAnim:'pie-burst .45s cubic-bezier(.2,1.4,.4,1)',   legAnim:'leg-pop',      legDur:.35, legStagger:.06  },
+  { segType:'wrap',  dur:0,   ease:'',                                stagger:0,   svgAnim:'pie-flip-in .5s ease-in-out',                legAnim:'leg-slide-l',  legDur:.3,  legStagger:.08  },
+  { segType:'wrap',  dur:0,   ease:'',                                stagger:0,   svgAnim:'pie-rise .5s ease-out',                      legAnim:'leg-slide-dn', legDur:.35, legStagger:.08  },
+  { segType:'pop',   dur:.42, ease:'cubic-bezier(.4,0,.2,1)',         stagger:.18, svgAnim:null,                                         legAnim:'leg-pop',      legDur:.32, legStagger:.12  },
+];
+
 function renderStatusDonut() {
   var counts = {};
   _allLoans.forEach(function(l){
@@ -985,6 +1014,39 @@ function renderStatusDonut() {
       + '</div>';
   }).join('');
   lgnd.innerHTML = hdr + rows;
+
+  /* ── Apply random animation style ── */
+  var _st = _STATUS_ANIM_STYLES[Math.floor(Math.random() * _STATUS_ANIM_STYLES.length)];
+  var _circ = 2 * Math.PI * 55;
+  var _dataCircles = Array.from(svg.querySelectorAll('circle')).slice(1);
+
+  if (_st.segType === 'sweep') {
+    var _realOffsets = _dataCircles.map(function(c){ return parseFloat(c.getAttribute('stroke-dashoffset')); });
+    _dataCircles.forEach(function(c){ c.style.transition = 'none'; c.setAttribute('stroke-dashoffset', (_circ * 0.75).toFixed(2)); });
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      _dataCircles.forEach(function(c, i){
+        c.style.transition = 'stroke-dashoffset ' + _st.dur + 's ' + _st.ease + ' ' + (i * _st.stagger) + 's, stroke-width .2s';
+        c.setAttribute('stroke-dashoffset', _realOffsets[i].toFixed(2));
+      });
+    }); });
+  } else if (_st.segType === 'pop') {
+    _dataCircles.forEach(function(c, i){
+      c.style.transformOrigin = '80px 80px';
+      c.style.animation = 'pie-seg-pop ' + _st.dur + 's ' + _st.ease + ' ' + (i * _st.stagger) + 's both';
+    });
+  } else if (_st.segType === 'wrap') {
+    svg.style.transformOrigin = 'center';
+    svg.style.animation = _st.svgAnim + ' both';
+  }
+
+  Array.from(svg.querySelectorAll('text')).forEach(function(t, i){
+    t.style.transformOrigin = '80px 80px';
+    t.style.animation = 'pie-text-in .38s ease-out ' + (.28 + i * .1) + 's both';
+  });
+
+  Array.from(lgnd.querySelectorAll('div')).forEach(function(d, i){
+    d.style.animation = _st.legAnim + ' ' + _st.legDur + 's ease-out ' + (i * _st.legStagger) + 's both';
+  });
 }
 
 function renderGroupBars() {

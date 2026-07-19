@@ -97,6 +97,26 @@ function renderAnalytics(rows){
         }
       }
     });
+
+    /* ── Random animation style (0-9) each render ── */
+    const _anStyle = Math.floor(Math.random() * 10);
+    if (_anStyle < 5) {
+      const _durations = [850, 950, 1100, 700, 1000];
+      analyticsChart.animate(_anStyle, _durations[_anStyle]);
+    } else {
+      const _cssAnims = [
+        'rev-zoom-in .55s cubic-bezier(.3,1.4,.5,1) both',
+        'rev-slide-up .5s ease-out both',
+        'rev-slide-left .5s ease-out both',
+        'rev-flip .55s ease-in-out both',
+        'rev-burst .45s cubic-bezier(.2,1.4,.4,1) both',
+      ];
+      const _chartBox = ctx.closest('.chart-box') || ctx.parentElement;
+      if (_chartBox) {
+        _chartBox.style.animation = 'none';
+        requestAnimationFrame(function() { _chartBox.style.animation = _cssAnims[_anStyle - 5]; });
+      }
+    }
   }
 
   /* ── Top Products ── */
