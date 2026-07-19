@@ -2780,6 +2780,13 @@
   /* Mobile section order is handled by applyMobileOrder() in JS (DOM reorder),
      which works on all browsers without relying on display:contents. */
 
+  /* ── Product Card: 6 Animation Style Keyframes ── */
+  @keyframes card-slide-up { from{transform:translateY(22px);opacity:0} to{transform:translateY(0);opacity:1} }
+  @keyframes card-fade-in  { from{opacity:0} to{opacity:1} }
+  @keyframes card-slide-r  { from{transform:translateX(-26px);opacity:0} to{transform:translateX(0);opacity:1} }
+  @keyframes card-pop      { 0%{transform:scale(.88);opacity:0} 65%{transform:scale(1.03)} 100%{transform:scale(1);opacity:1} }
+  @keyframes card-flip     { from{transform:perspective(700px) rotateX(-45deg);opacity:0} to{transform:perspective(700px) rotateX(0);opacity:1} }
+  @keyframes card-drop     { from{transform:translateY(-18px);opacity:0} to{transform:translateY(0);opacity:1} }
   </style>
 </head>
 <body>
@@ -3515,6 +3522,15 @@ function getFiltered(){
 }
 function filterProds(){ renderPList(getFiltered()); }
 function renderPList(list){
+  var _CARD_STYLES = [
+    { kf:'card-slide-up', dur:.28, ease:'ease-out',                 stagger:.04  },
+    { kf:'card-fade-in',  dur:.30, ease:'ease-in-out',              stagger:.048 },
+    { kf:'card-slide-r',  dur:.26, ease:'ease-out',                 stagger:.038 },
+    { kf:'card-pop',      dur:.34, ease:'cubic-bezier(.4,0,.2,1)',  stagger:.042 },
+    { kf:'card-flip',     dur:.30, ease:'ease-out',                 stagger:.045 },
+    { kf:'card-drop',     dur:.26, ease:'ease-out',                 stagger:.038 },
+  ];
+  var _cs = _CARD_STYLES[Math.floor(Math.random() * _CARD_STYLES.length)];
   _el('pList').innerHTML = list.map(function(p){
     var basePrice = Number(p.price)||0;
     var packCnt   = Number(p.pack)||0;
@@ -3554,6 +3570,13 @@ function renderPList(list){
       +'</div>'
     +'</div>';
   }).join('');
+
+  /* Apply stagger animation to each card */
+  var _cards = _el('pList').querySelectorAll('.prow');
+  var _cStagger = _cards.length > 1 ? Math.min(_cs.stagger, 0.6 / (_cards.length - 1)) : 0;
+  _cards.forEach(function(c, i){
+    c.style.animation = _cs.kf + ' ' + _cs.dur + 's ' + _cs.ease + ' ' + (i * _cStagger).toFixed(3) + 's both';
+  });
 }
 
 function toggleUnit(btn, e){
