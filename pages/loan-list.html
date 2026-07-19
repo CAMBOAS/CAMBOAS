@@ -134,6 +134,42 @@
       border:none; background:transparent; color:var(--text); font-size:12.5px; font-weight:600; cursor:pointer; font-family:inherit; text-align:left; transition:.15s }
     .lr-action-item:hover { background:rgba(148,163,200,.1) }
     .lr-action-item svg { flex-shrink:0 }
+    /* ── Export Modal ── */
+    .lrex-info-chips { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px }
+    .lrex-info-chip { display:inline-flex; align-items:center; gap:5px; padding:4px 11px; background:rgba(124,92,255,.12); border:1px solid rgba(124,92,255,.3); border-radius:20px; font-size:11.5px; font-weight:600; color:#a78bfa }
+    [data-theme="light"] .lrex-info-chip { background:rgba(124,92,255,.08); border-color:rgba(124,92,255,.25); color:#7c5cff }
+    .lrex-col-label { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px }
+    .lrex-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px }
+    .lrex-chip { padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border:1.5px solid rgba(148,163,184,.2); background:rgba(148,163,184,.08); color:var(--muted); transition:.15s; user-select:none }
+    .lrex-chip.active { background:rgba(124,92,255,.18); border-color:rgba(124,92,255,.55); color:#c4b5fd }
+    .lrex-chip:hover:not(.active) { background:rgba(148,163,184,.15); border-color:rgba(148,163,184,.35) }
+    [data-theme="light"] .lrex-chip { background:rgba(100,116,139,.07); border-color:rgba(100,116,139,.22); color:#64748b }
+    [data-theme="light"] .lrex-chip.active { background:rgba(124,92,255,.1); border-color:rgba(124,92,255,.45); color:#6d28d9 }
+    .lrex-preview-wrap { border:1px solid rgba(148,163,184,.14); border-radius:12px; overflow:auto; max-height:340px }
+    [data-theme="light"] .lrex-preview-wrap { border-color:rgba(148,163,184,.28) }
+    .lrex-preview-wrap table { width:100%; border-collapse:collapse; font-size:12px }
+    .lrex-preview-wrap th { padding:8px 12px; text-align:left; background:var(--card); border-bottom:1px solid rgba(148,163,184,.14); font-size:10.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; position:sticky; top:0; z-index:1; white-space:nowrap }
+    .lrex-preview-wrap td { padding:7px 12px; border-bottom:1px solid rgba(148,163,184,.07); color:var(--text); white-space:nowrap }
+    .lrex-preview-wrap tr:last-child td { border-bottom:none }
+    .lrex-preview-wrap tr.lrex-total td { font-weight:700; color:#f59e0b; border-top:1.5px solid rgba(148,163,184,.18); background:rgba(245,158,11,.05) }
+    [data-theme="light"] .lrex-preview-wrap th { background:#f8fafc; border-color:rgba(148,163,184,.25) }
+    [data-theme="light"] .lrex-preview-wrap td { border-color:rgba(148,163,184,.12) }
+    .lrex-footer { display:flex; align-items:center; justify-content:space-between; margin-top:16px; padding-top:14px; border-top:1px solid rgba(148,163,184,.1); gap:10px; flex-wrap:wrap }
+    .lrex-footer-info { font-size:12px; color:var(--muted) }
+    .lrex-footer-btns { display:flex; gap:8px; flex-wrap:wrap }
+    .lrex-btn { display:inline-flex; align-items:center; gap:7px; padding:9px 16px; border-radius:10px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:inherit; transition:.18s; white-space:nowrap }
+    .lrex-btn:active { transform:scale(.97) }
+    .lrex-btn-jpg { background:linear-gradient(135deg,#7c5cff,#06b6d4); color:#fff; border:none }
+    .lrex-btn-jpg:hover { opacity:.88 }
+    .lrex-btn-pdf { background:rgba(239,68,68,.1); color:#fca5a5; border:1.5px solid rgba(239,68,68,.3) }
+    .lrex-btn-pdf:hover { background:rgba(239,68,68,.2) }
+    .lrex-btn-tg { background:rgba(6,182,212,.1); color:#7dd3fc; border:1.5px solid rgba(6,182,212,.28) }
+    .lrex-btn-tg:hover { background:rgba(6,182,212,.2) }
+    .lrex-btn-close { background:rgba(148,163,184,.1); color:var(--muted); border:1.5px solid rgba(148,163,184,.2) }
+    .lrex-btn-close:hover { background:rgba(148,163,184,.2) }
+    [data-theme="light"] .lrex-btn-pdf { color:#dc2626; border-color:rgba(220,38,38,.3) }
+    [data-theme="light"] .lrex-btn-tg { color:#0891b2; border-color:rgba(8,145,178,.3) }
+    [data-theme="light"] .lrex-btn-close { color:#64748b; border-color:rgba(100,116,139,.25) }
     .lr-btn-refresh { background:rgba(6,182,212,.1); color:#7dd3fc; border:1px solid rgba(6,182,212,.25) }
     .lr-btn-refresh:hover { background:rgba(6,182,212,.2) }
     @keyframes lr-spin { to { transform:rotate(360deg) } }
@@ -144,22 +180,54 @@
     [data-theme="light"] .lr-btn-filter { background:rgba(124,92,255,.08); color:#7c5cff; border-color:rgba(124,92,255,.2) }
     [data-theme="light"] .lr-btn-filter.lr-filter-on { background:rgba(124,92,255,.15); border-color:rgba(124,92,255,.4) }
     .lr-filter-badge { position:absolute; top:-3px; right:-3px; width:8px; height:8px; border-radius:50%; background:#7c5cff; border:1.5px solid var(--body-bg,#090f23); pointer-events:none }
+    /* ── Date Range Filter ── */
+    .lr-date-wrap { position:relative; display:inline-flex }
+    .lr-btn-date { display:flex; align-items:center; gap:7px; padding:7px 12px; background:rgba(245,158,11,.1); color:#fbbf24; border:1px solid rgba(245,158,11,.28); border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:.15s; white-space:nowrap }
+    .lr-btn-date:hover { background:rgba(245,158,11,.2) }
+    .lr-btn-date.lr-date-on { background:rgba(245,158,11,.18); border-color:rgba(245,158,11,.55); color:#f59e0b }
+    [data-theme="light"] .lr-btn-date { background:rgba(245,158,11,.09); color:#d97706; border-color:rgba(245,158,11,.22) }
+    [data-theme="light"] .lr-btn-date.lr-date-on { background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.45) }
+    .lr-date-panel { position:absolute; top:calc(100% + 6px); right:0; z-index:300; min-width:230px; background:var(--glass-bg,rgba(15,23,42,.92)); border:1px solid rgba(148,163,184,.18); border-radius:14px; box-shadow:0 8px 32px rgba(0,0,0,.35); backdrop-filter:blur(16px); padding:14px; display:none }
+    .lr-date-panel.open { display:block }
+    [data-theme="light"] .lr-date-panel { background:rgba(255,255,255,.97); border-color:rgba(148,163,184,.25); box-shadow:0 8px 28px rgba(0,0,0,.1) }
+    .lr-date-row { display:flex; align-items:center; gap:10px; margin-bottom:9px }
+    .lr-date-row label { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; width:34px; flex-shrink:0 }
+    .lr-date-row input[type="date"] { flex:1; padding:7px 9px; border-radius:8px; border:1px solid rgba(148,163,184,.2); background:rgba(148,163,184,.07); color:var(--text); font-size:12px; font-family:inherit; outline:none; cursor:pointer; transition:.15s }
+    .lr-date-row input[type="date"]:focus { border-color:rgba(245,158,11,.5); background:rgba(245,158,11,.05) }
+    .lr-date-acts { display:flex; gap:7px; padding-top:10px; border-top:1px solid rgba(148,163,184,.1) }
+    .lr-date-act { flex:1; padding:7px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; transition:.15s; border:none }
+    .lr-date-act-clear { background:rgba(148,163,184,.12); color:var(--muted) }
+    .lr-date-act-clear:hover { background:rgba(148,163,184,.22) }
+    .lr-date-act-apply { background:rgba(245,158,11,.15); color:#fbbf24; border:1px solid rgba(245,158,11,.3) !important }
+    .lr-date-act-apply:hover { background:rgba(245,158,11,.28) }
     [data-theme="light"] .lr-filter-badge { border-color:#f8fafc }
     .lr-filter-wrap { position:relative; display:inline-flex }
-    .lr-fpanel { position:absolute; top:calc(100% + 6px); right:0; z-index:300; min-width:270px; max-width:320px;
-      background:rgba(9,15,35,.97); backdrop-filter:blur(16px); border:1px solid rgba(148,163,200,.18);
-      border-radius:14px; padding:14px; box-shadow:0 8px 32px rgba(0,0,0,.4); display:flex; flex-direction:column; gap:10px }
-    [data-theme="light"] .lr-fpanel { background:#fff; border-color:rgba(148,163,184,.22); box-shadow:0 8px 24px rgba(0,0,0,.12) }
-    .lr-fpanel-hd { display:flex; align-items:center; justify-content:space-between; font-size:12px; font-weight:800; color:var(--text) }
-    .lr-fpanel-clear { font-size:11px; color:#a78bfa; background:none; border:none; cursor:pointer; font-family:inherit; padding:3px 7px; border-radius:6px; transition:.13s }
-    .lr-fpanel-clear:hover { background:rgba(124,92,255,.12) }
-    .lr-fpanel-stitle { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted,#64748b); margin-bottom:6px }
-    .lr-fpanel-chips { display:flex; flex-wrap:wrap; gap:5px }
-    .lr-fpanel-chip { padding:5px 10px; border-radius:8px; font-size:11.5px; cursor:pointer; border:1px solid rgba(148,163,200,.16);
-      color:var(--text-muted,#94a3b8); background:rgba(148,163,200,.06); transition:.13s; user-select:none; font-family:inherit; white-space:nowrap }
-    .lr-fpanel-chip:hover { background:rgba(148,163,200,.13); color:var(--text) }
-    .lr-fpanel-chip.lr-factive { background:var(--chip-bg,rgba(124,92,255,.15)); border-color:var(--chip-c,rgba(124,92,255,.45)); color:var(--chip-c,#c4b5fd); font-weight:700 }
-    .lr-fpanel-div { height:1px; background:rgba(148,163,200,.1); margin:0 -2px }
+    .lr-fpanel { position:absolute; top:calc(100% + 6px); right:0; z-index:300; width:340px;
+      background:rgba(9,15,35,.97); backdrop-filter:blur(20px); border:1px solid rgba(148,163,200,.16);
+      border-radius:18px; padding:0; box-shadow:0 12px 40px rgba(0,0,0,.45); display:flex; flex-direction:column; overflow:hidden }
+    [data-theme="light"] .lr-fpanel { background:rgba(255,255,255,.98); border-color:rgba(148,163,184,.2); box-shadow:0 8px 32px rgba(0,0,0,.1) }
+    .lr-fpanel-hd { display:flex; align-items:center; justify-content:space-between; padding:13px 16px 12px;
+      border-bottom:1px solid rgba(148,163,200,.1); font-size:13px; font-weight:800; color:var(--text) }
+    .lr-fpanel-clear { font-size:11.5px; color:#a78bfa; background:rgba(124,92,255,.1); border:1px solid rgba(124,92,255,.2);
+      cursor:pointer; font-family:inherit; padding:4px 10px; border-radius:20px; transition:.13s; font-weight:600 }
+    .lr-fpanel-clear:hover { background:rgba(124,92,255,.2); border-color:rgba(124,92,255,.4) }
+    .lr-fpanel-div { display:none }
+    .lr-fpanel-body { padding:14px 16px 16px; display:flex; flex-direction:column; gap:12px }
+    .lr-fpanel-row { display:flex; flex-direction:column; gap:5px }
+    .lr-fpanel-label { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
+      color:var(--muted,#64748b); display:flex; align-items:center; gap:6px }
+    .lr-fpanel-label::before { content:''; display:inline-block; width:3px; height:11px; border-radius:2px;
+      background:var(--sect-c,rgba(148,163,200,.4)); flex-shrink:0 }
+    .lr-fpanel-select { width:100%; padding:9px 32px 9px 12px; border-radius:10px; font-size:12.5px; font-weight:600;
+      border:1.5px solid rgba(148,163,200,.18); background:rgba(148,163,200,.06) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='4 6 8 10 12 6'/%3E%3C/svg%3E") no-repeat right 10px center / 14px;
+      color:var(--text); font-family:inherit; cursor:pointer; outline:none; transition:.15s;
+      appearance:none; -webkit-appearance:none }
+    .lr-fpanel-select:hover { border-color:rgba(148,163,200,.4) }
+    .lr-fpanel-select:focus { border-color:rgba(124,92,255,.55); box-shadow:0 0 0 3px rgba(124,92,255,.12) }
+    .lr-fpanel-select option { background:#0f172a; color:#e2e8f0 }
+    [data-theme="light"] .lr-fpanel-select { background-color:rgba(100,116,139,.06); border-color:rgba(100,116,139,.2); color:#0f172a }
+    [data-theme="light"] .lr-fpanel-select option { background:#fff; color:#0f172a }
+    [data-theme="light"] .lr-fpanel-select:focus { box-shadow:0 0 0 3px rgba(124,92,255,.1) }
 
     /* Table */
     .lr-tbl-wrap { overflow-x:auto; max-height:calc(100vh - 360px); min-height:260px; scrollbar-width:thin; scrollbar-color:rgba(148,163,200,.15) transparent }
@@ -355,14 +423,29 @@
             <div class="lr-toolbar-left">
               <input class="lr-srch" id="lrSrch" placeholder="ស្វែងរកឈ្មោះ / NID / ទូរស័ព្ទ..." oninput="applyFilter()">
               <button class="lr-btn lr-btn-add" onclick="openAddModal()" title="បន្ថែម Borrower ថ្មី">＋</button>
-              <!-- Hidden state holders — values read by applyFilter() -->
-              <select style="display:none" id="lrFGroup" onchange="applyFilter()"><option value="">All Groups</option></select>
-              <select style="display:none" id="lrFStatus" onchange="applyFilter()"><option value="">All Status</option><option value="Good">Good</option><option value="Normal">Normal</option><option value="BlackListed">BlackListed</option><option value="High Risk">High Risk</option></select>
-              <select style="display:none" id="lrFGender" onchange="applyFilter()"><option value="">All Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
             </div>
             <button class="lr-btn lr-btn-refresh" onclick="loadData()" title="Refresh" style="padding:8px 10px">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
             </button>
+            <div class="lr-date-wrap" id="lrDateWrap">
+              <button class="lr-btn-date" id="lrBtnDate" onclick="toggleDatePanel()" style="padding:8px 10px">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </button>
+              <div class="lr-date-panel" id="lrDatePanel">
+                <div class="lr-date-row">
+                  <label>FROM</label>
+                  <input type="date" id="lrDateFrom">
+                </div>
+                <div class="lr-date-row">
+                  <label>TO</label>
+                  <input type="date" id="lrDateTo">
+                </div>
+                <div class="lr-date-acts">
+                  <button class="lr-date-act lr-date-act-clear" onclick="clearDateFilter()">Clear</button>
+                  <button class="lr-date-act lr-date-act-apply" onclick="applyDateFilter()">Apply</button>
+                </div>
+              </div>
+            </div>
             <div class="lr-filter-wrap">
               <button class="lr-btn lr-btn-filter" id="lrBtnFilter" onclick="toggleLrFilters()" title="Filter Data">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
@@ -373,46 +456,39 @@
                   <span>Filter Data</span>
                   <button class="lr-fpanel-clear" onclick="clearLrFilters()">Clear All</button>
                 </div>
-                <div class="lr-fpanel-div"></div>
-                <div>
-                  <div class="lr-fpanel-stitle">ស្ថានភាព (Status)</div>
-                  <div class="lr-fpanel-chips" id="lrFPStatus">
-                    <span class="lr-fpanel-chip lr-factive" data-type="status" data-val="">All</span>
-                    <span class="lr-fpanel-chip" data-type="status" data-val="Good" style="--chip-c:#22c55e;--chip-bg:rgba(34,197,94,.13)">Good</span>
-                    <span class="lr-fpanel-chip" data-type="status" data-val="Normal" style="--chip-c:#06b6d4;--chip-bg:rgba(6,182,212,.13)">Normal</span>
-                    <span class="lr-fpanel-chip" data-type="status" data-val="BlackListed" style="--chip-c:#ef4444;--chip-bg:rgba(239,68,68,.13)">BlackListed</span>
-                    <span class="lr-fpanel-chip" data-type="status" data-val="High Risk" style="--chip-c:#f59e0b;--chip-bg:rgba(245,158,11,.13)">High Risk</span>
+                <div class="lr-fpanel-body">
+                  <div class="lr-fpanel-row">
+                    <label class="lr-fpanel-label" style="--sect-c:#a78bfa">ស្ថានភាព · Status</label>
+                    <select class="lr-fpanel-select" id="lrFStatus" onchange="setFPChip('status',this.value)">
+                      <option value="">— All Statuses —</option>
+                      <option value="Good">Good</option>
+                      <option value="Normal">Normal</option>
+                      <option value="BlackListed">BlackListed</option>
+                      <option value="High Risk">High Risk</option>
+                    </select>
                   </div>
-                </div>
-                <div class="lr-fpanel-div"></div>
-                <div>
-                  <div class="lr-fpanel-stitle">ភេទ (Gender)</div>
-                  <div class="lr-fpanel-chips" id="lrFPGender">
-                    <span class="lr-fpanel-chip lr-factive" data-type="gender" data-val="">All</span>
-                    <span class="lr-fpanel-chip" data-type="gender" data-val="Male">Male / ប្រុស</span>
-                    <span class="lr-fpanel-chip" data-type="gender" data-val="Female">Female / ស្រី</span>
-                    <span class="lr-fpanel-chip" data-type="gender" data-val="Other">Other</span>
+                  <div class="lr-fpanel-row">
+                    <label class="lr-fpanel-label" style="--sect-c:#06b6d4">ភេទ · Gender</label>
+                    <select class="lr-fpanel-select" id="lrFGender" onchange="setFPChip('gender',this.value)">
+                      <option value="">— All Genders —</option>
+                      <option value="Male">Male / ប្រុស</option>
+                      <option value="Female">Female / ស្រី</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
-                </div>
-                <div class="lr-fpanel-div"></div>
-                <div>
-                  <div class="lr-fpanel-stitle">ក្រុម (Groups)</div>
-                  <div class="lr-fpanel-chips" id="lrFPGroups">
-                    <span class="lr-fpanel-chip lr-factive" data-type="group" data-val="">All</span>
+                  <div class="lr-fpanel-row">
+                    <label class="lr-fpanel-label" style="--sect-c:#f59e0b">ក្រុម · Groups</label>
+                    <select class="lr-fpanel-select" id="lrFGroup" onchange="setFPChip('group',this.value)">
+                      <option value="">— All Groups —</option>
+                    </select>
                   </div>
                 </div>
               </div>
             </div>
             <div class="lr-actions-wrap" id="lrActionsWrap">
-              <button class="lr-btn lr-btn-actions" onclick="toggleActionsPanel()" title="Actions" style="padding:8px 10px">
+              <button class="lr-btn lr-btn-actions" onclick="openExportModal()" title="Export Report" style="padding:8px 10px">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
               </button>
-              <div class="lr-actions-panel" id="lrActionsPanel">
-                <button class="lr-action-item" onclick="exportCSV();closeActionsPanel()">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#86efac" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  Export CSV
-                </button>
-              </div>
             </div>
           </div>
 
@@ -608,6 +684,8 @@ function applyFilter() {
   var fg = document.getElementById('lrFGroup').value;
   var fs = document.getElementById('lrFStatus').value;
   var fn = document.getElementById('lrFGender').value;
+  var df = document.getElementById('lrDateFrom') ? document.getElementById('lrDateFrom').value : '';
+  var dt = document.getElementById('lrDateTo')   ? document.getElementById('lrDateTo').value   : '';
 
   _filtered = _allLoans.filter(function(l){
     if (q && !(
@@ -624,11 +702,56 @@ function applyFilter() {
       var gv = (l.Gender||'').trim().toLowerCase();
       if (fn.toLowerCase() !== gv) return false;
     }
+    if (df || dt) {
+      var d = String(l.DateTime||'').slice(0,10); /* YYYY-MM-DD */
+      if (df && d < df) return false;
+      if (dt && d > dt) return false;
+    }
     return true;
   });
 
   sortAndRender();
 }
+
+/* ── Date Range Filter ── */
+function toggleDatePanel() {
+  document.getElementById('lrDatePanel').classList.toggle('open');
+}
+function closeDatePanel() {
+  var p = document.getElementById('lrDatePanel');
+  if (p) p.classList.remove('open');
+}
+function updateDateLabel() {
+  var f   = document.getElementById('lrDateFrom').value;
+  var t   = document.getElementById('lrDateTo').value;
+  var lbl = document.getElementById('lrDateLabel');
+  var btn = document.getElementById('lrBtnDate');
+  if (f || t) {
+    var fs = f ? f.split('-').reverse().join('/') : '...';
+    var ts = t ? t.split('-').reverse().join('/') : '...';
+    if (lbl) lbl.textContent = fs + ' → ' + ts;
+    if (btn) btn.classList.add('lr-date-on');
+  } else {
+    if (lbl) lbl.textContent = 'All Dates';
+    if (btn) btn.classList.remove('lr-date-on');
+  }
+}
+function applyDateFilter() {
+  closeDatePanel();
+  updateDateLabel();
+  applyFilter();
+}
+function clearDateFilter() {
+  document.getElementById('lrDateFrom').value = '';
+  document.getElementById('lrDateTo').value   = '';
+  updateDateLabel();
+  closeDatePanel();
+  applyFilter();
+}
+document.addEventListener('click', function(e) {
+  var wrap = document.getElementById('lrDateWrap');
+  if (wrap && !wrap.contains(e.target)) closeDatePanel();
+});
 
 function sortTable(col) {
   if (_sortCol === col) { _sortAsc = !_sortAsc; }
@@ -885,26 +1008,341 @@ function toggleLrFilters() {
   btn.classList.toggle('lr-filter-on', open);
   if (open) closeActionsPanel();
 }
-function toggleActionsPanel() {
-  var p = document.getElementById('lrActionsPanel');
-  p.classList.toggle('open');
+function closeActionsPanel() { /* no-op — kept for callers */ }
+
+/* ── Export Modal ── */
+var LREX_COLS = [
+  { key:'FullName',   label:'Full Name',   on:true  },
+  { key:'NationalID', label:'National ID', on:true  },
+  { key:'DOB',        label:'DOB',         on:true  },
+  { key:'Phone',      label:'Phone',       on:true  },
+  { key:'Gender',     label:'Gender',      on:true  },
+  { key:'Groups',     label:'Group',       on:true  },
+  { key:'Money',      label:'Amount ($)',  on:true  },
+  { key:'Status',     label:'Status',      on:true  },
+  { key:'DateTime',   label:'Date',        on:true  },
+  { key:'Note',       label:'Note',        on:false }
+];
+var lrexShowTotal = true;
+
+function openExportModal() {
+  renderExportCols();
+  renderExportInfoChips();
+  renderExportPreview();
+  document.getElementById('lrExportModalBg').classList.add('open');
 }
-function closeActionsPanel() {
-  var p = document.getElementById('lrActionsPanel');
-  if (p) p.classList.remove('open');
+
+function closeExportModal() {
+  document.getElementById('lrExportModalBg').classList.remove('open');
 }
-document.addEventListener('click', function(e) {
-  var wrap = document.getElementById('lrActionsWrap');
-  if (wrap && !wrap.contains(e.target)) closeActionsPanel();
-});
+
+function renderExportCols() {
+  var c = document.getElementById('lrExCols');
+  if (!c) return;
+  c.innerHTML = LREX_COLS.map(function(col, i) {
+    return '<span class="lrex-chip' + (col.on ? ' active' : '') + '" onclick="lrexToggleCol(' + i + ')">' + col.label + '</span>';
+  }).join('')
+  + '<span class="lrex-chip lrex-chip-total' + (lrexShowTotal ? ' active' : '') + '" onclick="lrexToggleTotal()" style="border-style:dashed">Total Row</span>';
+}
+
+function lrexToggleCol(idx) {
+  LREX_COLS[idx].on = !LREX_COLS[idx].on;
+  var chips = document.querySelectorAll('#lrExCols .lrex-chip');
+  if (chips[idx]) chips[idx].classList.toggle('active', LREX_COLS[idx].on);
+  renderExportPreview();
+}
+
+function lrexToggleTotal() {
+  lrexShowTotal = !lrexShowTotal;
+  var chip = document.querySelector('.lrex-chip-total');
+  if (chip) chip.classList.toggle('active', lrexShowTotal);
+  renderExportPreview();
+}
+
+function renderExportInfoChips() {
+  var el = document.getElementById('lrExInfoChips');
+  if (!el) return;
+  var data = lrexGetData();
+  var chips = [];
+  var grp    = document.getElementById('lrFGroup')  ? document.getElementById('lrFGroup').value  : '';
+  var status = document.getElementById('lrFStatus') ? document.getElementById('lrFStatus').value : '';
+  var gender = document.getElementById('lrFGender') ? document.getElementById('lrFGender').value : '';
+  if (!grp && !status && !gender) {
+    chips.push('<span class="lrex-info-chip"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> All Borrowers</span>');
+  } else {
+    if (grp)    chips.push('<span class="lrex-info-chip">Group: ' + grp + '</span>');
+    if (status) chips.push('<span class="lrex-info-chip">Status: ' + status + '</span>');
+    if (gender) chips.push('<span class="lrex-info-chip">Gender: ' + gender + '</span>');
+  }
+  el.innerHTML = chips.join('');
+}
+
+function renderExportPreview() {
+  var wrap = document.getElementById('lrExPreview');
+  if (!wrap) return;
+  var data = lrexGetData();
+  var cols = lrexActiveCols();
+  if (!cols.length) { wrap.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">Select at least one column</div>'; return; }
+
+  var totalMoney = 0;
+  data.forEach(function(l) { totalMoney += parseFloat(l.Money||0) || 0; });
+
+  var th = cols.map(function(c) { return '<th>' + c.label + '</th>'; }).join('');
+  var rows = data.map(function(loan) {
+    return '<tr>' + cols.map(function(col) {
+      var v = col.key === 'DateTime' ? fmtDate(loan.DateTime) : String(loan[col.key]||'');
+      var style = col.key === 'Money' ? ' style="color:#22c55e;font-weight:700"' : '';
+      return '<td' + style + '>' + v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+
+  var hasMoney = cols.some(function(c){ return c.key==='Money'; });
+  var totalCells = cols.map(function(c, ci) {
+    if (ci === 0)            return '<td>TOTAL</td>';
+    if (c.key === 'Money')   return '<td style="color:#f59e0b;font-weight:700">$' + totalMoney.toFixed(2) + '</td>';
+    return '<td></td>';
+  }).join('');
+
+  var totalRow = (lrexShowTotal && data.length) ? '<tr class="lrex-total">' + totalCells + '</tr>' : '';
+  wrap.innerHTML = '<table><thead><tr>' + th + '</tr></thead><tbody>' + rows + totalRow + '</tbody></table>';
+
+  var info = document.getElementById('lrExFooterInfo');
+  if (info) info.textContent = data.length + ' records' + (hasMoney ? ' · $' + totalMoney.toFixed(2) : '');
+}
+
+function lrexGetData() {
+  return _filtered.length ? _filtered : _allLoans;
+}
+
+function lrexActiveCols() {
+  return LREX_COLS.filter(function(c) { return c.on; });
+}
+
+function lrexBuildTableHTML(data, cols) {
+  var dark = !(document.documentElement.getAttribute('data-theme') === 'light');
+  var bg      = dark ? '#0f172a' : '#ffffff';
+  var altBg   = dark ? '#111827' : '#f8fafc';
+  var hdrBg   = dark ? '#1e293b' : '#f1f5f9';
+  var text    = dark ? '#e2e8f0' : '#1e293b';
+  var border  = dark ? '#334155' : '#e2e8f0';
+  var h = '<table style="width:100%;border-collapse:collapse;font-family:system-ui,sans-serif;font-size:12px;background:'+bg+';color:'+text+'">'
+    + '<thead><tr>';
+  cols.forEach(function(col) {
+    h += '<th style="padding:8px 12px;text-align:left;background:'+hdrBg+';border-bottom:2px solid '+border+';font-weight:700;white-space:nowrap">'+col.label+'</th>';
+  });
+  h += '</tr></thead><tbody>';
+  data.forEach(function(loan, idx) {
+    h += '<tr style="background:'+(idx%2===0?bg:altBg)+'">';
+    cols.forEach(function(col) {
+      var v = col.key === 'DateTime' ? fmtDate(loan.DateTime) : String(loan[col.key]||'');
+      h += '<td style="padding:7px 12px;border-bottom:1px solid '+border+';white-space:nowrap">'+v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</td>';
+    });
+    h += '</tr>';
+  });
+  return h + '</tbody></table>';
+}
+
+/* Canvas-based table renderer — no html2canvas, works with Khmer text */
+function lrexRenderToCanvas(data, cols) {
+  var dark = !(document.documentElement.getAttribute('data-theme') === 'light');
+  var SC=2, PH=14, PV=9, FS=13, HFS=11, OUTER=20;
+  var BG    = dark?'#0f172a':'#ffffff';
+  var HBGC  = dark?'#1e293b':'#f1f5f9';
+  var ALTBG = dark?'#111827':'#f8fafc';
+  var TEXT  = dark?'#e2e8f0':'#1e293b';
+  var MUTED = dark?'#94a3b8':'#64748b';
+  var BRDR  = dark?'#334155':'#e2e8f0';
+  var ROW_H=FS+PV*2+2, HDR_H=HFS+PV*2+4, TITLE_H=36;
+
+  /* measure column widths */
+  var tmp = document.createElement('canvas').getContext('2d');
+  var colW = cols.map(function(col) {
+    tmp.font = 'bold '+HFS+'px system-ui,sans-serif';
+    var w = tmp.measureText(col.label).width + PH*2;
+    tmp.font = FS+'px system-ui,sans-serif';
+    data.forEach(function(loan) {
+      var v = col.key==='DateTime' ? fmtDate(loan.DateTime) : String(loan[col.key]||'');
+      w = Math.max(w, tmp.measureText(v).width + PH*2);
+    });
+    if (col.key==='Note') w = Math.min(w, 200);
+    return Math.ceil(w) + 4;
+  });
+
+  /* A4 at 96dpi: 794 × 1123px
+     - Width : always A4 minimum; auto-expands if columns are wider
+     - Height: always A4 minimum; auto-expands if rows are taller          */
+  var A4_W = 794, A4_H = 1123;
+  var naturalW = colW.reduce(function(a,b){return a+b;},0) + OUTER*2;
+  var naturalH = TITLE_H + HDR_H + (data.length + (lrexShowTotal ? 1 : 0))*ROW_H + OUTER;
+  var W = Math.max(naturalW, A4_W);
+  var H = Math.max(naturalH, A4_H);
+  /* distribute extra width proportionally so columns fill A4 width */
+  if (naturalW < A4_W && cols.length > 0) {
+    var tableArea  = W - OUTER*2;
+    var naturalTbl = colW.reduce(function(a,b){return a+b;},0);
+    var ratio = tableArea / naturalTbl;
+    colW = colW.map(function(w){ return Math.floor(w * ratio); });
+    var usedW = colW.reduce(function(a,b){return a+b;},0);
+    colW[colW.length-1] += (tableArea - usedW);
+  }
+  var canvas = document.createElement('canvas');
+  canvas.width=W*SC; canvas.height=H*SC;
+  var ctx=canvas.getContext('2d'); ctx.scale(SC,SC);
+
+  /* background */
+  ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
+
+  /* title */
+  ctx.font='bold 12px system-ui,sans-serif'; ctx.fillStyle='#94a3b8';
+  ctx.fillText('Helen Loan Report — '+new Date().toLocaleDateString('en-GB')+' ('+data.length+' records)',OUTER,22);
+
+  var y=TITLE_H, totalMoney=0;
+
+  /* header */
+  ctx.fillStyle=HBGC; ctx.fillRect(OUTER,y,W-OUTER*2,HDR_H);
+  ctx.fillStyle=BRDR; ctx.fillRect(OUTER,y+HDR_H-1,W-OUTER*2,1);
+  ctx.font='bold '+HFS+'px system-ui,sans-serif'; ctx.fillStyle=MUTED;
+  var cx=OUTER;
+  cols.forEach(function(col,i){ ctx.fillText(col.label.toUpperCase(),cx+PH,y+PV+HFS); cx+=colW[i]; });
+  y+=HDR_H;
+
+  /* rows */
+  data.forEach(function(loan,ri) {
+    ctx.fillStyle=ri%2===0?BG:ALTBG; ctx.fillRect(OUTER,y,W-OUTER*2,ROW_H);
+    ctx.fillStyle=BRDR; ctx.fillRect(OUTER,y+ROW_H-1,W-OUTER*2,1);
+    ctx.font=FS+'px system-ui,sans-serif';
+    var rx=OUTER;
+    cols.forEach(function(col,i) {
+      var v=col.key==='DateTime'?fmtDate(loan.DateTime):String(loan[col.key]||'');
+      var maxW=colW[i]-PH*2;
+      /* truncate long text */
+      while(v.length>1 && ctx.measureText(v).width>maxW) v=v.slice(0,-1);
+      ctx.fillStyle=col.key==='Money'?'#22c55e':TEXT;
+      ctx.fillText(v,rx+PH,y+PV+FS); rx+=colW[i];
+    });
+    totalMoney+=parseFloat(loan.Money||0)||0;
+    y+=ROW_H;
+  });
+
+  /* total row — only if toggled on */
+  if (lrexShowTotal) {
+    ctx.fillStyle=dark?'rgba(245,158,11,.07)':'rgba(245,158,11,.05)';
+    ctx.fillRect(OUTER,y,W-OUTER*2,ROW_H);
+    ctx.fillStyle='#f59e0b'; ctx.fillRect(OUTER,y,W-OUTER*2,2);
+    ctx.font='bold '+FS+'px system-ui,sans-serif';
+    var tx=OUTER;
+    cols.forEach(function(col,i) {
+      ctx.fillStyle='#f59e0b';
+      if(i===0) ctx.fillText('TOTAL',tx+PH,y+PV+FS);
+      else if(col.key==='Money') ctx.fillText('$'+totalMoney.toFixed(2),tx+PH,y+PV+FS);
+      tx+=colW[i];
+    });
+  }
+  return canvas;
+}
+
+function doExportCsvModal() {
+  var data = lrexGetData();
+  if (!data.length) { toast('No data to export', true); return; }
+  var cols = lrexActiveCols();
+  if (!cols.length) { toast('Select at least one column', true); return; }
+  var headers = cols.map(function(c) { return c.label; });
+  var rows = data.map(function(loan) {
+    return cols.map(function(col) {
+      if (col.key === 'DateTime') return fmtDate(loan.DateTime);
+      if (col.key === 'Phone')    return '\t'+(loan.Phone||'');
+      return String(loan[col.key]||'');
+    });
+  });
+  var csv = [headers].concat(rows).map(function(r){
+    return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(',');
+  }).join('\r\n');
+  var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'LoanReport_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Exported '+data.length+' rows');
+  closeExportModal();
+}
+
+function doExportJpg() {
+  var data = lrexGetData();
+  if (!data.length) { toast('No data', true); return; }
+  var cols = lrexActiveCols();
+  if (!cols.length) { toast('Select at least one column', true); return; }
+  try {
+    var canvas = lrexRenderToCanvas(data, cols);
+    canvas.toBlob(function(blob) {
+      if (!blob) { toast('Export failed', true); return; }
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'LoanReport_' + new Date().toISOString().slice(0,10) + '.jpg';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+      toast('JPG saved ✓');
+      closeExportModal();
+    }, 'image/jpeg', 0.92);
+  } catch(e) {
+    toast('Export failed: ' + e.message, true);
+  }
+}
+
+function doExportPdf() {
+  var data = lrexGetData();
+  if (!data.length) { toast('No data', true); return; }
+  var cols = lrexActiveCols();
+  if (!cols.length) { toast('Select at least one column', true); return; }
+  var now = new Date();
+  var html = '<!doctype html><html><head><meta charset="utf-8"><title>Loan Report</title>'
+    + '<style>body{margin:16px;font-family:system-ui,sans-serif}h3{font-size:13px;margin-bottom:10px;color:#1e293b}'
+    + '@media print{@page{margin:10mm}body{margin:0}}</style></head><body>'
+    + '<h3>Helen Loan Report — '+now.toLocaleDateString('en-GB')+' ('+data.length+' records)</h3>'
+    + lrexBuildTableHTML(data, cols)
+    + '<script>window.onload=function(){window.print();}<\/script></body></html>';
+  var w = window.open('','_blank','width=950,height=700');
+  if (!w) { toast('Allow popups and try again', true); return; }
+  w.document.write(html);
+  w.document.close();
+  closeExportModal();
+}
+
+function doShareTelegram() {
+  var data = lrexGetData();
+  if (!data.length) { toast('No data', true); return; }
+  var cols = lrexActiveCols();
+  if (!cols.length) { toast('Select at least one column', true); return; }
+  try {
+    var canvas = lrexRenderToCanvas(data, cols);
+    canvas.toBlob(async function(blob) {
+      if (!blob) { toast('Failed to generate image', true); return; }
+      try {
+        var file = new File([blob], 'LoanReport.jpg', { type:'image/jpeg' });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files:[file] })) {
+          await navigator.share({ files:[file], title:'Helen Loan Report' });
+          toast('Shared ✓');
+        } else {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url; a.download = 'LoanReport.jpg';
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+          setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+          setTimeout(function(){ window.open('https://t.me', '_blank'); }, 600);
+          toast('Image saved — open Telegram to share');
+        }
+      } catch(e2) { toast('Share cancelled', true); }
+    }, 'image/jpeg', 0.92);
+    closeExportModal();
+  } catch(e) {
+    toast('Failed: ' + e.message, true);
+  }
+}
 
 function setFPChip(type, val) {
-  var containers = { status:'lrFPStatus', gender:'lrFPGender', group:'lrFPGroups' };
-  var selects    = { status:'lrFStatus',  gender:'lrFGender',  group:'lrFGroup'  };
-  var c = document.getElementById(containers[type]);
-  if (c) c.querySelectorAll('.lr-fpanel-chip').forEach(function(ch) {
-    ch.classList.toggle('lr-factive', ch.getAttribute('data-val') === val);
-  });
+  var selects = { status:'lrFStatus', gender:'lrFGender', group:'lrFGroup' };
   var sel = document.getElementById(selects[type]);
   if (sel) sel.value = val;
   if (type === 'group') {
@@ -933,22 +1371,9 @@ function updateFilterBadge() {
   if (badge) badge.style.display = active ? 'block' : 'none';
 }
 
-function renderFPGroups() {
-  var c = document.getElementById('lrFPGroups');
-  if (!c) return;
-  var groups = [];
-  _allLoans.forEach(function(l){ var g=(l.Groups||'').trim(); if(g && !groups.includes(g)) groups.push(g); });
-  groups.sort();
-  var cur = document.getElementById('lrFGroup').value;
-  c.innerHTML = '<span class="lr-fpanel-chip'+(cur===''?' lr-factive':'')+'" data-type="group" data-val="">All</span>'
-    + groups.map(function(g){
-        return '<span class="lr-fpanel-chip'+(cur===g?' lr-factive':'')+'" data-type="group" data-val="'+g.replace(/"/g,'&quot;')+'">'+g+'</span>';
-      }).join('');
-}
+function renderFPGroups() { /* no-op — populateFilters() fills #lrFGroup select directly */ }
 
 document.addEventListener('click', function(e) {
-  var chip = e.target.closest('.lr-fpanel-chip');
-  if (chip) { setFPChip(chip.getAttribute('data-type'), chip.getAttribute('data-val')); return; }
   var panel = document.getElementById('lrFilterPanel');
   var btn   = document.getElementById('lrBtnFilter');
   if (panel && panel.style.display !== 'none' && !panel.contains(e.target) && btn && !btn.contains(e.target)) {
@@ -1297,6 +1722,49 @@ loadData();
     <div class="lr-modal-footer">
       <button class="lr-btn lr-btn-cancel" onclick="closeEditModal()">Cancel</button>
       <button class="lr-btn lr-btn-save" id="lrSaveBtn" onclick="saveEdit()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export Report Modal -->
+<div class="lr-modal-bg" id="lrExportModalBg" onclick="if(event.target===this)closeExportModal()">
+  <div class="lr-modal" style="width:min(660px,96vw);padding:24px 24px 20px">
+    <div class="lr-modal-hdr" style="margin-bottom:14px">
+      <div class="lr-modal-title" style="display:flex;align-items:center;gap:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Export Report
+      </div>
+      <button class="lr-modal-close" onclick="closeExportModal()">✕</button>
+    </div>
+
+    <!-- Current filter state chips -->
+    <div class="lrex-info-chips" id="lrExInfoChips"></div>
+
+    <!-- Column pill toggles -->
+    <div class="lrex-col-label">COLUMNS</div>
+    <div class="lrex-chips" id="lrExCols"></div>
+
+    <!-- Inline data preview -->
+    <div class="lrex-preview-wrap" id="lrExPreview"></div>
+
+    <!-- Footer: summary + action buttons -->
+    <div class="lrex-footer">
+      <div class="lrex-footer-info" id="lrExFooterInfo"></div>
+      <div class="lrex-footer-btns">
+        <button class="lrex-btn lrex-btn-jpg" onclick="doExportJpg()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export JPG
+        </button>
+        <button class="lrex-btn lrex-btn-pdf" onclick="doExportPdf()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Export PDF
+        </button>
+        <button class="lrex-btn lrex-btn-tg" onclick="doShareTelegram()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Telegram
+        </button>
+        <button class="lrex-btn lrex-btn-close" onclick="closeExportModal()">Close</button>
+      </div>
     </div>
   </div>
 </div>
