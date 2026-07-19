@@ -180,6 +180,13 @@
   /* spinning animation when refreshing */
   .ol-sync-btn.spinning svg{animation:spinIcon .7s linear infinite}
   @keyframes spinIcon{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  /* ── Table Row: 6 Animation Style Keyframes ── */
+  @keyframes tbl-slide-up { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+  @keyframes tbl-fade-in  { from{opacity:0} to{opacity:1} }
+  @keyframes tbl-slide-r  { from{transform:translateX(-24px);opacity:0} to{transform:translateX(0);opacity:1} }
+  @keyframes tbl-pop      { 0%{transform:scale(.9);opacity:0} 65%{transform:scale(1.02)} 100%{transform:scale(1);opacity:1} }
+  @keyframes tbl-flip     { from{transform:perspective(600px) rotateX(-50deg);opacity:0} to{transform:perspective(600px) rotateX(0);opacity:1} }
+  @keyframes tbl-drop     { from{transform:translateY(-16px);opacity:0} to{transform:translateY(0);opacity:1} }
 
   /* Latest customer name — smaller text so it fits */
   .ol-stat-cust{font-size:13px !important;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}

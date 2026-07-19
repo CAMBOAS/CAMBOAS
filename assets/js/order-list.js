@@ -748,6 +748,22 @@ function render(keepPage){
   }
   tbody.innerHTML = rowHtml;
 
+  /* ── Random row stagger animation ── */
+  var _OL_TBL_STYLES = [
+    { kf:'tbl-slide-up', dur:.30, ease:'ease-out',                 stagger:.042 },
+    { kf:'tbl-fade-in',  dur:.32, ease:'ease-in-out',              stagger:.05  },
+    { kf:'tbl-slide-r',  dur:.28, ease:'ease-out',                 stagger:.04  },
+    { kf:'tbl-pop',      dur:.36, ease:'cubic-bezier(.4,0,.2,1)',  stagger:.045 },
+    { kf:'tbl-flip',     dur:.32, ease:'ease-out',                 stagger:.048 },
+    { kf:'tbl-drop',     dur:.28, ease:'ease-out',                 stagger:.04  },
+  ];
+  var _ots = _OL_TBL_STYLES[Math.floor(Math.random() * _OL_TBL_STYLES.length)];
+  var _otrows = tbody.querySelectorAll('tr[data-id]');
+  var _oStagger = _otrows.length > 1 ? Math.min(_ots.stagger, 0.55 / (_otrows.length - 1)) : 0;
+  _otrows.forEach(function(r, i){
+    r.style.animation = _ots.kf + ' ' + _ots.dur + 's ' + _ots.ease + ' ' + (i * _oStagger).toFixed(3) + 's both';
+  });
+
   // Sync card view — pass already-sliced visible rows + remaining count
   try { if(typeof window._olRenderCards==='function') window._olRenderCards(visible, rows.length - visible.length); } catch(e) { console.warn('Card render error:', e); }
 

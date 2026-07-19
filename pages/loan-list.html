@@ -174,6 +174,13 @@
     .lr-btn-refresh:hover { background:rgba(6,182,212,.2) }
     @keyframes lr-spin { to { transform:rotate(360deg) } }
     .lr-btn-refresh.spinning svg { animation:lr-spin .7s linear infinite }
+    /* ── Table Row: 6 Animation Style Keyframes ── */
+    @keyframes tbl-slide-up { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+    @keyframes tbl-fade-in  { from{opacity:0} to{opacity:1} }
+    @keyframes tbl-slide-r  { from{transform:translateX(-24px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes tbl-pop      { 0%{transform:scale(.9);opacity:0} 65%{transform:scale(1.02)} 100%{transform:scale(1);opacity:1} }
+    @keyframes tbl-flip     { from{transform:perspective(600px) rotateX(-50deg);opacity:0} to{transform:perspective(600px) rotateX(0);opacity:1} }
+    @keyframes tbl-drop     { from{transform:translateY(-16px);opacity:0} to{transform:translateY(0);opacity:1} }
     /* ── Status Donut: 10 Animation Style Keyframes ── */
     @keyframes pie-zoom-in  { from{transform:scale(.3) rotate(-20deg);opacity:0} to{transform:scale(1) rotate(0);opacity:1} }
     @keyframes pie-spin-in  { from{transform:rotate(-200deg) scale(.7);opacity:0} to{transform:rotate(0) scale(1);opacity:1} }
@@ -854,6 +861,22 @@ function renderTable() {
   document.getElementById('lrTbody').innerHTML = html;
   document.getElementById('lrFootInfo').textContent = _filtered.length + ' / ' + _allLoans.length + ' borrowers';
   document.getElementById('lrFootCount').textContent = arr.length + ' shown';
+
+  /* ── Random row stagger animation ── */
+  var _LR_TBL_STYLES = [
+    { kf:'tbl-slide-up', dur:.30, ease:'ease-out',                 stagger:.042 },
+    { kf:'tbl-fade-in',  dur:.32, ease:'ease-in-out',              stagger:.05  },
+    { kf:'tbl-slide-r',  dur:.28, ease:'ease-out',                 stagger:.04  },
+    { kf:'tbl-pop',      dur:.36, ease:'cubic-bezier(.4,0,.2,1)',  stagger:.045 },
+    { kf:'tbl-flip',     dur:.32, ease:'ease-out',                 stagger:.048 },
+    { kf:'tbl-drop',     dur:.28, ease:'ease-out',                 stagger:.04  },
+  ];
+  var _lts = _LR_TBL_STYLES[Math.floor(Math.random() * _LR_TBL_STYLES.length)];
+  var _ltrows = document.getElementById('lrTbody').querySelectorAll('tr');
+  var _ltStagger = _ltrows.length > 1 ? Math.min(_lts.stagger, 0.55 / (_ltrows.length - 1)) : 0;
+  _ltrows.forEach(function(r, i){
+    r.style.animation = _lts.kf + ' ' + _lts.dur + 's ' + _lts.ease + ' ' + (i * _ltStagger).toFixed(3) + 's both';
+  });
 }
 
 /* ── Charts ── */

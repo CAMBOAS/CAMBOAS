@@ -581,6 +581,13 @@
   [data-theme="light"] .sr-legend-row:hover { background:rgba(109,40,217,.06) }
   [data-theme="light"] .sr-legend-row.sr-pg-active { background:rgba(109,40,217,.09) !important }
 
+  /* ── Table Row: 6 Animation Style Keyframes ── */
+  @keyframes tbl-slide-up { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+  @keyframes tbl-fade-in  { from{opacity:0} to{opacity:1} }
+  @keyframes tbl-slide-r  { from{transform:translateX(-24px);opacity:0} to{transform:translateX(0);opacity:1} }
+  @keyframes tbl-pop      { 0%{transform:scale(.9);opacity:0} 65%{transform:scale(1.02)} 100%{transform:scale(1);opacity:1} }
+  @keyframes tbl-flip     { from{transform:perspective(600px) rotateX(-50deg);opacity:0} to{transform:perspective(600px) rotateX(0);opacity:1} }
+  @keyframes tbl-drop     { from{transform:translateY(-16px);opacity:0} to{transform:translateY(0);opacity:1} }
   /* ── Orders by Pages: 10 Animation Style Keyframes ── */
   @keyframes pie-zoom-in  { from{transform:scale(.3) rotate(-20deg);opacity:0} to{transform:scale(1) rotate(0);opacity:1} }
   @keyframes pie-spin-in  { from{transform:rotate(-200deg) scale(.7);opacity:0} to{transform:rotate(0) scale(1);opacity:1} }
@@ -1243,6 +1250,23 @@
         '</table>' +
       '</div>' +
       '<div class="dr-table-footer">បង្ហាញ ' + filteredOrders.length + ' orders · ' + fmtRange() + '</div>';
+
+    /* ── Random row stagger animation ── */
+    var _TBL_STYLES = [
+      { kf:'tbl-slide-up', dur:.30, ease:'ease-out',                   stagger:.042 },
+      { kf:'tbl-fade-in',  dur:.32, ease:'ease-in-out',                stagger:.05  },
+      { kf:'tbl-slide-r',  dur:.28, ease:'ease-out',                   stagger:.04  },
+      { kf:'tbl-pop',      dur:.36, ease:'cubic-bezier(.4,0,.2,1)',     stagger:.045 },
+      { kf:'tbl-flip',     dur:.32, ease:'ease-out',                   stagger:.048 },
+      { kf:'tbl-drop',     dur:.28, ease:'ease-out',                   stagger:.04  },
+    ];
+    var _ts = _TBL_STYLES[Math.floor(Math.random() * _TBL_STYLES.length)];
+    var _trows = container.querySelectorAll('.dr-tr-main');
+    /* cap total stagger at 0.55s so long tables don't feel sluggish */
+    var _stagger = _trows.length > 1 ? Math.min(_ts.stagger, 0.55 / (_trows.length - 1)) : 0;
+    _trows.forEach(function(r, i){
+      r.style.animation = _ts.kf + ' ' + _ts.dur + 's ' + _ts.ease + ' ' + (i * _stagger).toFixed(3) + 's both';
+    });
   }
 
   function drTableHead() {
