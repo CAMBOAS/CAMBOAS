@@ -307,6 +307,27 @@
     .lr-add-hdr-sub { font-size:11px; color:var(--muted); margin-top:3px }
     .lr-add-hdr-close { position:absolute; top:16px; right:16px; width:32px; height:32px; border-radius:50%; border:none; background:rgba(148,163,184,.12); color:var(--muted); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.18s }
     .lr-add-hdr-close:hover { background:rgba(239,68,68,.15); color:#fca5a5 }
+    .lr-add-hdr-settings { position:absolute; top:16px; right:54px; width:32px; height:32px; border-radius:50%; border:1.5px solid rgba(99,102,241,.5); background:rgba(99,102,241,.22); color:#6366f1; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.18s }
+    .lr-add-hdr-settings:hover { background:rgba(99,102,241,.38); border-color:rgba(99,102,241,.8); color:#4f46e5 }
+    [data-theme="dark"] .lr-add-hdr-settings { background:rgba(99,102,241,.25); border-color:rgba(165,180,252,.45); color:#a5b4fc }
+    [data-theme="dark"] .lr-add-hdr-settings:hover { background:rgba(99,102,241,.4); border-color:#a5b4fc; color:#c7d2fe }
+    /* Manage Groups & Statuses Modal */
+    .lr-infor-bg { position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(4px); z-index:1100; display:none; align-items:center; justify-content:center }
+    .lr-infor-bg.open { display:flex }
+    .lr-infor-box { background:var(--card); border:1px solid rgba(99,102,241,.25); border-radius:18px; width:min(360px,94vw); overflow:hidden; box-shadow:0 24px 64px rgba(0,0,0,.45) }
+    .lr-infor-hdr { display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid rgba(148,163,200,.12) }
+    .lr-infor-tabs { display:flex; border-bottom:1px solid rgba(148,163,200,.12) }
+    .lr-infor-tab { flex:1; padding:10px; border:none; background:transparent; color:var(--muted); font-weight:600; font-size:13px; cursor:pointer; font-family:inherit; transition:.15s }
+    .lr-infor-tab.active { background:rgba(99,102,241,.12); color:#6366f1; border-bottom:2px solid #6366f1 }
+    .lr-infor-list { max-height:220px; overflow-y:auto }
+    .lr-infor-item { display:flex; align-items:center; padding:9px 16px; border-bottom:1px solid rgba(148,163,200,.08) }
+    .lr-infor-item span { flex:1; font-size:13px; color:var(--text) }
+    .lr-infor-del { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.2); border-radius:6px; color:#f87171; padding:4px 10px; font-size:12px; cursor:pointer; font-family:inherit }
+    .lr-infor-del:hover { background:rgba(239,68,68,.2) }
+    .lr-infor-add-row { padding:12px 16px; border-top:1px solid rgba(148,163,200,.12); display:flex; gap:8px }
+    .lr-infor-input { flex:1; padding:8px 12px; border-radius:8px; border:1px solid rgba(148,163,200,.25); background:rgba(148,163,200,.07); color:var(--text); font-size:13px; font-family:inherit; outline:none }
+    .lr-infor-input:focus { border-color:rgba(99,102,241,.5) }
+    .lr-infor-add-btn { padding:8px 14px; border-radius:8px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; white-space:nowrap }
     .lr-add-body { padding:22px 24px 0 }
     .lr-add-section { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; display:flex; align-items:center; gap:8px; margin:0 0 12px }
     .lr-add-section::after { content:''; flex:1; height:1px; background:rgba(148,163,200,.12) }
@@ -1498,6 +1519,77 @@ function closeAddModal() {
   document.getElementById('lrAddModalBg').classList.remove('open');
 }
 
+/* ── Manage Groups & Statuses ── */
+var _inforTab = 'groups';
+var _inforData = { groups: [], statuses: [] };
+
+function openInforSettings() {
+  document.getElementById('lrInforBg').classList.add('open');
+  _inforTab = 'groups';
+  document.getElementById('lrInforTabG').className = 'lr-infor-tab active';
+  document.getElementById('lrInforTabS').className = 'lr-infor-tab';
+  loadInforData();
+}
+function closeInforSettings() {
+  document.getElementById('lrInforBg').classList.remove('open');
+  document.getElementById('lrInforNewVal').value = '';
+}
+function switchInforTab(tab) {
+  _inforTab = tab;
+  document.getElementById('lrInforTabG').className = 'lr-infor-tab' + (tab === 'groups' ? ' active' : '');
+  document.getElementById('lrInforTabS').className = 'lr-infor-tab' + (tab === 'statuses' ? ' active' : '');
+  renderInforList();
+}
+async function loadInforData() {
+  document.getElementById('lrInforList').innerHTML = '<div style="padding:14px 16px;color:var(--muted);font-size:13px">កំពុងផ្ទុក...</div>';
+  try {
+    var res = await CamboAPI.get({ action: 'helen_infor' });
+    if (res && res.ok) {
+      _inforData.groups   = res.groups   || [];
+      _inforData.statuses = res.statuses || [];
+      _helenInfor.groups   = _inforData.groups;
+      _helenInfor.statuses = _inforData.statuses;
+    }
+  } catch(e) {}
+  renderInforList();
+}
+function renderInforList() {
+  var items = _inforData[_inforTab] || [];
+  document.getElementById('lrInforList').innerHTML = items.length
+    ? items.map(function(v) {
+        return '<div class="lr-infor-item"><span>' + esc(v) + '</span>' +
+          '<button class="lr-infor-del" onclick="deleteInforItem(\'' + v.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')">លុប</button></div>';
+      }).join('')
+    : '<div style="padding:14px 16px;color:var(--muted);font-size:13px">មិនមានទិន្នន័យ</div>';
+}
+async function addInforItem() {
+  var val = (document.getElementById('lrInforNewVal').value || '').trim();
+  if (!val) return toast('⚠️ សូមបញ្ចូលឈ្មោះ!');
+  if (!confirm('បន្ថែម "' + val + '" ?\nតើអ្នកប្រាកដឬ?')) return;
+  try {
+    var res = await CamboAPI.post({ action: 'helen_infor_add', type: _inforTab, value: val });
+    if (res && res.ok) {
+      _inforData[_inforTab].push(val);
+      _helenInfor[_inforTab] = _inforData[_inforTab].slice();
+      document.getElementById('lrInforNewVal').value = '';
+      renderInforList();
+      toast('✅ បន្ថែមបានជោគជ័យ!');
+    } else { toast('❌ ' + (res.message || 'Error')); }
+  } catch(e) { toast('❌ Server error'); }
+}
+async function deleteInforItem(val) {
+  if (!confirm('លុប "' + val + '" ?\nតើអ្នកប្រាកដឬ?')) return;
+  try {
+    var res = await CamboAPI.post({ action: 'helen_infor_delete', type: _inforTab, value: val });
+    if (res && res.ok) {
+      _inforData[_inforTab] = _inforData[_inforTab].filter(function(x){ return x !== val; });
+      _helenInfor[_inforTab] = _inforData[_inforTab].slice();
+      renderInforList();
+      toast('🗑️ លុបបានជោគជ័យ!');
+    } else { toast('❌ ' + (res.message || 'Error')); }
+  } catch(e) { toast('❌ Server error'); }
+}
+
 async function saveAdd() {
   var fullName = document.getElementById('af_FullName').value.trim();
   var status   = document.getElementById('af_Status').value;
@@ -1540,7 +1632,7 @@ async function saveAdd() {
 
 function openEditModal(loan) {
   _editLoan = loan;
-  var groups = [...new Set(_allLoans.map(function(l){ return l.Groups||''; }).filter(Boolean))].sort();
+  var groups = _helenInfor.groups.length ? _helenInfor.groups : [...new Set(_allLoans.map(function(l){ return l.Groups||''; }).filter(Boolean))].sort();
   var groupOpts = groups.map(function(g){
     return '<option value="'+esc(g)+'"'+(g===loan.Groups?' selected':'')+'>'+esc(g)+'</option>';
   }).join('');
@@ -1548,29 +1640,47 @@ function openEditModal(loan) {
   var statusOpts = statusList.map(function(s){
     return '<option value="'+s+'"'+(s===(loan.Status||'').trim()?' selected':'')+'>'+s+'</option>';
   }).join('');
-  var genderList = ['Male','Female','Other'];
   var _gNorm = {'ប្រុស':'Male','male':'Male','ស្រី':'Female','female':'Female','ផ្សេងៗ':'Other','other':'Other'};
-  var _gSel  = _gNorm[(loan.Gender||'').trim()] || _gNorm[(loan.Gender||'').trim().toLowerCase()] || '';
-  var genderOpts = '<option value="">—</option>' + genderList.map(function(g){
-    return '<option value="'+g+'"'+(g===_gSel?' selected':'')+'>'+g+'</option>';
-  }).join('');
+  var _gSel  = _gNorm[(loan.Gender||'').trim()] || _gNorm[(loan.Gender||'').trim().toLowerCase()] || (loan.Gender||'');
+  var genderOpts = '<option value="">— Select —</option>'
+    +'<option value="Male"'  +(_gSel==='Male'  ?' selected':'')+'>Male</option>'
+    +'<option value="Female"'+(_gSel==='Female'?' selected':'')+'>Female</option>'
+    +'<option value="Other"' +(_gSel==='Other' ?' selected':'')+'>Other</option>';
 
-  document.getElementById('lrModalName').textContent = esc(loan.FullName||'—');
+  var svgUser   = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+  var svgID     = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>';
+  var svgCal    = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+  var svgPhone  = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.75a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+  var svgGender = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M12 12v8M9 17h6"/></svg>';
+  var svgGroup  = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+  var svgMoney  = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
+  var svgStatus = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>';
+  var svgNote   = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
+
+  document.getElementById('lrModalName').textContent = loan.FullName || '—';
   document.getElementById('lrEditForm').innerHTML =
-    '<div class="lr-modal-grid">'
-    +'<div class="lr-field"><label>Full Name</label><input id="ef_FullName" value="'+esc(loan.FullName||'')+'"></div>'
-    +'<div class="lr-field"><label>National ID</label><input id="ef_NationalID" value="'+esc(loan.NationalID||'')+'"></div>'
-    +'<div class="lr-field"><label>Date of Birth (DOB)</label><input id="ef_DOB" value="'+esc(loan.DOB||'')+'" maxlength="10" inputmode="numeric" oninput="fmtDOB(this)"></div>'
-    +'<div class="lr-field"><label>Phone</label><input id="ef_Phone" value="'+esc(loan.Phone||'')+'"></div>'
-    +'<div class="lr-field"><label>Gender</label><select id="ef_Gender">'+genderOpts+'</select></div>'
-    +'<div class="lr-field"><label>Group</label><select id="ef_Groups"><option value="">—</option>'+groupOpts+'</select></div>'
-    +'<div class="lr-field"><label>Loan Amount ($)</label><input id="ef_Money" type="number" min="0" value="'+esc(loan.Money||'')+'"></div>'
-    +'<div class="lr-field"><label>Status</label><select id="ef_Status"><option value="">—</option>'+statusOpts+'</select></div>'
+    '<div class="lr-add-section">Personal Information</div>'
+    +'<div class="lr-add-grid">'
+    +'<div class="lr-add-field"><div class="lr-add-label">'+svgUser+' Full Name <span style="color:#ef4444;margin-left:2px">*</span></div><input class="lr-add-input" id="ef_FullName" value="'+esc(loan.FullName||'')+'" placeholder="Enter full name..."></div>'
+    +'<div class="lr-add-field"><div class="lr-add-label">'+svgID+' National ID</div><input class="lr-add-input" id="ef_NationalID" value="'+esc(loan.NationalID||'')+'" placeholder="XXX-XXX-XXX..."></div>'
+    +'<div class="lr-add-field"><div class="lr-add-label">'+svgCal+' Date of Birth (DOB)</div><input class="lr-add-input" id="ef_DOB" value="'+esc(loan.DOB||'')+'" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric" oninput="fmtDOB(this)"></div>'
+    +'<div class="lr-add-field"><div class="lr-add-label">'+svgPhone+' Phone</div><input class="lr-add-input" id="ef_Phone" value="'+esc(loan.Phone||'')+'" placeholder="0XX XXX XXX"></div>'
+    +'<div class="lr-add-field"><div class="lr-add-label">'+svgGender+' Gender</div><select class="lr-add-input" id="ef_Gender">'+genderOpts+'</select></div>'
+    +'<div class="lr-add-field"><div class="lr-add-label">'+svgGroup+' Group</div><select class="lr-add-input" id="ef_Groups"><option value="">— Select —</option>'+groupOpts+'</select></div>'
     +'</div>'
-    +'<div class="lr-field"><label>📅 Entry Date</label><input id="ef_DateTime" type="date" value="'+esc((loan.DateTime||'').slice(0,10))+'" max="'+today_ymd()+'"></div>'
-    +'<div class="lr-field"><label>Note</label><textarea id="ef_Note">'+esc(loan.Note||'')+'</textarea></div>';
+    +'<div class="lr-add-section">Financial Information</div>'
+    +'<div class="lr-add-grid">'
+    +'<div class="lr-add-field"><div class="lr-add-label">'+svgMoney+' Loan Amount ($)</div><input class="lr-add-input" id="ef_Money" type="number" min="0" value="'+esc(loan.Money||'')+'" placeholder="0.00"></div>'
+    +'<div class="lr-add-field"><div class="lr-add-label">'+svgStatus+' Status</div><select class="lr-add-input" id="ef_Status"><option value="">— Select —</option>'+statusOpts+'</select></div>'
+    +'</div>'
+    +'<div class="lr-add-date-row">'
+    +'<div class="lr-add-date-label">'+svgCal+' Entry Date</div>'
+    +'<input class="lr-add-input" id="ef_DateTime" type="date" value="'+esc((loan.DateTime||'').slice(0,10))+'" max="'+today_ymd()+'" style="background:transparent;border-color:rgba(124,92,255,.2)">'
+    +'</div>'
+    +'<div class="lr-add-field"><div class="lr-add-label">'+svgNote+' Note</div><textarea class="lr-add-input" id="ef_Note" placeholder="Add a note...">'+esc(loan.Note||'')+'</textarea></div>';
 
   document.getElementById('lrModalBg').classList.add('open');
+  setTimeout(function(){ var f=document.getElementById('ef_FullName'); if(f) f.focus(); }, 80);
 }
 
 function closeEditModal() {
@@ -1582,7 +1692,7 @@ async function saveEdit() {
   if (!_editLoan) return;
   var btn = document.getElementById('lrSaveBtn');
   btn.disabled = true;
-  btn.textContent = 'Saving…';
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Saving…';
   var newDate = document.getElementById('ef_DateTime').value;
   var updated = {
     DateTime:   newDate ? newDate + 'T00:00:00' : _editLoan.DateTime,
@@ -1604,11 +1714,11 @@ async function saveEdit() {
       loadData();
     } else {
       toast('❌ ' + ((res && res.message) || 'Update failed'), true);
-      btn.disabled = false; btn.textContent = 'Save';
+      btn.disabled = false; btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg> Save';
     }
   } catch(e) {
     toast('❌ Network error', true);
-    btn.disabled = false; btn.textContent = 'Save';
+    btn.disabled = false; btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg> Save';
   }
 }
 
@@ -1710,18 +1820,22 @@ loadData();
 
 <!-- Edit Modal -->
 <div class="lr-modal-bg" id="lrModalBg" onclick="if(event.target===this)closeEditModal()">
-  <div class="lr-modal">
-    <div class="lr-modal-hdr">
-      <div>
-        <div class="lr-modal-title">Edit Borrower</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px" id="lrModalName"></div>
+  <div class="lr-add-modal">
+    <div class="lr-add-hdr" style="background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(239,68,68,.10))">
+      <div class="lr-add-hdr-icon" style="background:linear-gradient(135deg,#f59e0b,#ef4444);box-shadow:0 4px 16px rgba(245,158,11,.35)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       </div>
-      <button class="lr-modal-close" onclick="closeEditModal()">✕</button>
+      <div class="lr-add-hdr-title">Edit Borrower</div>
+      <div class="lr-add-hdr-sub" id="lrModalName"></div>
+      <button class="lr-add-hdr-close" onclick="closeEditModal()">✕</button>
     </div>
-    <div id="lrEditForm"></div>
-    <div class="lr-modal-footer">
-      <button class="lr-btn lr-btn-cancel" onclick="closeEditModal()">Cancel</button>
-      <button class="lr-btn lr-btn-save" id="lrSaveBtn" onclick="saveEdit()">💾 Save</button>
+    <div class="lr-add-body" id="lrEditForm"></div>
+    <div class="lr-add-footer">
+      <button class="lr-add-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="lr-add-submit" id="lrSaveBtn" onclick="saveEdit()" style="background:linear-gradient(135deg,#f59e0b,#ef4444);box-shadow:0 4px 16px rgba(245,158,11,.3)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save
+      </button>
     </div>
   </div>
 </div>
@@ -1769,6 +1883,26 @@ loadData();
   </div>
 </div>
 
+<!-- Manage Groups & Statuses Modal -->
+<div class="lr-infor-bg" id="lrInforBg" onclick="if(event.target===this)closeInforSettings()">
+  <div class="lr-infor-box">
+    <div class="lr-infor-hdr">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span style="font-size:15px;font-weight:700;color:var(--text);flex:1">Manage Groups &amp; Statuses</span>
+      <button onclick="closeInforSettings()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:2px 6px;line-height:1">✕</button>
+    </div>
+    <div class="lr-infor-tabs">
+      <button class="lr-infor-tab active" id="lrInforTabG" onclick="switchInforTab('groups')">ក្រុម (Groups)</button>
+      <button class="lr-infor-tab" id="lrInforTabS" onclick="switchInforTab('statuses')">ស្ថានភាព (Status)</button>
+    </div>
+    <div class="lr-infor-list" id="lrInforList"></div>
+    <div class="lr-infor-add-row">
+      <input class="lr-infor-input" id="lrInforNewVal" placeholder="ឈ្មោះថ្មី...">
+      <button class="lr-infor-add-btn" onclick="addInforItem()">+ បន្ថែម</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add New Borrower Modal -->
 <div class="lr-modal-bg" id="lrAddModalBg" onclick="if(event.target===this)closeAddModal()">
   <div class="lr-add-modal">
@@ -1777,7 +1911,9 @@ loadData();
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
       </div>
       <div class="lr-add-hdr-title">Add New Borrower</div>
-      
+      <button class="lr-add-hdr-settings" onclick="openInforSettings()" title="Manage Groups &amp; Statuses">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
       <button class="lr-add-hdr-close" onclick="closeAddModal()">✕</button>
     </div>
     <div class="lr-add-body" id="lrAddForm"></div>
