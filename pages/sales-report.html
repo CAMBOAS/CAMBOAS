@@ -910,6 +910,7 @@
       if(m<1){m=12;y--;} var my=y+'-'+(m<10?'0':'')+m;
       return {f:_startOfMonth(my+'-01'),to:_endOfMonth(my+'-01')};
     }},
+    { id:'alltime',    label:'All Time',     fn: function(){ return {f:'2000-01-01',to:'2099-12-31'}; } },
   ];
 
   // Build compact popup HTML
@@ -917,7 +918,7 @@
   _datePop.className = 'dr-date-pop';
   var presetsHTML = '<div class="dr-date-presets">';
   _PRESETS.forEach(function(p){
-    var full = (p.id==='thisweek'||p.id==='thismonth'||p.id==='lastmonth') ? ' full' : '';
+    var full = (p.id==='thisweek'||p.id==='thismonth'||p.id==='lastmonth'||p.id==='alltime') ? ' full' : '';
     presetsHTML += '<button class="dr-preset-btn'+full+(p.id==='today'?' active':'')+'" data-preset="'+p.id+'">'+p.label+'</button>';
   });
   presetsHTML += '</div>';
@@ -949,7 +950,7 @@
     var preset = _PRESETS.find(function(p){ return p.id===_activePreset; });
     if(preset) {
       _pillLabel.textContent = preset.label;
-      _pillSub.textContent = (dateFrom===dateTo) ? _fmtShort(dateFrom) : _fmtShort(dateFrom)+' → '+_fmtShort(dateTo);
+      _pillSub.textContent = (preset.id==='alltime') ? '' : (dateFrom===dateTo) ? _fmtShort(dateFrom) : _fmtShort(dateFrom)+' → '+_fmtShort(dateTo);
     } else {
       _pillLabel.textContent = (dateFrom===dateTo) ? _fmtShort(dateFrom) : _fmtShort(dateFrom)+' → '+_fmtShort(dateTo);
       _pillSub.textContent = '';
@@ -1130,6 +1131,7 @@
 
   /* ── Date range label helper ── */
   function fmtRange() {
+    if (_activePreset === 'alltime') return 'All Time';
     if (dateFrom === dateTo) return fmtDate(dateFrom);
     return fmtDate(dateFrom) + ' → ' + fmtDate(dateTo);
   }
@@ -2132,6 +2134,7 @@
       { id:'avgitem', label:'Avg$/Item',vis:false, pinned:false },
     ];
     var _drShowTotal = true;
+    var _drShowRowNum = false;
 
     var _drExpMod = document.createElement('div');
     _drExpMod.className = 'drps-overlay';
@@ -2195,11 +2198,14 @@
           return '<button class="' + cls + '" data-dcol="' + c.id + '">' + c.label + '</button>';
         }).join('') +
         '<span style="width:1px;height:20px;background:rgba(148,163,200,.15);margin:0 4px;align-self:center;flex-shrink:0"></span>' +
-        '<button class="drps-col-chip' + (_drShowTotal ? ' drps-col-on' : '') + '" data-dtotal="1">Total Row</button>';
+        '<button class="drps-col-chip' + (_drShowTotal ? ' drps-col-on' : '') + '" data-dtotal="1">Total Row</button>' +
+        '<button class="drps-col-chip' + (_drShowRowNum ? ' drps-col-on' : '') + '" data-drownum="1">Row #</button>';
       bar.querySelectorAll('.drps-col-chip:not(.drps-col-pin)').forEach(function(btn){
         btn.addEventListener('click', function(){
           if (this.getAttribute('data-dtotal')) {
             _drShowTotal = !_drShowTotal; _renderDrColBar(); _renderDrPreviewTable();
+          } else if (this.getAttribute('data-drownum')) {
+            _drShowRowNum = !_drShowRowNum; _renderDrColBar(); _renderDrPreviewTable();
           } else {
             var cid = this.getAttribute('data-dcol');
             var col = _DR_COLS.find(function(c){ return c.id === cid; });
@@ -2218,23 +2224,29 @@
         document.getElementById('drExpFootInfo').textContent = '';
         return;
       }
-      var thead = '<thead><tr>' + vis.map(function(c){
-        var al = c.id==='date' ? 'left' : (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? 'right' : 'center';
-        return '<th class="drps-th" style="text-align:' + al + '">' + c.label + '</th>';
-      }).join('') + '</tr></thead>';
+      var thead = '<thead><tr>' +
+        (_drShowRowNum ? '<th class="drps-th" style="text-align:center;width:40px">#</th>' : '') +
+        vis.map(function(c){
+          var al = c.id==='date' ? 'left' : (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? 'right' : 'center';
+          return '<th class="drps-th" style="text-align:' + al + '">' + c.label + '</th>';
+        }).join('') + '</tr></thead>';
       var tbody = '<tbody>' + rows.map(function(row, i){
-        return '<tr>' + vis.map(function(c){
-          var val = _drCellVal(c, row);
-          var al  = c.id==='date' ? 'left' : (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? 'right' : 'center';
-          var xc  = (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? ' drps-td-revenue' : '';
-          return '<td class="drps-tbl-td' + xc + '" style="text-align:' + al + ';padding:8px 10px">' + val + '</td>';
-        }).join('') + '</tr>';
+        return '<tr>' +
+          (_drShowRowNum ? '<td class="drps-tbl-td" style="text-align:center;padding:8px 10px;color:var(--muted);font-size:12px">' + (i+1) + '</td>' : '') +
+          vis.map(function(c){
+            var val = _drCellVal(c, row);
+            var al  = c.id==='date' ? 'left' : (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? 'right' : 'center';
+            var xc  = (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? ' drps-td-revenue' : '';
+            return '<td class="drps-tbl-td' + xc + '" style="text-align:' + al + ';padding:8px 10px">' + val + '</td>';
+          }).join('') + '</tr>';
       }).join('') + '</tbody>';
-      var tfoot = '<tfoot><tr class="drps-tr-foot">' + vis.map(function(c){
-        var val = _drFootVal(c, rows);
-        var al  = c.id==='date' ? 'left' : (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? 'right' : 'center';
-        return '<td style="text-align:' + al + '">' + val + '</td>';
-      }).join('') + '</tr></tfoot>';
+      var tfoot = '<tfoot><tr class="drps-tr-foot">' +
+        (_drShowRowNum ? '<td style="text-align:center"></td>' : '') +
+        vis.map(function(c){
+          var val = _drFootVal(c, rows);
+          var al  = c.id==='date' ? 'left' : (c.id==='revenue'||c.id==='avgord'||c.id==='avgitem') ? 'right' : 'center';
+          return '<td style="text-align:' + al + '">' + val + '</td>';
+        }).join('') + '</tr></tfoot>';
       body.innerHTML = '<div class="drps-tbl-wrap"><table class="drps-tbl">' + thead + tbody + (_drShowTotal ? tfoot : '') + '</table></div>';
       var tO = rows.reduce(function(s,r){ return s+r.orders; },0);
       document.getElementById('drExpFootInfo').textContent = rows.length + ' ថ្ងៃ · ' + tO + ' orders';
@@ -2257,9 +2269,10 @@
       var vis  = _DR_COLS.filter(function(c){ return c.vis; });
       var CW   = { date:155, orders:95, items:95, revenue:120, avgord:120, avgitem:120 };
       var colW = vis.map(function(c){ return CW[c.id]||95; });
+      var rnW  = _drShowRowNum ? 46 : 0;
       var scale=3, padX=48, titleH=132, rowH=44, colH=50;
       var footRows = _drShowTotal ? 1 : 0;
-      var tableW = colW.reduce(function(s,w){ return s+w; },0);
+      var tableW = rnW + colW.reduce(function(s,w){ return s+w; },0);
       var W = padX*2 + tableW, H = titleH + colH + (rows.length + footRows)*rowH + 48;
       var canvas=document.createElement('canvas'); canvas.width=W*scale; canvas.height=H*scale;
       var ctx=canvas.getContext('2d');
@@ -2280,6 +2293,10 @@
       ctx.fillStyle='#4f46e5'; ctx.fillRect(padX,titleH,tableW,colH);
       ctx.fillStyle='#fff'; ctx.font='bold 14px system-ui,sans-serif';
       var x=padX;
+      if(_drShowRowNum){
+        var tw=ctx.measureText('#').width;
+        ctx.fillText('#',x+(rnW-tw)/2,titleH+colH/2+5); x+=rnW;
+      }
       vis.forEach(function(c,ci){
         var w=colW[ci];
         var al=c.id==='date'?'left':(c.id==='revenue'||c.id==='avgord'||c.id==='avgitem')?'right':'center';
@@ -2294,6 +2311,11 @@
         ctx.strokeStyle='#e5e7eb'; ctx.lineWidth=0.5;
         ctx.beginPath();ctx.moveTo(padX,y+rowH);ctx.lineTo(padX+tableW,y+rowH);ctx.stroke();
         var cy=y+rowH/2+5; x=padX;
+        if(_drShowRowNum){
+          ctx.fillStyle='#9ca3af'; ctx.font='12px system-ui,sans-serif';
+          var rn=String(i+1); var tw=ctx.measureText(rn).width;
+          ctx.fillText(rn,x+(rnW-tw)/2,cy); x+=rnW;
+        }
         vis.forEach(function(c,ci){
           var w=colW[ci]; var val=String(_drCellVal(c,row));
           var al=c.id==='date'?'left':(c.id==='revenue'||c.id==='avgord'||c.id==='avgitem')?'right':'center';
@@ -2312,6 +2334,7 @@
         ctx.strokeStyle='#6366f1'; ctx.lineWidth=1.5;
         ctx.beginPath();ctx.moveTo(padX,fy);ctx.lineTo(padX+tableW,fy);ctx.stroke();
         var fcy=fy+rowH/2+5; x=padX;
+        if(_drShowRowNum){ x+=rnW; }
         vis.forEach(function(c,ci){
           var w=colW[ci]; var val=String(_drFootVal(c,rows));
           var al=c.id==='date'?'left':(c.id==='revenue'||c.id==='avgord'||c.id==='avgitem')?'right':'center';
@@ -2339,14 +2362,17 @@
       var vis  = _DR_COLS.filter(function(c){ return c.vis; });
       var pageTxt = selectedPages.length ? selectedPages.join(', ') : 'All Pages';
       var dateTxt = dateFrom === dateTo ? fmtDate(dateFrom) : fmtDate(dateFrom) + ' → ' + fmtDate(dateTo);
-      var thHtml = vis.map(function(c){ return '<th>'+c.label+'</th>'; }).join('');
+      var thHtml = (_drShowRowNum ? '<th style="width:36px;text-align:center">#</th>' : '') +
+        vis.map(function(c){ return '<th>'+c.label+'</th>'; }).join('');
       var tbHtml = rows.map(function(row, i){
-        var tds = vis.map(function(c){ return '<td'+(c.id==='revenue'||c.id==='avgord'||c.id==='avgitem'?' class="rev"':'')+'>'+_drCellVal(c,row)+'</td>'; }).join('');
+        var tds = (_drShowRowNum ? '<td style="text-align:center;color:#9ca3af;font-size:11px">'+(i+1)+'</td>' : '') +
+          vis.map(function(c){ return '<td'+(c.id==='revenue'||c.id==='avgord'||c.id==='avgitem'?' class="rev"':'')+'>'+_drCellVal(c,row)+'</td>'; }).join('');
         return '<tr style="background:'+(i%2===0?'#fff':'#f9fafb')+'">'+tds+'</tr>';
       }).join('');
       var footHtml = '';
       if (_drShowTotal) {
-        var tds = vis.map(function(c){ return '<td class="foot">'+_drFootVal(c,rows)+'</td>'; }).join('');
+        var tds = (_drShowRowNum ? '<td class="foot"></td>' : '') +
+          vis.map(function(c){ return '<td class="foot">'+_drFootVal(c,rows)+'</td>'; }).join('');
         footHtml = '<tfoot><tr>'+tds+'</tr></tfoot>';
       }
       var ed=(function(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();})();
