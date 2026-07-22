@@ -2089,6 +2089,21 @@ input::placeholder, textarea::placeholder {
   grid-template-columns: 1fr 460px;
   gap: 14px;
   margin-bottom: 16px;
+  align-items: start;
+}
+/* Top Customers in stock-pages-row — height synced via JS */
+.stock-pages-row #topCustomersCard {
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+.stock-pages-row #topCustomersCard .tc-list {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(148,163,184,.2) transparent !important;
 }
 @media (max-width: 1300px) {
   .stock-pages-row { grid-template-columns: 1fr 380px !important; }

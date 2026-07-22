@@ -120,11 +120,22 @@ function render(orders) {
   }).join('');
 }
 
+function syncTCHeight() {
+  var so = document.querySelector('.stock-pages-row > .glass-card:first-child');
+  var tc = document.getElementById('topCustomersCard');
+  if (!so || !tc) return;
+  var h = so.offsetHeight;
+  if (!h) return;
+  tc.style.setProperty('height', h + 'px', 'important');
+  tc.style.setProperty('max-height', h + 'px', 'important');
+}
+
 async function init() {
   const el = document.getElementById('tcList');
   if (el) el.innerHTML = '<div class="tc-loading">Loading...</div>';
   const orders = await fetchOrders();
   render(orders);
+  setTimeout(syncTCHeight, 150);
 }
 
 window.addEventListener('cambo-global-date', e => {
@@ -138,7 +149,11 @@ window.addEventListener('cambo-orders-updated', async () => {
   _cachedOrders = null;
   const fresh = await fetchOrders();
   render(fresh);
+  setTimeout(syncTCHeight, 150);
 });
+
+window.addEventListener('resize', syncTCHeight);
+window.addEventListener('cambo-stock-rendered', function() { requestAnimationFrame(syncTCHeight); });
 
 document.addEventListener('DOMContentLoaded', init);
 

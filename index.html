@@ -280,16 +280,18 @@
                     </div>
                 </div>
 
-                <!-- Activity Feed -->
-                <div class="glass-card activity-card" id="topCustomersCard">
-                    <div class="card-header">
+                <!-- Orders by Pages donut chart -->
+                <div class="glass-card activity-card" style="display:flex;flex-direction:column;min-height:260px">
+                    <div class="card-header" style="flex-shrink:0">
                         <div>
-                            <h2 class="card-title">Top Customers</h2>
-                            <p class="card-subtitle">អតិថិជនទិញច្រើនជាងគេ</p>
+                            <h2 class="card-title">Orders by Pages</h2>
+                            <p class="card-subtitle">ការបញ្ជាទិញតាម Pages</p>
                         </div>
+                        <span id="pagesTotalBadge" style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(124,92,255,.12);color:#7c5cff;font-weight:700"></span>
                     </div>
-                    <div class="tc-list" id="tcList">
-                        <div class="tc-loading">Loading...</div>
+                    <div id="pagesPieWrap" style="flex:1;display:flex;align-items:center;gap:16px;padding:8px 0 4px">
+                        <svg id="pagesPieSvg" width="150" height="150" viewBox="0 0 160 160" style="flex-shrink:0"></svg>
+                        <div id="pagesPieLegend" style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;overflow:hidden"></div>
                     </div>
                 </div>
 
@@ -369,7 +371,7 @@
                 </div>
             </section>
 
-            <!-- Row 3: Stock Overview + Pages Chart -->
+            <!-- Row 3: Stock Overview + Top Customers -->
             <section class="stock-pages-row">
                 <!-- Left: Stock Overview -->
                 <div class="glass-card">
@@ -379,24 +381,23 @@
                             <p class="card-subtitle">ស្ថានភាពស្តុកផលិតផល</p>
                         </div>
                         <div class="card-actions" style="display:flex;align-items:center;gap:8px">
-                            <div id="stockSummaryBadges" style="display:flex;gap:6px"></div>
                             <a href="pages/stock.html" class="card-btn">View Stock</a>
                         </div>
                     </div>
-                    <div id="stockOverviewList" class="tx-stroke-list" style="max-height:320px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,.2) transparent"></div>
+                    <!-- Stock Donut Chart -->
+                    <div id="stockDonutWrap" style="display:flex;align-items:center;gap:18px;padding:10px 4px 14px"></div>
+                    <div id="stockOverviewList" class="tx-stroke-list" style="max-height:230px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(148,163,184,.2) transparent"></div>
                 </div>
-                <!-- Right: Orders by Pages donut chart -->
-                <div class="glass-card" style="display:flex;flex-direction:column;min-height:260px">
-                    <div class="card-header" style="flex-shrink:0">
+                <!-- Right: Top Customers -->
+                <div class="glass-card activity-card" id="topCustomersCard" style="display:flex;flex-direction:column">
+                    <div class="card-header">
                         <div>
-                            <h2 class="card-title">Orders by Pages</h2>
-                            <p class="card-subtitle">ការបញ្ជាទិញតាម Pages</p>
+                            <h2 class="card-title">Top Customers</h2>
+                            <p class="card-subtitle">អតិថិជនទិញច្រើនជាងគេ</p>
                         </div>
-                        <span id="pagesTotalBadge" style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(124,92,255,.12);color:#7c5cff;font-weight:700"></span>
                     </div>
-                    <div id="pagesPieWrap" style="flex:1;display:flex;align-items:center;gap:16px;padding:8px 0 4px">
-                        <svg id="pagesPieSvg" width="150" height="150" viewBox="0 0 160 160" style="flex-shrink:0"></svg>
-                        <div id="pagesPieLegend" style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;overflow:hidden"></div>
+                    <div class="tc-list" id="tcList" style="flex:1;overflow-y:auto">
+                        <div class="tc-loading">Loading...</div>
                     </div>
                 </div>
             </section>
@@ -553,69 +554,162 @@
   }
   function catInitial(cat){ return (cat||'?')[0]; }
 
-  function renderStockOverview(){
-    var el  = document.getElementById('stockOverviewList');
-    var sum = document.getElementById('stockSummaryBadges');
-    if(!el) return;
+  /* inject keyframe once */
+  (function(){
+    if(document.getElementById('stk-kf-style')) return;
+    var s = document.createElement('style'); s.id = 'stk-kf-style';
+    s.textContent = '@keyframes stk-in{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}';
+    document.head.appendChild(s);
+  })();
 
+  var _stkFilter = 'all';
+
+  function _renderStockList() {
+    var el = document.getElementById('stockOverviewList');
+    if(!el) return;
     var items = getStock();
 
-    /* Summary badges */
-    var nOk  = items.filter(function(p){return getStatus(p)==='ok';}).length;
-    var nLow = items.filter(function(p){return getStatus(p)==='low';}).length;
-    var nOut = items.filter(function(p){return getStatus(p)==='out';}).length;
-
-    if(sum){
-      sum.innerHTML =
-        '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(16,185,129,.15);color:#10b981;font-weight:600">✓ '+nOk+' In Stock</span>' +
-        (nLow?'<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(245,158,11,.15);color:#f59e0b;font-weight:600">⚠ '+nLow+' Low</span>':'') +
-        (nOut?'<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(239,68,68,.15);color:#ef4444;font-weight:600">✕ '+nOut+' Out</span>':'');
-    }
-
-    /* Sort: out → low → ok */
-    var sorted = items.slice().sort(function(a,b){
-      var order = {out:0, low:1, ok:2};
-      return order[getStatus(a)] - order[getStatus(b)];
+    var filtered = items.filter(function(p){
+      if(_stkFilter==='ok')  return getStatus(p)==='ok';
+      if(_stkFilter==='low') return getStatus(p)==='low';
+      if(_stkFilter==='out') return getStatus(p)==='out';
+      return true;
+    }).sort(function(a,b){
+      var ord={out:0,low:1,ok:2};
+      return ord[getStatus(a)]-ord[getStatus(b)];
     });
 
-    var html = sorted.map(function(p){
+    if(!filtered.length){
+      el.innerHTML='<div style="text-align:center;padding:28px 16px;color:var(--muted);font-size:13px">គ្មានផលិតផល</div>';
+      return;
+    }
+
+    el.innerHTML = filtered.map(function(p){
       var st  = getStatus(p);
       var box = p.box !== undefined ? p.box : (p.qty||0);
       var pct = Math.min(box * 10, 100);
-
-      /* Status colors */
-      var stBg    = st==='ok'?'rgba(16,185,129,.15)':st==='low'?'rgba(245,158,11,.15)':'rgba(239,68,68,.15)';
-      var stColor = st==='ok'?'#10b981':st==='low'?'#f59e0b':'#ef4444';
-      var stLabel = st==='ok'?'In Stock':st==='low'?'Low Stock':'Out of Stock';
-      var barColor= st==='ok'?'#10b981':st==='low'?'#f59e0b':'#ef4444';
-
-      /* Left border accent */
-      var borderLeft = st==='ok'?'3px solid #10b981':st==='low'?'3px solid #f59e0b':'3px solid #ef4444';
-
-      return '<a class="tx-stroke-item" href="pages/stock.html" style="border-left:'+borderLeft+';border-radius:0 10px 10px 0;gap:10px;padding:10px 12px;align-items:center">'
-        // Avatar
-        +'<div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;'+catStyle(p.cat)+'">'+catInitial(p.cat)+'</div>'
-        // Info block
+      var stBg  = st==='ok'?'rgba(16,185,129,.14)':st==='low'?'rgba(245,158,11,.14)':'rgba(239,68,68,.14)';
+      var stCol = st==='ok'?'#10b981':st==='low'?'#f59e0b':'#ef4444';
+      var stLbl = st==='ok'?'In Stock':st==='low'?'Low Stock':'Out of Stock';
+      var stIcon= st==='ok'?'✓':st==='low'?'⚠':'✕';
+      return '<a class="stk-item" href="pages/stock.html" style="'
+        +'display:flex;align-items:center;gap:10px;padding:9px 12px 9px 10px;'
+        +'border-radius:10px;text-decoration:none;margin-bottom:5px;'
+        +'border-left:3px solid '+stCol+';'
+        +'background:rgba(148,163,184,.05);'
+        +'transition:background .15s,transform .15s;cursor:pointer"'
+        +' onmouseover="this.style.background=\'rgba(148,163,184,.1)\';this.style.transform=\'translateX(2px)\'"'
+        +' onmouseout="this.style.background=\'rgba(148,163,184,.05)\';this.style.transform=\'\'">'
+        // avatar
+        +'<div style="width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;'+catStyle(p.cat)+'">'+catInitial(p.cat)+'</div>'
+        // info
         +'<div style="flex:1;min-width:0">'
-        //   Row 1: name + category pill
-        +  '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px">'
-        +    '<span style="font-size:12px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">'+p.name+'</span>'
-        +    '<span style="font-size:10px;padding:1px 7px;border-radius:8px;'+catStyle(p.cat)+';font-weight:700;flex-shrink:0;white-space:nowrap">'+p.cat+'</span>'
+        +  '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px">'
+        +    '<span style="font-size:12px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+p.name+'</span>'
+        +    '<span style="font-size:10px;padding:1px 7px;border-radius:6px;'+catStyle(p.cat)+';font-weight:700;flex-shrink:0">'+p.cat+'</span>'
         +  '</div>'
-        //   Row 2: bar + box count + status pill
-        +  '<div style="display:flex;align-items:center;gap:7px">'
-        +    '<div style="flex:1;height:5px;border-radius:3px;background:rgba(148,163,184,.18);overflow:hidden">'
-        +      '<div style="height:100%;width:'+pct+'%;border-radius:3px;background:'+barColor+'"></div>'
+        +  '<div style="display:flex;align-items:center;gap:6px">'
+        +    '<div style="flex:1;height:4px;border-radius:2px;background:rgba(148,163,184,.18);overflow:hidden">'
+        +      '<div style="height:100%;width:'+pct+'%;border-radius:2px;background:'+stCol+';transition:width .4s"></div>'
         +    '</div>'
-        +    '<span style="font-size:10px;color:var(--muted);flex-shrink:0;white-space:nowrap">Box: '+box+'</span>'
-        +    '<span style="font-size:10px;padding:1px 7px;border-radius:8px;background:'+stBg+';color:'+stColor+';font-weight:700;flex-shrink:0;white-space:nowrap">'+stLabel+'</span>'
+        +    '<span style="font-size:10px;color:var(--muted);flex-shrink:0;white-space:nowrap">'+box+' Box</span>'
         +  '</div>'
         +'</div>'
+        // status badge
+        +'<span style="font-size:10px;padding:3px 8px;border-radius:20px;background:'+stBg+';color:'+stCol+';font-weight:700;flex-shrink:0;white-space:nowrap">'+stIcon+' '+stLbl+'</span>'
         +'</a>';
-    }).join('');
+    }).join('')
+    + '<div style="padding:8px 0 2px;text-align:center"><a href="pages/stock.html" style="font-size:11px;color:var(--muted);text-decoration:none;opacity:.7">មើល Stock ទាំងអស់ →</a></div>';
 
-    html += '<div class="tx-stroke-footer" style="grid-column:1/-1"><a href="pages/stock.html">មើល Stock ទាំងអស់ →</a></div>';
-    el.innerHTML = html;
+    /* stagger animation */
+    var rows = el.querySelectorAll('.stk-item');
+    var cap  = rows.length > 1 ? Math.min(0.05, 0.45/(rows.length-1)) : 0;
+    rows.forEach(function(r,i){
+      r.style.animation = 'stk-in .25s ease-out '+(i*cap).toFixed(3)+'s both';
+    });
+  }
+
+
+  function renderStockOverview(){
+    var items  = getStock();
+    var nOk    = items.filter(function(p){return getStatus(p)==='ok';}).length;
+    var nLow   = items.filter(function(p){return getStatus(p)==='low';}).length;
+    var nOut   = items.filter(function(p){return getStatus(p)==='out';}).length;
+    var nTotal = nOk + nLow + nOut;
+
+    /* ── Donut + Filter ── */
+    var dw = document.getElementById('stockDonutWrap');
+    if(dw && nTotal > 0){
+      var R=40, C=54, CIRC=2*Math.PI*R;
+      var pOk=nOk/nTotal, pLow=nLow/nTotal, pOut=nOut/nTotal;
+      var dOk=pOk*CIRC, dLow=pLow*CIRC, dOut=pOut*CIRC;
+
+      function seg(col,dash,off){
+        return '<circle cx="'+C+'" cy="'+C+'" r="'+R+'" fill="none" stroke="'+col+'" stroke-width="15"'
+          +' stroke-dasharray="'+(dash>0?dash.toFixed(1):0)+' '+CIRC.toFixed(1)+'"'
+          +' stroke-dashoffset="'+(-off).toFixed(1)+'"'
+          +' transform="rotate(-90 '+C+' '+C+')" stroke-linecap="butt"/>';
+      }
+
+      var bigPct = nOk>=nLow&&nOk>=nOut?Math.round(pOk*100):nLow>=nOut?Math.round(pLow*100):Math.round(pOut*100);
+      var bigCol = nOk>=nLow&&nOk>=nOut?'#10b981':nLow>=nOut?'#f59e0b':'#ef4444';
+
+      var svg = '<svg width="108" height="108" viewBox="0 0 108 108" style="flex-shrink:0">'
+        +'<circle cx="'+C+'" cy="'+C+'" r="'+R+'" fill="none" stroke="rgba(148,163,184,.12)" stroke-width="15"/>'
+        +(dOk>0?seg('#10b981',dOk,0):'')
+        +(dLow>0?seg('#f59e0b',dLow,dOk):'')
+        +(dOut>0?seg('#ef4444',dOut,dOk+dLow):'')
+        +'<text x="'+C+'" y="'+(C-4)+'" text-anchor="middle" font-size="18" font-weight="800" fill="'+bigCol+'">'+bigPct+'%</text>'
+        +'<text x="'+C+'" y="'+(C+12)+'" text-anchor="middle" font-size="9" fill="#64748b">'+nTotal+' items</text>'
+        +'</svg>';
+
+      function filBtn(f, icon, lbl, n, col, bg){
+        var on = _stkFilter===f;
+        return '<button class="stk-fil-btn" data-f="'+f+'" style="'
+          +'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;'
+          +'border-radius:20px;border:1.5px solid '+(on?col:'rgba(148,163,184,.2)')+';'
+          +'background:'+(on?bg:'transparent')+';color:'+(on?col:'var(--muted)')+';'
+          +'font-size:11px;font-weight:'+(on?'700':'500')+';cursor:pointer;'
+          +'font-family:inherit;transition:.15s;white-space:nowrap">'
+          +icon+' '+lbl+'<span style="font-weight:800;margin-left:3px">('+n+')</span></button>';
+      }
+
+      function legRow(col, lbl, n, pct){
+        return '<div style="display:flex;align-items:center;gap:7px;padding:4px 0">'
+          +'<div style="width:9px;height:9px;border-radius:50%;background:'+col+';flex-shrink:0"></div>'
+          +'<span style="font-size:11px;color:var(--text);flex:1">'+lbl+'</span>'
+          +'<span style="font-size:12px;font-weight:800;color:'+col+'">'+n+'</span>'
+          +'<span style="font-size:10px;color:var(--muted);min-width:30px;text-align:right">'+Math.round(pct*100)+'%</span>'
+          +'</div>';
+      }
+
+      var right = '<div style="flex:1;display:flex;flex-direction:column;gap:8px;min-width:0">'
+        // filter pill buttons
+        +'<div style="display:flex;flex-wrap:wrap;gap:5px">'
+        + filBtn('all','','All', nTotal,'#7c5cff','rgba(124,92,255,.12)')
+        + filBtn('ok','✓','In Stock', nOk,'#10b981','rgba(16,185,129,.12)')
+        +(nLow?filBtn('low','⚠','Low', nLow,'#f59e0b','rgba(245,158,11,.12)'):'')
+        +(nOut?filBtn('out','✕','Out', nOut,'#ef4444','rgba(239,68,68,.12)'):'')
+        +'</div>'
+        // legend
+        +'<div style="border-top:1px solid rgba(148,163,184,.12);padding-top:6px">'
+        +(nOk  ? legRow('#10b981','In Stock',nOk,pOk) :'')
+        +(nLow  ? legRow('#f59e0b','Low Stock',nLow,pLow):'')
+        +(nOut  ? legRow('#ef4444','Out of Stock',nOut,pOut):'')
+        +'</div></div>';
+
+      dw.innerHTML = '<div style="display:flex;align-items:center;gap:14px;width:100%">'+svg+right+'</div>';
+
+      dw.querySelectorAll('.stk-fil-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          _stkFilter = this.getAttribute('data-f');
+          renderStockOverview();
+        });
+      });
+    }
+
+    _renderStockList();
+    setTimeout(function(){ window.dispatchEvent(new Event('cambo-stock-rendered')); }, 100);
   }
 
   window._camboGetStock = getStock;
