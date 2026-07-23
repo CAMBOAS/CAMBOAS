@@ -228,6 +228,26 @@
     if (sidebar) sidebar.innerHTML = buildSidebar();
     if (header)  header.innerHTML  = buildTopbar();
 
+    /* Sidebar nav items stagger animation — random style each page load */
+    if (sidebar) {
+      var _sbStyles = [
+        { kf:'sb-slide-in',  dur:.28, ease:'ease-out' },
+        { kf:'sb-fade-up',   dur:.30, ease:'ease-out' },
+        { kf:'sb-pop',       dur:.32, ease:'cubic-bezier(.34,1.56,.64,1)' },
+        { kf:'sb-flip-in',   dur:.30, ease:'ease-out' },
+        { kf:'sb-drop-down', dur:.28, ease:'ease-out' },
+        { kf:'sb-blur-in',   dur:.32, ease:'ease-in-out' },
+      ];
+      var _ss    = _sbStyles[Math.floor(Math.random() * _sbStyles.length)];
+      var items  = sidebar.querySelectorAll('.sb-list li');
+      var base   = 60;
+      var stagger = items.length > 1 ? Math.min(40, 400 / (items.length - 1)) : 0;
+      items.forEach(function(li, i) {
+        li.classList.add('sb-nav-item-anim');
+        li.style.animation = _ss.kf + ' ' + _ss.dur + 's ' + _ss.ease + ' ' + (base + i * stagger) + 'ms forwards';
+      });
+    }
+
     /* Active link highlight */
     const cur = getCurrentPage();
     document.querySelectorAll('.sb-link').forEach(a => {

@@ -214,6 +214,15 @@ option { background:#0f172a; color:#e5eefc; }
 .sb-divider-sm { margin-top: 8px; margin-bottom: 10px; }
 
 /* ── Nav ── */
+/* ── Sidebar nav item stagger entrance — 6 random styles ── */
+@keyframes sb-slide-in  { from{opacity:0;transform:translateX(-18px)} to{opacity:1;transform:translateX(0)} }
+@keyframes sb-fade-up   { from{opacity:0;transform:translateY(14px)}  to{opacity:1;transform:translateY(0)} }
+@keyframes sb-pop       { from{opacity:0;transform:scale(.6)}          to{opacity:1;transform:scale(1)} }
+@keyframes sb-flip-in   { from{opacity:0;transform:rotateX(-70deg);transform-origin:top} to{opacity:1;transform:rotateX(0);transform-origin:top} }
+@keyframes sb-drop-down { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes sb-blur-in   { from{opacity:0;filter:blur(6px)}            to{opacity:1;filter:blur(0)} }
+.sb-nav-item-anim { opacity:0; animation-fill-mode:forwards; }
+
 .sb-nav { padding: 0 10px; flex-shrink: 0; }
 .sb-section-label {
   font-size: 10px; font-weight: 800;
