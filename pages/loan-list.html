@@ -197,6 +197,8 @@
     @keyframes leg-bounce   { 0%{transform:translateY(10px) scale(.9);opacity:0} 60%{transform:translateY(-4px) scale(1.04)} 100%{transform:translateY(0) scale(1);opacity:1} }
     @keyframes leg-fade     { from{opacity:0} to{opacity:1} }
     @keyframes pie-text-in  { from{opacity:0;transform:scale(.4)} to{opacity:1;transform:scale(1)} }
+    @keyframes lr-spin-cw  { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    @keyframes lr-spin-ccw { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
     .lr-btn-filter { background:rgba(124,92,255,.1); color:#a78bfa; border:1px solid rgba(124,92,255,.25); padding:8px 10px; position:relative }
     .lr-btn-filter:hover { background:rgba(124,92,255,.2) }
     .lr-btn-filter.lr-filter-on { background:rgba(124,92,255,.18); border-color:rgba(124,92,255,.5); color:#c4b5fd }
@@ -992,7 +994,10 @@ function renderStatusDonut() {
   var off  = 0;
   var top  = entries[0];
   var topPct = Math.round(top.count/total*100);
-  var parts = ['<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.08)" stroke-width="24"/>'];
+
+  /* Ring segments wrapped in <g> for independent spin */
+  var parts = ['<g id="lrStatusRing" style="transform-origin:80px 80px">',
+    '<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.08)" stroke-width="24"/>'];
 
   entries.forEach(function(e){
     var dash  = (e.count/total)*circ;
@@ -1006,11 +1011,20 @@ function renderStatusDonut() {
       +' style="transform-origin:center;transition:stroke-dashoffset .5s,stroke-width .2s"/>');
     off += dash;
   });
+  parts.push('</g>');
+
+  /* Center text stays outside group (doesn't rotate) */
   parts.push(
     '<text x="80" y="74" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text,#18213a)">'+topPct+'%</text>',
     '<text x="80" y="91" text-anchor="middle" font-size="9" font-weight="700" fill="#94a3b8">'+top.name+'</text>'
   );
   svg.innerHTML = parts.join('');
+
+  /* Random slow spin — direction & speed change each render */
+  var _spinDir = Math.random() > 0.5 ? 'lr-spin-cw' : 'lr-spin-ccw';
+  var _spinDur = (10 + Math.random() * 14).toFixed(1); /* 10–24s per rotation */
+  var ring = document.getElementById('lrStatusRing');
+  if (ring) ring.style.animation = _spinDir + ' ' + _spinDur + 's linear infinite';
 
   var GCOLS = '8px 1fr 26px 30px';
   var ROW = 'display:grid;align-items:center;column-gap:4px;grid-template-columns:'+GCOLS;

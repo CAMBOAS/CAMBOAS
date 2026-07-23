@@ -118,6 +118,8 @@
 @keyframes leg-bounce   { 0%{transform:translateY(10px) scale(.9);opacity:0} 60%{transform:translateY(-4px) scale(1.04)} 100%{transform:translateY(0) scale(1);opacity:1} }
 @keyframes leg-fade     { from{opacity:0} to{opacity:1} }
 @keyframes pie-text-in  { from{opacity:0;transform:scale(.4)} to{opacity:1;transform:scale(1)} }
+@keyframes sr-spin-cw  { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes sr-spin-ccw { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
 /* ── Export dropdown ── */
 .dash-export-panel{position:fixed;z-index:9999;background:rgba(15,23,42,.97);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:8px;min-width:200px;box-shadow:0 8px 36px rgba(0,0,0,.35);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
 [data-theme="light"] .dash-export-panel{background:rgba(255,255,255,.98);border-color:rgba(0,0,0,.12);box-shadow:0 8px 36px rgba(0,0,0,.15)}
@@ -811,9 +813,12 @@
     /* Build SVG donut */
     var circumference = 2 * Math.PI * 55;
     var offset = 0;
-    var svgParts = ['<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.1)" stroke-width="22"/>'];
     var topEntry = entries[0];
     var topPct   = Math.round(topEntry.count / total * 100);
+
+    /* Ring segments wrapped in <g> for independent spin */
+    var svgParts = ['<g id="dbPieRing" style="transform-origin:80px 80px">',
+      '<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.1)" stroke-width="22"/>'];
 
     entries.forEach(function(e, i){
       var dash  = (e.count / total) * circumference;
@@ -830,12 +835,21 @@
       );
       offset += dash;
     });
+    svgParts.push('</g>');
+
+    /* Center text stays outside group (doesn't rotate) */
     svgParts.push(
       '<text x="80" y="75" text-anchor="middle" font-size="20" font-weight="800" fill="var(--text,#18213a)">'+topPct+'%</text>',
       '<text x="80" y="94" text-anchor="middle" font-size="9" font-weight="700" fill="#94a3b8" letter-spacing="0.04em">'+
         (topEntry.name.length > 12 ? topEntry.name.slice(0,11)+'…' : topEntry.name)+'</text>'
     );
     svg.innerHTML = svgParts.join('');
+
+    /* Random slow spin — direction & speed change each render */
+    var _spinDir = Math.random() > 0.5 ? 'sr-spin-cw' : 'sr-spin-ccw';
+    var _spinDur = (10 + Math.random() * 14).toFixed(1); /* 10–24s per rotation */
+    var ring = document.getElementById('dbPieRing');
+    if (ring) ring.style.animation = _spinDir + ' ' + _spinDur + 's linear infinite';
 
     /* Legend — aligned grid: dot | name | % | QTY | Revenue */
     var GCOLS = '9px 1fr 26px 28px 54px';

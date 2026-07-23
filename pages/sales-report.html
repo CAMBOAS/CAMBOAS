@@ -604,6 +604,9 @@
   @keyframes leg-bounce   { 0%{transform:translateY(10px) scale(.9);opacity:0} 60%{transform:translateY(-4px) scale(1.04)} 100%{transform:translateY(0) scale(1);opacity:1} }
   @keyframes leg-fade     { from{opacity:0} to{opacity:1} }
   @keyframes pie-text-in  { from{opacity:0;transform:scale(.4)} to{opacity:1;transform:scale(1)} }
+  /* ── Donut slow random spin ── */
+  @keyframes sr-spin-cw  { from{transform:rotate(0deg)}   to{transform:rotate(360deg)}  }
+  @keyframes sr-spin-ccw { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
   </style>
 </head>
 <body>
@@ -1401,26 +1404,38 @@
     var offset = 0;
     var topEntry = entries[0];
     var topPct   = Math.round(topEntry.count / total * 100);
-    var parts = ['<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.1)" stroke-width="22"/>'];
+
+    /* Ring segments wrapped in <g> for independent spin */
+    var rings = ['<g id="srPieRing" style="transform-origin:80px 80px">',
+      '<circle cx="80" cy="80" r="55" fill="none" stroke="rgba(148,163,184,.1)" stroke-width="22"/>'];
 
     entries.forEach(function(e, i){
       var dash  = (e.count / total) * circumference;
       var gap   = circumference - dash;
       var color = SR_PIE_COLORS[i % SR_PIE_COLORS.length];
       var sdo   = circumference - offset - circumference * 0.25;
-      parts.push('<circle cx="80" cy="80" r="55" fill="none"'
+      rings.push('<circle cx="80" cy="80" r="55" fill="none"'
         + ' stroke="' + color + '" stroke-width="22"'
         + ' stroke-dasharray="' + dash.toFixed(2) + ' ' + gap.toFixed(2) + '"'
         + ' stroke-dashoffset="' + sdo.toFixed(2) + '"'
         + ' style="transform-origin:center;transition:stroke-dashoffset .4s"/>');
       offset += dash;
     });
-    parts.push(
+    rings.push('</g>');
+
+    /* Center text stays outside group (doesn't rotate) */
+    var parts = rings.concat([
       '<text x="80" y="75" text-anchor="middle" font-size="20" font-weight="800" fill="var(--text,#18213a)">' + topPct + '%</text>',
       '<text x="80" y="94" text-anchor="middle" font-size="9" font-weight="700" fill="#94a3b8" letter-spacing="0.04em">'
         + (topEntry.name.length > 12 ? topEntry.name.slice(0,11) + '…' : topEntry.name) + '</text>'
-    );
+    ]);
     svg.innerHTML = parts.join('');
+
+    /* Random slow spin — direction & speed change each render */
+    var _spinDir = Math.random() > 0.5 ? 'sr-spin-cw' : 'sr-spin-ccw';
+    var _spinDur = (10 + Math.random() * 14).toFixed(1); /* 10–24s per rotation */
+    var ring = document.getElementById('srPieRing');
+    if (ring) ring.style.animation = _spinDir + ' ' + _spinDur + 's linear infinite';
 
     /* Make SVG segments clickable */
     var svgCircles = svg.querySelectorAll('circle');
