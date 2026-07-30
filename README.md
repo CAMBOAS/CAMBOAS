@@ -5,11 +5,9 @@ A Creative Digital Media Specialist, Graphic Designer & Photographer focusing on
 ---
 
 ### 👨‍💻 About Me
-- 🎨 **Graphic Design (Core):** Professional in visual art, branding, poster design, and marketing collaterals.
-- 📸 **Photography & Videography (Core):** Professional in shooting high-quality photos and cinematic videos.
-- 🎬 **Video Editing & Post-Production (Core):** Experienced in advanced photo retouching, motion graphics, and high-quality video editing.
-- 🚀 **Digital Marketing:** Proficient in managing and optimizing Facebook Ads (Boost & Campaign Management) for e-commerce growth.
-- 💻 **Basic Web Development:** Secondary skill with basic knowledge of HTML, CSS, and JavaScript from past learning, applied for light tools and system integration (Google Sheets API).
+- 🎨 **Visual Media & Design (Core):** Specialized in graphic design, high-quality photography, videography, photo retouching, and video post-production.
+- 🚀 **Digital Marketing:** Proficient in managing and optimizing Facebook Ads campaigns for business growth.
+- 💻 **Basic Web Development:** Secondary skill in HTML/CSS/JS for building lightweight tools & POS systems.
 
 ---
 
@@ -19,7 +17,7 @@ A Creative Digital Media Specialist, Graphic Designer & Photographer focusing on
 `Photoshop` `Lightroom` `Illustrator` `InDesign`
 
 #### 🎬 Video & Motion Graphics
-`Premiere Pro` `After Effects`
+`CapCut`​ `Premiere Pro` `After Effects`
 
 #### 📈 Marketing & Business Tools
 `Facebook Ads Manager` `POS Systems`
