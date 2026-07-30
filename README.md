@@ -1,35 +1,35 @@
 # 👋 Hi, I'm ART SEREYROB!
 
-A Web Developer, Digital Media Specialist & Graphic Designer passionate about building custom web solutions, creating high-quality visual content, and managing digital marketing campaigns.
+A Creative Digital Media Specialist & Graphic Designer focusing on visual art, 3D digital fashion, video production, and digital marketing.
 
 ---
 
 ### 👨‍💻 About Me
-- 🎨 **Graphic & Digital Fashion Design:** Professional in visual art, branding, poster design, and 3D digital fashion modeling.
-- 🎬 **Video & Media Production:** Experienced in photo editing, motion graphics, and professional video editing.
-- 💻 **Web Development:** Skilled in building web tools & dashboards using HTML5, CSS3, Vanilla JavaScript, and Google Sheets API integration.
+- 🎨 **Graphic & Digital Fashion Design (Core):** Professional in visual art, branding, poster design, and 3D digital fashion modeling.
+- 🎬 **Video & Media Production (Core):** Experienced in photo editing, motion graphics, and high-quality video production.
 - 🚀 **Digital Marketing:** Proficient in managing and optimizing Facebook Ads (Boost & Campaign Management) for e-commerce growth.
+- 💻 **Basic Web Development:** Secondary skill with basic knowledge of HTML, CSS, and JavaScript from past learning, applied for light tools and system integration (Google Sheets API).
 
 ---
 
 ### 🛠️ Tech Stack & Creative Tools
 
-#### 🎨 Design, 3D & Digital Fashion
+#### 🎨 Creative, 3D & Digital Fashion (Primary Skills)
 `Photoshop` `Illustrator` `InDesign` `CLO 3D` `Cinema 4D` `Substance 3D`
 
-#### 🎬 Video Production & Motion Graphics
+#### 🎬 Video & Motion Graphics
 `Premiere Pro` `After Effects`
 
 #### 📈 Marketing & Business Tools
 `Facebook Ads Manager` `POS Systems`
 
-#### 💻 Programming & Web
-`HTML5` `CSS3` `JavaScript (ES6+)` `Google Sheets API` `Telegram API`
+#### 💻 Basic Web & Tools (Secondary Knowledge)
+`HTML5` `CSS3` `JavaScript (Basic)` `Google Sheets API`
 
 ---
 
-### 📦 Featured Projects
-- **CAMBO MINI / CAMBOAS:** Lightweight POS & seller dashboard system designed for online business management.
+### 📦 Personal Projects
+- **CAMBO MINI / CAMBOAS:** Lightweight POS & seller dashboard experiment built for online business management.
 
 ---
 
