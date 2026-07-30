@@ -1,31 +1,43 @@
-# 👋 Hi, I'm CAMBOAS!
+# 👋 Hi, I'm ART SEREYROB!
 
-A Web Developer & Digital Media Specialist focused on building lightweight POS tools, custom web applications, and managing e-commerce solutions.
+A Web Developer, Digital Media Specialist & Graphic Designer passionate about building custom web solutions, creating high-quality visual content, and managing digital marketing campaigns.
 
 ---
 
 ### 👨‍💻 About Me
-- 💻 **Web Development:** Experienced in HTML5, CSS3, Vanilla JavaScript, and API integrations (Google Sheets & Telegram APIs).
-- 🎨 **Media & Design:** Professional in Graphic Design, Photo Editing, and Video Production.
-- 📦 **Featured Projects:** Developing **CAMBO MINI** and **CAMBOAS** — lightweight POS & dashboard systems designed for online seller management.
-- 🛍️ **E-Commerce:** Managing online distribution systems and digital marketing campaigns.
+- 🎨 **Graphic & Digital Fashion Design:** Professional in visual art, branding, poster design, and 3D digital fashion modeling.
+- 🎬 **Video & Media Production:** Experienced in photo editing, motion graphics, and professional video editing.
+- 💻 **Web Development:** Skilled in building web tools & dashboards using HTML5, CSS3, Vanilla JavaScript, and Google Sheets API integration.
+- 🚀 **Digital Marketing:** Proficient in managing and optimizing Facebook Ads (Boost & Campaign Management) for e-commerce growth.
 
 ---
 
-### 🛠️ Tech Stack & Tools
-- **Languages:** HTML5 / CSS3 / JavaScript (ES6+)
-- **Tools & Software:** Adobe Photoshop / Premiere Pro / Illustrator
-- **Integrations:** Google Sheets API / Telegram Bot API / POS Thermal Printing
-- **Platform Management:** Facebook Ads / TikTok Ads
+### 🛠️ Tech Stack & Creative Tools
+
+#### 💻 Programming & Web
+`HTML5` `CSS3` `JavaScript (ES6+)` `Google Sheets API` `Telegram API`
+
+#### 🎨 Design, 3D & Digital Fashion
+`Photoshop` `Illustrator` `InDesign` `CLO 3D` `Cinema 4D` `Substance 3D`
+
+#### 🎬 Video Production & Motion Graphics
+`Premiere Pro` `After Effects`
+
+#### 📈 Marketing & Business Tools
+`Facebook Ads Manager` `POS Systems`
+
+---
+
+### 📦 Featured Projects
+- **CAMBO MINI / CAMBOAS:** Lightweight POS & seller dashboard system designed for online business management.
 
 ---
 
 ### 📊 GitHub Stats
-![CAMBOAS's GitHub Stats](https://github-readme-stats.vercel.app/api?username=CAMBOAS&show_icons=true&theme=dark)
+![ART SEREYROB's GitHub Stats](https://github-readme-stats.vercel.app/api?username=CAMBOAS&show_icons=true&theme=dark)
 
 ---
 
 ### 📫 Connect with Me
-- 🌐 **Facebook:** [Your Facebook Page/Profile Link]
-- 📱 **Telegram:** [Your Telegram Link]
-- 📧 **Email:** [Your Email Address]
+- 🌐 **Facebook:** [@SEREYROB22](https://www.facebook.com/SEREYROB22)
+- 📱 **Telegram:** [@ARTSEREYROB](https://t.me/ARTSEREYROB)
