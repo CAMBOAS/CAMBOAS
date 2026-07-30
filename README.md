@@ -5,7 +5,7 @@ A Creative Digital Media Specialist, Graphic Designer & Photographer focusing on
 ---
 
 ### 👨‍💻 About Me
-- 🎨 **Graphic & Digital Fashion Design (Core):** Professional in visual art, branding, poster design, and 3D digital fashion modeling.
+- 🎨 **Graphic & Digital Fashion Design (Core):** Professional in visual art, branding, poster design.
 - 📸 **Photography & Videography (Core):** Professional in shooting high-quality photos and cinematic videos.
 - 🎬 **Video Editing & Post-Production (Core):** Experienced in advanced photo retouching, motion graphics, and high-quality video editing.
 - 🚀 **Digital Marketing:** Proficient in managing and optimizing Facebook Ads (Boost & Campaign Management) for e-commerce growth.
