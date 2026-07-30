@@ -14,9 +14,6 @@ A Web Developer, Digital Media Specialist & Graphic Designer passionate about bu
 
 ### 🛠️ Tech Stack & Creative Tools
 
-#### 💻 Programming & Web
-`HTML5` `CSS3` `JavaScript (ES6+)` `Google Sheets API` `Telegram API`
-
 #### 🎨 Design, 3D & Digital Fashion
 `Photoshop` `Illustrator` `InDesign` `CLO 3D` `Cinema 4D` `Substance 3D`
 
@@ -25,6 +22,9 @@ A Web Developer, Digital Media Specialist & Graphic Designer passionate about bu
 
 #### 📈 Marketing & Business Tools
 `Facebook Ads Manager` `POS Systems`
+
+#### 💻 Programming & Web
+`HTML5` `CSS3` `JavaScript (ES6+)` `Google Sheets API` `Telegram API`
 
 ---
 
