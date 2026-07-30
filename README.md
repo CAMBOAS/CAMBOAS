@@ -33,11 +33,6 @@ A Creative Digital Media Specialist & Graphic Designer focusing on visual art, 3
 
 ---
 
-### 📊 GitHub Stats
-![ART SEREYROB's GitHub Stats](https://github-readme-stats.vercel.app/api?username=CAMBOAS&show_icons=true&theme=dark)
-
----
-
 ### 📫 Connect with Me
 - 🌐 **Facebook:** [@SEREYROB22](https://www.facebook.com/SEREYROB22)
 - 📱 **Telegram:** [@ARTSEREYROB](https://t.me/ARTSEREYROB)
