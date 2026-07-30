@@ -1,11 +1,11 @@
 # 👋 Hi, I'm ART SEREYROB!
 
-A Creative Digital Media Specialist, Graphic Designer & Photographer focusing on visual art, 3D digital fashion, video production, and digital marketing.
+A Creative Digital Media Specialist, Graphic Designer & Photographer focusing on visual art, photo/video production, and digital marketing.
 
 ---
 
 ### 👨‍💻 About Me
-- 🎨 **Graphic & Digital Fashion Design (Core):** Professional in visual art, branding, poster design.
+- 🎨 **Graphic Design (Core):** Professional in visual art, branding, poster design, and marketing collaterals.
 - 📸 **Photography & Videography (Core):** Professional in shooting high-quality photos and cinematic videos.
 - 🎬 **Video Editing & Post-Production (Core):** Experienced in advanced photo retouching, motion graphics, and high-quality video editing.
 - 🚀 **Digital Marketing:** Proficient in managing and optimizing Facebook Ads (Boost & Campaign Management) for e-commerce growth.
@@ -15,8 +15,8 @@ A Creative Digital Media Specialist, Graphic Designer & Photographer focusing on
 
 ### 🛠️ Tech Stack & Creative Tools
 
-#### 🎨 Creative, 3D & Digital Fashion (Primary Skills)
-`Photoshop` `Lightroom` `Illustrator` `InDesign` `CLO 3D` `Cinema 4D` `Substance 3D`
+#### 🎨 Graphic Design & Photo Editing (Primary Skills)
+`Photoshop` `Lightroom` `Illustrator` `InDesign`
 
 #### 🎬 Video & Motion Graphics
 `Premiere Pro` `After Effects`
