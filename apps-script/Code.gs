@@ -593,8 +593,8 @@ function addProduct_(data) {
 }
 
 /**
- * updateProduct_ — Update Name and/or Price in NewOrder sheet by ID
- * Columns: A=ID, B=Products(name), D=Price
+ * updateProduct_ — Update Name/Price/Sale/Description in NewOrder sheet by ID
+ * Columns: A=ID, B=Products(name), D=Price, E=Sale, F=Description
  */
 function updateProduct_(id, data) {
   const ss    = SpreadsheetApp.getActiveSpreadsheet();
@@ -606,12 +606,10 @@ function updateProduct_(id, data) {
   for (let i = 0; i < ids.length; i++) {
     if (String(ids[i][0]).trim() === String(id).trim()) {
       const row = i + 2;
-      if (data.name  !== undefined && data.name  !== '') sheet.getRange(row, 2).setValue(data.name);
-      if (data.price !== undefined && data.price !== '') sheet.getRange(row, 4).setValue(Number(data.price));
-      if (data.sale  !== undefined) sheet.getRange(row, 5).setValue(Number(data.sale)  || 1);
-      if (data.box   !== undefined) sheet.getRange(row, 6).setValue(Number(data.box)   || 1);
-      if (data.pack  !== undefined) sheet.getRange(row, 7).setValue(Number(data.pack)  || 0);
-      if (data.qty   !== undefined) sheet.getRange(row, 8).setValue(Number(data.qty)   || 0);
+      if (data.name        !== undefined && data.name        !== '') sheet.getRange(row, 2).setValue(data.name);
+      if (data.price       !== undefined && data.price       !== '') sheet.getRange(row, 4).setValue(Number(data.price));
+      if (data.sale        !== undefined) sheet.getRange(row, 5).setValue(Number(data.sale) || 1);
+      if (data.description !== undefined) sheet.getRange(row, 6).setValue(data.description);
       return;
     }
   }

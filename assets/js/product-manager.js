@@ -496,7 +496,7 @@ function bindSave(){
           fetch(base, {
             method:  'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body:    JSON.stringify({ action:'updateProduct', id:origId, data:{ name:name, price:price, sale:sale, box:box, pack:pack, qty:qty } }),
+            body:    JSON.stringify({ action:'updateProduct', id:origId, data:{ name:name, price:price, sale:sale, description:sub } }),
             redirect:'follow'
           }).then(function(r){ return r.json(); }).then(function(d){
             if(d && d.ok){

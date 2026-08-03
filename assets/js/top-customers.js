@@ -28,7 +28,7 @@ async function fetchOrders() {
     if (window.CamboAPI) {
       data = await window.CamboAPI.get({action:'list', limit:'1000'});
     } else {
-      const DIRECT = 'https://script.google.com/macros/s/AKfycbyhPAP25edj3Q2hlW1yZNMW56BzsC3Hd9fH60lRZofqQnRUMcuqa-CRIo60912HGweM1w/exec';
+      const DIRECT = 'https://script.google.com/macros/s/AKfycbz6mMarHEPI2s7F8q5roKS7Is3nu1Cf3836RJJzTQ5SvtPJ612i9bh13WL1XHWN_bxpJA/exec';
       const res = await fetch(DIRECT + '?action=list&limit=1000&_=' + Date.now());
       data = await res.json();
     }

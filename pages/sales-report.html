@@ -1591,7 +1591,7 @@
         CamboOrdersData.fetchOrders(5000),
         window.CamboAPI
           ? window.CamboAPI.get({ action: 'saleinfor' })
-          : fetch('https://script.google.com/macros/s/AKfycbyhPAP25edj3Q2hlW1yZNMW56BzsC3Hd9fH60lRZofqQnRUMcuqa-CRIo60912HGweM1w/exec?action=saleinfor&_=' + Date.now()).then(function(r){ return r.json(); })
+          : fetch('https://script.google.com/macros/s/AKfycbz6mMarHEPI2s7F8q5roKS7Is3nu1Cf3836RJJzTQ5SvtPJ612i9bh13WL1XHWN_bxpJA/exec?action=saleinfor&_=' + Date.now()).then(function(r){ return r.json(); })
       ]);
       allOrders = ordersResult;
       _dataReady = true;
